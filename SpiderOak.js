@@ -31,7 +31,7 @@ var spideroak = function() {
             $.ajax({
                 url: url || storage_root,
                 type: 'POST',
-                dataType: 'jsonp',
+                dataType: 'text',
                 data: login_info,
                 success: function (data) {
                     var match = data.match(/^(login|location):(.+)$/m);
