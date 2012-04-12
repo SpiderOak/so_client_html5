@@ -7,6 +7,7 @@ $(document).bind("mobileinit", function(){
 */
 $(document).bind("mobileinit", function(){
     $.extend(  $.mobile , {
-        "defaultPageTransition": "fade"
+        "defaultPageTransition": "fade",
+        "allowCrossDomainPages": true,
     });
 });
