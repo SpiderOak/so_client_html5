@@ -20,6 +20,7 @@ $(document).ready(function() {
 /* Modular singleton pattern: */
 var spideroak = function() {
     /* private: */
+    /* "?callback=" is automatically included if $.ajax(dataType: 'jsonp') */
     var storage_root = 'https://spideroak.com/browse/login';
 
     /* public: */
@@ -33,6 +34,7 @@ var spideroak = function() {
                 type: 'POST',
                 dataType: 'text',
                 data: login_info,
+                crossDomain: true,
                 success: function (data) {
                     var match = data.match(/^(login|location):(.+)$/m);
                     if (!match) {
