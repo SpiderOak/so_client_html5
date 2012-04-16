@@ -21,7 +21,7 @@ $(document).ready(function() {
 var spideroak = function() {
     /* private: */
     /* "?callback=" is automatically included if $.ajax(dataType: 'jsonp') */
-    var storage_root = 'https://spideroak.com/browse/login';
+    var storage_root = "https://spideroak.com/storage/%s/login";
 
     /* public: */
     return {
@@ -29,8 +29,11 @@ var spideroak = function() {
             /* Nothing, yet. */
             },
         remote_login: function (login_info, url) {
+            var url = url || storage_root
+            var login_url = url.replace(/%s/,
+                                        b32encode_trim(login_info['username']));
             $.ajax({
-                url: url || storage_root,
+                url: login_url,
                 type: 'POST',
                 dataType: 'text',
                 data: login_info,
