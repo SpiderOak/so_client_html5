@@ -1,9 +1,9 @@
 /* SpiderOak html5 client Main app.
 
- * Uses:
- * - jquery.mobile-1.0.1.min.css
- * - jquery-1.6.4.min.js
- * - jquery.mobile-1.0.1.min.js
+ * Works with:
+ * - jquery.mobile-1.0.1.css
+ * - jquery-1.6.4.js
+ * - jquery.mobile-1.0.1.js
  */
 
 
