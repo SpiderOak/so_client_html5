@@ -23,17 +23,18 @@
     <div data=role="header">
       <img src="brand_images/named_logo.png" alt="Logo">
     </div>
-    <h1> Hello </h1>
+    <h1> SpiderOak </h1>
     <div class="new_login_form nav_login_storage">
       <form method="POST">
         <label for="my_login_username">Username:</label>
         <input type="text" name="username" id="my_login_username" /><br />
         <label for="my_login_password">Password:</label>
         <input type="password" name="password" id="my_login_password" /><br />
-        <input type="submit" name="Login">
+        <input type="submit" data-inline="true" data-role="button"
+               value="Login" name="Login">
+        <a href="#About" data-inline="true" data-role="button">About</a>
       </form>
     </div>
-    <a href="#About">About</a>
   </div>
   <div data-role="page" id="About">
     <div data=role="header">
@@ -41,7 +42,16 @@
     </div>
     <h1> About </h1>
     <div> SpiderOak All-Weather client 0.1 </div>
-    <a href="#Home">Home</a>
+    <a href="#Home" data-inline="true" data-role="button">Home</a>
+  </div>
+  <div data-role="page" id="storage-root">
+    <h1> Access </h1>
+    <form method="POST" id="access-view">
+      <input type="select" name="username" id="my_login_username" /><br />
+      <label for="my_login_password">Password:</label>
+      <input type="password" name="password" id="my_login_password" /><br />
+      <input type="submit" data-role="button" name="Device">
+    </form>
   </div>
 </body>
 </html>
