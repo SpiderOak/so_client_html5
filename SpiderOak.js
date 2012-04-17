@@ -48,8 +48,8 @@ var spideroak = function() {
                         alert(translate('Temporary server failure. Please'
                                         + ' try again in a few minutes.'));
                     } else if (match[1] == 'login') {
-                        /* XXX Must confirm this case */
-                        // Relay to other server.
+                        /* XXX Must confirm pong case. */
+                        // Relay to other server - pong.
                         remote_login(login_info, match[2]);
                     } else {
                         // Browser haz auth cookies, we haz relative location.
