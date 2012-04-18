@@ -20,9 +20,9 @@ $(document).ready(function() {
 /* Modular singleton pattern: */
 var spideroak = function() {
     /* private: */
-    /* "?callback=" is automatically included if $.ajax(dataType: 'jsonp') */
+    // XXX server_host_url may vary, eg according to brand/package criteria.
     var server_host_url = "https://spideroak.com";
-    var storage_login_path = "/storage/%s/login";
+    var storage_login_path = "/browse/login";
     var storage_root_path;
     /* XXX storage_node_page will likely branch to _root_ / _folder_ versions */
     var storage_root_page = "storage-root";
@@ -31,12 +31,10 @@ var spideroak = function() {
     /* public: */
     return {
         init: function () {
-            /* Nothing, yet. */
+            /* No init business yet. */
             },
         remote_login: function (login_info, url) {
-            var url = url || (server_host_url + storage_login_path)
-            var login_url = url.replace(/%s/,
-                                        b32encode_trim(login_info['username']));
+            var login_url = url || (server_host_url + storage_login_path);
             $.ajax({
                 url: login_url,
                 type: 'POST',
@@ -50,12 +48,13 @@ var spideroak = function() {
                     } else if (match[1] == 'login') {
                         /* XXX Must confirm pong case. */
                         // Relay to other server - pong.
-                        remote_login(login_info, match[2]);
+                        spideroak.remote_login(login_info,
+                                               server_host_url + match[2]);
                     } else {
                         // Browser haz auth cookies, we haz relative location.
                         storage_root_path = match[2];
                         spideroak.visit_storage_node(server_host_url,
-                                                storage_root_path);
+                                                     storage_root_path);
                     }
                 },
                 error: function (xhr) {
@@ -75,8 +74,8 @@ var spideroak = function() {
                   + storage_host_url + "\n   path: " + storage_path);
             $.ajax({
                 url: storage_host_url + storage_path,
-                type: 'POST',
-                dataType: 'text',
+                type: 'GET',
+                dataType: 'json',
                 success: function (data) {
                     alert(storage_host_url + storage_path + " data:\n"
                           + data);
@@ -88,6 +87,9 @@ var spideroak = function() {
                     } else if (xhr.status == 404) {
                         /* XXX Elaborate. */
                         alert(translate('404'));
+                    } else if (xhr.status == 405) {
+                        /* XXX Elaborate. */
+                        alert(translate('Whoops - method not allowed.'));
                     } else {
                         alert(translate('Temporary server failure. Please'
                                         + ' try again in a few minutes.'));
