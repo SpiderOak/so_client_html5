@@ -21,10 +21,10 @@ $(document).ready(function() {
 var spideroak = function() {
     /* private: */
     // XXX server_host_url may vary, eg according to brand/package criteria.
-    var server_host_url = "https://spideroak.com";
+    var default_server_host_url = "https://spideroak.com";
+    var server_host_url;
     var storage_login_path = "/browse/login";
     var storage_root_path;
-    /* XXX storage_node_page will likely branch to _root_ / _folder_ versions */
     var storage_root_page = "storage-root";
     var storage_folder_page = "storage-folder";
 
@@ -34,7 +34,14 @@ var spideroak = function() {
             /* No init business yet. */
             },
         remote_login: function (login_info, url) {
-            var login_url = url || (server_host_url + storage_login_path);
+            var login_url;
+            if (url && (url.slice(0,4) == "http")) {
+                server_host_url = url.split('/').slice(0,3).join('/');
+                login_url = url
+            } else {
+                server_host_url = default_server_host_url;
+                login_url = server_host_url + storage_login_path;
+            }
             $.ajax({
                 url: login_url,
                 type: 'POST',
@@ -46,10 +53,7 @@ var spideroak = function() {
                         alert(translate('Temporary server failure. Please'
                                         + ' try again in a few minutes.'));
                     } else if (match[1] == 'login') {
-                        /* XXX Must confirm pong case. */
-                        // Relay to other server - pong.
-                        spideroak.remote_login(login_info,
-                                               server_host_url + match[2]);
+                        spideroak.remote_login(login_info, match[2]);
                     } else {
                         // Browser haz auth cookies, we haz relative location.
                         storage_root_path = match[2];
