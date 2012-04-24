@@ -24,9 +24,19 @@ var spideroak = function() {
     var default_server_host_url = "https://spideroak.com";
     var server_host_url;
     var storage_login_path = "/browse/login";
-    var storage_root_path;
-    var storage_root_page = "storage-root";
-    var storage_folder_page = "storage-folder";
+    var storage_path;
+    // API v1 (per https://spideroak.com/apis/partners/web_storage_api)
+    var storage_root = "https://spideroak.com/storage/";
+    var share_root = "https://spideroak.com/share/";
+    // Proposed API v2 (per https://spideroak.com/pandora/wiki/NewJsonObjectApi)
+    //var storage_root = "https://spideroak.com/webapi2/storage/";
+    //var share_root = "https://spideroak.com/webapi2/share/";
+    //var mobile_root = "https://spideroak.com/webapi2/mobile/";
+    var storage_root_user;
+    var share_root_user;
+    var storage_root_page_type = "storage-root";
+    var storage_folder_page_type = "storage-folder";
+    var device_info_query = '?device_info=yes';
 
     /* public: */
     return {
@@ -35,7 +45,7 @@ var spideroak = function() {
             },
         remote_login: function (login_info, url) {
             var login_url;
-            if (url && (url.slice(0,4) == "http")) {
+            if (url && (url.slice(0,4) === "http")) {
                 server_host_url = url.split('/').slice(0,3).join('/');
                 login_url = url
             } else {
@@ -52,19 +62,24 @@ var spideroak = function() {
                     if (!match) {
                         alert(translate('Temporary server failure. Please'
                                         + ' try again in a few minutes.'));
-                    } else if (match[1] == 'login') {
-                        spideroak.remote_login(login_info, match[2]);
+                    } else if (match[1] === 'login') {
+                        if (match[2].charAt(0) === "/") {
+                            login_url = server_host_url + match[2];
+                        } else {
+                            login_url = match[2];
+                        }
+                        spideroak.remote_login(login_info, login_url);
                     } else {
                         // Browser haz auth cookies, we haz relative location.
-                        storage_root_path = match[2];
-                        spideroak.visit_storage_node(server_host_url,
-                                                     storage_root_path);
+                        storage_path = match[2];
+                        spideroak.set_storage_user(login_info['username']);
+                        spideroak.visit_storage_devices();
                     }
                 },
                 error: function (xhr) {
-                    if (xhr.status == 403) {
+                    if (xhr.status === 403) {
                         alert(translate('Incorrect username or password.'));
-                    } else if (xhr.status == 404) {
+                    } else if (xhr.status === 404) {
                         alert(translate('Incorrect ShareID or RoomKey.'));
                     } else {
                         alert(translate('Temporary server failure. Please'
@@ -73,32 +88,41 @@ var spideroak = function() {
                 }
             });
         },
-        visit_storage_node: function (storage_host_url, storage_path) {
-            alert("visit_storage_node:\n   host: "
-                  + storage_host_url + "\n   path: " + storage_path);
+        set_storage_user: function (username) {
+            /* Associate the username with the SpiderOak instance. */
+            storage_root_user = storage_root + b32encode_trim(username) + "/";
+        },
+        visit_storage_devices: function () {
+            /* Visit the device directory, asking for detailed device info. */
+            spideroak.visit_storage_node("", device_info_query);
+        },
+        visit_storage_node: function (storage_path, query) {
+            var storage_url = storage_root_user + storage_path
+            if (typeof query !== 'undefined') { storage_url += query; }
+            alert("visit_storage_node: " + storage_url + "\n");
             $.ajax({
-                url: storage_host_url + storage_path,
+                url: storage_url,
                 type: 'GET',
                 dataType: 'json',
                 success: function (data) {
-                    alert(storage_host_url + storage_path + " data:\n"
+                    alert("visit_storage_node " + storage_url + " got:\n"
                           + data);
                     },
                 error: function (xhr) {
-                    if (xhr.status == 403) {
+                    if (xhr.status === 403) {
                         /* XXX Elaborate. */
                         alert(translate('403'));
-                    } else if (xhr.status == 404) {
+                    } else if (xhr.status === 404) {
                         /* XXX Elaborate. */
                         alert(translate('404'));
-                    } else if (xhr.status == 405) {
+                    } else if (xhr.status === 405) {
                         /* XXX Elaborate. */
                         alert(translate('Whoops - method not allowed.'));
                     } else {
                         alert(translate('Temporary server failure. Please'
                                         + ' try again in a few minutes.'));
                     }
-                }
+                },
             });
         }
     }
