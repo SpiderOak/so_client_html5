@@ -77,14 +77,7 @@ var spideroak = function() {
                     }
                 },
                 error: function (xhr) {
-                    if (xhr.status === 403) {
-                        alert(translate('Incorrect username or password.'));
-                    } else if (xhr.status === 404) {
-                        alert(translate('Incorrect ShareID or RoomKey.'));
-                    } else {
-                        alert(translate('Temporary server failure. Please'
-                                        + ' try again in a few minutes.'));
-                    }
+                    spideroak.handle_error_statuses("Login", xhr);
                 }
             });
         },
@@ -106,24 +99,26 @@ var spideroak = function() {
                 dataType: 'json',
                 success: function (data) {
                     alert("visit_storage_node " + storage_url + " got:\n"
-                          + data);
+                          + JSON.stringify(data));
                     },
                 error: function (xhr) {
-                    if (xhr.status === 403) {
-                        /* XXX Elaborate. */
-                        alert(translate('403'));
-                    } else if (xhr.status === 404) {
-                        /* XXX Elaborate. */
-                        alert(translate('404'));
-                    } else if (xhr.status === 405) {
-                        /* XXX Elaborate. */
-                        alert(translate('Whoops - method not allowed.'));
-                    } else {
-                        alert(translate('Temporary server failure. Please'
-                                        + ' try again in a few minutes.'));
-                    }
+                    spideroak.handle_error_statuses("Storage Visit", xhr);
                 },
             });
-        }
+        },
+        handle_error_statuses: function (purpose, xhr) {
+            var msg = purpose + ": ";
+            if (xhr.status === 401) {
+                msg += 'Unauthorized.';
+            } else if (xhr.status === 403) {
+                msg += 'Incorrect username or password.';
+            } else if (xhr.status === 404) {
+                msg += 'Incorrect ShareID or RoomKey.';
+            } else {
+                msg += ('Temporary server failure. Please'
+                        + ' try again in a few minutes.');
+            }
+            alert(translate(msg));
+        },
     }
 }();
