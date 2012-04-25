@@ -4,8 +4,10 @@
  * - jquery.mobile-1.0.1.css
  * - jquery-1.6.4.js
  * - jquery.mobile-1.0.1.js
+ * - misc.js
  */
 
+SO_DEBUGGING = true;            // for misc.js:blather()
 
 $(document).ready(function() {
     spideroak.init();
