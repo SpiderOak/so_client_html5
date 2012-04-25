@@ -22,8 +22,8 @@ $(document).ready(function() {
 /* Modular singleton pattern: */
 var spideroak = function() {
     /* private: */
-    // XXX server_host_url may vary, eg according to brand/package criteria.
     var default_locations = {
+        // XXX host_url may need variability according to brand package.
         host_url: "https://spideroak.com",
         storage_login_path: "/browse/login",
         // API v1 per https://spideroak.com/apis/partners/web_storage_api:
@@ -33,6 +33,7 @@ var spideroak = function() {
         share_root: "https://spideroak.com/share/",
         storage_page_div_type: "storage-root",
         storage_folder_div_type: "storage-folder",
+        device_info_query: '?device_info=yes',
     };
     var my = {
         host_url: null,
@@ -40,7 +41,6 @@ var spideroak = function() {
         username: null,
         storage_web_url: null,  // Hardly relevant - web UI for  user's storage.
     };
-    var device_info_query = '?device_info=yes';
 
     /* public: */
     return {
@@ -103,7 +103,8 @@ var spideroak = function() {
         },
         visit_storage_devices: function () {
             /* Visit the device directory, asking for detailed device info. */
-            spideroak.visit_storage_node("/", device_info_query);
+            spideroak.visit_storage_node("/",
+                                         default_locations.device_info_query);
         },
         visit_storage_node: function (storage_path, query_string) {
             /* Focus on storage_path relative to user's storage root URL.
