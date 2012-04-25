@@ -77,7 +77,7 @@ var spideroak = function() {
                     }
                 },
                 error: function (xhr) {
-                    spideroak.handle_error_statuses("Login", xhr);
+                    error_alert("SpiderOak Login", xhr);
                 }
             });
         },
@@ -102,23 +102,24 @@ var spideroak = function() {
                           + JSON.stringify(data));
                     },
                 error: function (xhr) {
-                    spideroak.handle_error_statuses("Storage Visit", xhr);
+                    error_alert("SpiderOak Storage Visit", xhr);
                 },
             });
         },
-        handle_error_statuses: function (purpose, xhr) {
-            var msg = purpose + ": ";
-            if (xhr.status === 401) {
-                msg += 'Unauthorized.';
-            } else if (xhr.status === 403) {
-                msg += 'Incorrect username or password.';
-            } else if (xhr.status === 404) {
-                msg += 'Incorrect ShareID or RoomKey.';
-            } else {
-                msg += ('Temporary server failure. Please'
-                        + ' try again in a few minutes.');
-            }
-            alert(translate(msg));
-        },
     }
 }();
+
+function error_alert(purpose, xhr) {
+    var msg = purpose + ": ";
+    if (xhr.status === 401) {
+        msg += 'Unauthorized.';
+    } else if (xhr.status === 403) {
+        msg += 'Incorrect username or password.';
+    } else if (xhr.status === 404) {
+        msg += 'Incorrect ShareID or RoomKey.';
+    } else {
+        msg += ('Temporary server failure. Please'
+                + ' try again in a few minutes.');
+    }
+    alert(translate(msg));
+}
