@@ -1,5 +1,7 @@
-/* Stub translate function for eventual i8n. */
+SO_DEBUGGING = false;            // for blather(), below.
+
 function translate(text) {
+    /* Stub translate function for eventual i8n. */
     return text
 };
 
@@ -60,4 +62,10 @@ b32encode = function(s) {
     for (i = 0; i < replace; i++) parts.pop();
     for (i = 0; i < replace; i++) parts.push("=");
     return parts.join("");
+}
+
+function blather(msg) {
+    if (SO_DEBUGGING) {
+        alert(msg);
+    }
 }
