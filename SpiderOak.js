@@ -30,8 +30,8 @@ var spideroak = function() {
         storage_path: "/storage/",
         share_path: "/share/",
         storage_root_page_id: "storage-root",
-        devices_query: '?device_info=yes',
-    };
+        devices_query_string: '?device_info=yes',
+    }
     var my = {
         host_url: null,
         storage_path: null,
@@ -39,46 +39,104 @@ var spideroak = function() {
         storage_web_url: null,  // Likely irrelevant - user's storage web UI.
         storage: [],
         shares: [],
-    };
+    }
     var devices = [];
 
-    function StorageNode(path, parent, device) {
-        /* Represent a storage directory.
-           - Device StorageNodes path is '/' and they have no specified parent
-             or device (undefined).
-           - The data structure includes cycles, so we need to deliberately
-             release obsolete or excessive nodes to avoid memory leaks.
+    function set_account(username, host_url,
+                                   storage_path, storage_web_url) {
+        /* Register user-specific storage details. */
+        my.username = username;
+        my.host_url = host_url;
+        my.storage_path = storage_path;
+        my.storage_root_url = (my.host_url
+                               + my.storage_path
+                               + b32encode_trim(username));
+        my.storage_web_url = storage_web_url;
+    }
+    // 'storage_node_by_path' registry initially always accumulates.
+    // TODO soon: release and delete a node when ascending above it.
+    // Eventually, if useful:
+    // - prefetch offspring layer and defer release til 2 layers above.
+    // - make fetch of multiple items contingent to device lastcommit time.
+    storage_node_by_path = {};   // A registry of StorageNodes.
+    function get_storage_node(path, parent) {
+        /* Return a StorageNode for specified 'path'.
+           Second arg 'parent' is optional.
+         */
+        return storage_node_by_path[path] || (storage_node_by_path[url] =
+                                              StorageNode(path, parent));
+    }
+    function StorageNode(path, parent) {
+        /* Represent a storage device, directory, or file.
+           - 'path' is relative to the storage root, must start with '/'.
+           - 'parent' is containing StorageNode, unspecified (undefined) parent.
+           - Data structure includes cycles, must be broken to release storage.
            See below for 'Device storage node example json data'.
         */
         if ( !(this instanceof arguments.callee) )
             throw new Error("Constructor called as a function");
+
+        /* Instance: */
         this.path = path;
         this.parent = parent;
-        this.device = device;
         this.set_page_id();
-        this.contents = [];
-    };
-    StorageNode.prototype.release = function() {
-        /* Extricate node from potential reference cycles, for eventual GC. */
-        // We extricate by deleting reference links...
-        delete this.device;
-        delete this.parent;
-        delete this.contents;
-    };
+        this.contents = [];     // Immediate contents of an individual node.
+        this.lastfetched = false;
+    }
     StorageNode.prototype.set_page_id = function() {
-        // Currently, every StorageNode has the same page_id.
+        /* Set the UI page id, acording to stored characteristics. */
+        // TODO: Use separate pages for separate nodes.
         this.page_id = (this.parent
                         ? this.parent.get_page_id()
                         : SpiderOak.storage_root_page_id); };
     StorageNode.prototype.get_page_id = function() {
-        return this.page_id;};
+        /* Return the UI page id. */
+        return this.page_id;}
     StorageNode.prototype.present = function() {
-        /* Display this node on the page. */
-        var page = $("#" + this.get_page_id()); };
+        /* Display on my UI page. */
+        var page = $("#" + this.get_page_id()); }
     StorageNode.prototype.set_contents = function(data) {
         /* Populate the node with retrieved json data. */
-        alert("Storage node <" + this.path);
-    };
+        alert("Set contents <Storage node " + this.path + ">");
+    }
+    StorageNode.prototype.up_to_date = function() {
+        /* True if StorageNode instance is populated with . */
+        // Eventually, this can be tested against the device lastcommit time.
+        return ! this.lastfetched || (this.lastfetched >= new Date().getTime());
+    }
+    StorageNode.prototype.release = function() {
+        /* Remove potential reference cycles, for GC. */
+        delete this.parent;
+        delete this.contents;
+    }
+    StorageNode.prototype.present_self = function(data) {
+        /* Receive root data and present it in the UI. */
+    }
+
+    StorageNode.prototype.fetch_data_and_dispatch = function(
+        path, do_root, success_callback, failure_callback) {
+        /* Retrieve data for 'path' within user's storage root URL.
+           - 'path' must begin with '/'.
+           - True-ish 'do_root' means get data for root storage node.
+           - 'success_callback' gets retrived data if retrieval succeeds.
+           - 'failure_callback' called with XMLHttpResponse object if retrieval
+             fails.
+        */
+        var storage_url = my.storage_root_url + storage_path;
+        if (do_root) {
+            storage_url += defaults.devices_query_string; }
+        $.ajax({url: storage_url,
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    // Relaying here is handy for debugging breakpoint.
+                    success_callback(data);
+                },
+                error: function (xhr) {
+                    failure_callback(xhr);
+            },
+        });
+    }
 
     /* public: */
     return {
@@ -103,13 +161,12 @@ var spideroak = function() {
              */
             var login_url;
             var server_host_url;
-            if (url && (url.slice(0,4) === "http")) {
-                server_host_url = url.split('/').slice(0,3).join('/');
-                login_url = url
+            if (url && url.match("https?:")) {
+                server_host_url = split_url(url)[0];
+                login_url = url;
             } else {
                 server_host_url = defaults.host_url;
-                login_url = (server_host_url
-                             + defaults.storage_login_path);
+                login_url = (server_host_url + defaults.storage_login_path);
             }
             $.ajax({
                 url: login_url,
@@ -130,12 +187,11 @@ var spideroak = function() {
                         spideroak.remote_login(login_info, login_url);
                     } else {
                         // Browser haz auth cookies, we haz relative location.
-                        spideroak.set_storage_specifics(
-                            login_info['username'],
-                            server_host_url,
-                            defaults.storage_path,
-                            match[2]);
-                        spideroak.visit_storage_devices();
+                        spideroak.set_account(login_info['username'],
+                                              server_host_url,
+                                              defaults.storage_path,
+                                              match[2]);
+                        spideroak.visit_storage_root();
                     }
                 },
                 error: function (xhr) {
@@ -143,48 +199,16 @@ var spideroak = function() {
                 }
             });
         },
-        set_storage_specifics: function (username, host_url,
-                                         storage_path, storage_web_url) {
-            /* Register user-specific storage details. */
-            my.username = username;
-            my.host_url = host_url;
-            my.storage_path = storage_path;
-            my.storage_root_url = (my.host_url
-                                   + my.storage_path
-                                   + b32encode_trim(username));
-            my.storage_web_url = storage_web_url;
-        },
 
         /* Browse storage. */
-
-        retrieve_storage_data: function (storage_path, query_string,
-                                         success_callback, failure_callback) {
-            /* Retrieve data for storage_path within user's storage root URL.
-               - Retrived data is passed to the success_callback.
-               - If retrieval fails, the XMLHttpResponse object is passed to
-                 the failure_callback.
-               - storage_path must begin with '/'.
-               - query_string, if present, is appended, for e.g. device_info.
-            */
-            var storage_url = my.storage_root_url + storage_path;
-            if (typeof query_string !== 'undefined') {
-                storage_url += query_string; }
-            $.ajax({
-                url: storage_url,
-                type: 'GET',
-                dataType: 'json',
-                success: function (data) {
-                    success_callback(data);
-                },
-                error: function (xhr) {
-                    failure_callback(xhr);
-                },
-            });
-        },
-        visit_storage_devices: function () {
+        visit_storage_root: function () {
             /* Retrieve detailed data for users's devices and present them. */
-            return spideroak.visit_storage_node("/", defaults.devices_query);
+            StorageNode.retrieve_and_handle_data(
+                "/", true,
+                StorageNode.present_root,
+                StorageNode.handle_root_visit_failure);
         },
+
     }
 }();
 

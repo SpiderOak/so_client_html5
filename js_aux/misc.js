@@ -14,7 +14,7 @@ $(document).ready(function() {
     $.event.props = $.event.props.join('|').replace('layerX|layerY|', '').split('|');
 })
 
-/* Object instantiation convenience, from Douglas Crockford */
+/* Object instantiation convenience, per Douglas Crockford: */
 // if (typeof Object.beget !== 'function') {
 //      Object.beget = function (o) {
 //         var F = function () {};
@@ -62,6 +62,29 @@ b32encode = function(s) {
     for (i = 0; i < replace; i++) parts.pop();
     for (i = 0; i < replace; i++) parts.push("=");
     return parts.join("");
+}
+
+
+function error_alert(purpose, status_code) {
+    var msg = purpose + ": ";
+    if (status_code === 401) {
+        msg += 'Unauthorized.';
+    } else if (status_code === 403) {
+        msg += 'Incorrect username or password.';
+    } else if (status_code === 404) {
+        msg += 'Incorrect ShareID or RoomKey.';
+    } else {
+        msg += ('Temporary server failure. Please'
+                + ' try again in a few minutes.');
+    }
+    alert(translate(msg));
+}
+
+function split_url(url) {
+    /* Return two-element array with the ["proto://host.domain", "/path..."]
+       Very simple splitting and rejoining - no error checking, etc. */
+    var splat = url.split('/');
+    return [splat.slice(0,3).join('/'), "/" + splat.slice(3).join('/')];
 }
 
 function blather(msg) {
