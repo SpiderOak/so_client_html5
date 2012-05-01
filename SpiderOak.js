@@ -42,8 +42,7 @@ var spideroak = function() {
     }
     var devices = [];
 
-    function set_account(username, host_url,
-                                   storage_path, storage_web_url) {
+    function set_account(username, host_url, storage_path, storage_web_url) {
         /* Register user-specific storage details. */
         my.username = username;
         my.host_url = host_url;
@@ -53,19 +52,6 @@ var spideroak = function() {
                                + b32encode_trim(username));
         my.storage_web_url = storage_web_url;
     }
-    // 'storage_node_by_path' registry initially always accumulates.
-    // TODO soon: release and delete a node when ascending above it.
-    // Eventually, if useful:
-    // - prefetch offspring layer and defer release til 2 layers above.
-    // - make fetch of multiple items contingent to device lastcommit time.
-    storage_node_by_path = {};   // A registry of StorageNodes.
-    function get_storage_node(path, parent) {
-        /* Return a StorageNode for specified 'path'.
-           Second arg 'parent' is optional.
-         */
-        return storage_node_by_path[path] || (storage_node_by_path[url] =
-                                              StorageNode(path, parent));
-    }
     function StorageNode(path, parent) {
         /* Represent a storage device, directory, or file.
            - 'path' is relative to the storage root, must start with '/'.
@@ -73,82 +59,149 @@ var spideroak = function() {
            - Data structure includes cycles, must be broken to release storage.
            See below for 'Device storage node example json data'.
         */
-        if ( !(this instanceof arguments.callee) )
+        if ( !(this instanceof StorageNode) )
             throw new Error("Constructor called as a function");
 
         /* Instance: */
         this.path = path;
+        this.is_device = false;
         this.parent = parent;
-        this.set_page_id();
         this.contents = [];     // Immediate contents of an individual node.
+        this.set_page_id();
         this.lastfetched = false;
     }
-    StorageNode.prototype.set_page_id = function() {
-        /* Set the UI page id, acording to stored characteristics. */
-        // TODO: Use separate pages for separate nodes.
-        this.page_id = (this.parent
-                        ? this.parent.get_page_id()
-                        : SpiderOak.storage_root_page_id); };
-    StorageNode.prototype.get_page_id = function() {
-        /* Return the UI page id. */
-        return this.page_id;}
-    StorageNode.prototype.present = function() {
-        /* Display on my UI page. */
-        var page = $("#" + this.get_page_id()); }
-    StorageNode.prototype.set_contents = function(data) {
-        /* Populate the node with retrieved json data. */
-        alert("Set contents <Storage node " + this.path + ">");
+    StorageNode.prototype.visit = function() {
+        /* Get up-to-date with remote copy and show. */
+        if (! this.up_to_date()) {
+            // We use 'node' because 'this' gets replaced when success_handler
+            // is actually running, so we need to use a var in lexical scope:
+            var node = this; var success_handler = function(data, when) {
+                node.provision(data, when); node.show(); }
+
+            this.fetch_and_dispatch(success_handler, this.handle_failed_visit);
+
+        } else {
+            this.show();
+        }
     }
-    StorageNode.prototype.up_to_date = function() {
-        /* True if StorageNode instance is populated with . */
-        // Eventually, this can be tested against the device lastcommit time.
-        return ! this.lastfetched || (this.lastfetched >= new Date().getTime());
+    StorageNode.prototype.handle_failed_visit = function(xhr) {
+        /* Do error handling failed visit with 'xhr' XMLHttpResponse report. */
+        // TODO: Proper error handling.
+        error_alert("Failure reaching " + this.path, xhr.status);
+    }
+    StorageNode.prototype.provision = function(data, when) {
+        /* Provision with JSON 'data'.
+           Optional 'when' specifies the time at which the data was updated. */
+        // >>>
+        if (! when) {
+            // Ideally, when was captured before the Ajax call, to prevent the
+            // claimed provision time being at all after the actual fetch.
+            when = new Date();
+        }
+        this.up_to_date(when);
+        // XXX Set this.is_device if it, um, is.
+        alert(this + ".provision(" + JSON.stringify(data).slice(0,25) + "...)");
+    }
+    StorageNode.prototype.show = function() {
+        /* Present self in the UI. */
+        var page = $("#" + this.get_page_id());
+        // >>>
+        alert(this + ".show(" + 
+              + "... on page" + page);
+    }
+    StorageNode.prototype.is_root = function() {
+        /* True if the node is a storage device entry. */
+        return (this.path === "/");
+    }
+    StorageNode.prototype.is_device = function() {
+        /* True if the node is a storage device entry. */
+        return this.is_device;
     }
     StorageNode.prototype.release = function() {
         /* Remove potential reference cycles, for GC. */
         delete this.parent;
         delete this.contents;
     }
-    StorageNode.prototype.present_self = function(data) {
-        /* Receive root data and present it in the UI. */
+    StorageNode.prototype.set_page_id = function() {
+        /* Set the UI page id, acording to stored characteristics. */
+        // TODO: Allocate and manage pages - probably per node.
+        this.page_id = (this.parent
+                        ? this.parent.get_page_id()
+                        : defaults.storage_root_page_id);
     }
-
-    StorageNode.prototype.fetch_data_and_dispatch = function(
-        path, do_root, success_callback, failure_callback) {
-        /* Retrieve data for 'path' within user's storage root URL.
-           - 'path' must begin with '/'.
-           - True-ish 'do_root' means get data for root storage node.
-           - 'success_callback' gets retrived data if retrieval succeeds.
-           - 'failure_callback' called with XMLHttpResponse object if retrieval
-             fails.
+    StorageNode.prototype.get_page_id = function() {
+        /* Return the UI page id. */
+        return this.page_id;
+    }
+    StorageNode.prototype.up_to_date = function(when) {
+        /* True if provisioned data is current.
+           Optional 'when' specifies (new) time we were fetched. */
+        if (when) {this.lastfetched = when;}
+        if (! this.lastfetched) { return false; }
+        // XXX: Currently, never up to date! Must actually test against the
+        //      device lastcommit time.
+        else { return (this.lastfetched >= new Date().getTime()); }
+    }
+    StorageNode.prototype.fetch_and_dispatch = function(success_callback,
+                                                        failure_callback) {
+        /* Retrieve this node's data.
+           - On success, 'success_callback' gets retrived data and Date() soon
+             before the Ajax call.
+           - Otherwise, 'failure_callback' called with XMLHttpResponse object.
         */
-        var storage_url = my.storage_root_url + storage_path;
-        if (do_root) {
-            storage_url += defaults.devices_query_string; }
+
+        var storage_url = my.storage_root_url + this.path;
+        var when = new Date();
+        if (this.is_root()) {storage_url += defaults.devices_query_string; }
         $.ajax({url: storage_url,
                 type: 'GET',
                 dataType: 'json',
-                success: function (data) {
-                    // Relaying here is handy for debugging breakpoint.
-                    success_callback(data);
+                success: function(data) {
+                    success_callback(data, when);
                 },
-                error: function (xhr) {
-                    failure_callback(xhr);
-            },
-        });
+                error: failure_callback,
+               })
+    };
+    StorageNode.prototype.toString = function() {
+        return "<Storage node " + this.path + ">";
     }
+
+var storage_node_manager = function () {
+        /* A singleton for getting objects representing storage nodes,
+           finding existing ones or else allocating new ones.
+         */
+        // TODO: Delete node when ascending above them.
+        // TODO Eventually, if useful:
+        // - prefetch offspring layer and defer release til 2 layers above.
+        // - make fetch of multiple items contingent to device lastcommit time.
+        var by_path = {};
+        return {
+            get: function (path, parent) {
+                /* Get an existing storage node object by 'path', else
+                   allocate a new one. Optional 'parent' is only used for
+                   assignment to new ones.  We do not fetch remote data. */
+                return (by_path[path]
+                        || (by_path[path] = new StorageNode(path, parent)));
+            },
+            delete: function(node) {
+                /* Remove a storage node object, eliminating references
+                   that could be circular and prevent GC. */
+                delete by_path[node.path];
+                node.release();
+                delete node;
+            }
+        }
+    }()
 
     /* public: */
     return {
         init: function () {/* No init business yet. */},
         toString: function () {
-            var user = (my.username ? "user " + my.username : "no user");
-            var storage = (my.storage.length
-                           ? "storage " + my.storage : "no storage");
-            var shares = (my.shares.length
-                          ? ("shares " + my.shares) : "no shares");
-            return ("SpiderOak instance for "
-                    + user + ", " + storage + ", " + shares);
+            var user = (my.username ? my.username : "-");
+            var storage = (my.storage.length ? my.storage : "-");
+            var shares = (my.shares.length ? my.shares : "-");
+            return ("SpiderOak instance (user "
+                    +user+ ", storage " +storage+ ", shares " +shares+ ")");
         },
 
         /* Login and account/identity. */
@@ -187,7 +240,7 @@ var spideroak = function() {
                         spideroak.remote_login(login_info, login_url);
                     } else {
                         // Browser haz auth cookies, we haz relative location.
-                        spideroak.set_account(login_info['username'],
+                        set_account(login_info['username'],
                                               server_host_url,
                                               defaults.storage_path,
                                               match[2]);
@@ -203,12 +256,9 @@ var spideroak = function() {
         /* Browse storage. */
         visit_storage_root: function () {
             /* Retrieve detailed data for users's devices and present them. */
-            StorageNode.retrieve_and_handle_data(
-                "/", true,
-                StorageNode.present_root,
-                StorageNode.handle_root_visit_failure);
+            var root = storage_node_manager.get("/");
+            root.visit();
         },
-
     }
 }();
 
