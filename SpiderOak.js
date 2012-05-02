@@ -52,88 +52,140 @@ var spideroak = function() {
                                + b32encode_trim(username));
         my.storage_web_url = storage_web_url;
     }
+
+    /* Various storage node types - the root, devices, directories, and
+       files - are implemented based on a generic StorageNode object.
+       Departures from the basic functionality are implemented as distinct
+       prototype functions defined immediately after the generic ones.
+
+       The generic functions are for container-style nodes, since that is
+       the prevailing type.
+    */
+
     function StorageNode(path, parent) {
         /* Represent a storage device, directory, or file.
            - 'path' is relative to the storage root, must start with '/'.
            - 'parent' is containing StorageNode, unspecified (undefined) parent.
-           - Data structure includes cycles, must be broken to release storage.
            See below for 'Device storage node example json data'.
         */
         if ( !(this instanceof StorageNode) )
             throw new Error("Constructor called as a function");
+        if (path) {             // Skip if we're in prototype assignment.
+            this.path = path;
+            this.parent_path = parent ? parent.path : null;
+            this.device_path = parent ? parent.device_path : null;
+            this.is_container = true;
+            this.sub = []; // Paths of contained devices, directories.
+            this.files = [];         // Paths of contained files.
+            this.set_page_id();
+            this.lastfetched = false;
+            this.general_setup(path, parent);
 
-        /* Instance: */
-        this.path = path;
-        this.is_device = false;
-        this.parent = parent;
-        this.contents = [];     // Immediate contents of an individual node.
-        this.set_page_id();
-        this.lastfetched = false;
+            // For type-specific setup, if any:
+            this.distinct_setup(path, parent);
+        }
     }
-    StorageNode.prototype.visit = function() {
+    // All of the derived objects use StorageNode's constructor.
+    function RootStorageNode(path, parent) {};
+    RootStorageNode.prototype = new StorageNode();
+    function DeviceStorageNode(path, parent) {};
+    DeviceStorageNode.prototype = new StorageNode();
+    function DirectoryStorageNode(path, parent) {};
+    DirectoryStorageNode.prototype = new StorageNode();
+    function FileStorageNode(path, parent) {};
+    FileStorageNode.prototype = new StorageNode();
+
+    StorageNode.prototype.distinct_setup = function (path, parent) {
+        /* Distinct setup to be overridden in derived objects that need it. */
+    }
+    FileStorageNode.prototype.distinct_setup = function (path, parent) {
+        // Distinguish from containers:
+        this.is_container = false;
+        delete this.sub;
+        delete this.files;
+    }
+
+    StorageNode.prototype.visit = function () {
         /* Get up-to-date with remote copy and show. */
         if (! this.up_to_date()) {
-            // We use 'node' because 'this' gets replaced when success_handler
-            // is actually running, so we need to use a var in lexical scope:
-            var node = this; var success_handler = function(data, when) {
-                node.provision(data, when); node.show(); }
-
-            this.fetch_and_dispatch(success_handler, this.handle_failed_visit);
-
+            // We use 'this_node' because 'this' gets overriden when
+            // success_handler is actually running, so we another
+            // lexically scoped var.
+            var this_node = this;
+            var success_handler = function (data, when) {
+                this_node.provision(data, when);
+                this_node.show();
+            }
+            this.fetch_and_dispatch(success_handler,
+                                    this_node.handle_failed_visit);
         } else {
             this.show();
         }
     }
-    StorageNode.prototype.handle_failed_visit = function(xhr) {
+    StorageNode.prototype.handle_failed_visit = function (xhr) {
         /* Do error handling failed visit with 'xhr' XMLHttpResponse report. */
         // TODO: Proper error handling.
         error_alert("Failure reaching " + this.path, xhr.status);
     }
-    StorageNode.prototype.provision = function(data, when) {
-        /* Provision with JSON 'data'.
-           Optional 'when' specifies the time at which the data was updated. */
-        // >>>
+    StorageNode.prototype.provision = function (data, when) {
+        /* Populate node with JSON 'data'. 'when' is the data's current-ness.
+           'when' should be no more recent than the XMLHttpRequest.
+        */
+        this.provision_preliminaries(data, when);
+        this.provision_populate(data, when);
+    }
+    StorageNode.prototype.provision_preliminaries = function (data, when) {
+        /* Do provisioning stuff generally useful for derived types. */
         if (! when) {
-            // Ideally, when was captured before the Ajax call, to prevent the
-            // claimed provision time being at all after the actual fetch.
-            when = new Date();
+            throw new Error("Node provisioning without reliable time stamp.");
         }
         this.up_to_date(when);
-        // XXX Set this.is_device if it, um, is.
-        alert(this + ".provision(" + JSON.stringify(data).slice(0,25) + "...)");
     }
-    StorageNode.prototype.show = function() {
+    StorageNode.prototype.provision_populate = function (data, when) {
+        /* Stub, must be overridden by type-specific provisionings. */
+        throw new Error("Type-specific provisioning implementaiton missing.")
+    }
+    RootStorageNode.prototype.provision_populate = function (data, when) {
+        /* Embody the root storage node with 'data'. */
+        var mgr = storage_node_manager
+        var dev;
+        mgr.stats = data["stats"];
+        for (devdata in data["devices"]) {
+            path = "/" + devdata["encoded"]
+            dev = mgr.get(path, this)
+            dev.name = devdata["name"];
+            dev.lastlogin = devdata["lastlogin"];
+            dev.lastcommit = devdata["lastcommit"];
+            dev.lastfetched = when;
+            if (! $.inArray(path, this.sub)) {
+                this.sub.push(path);
+            }
+        }
+    }
+
+    StorageNode.prototype.show = function () {
         /* Present self in the UI. */
         var page = $("#" + this.get_page_id());
         // >>>
         alert(this + ".show(" + 
               + "... on page" + page);
     }
-    StorageNode.prototype.is_root = function() {
+    StorageNode.prototype.is_root = function () {
         /* True if the node is a storage device entry. */
         return (this.path === "/");
     }
-    StorageNode.prototype.is_device = function() {
-        /* True if the node is a storage device entry. */
-        return this.is_device;
-    }
-    StorageNode.prototype.release = function() {
-        /* Remove potential reference cycles, for GC. */
-        delete this.parent;
-        delete this.contents;
-    }
-    StorageNode.prototype.set_page_id = function() {
+    StorageNode.prototype.set_page_id = function () {
         /* Set the UI page id, acording to stored characteristics. */
         // TODO: Allocate and manage pages - probably per node.
         this.page_id = (this.parent
                         ? this.parent.get_page_id()
                         : defaults.storage_root_page_id);
     }
-    StorageNode.prototype.get_page_id = function() {
+    StorageNode.prototype.get_page_id = function () {
         /* Return the UI page id. */
         return this.page_id;
     }
-    StorageNode.prototype.up_to_date = function(when) {
+    StorageNode.prototype.up_to_date = function (when) {
         /* True if provisioned data is current.
            Optional 'when' specifies (new) time we were fetched. */
         if (when) {this.lastfetched = when;}
@@ -142,12 +194,12 @@ var spideroak = function() {
         //      device lastcommit time.
         else { return (this.lastfetched >= new Date().getTime()); }
     }
-    StorageNode.prototype.fetch_and_dispatch = function(success_callback,
-                                                        failure_callback) {
-        /* Retrieve this node's data.
-           - On success, 'success_callback' gets retrived data and Date() soon
-             before the Ajax call.
-           - Otherwise, 'failure_callback' called with XMLHttpResponse object.
+    StorageNode.prototype.fetch_and_dispatch = function (success_callback,
+                                                         failure_callback) {
+        /* Retrieve this node's data and conduct specified actions accordingly.
+           - On success, 'success_callback' gets retrived data and Date() just
+             prior to the retrieval.
+           - Otherwise, 'failure_callback' invoked with XMLHttpResponse object.
         */
 
         var storage_url = my.storage_root_url + this.path;
@@ -156,42 +208,64 @@ var spideroak = function() {
         $.ajax({url: storage_url,
                 type: 'GET',
                 dataType: 'json',
-                success: function(data) {
+                success: function (data) {
                     success_callback(data, when);
                 },
-                error: failure_callback,
+                error: function (xhr) {
+                    failure_callback(xhr)
+                },
                })
     };
-    StorageNode.prototype.toString = function() {
+    StorageNode.prototype.toString = function () {
         return "<Storage node " + this.path + ">";
     }
 
-var storage_node_manager = function () {
-        /* A singleton for getting objects representing storage nodes,
-           finding existing ones or else allocating new ones.
-         */
+    var storage_node_manager = function () {
+        /* A singleton utility for getting and removing storage node objects.
+           "Getting" means finding existing ones or else allocating new ones.
+        */
+        // New node types are determined according to criteria specified in
+        // the get funtion. 
+
         // TODO: Delete node when ascending above them.
-        // TODO Eventually, if useful:
+        // TODO Probably:
         // - prefetch offspring layer and defer release til 2 layers above.
         // - make fetch of multiple items contingent to device lastcommit time.
+
         var by_path = {};
+        var root;
         return {
-            get: function (path, parent) {
-                /* Get an existing storage node object by 'path', else
-                   allocate a new one. Optional 'parent' is only used for
-                   assignment to new ones.  We do not fetch remote data. */
-                return (by_path[path]
-                        || (by_path[path] = new StorageNode(path, parent)));
+            get: function (path, parent, is_file) {
+                /* Retrieve a node, according to 'path' and 'parent'.
+                   This is where nodes are minted, when first encountered.
+                   Optional 'is_file' must be passed to distinguish types
+                   of items in non-root containers.
+                 */
+                got = by_path[path];
+                if (! got) {
+                    if (path === "/") {
+                        got = new RootStorageNode(path, parent);
+                        root = got; }
+                    else if (parent === root) {
+                        got = new DeviceStorageNode(path, parent); }
+                    else if (is_file) {
+                        got = new FileStorageNode(path, parent); }
+                    else {
+                        got = new DirectoryStorageNode(path, parent);
+                    }
+                    by_path[path] = got;
+                }
+                return got;
             },
-            delete: function(node) {
+            delete: function (node) {
                 /* Remove a storage node object, eliminating references
                    that could be circular and prevent GC. */
                 delete by_path[node.path];
-                node.release();
                 delete node;
             }
         }
     }()
+
 
     /* public: */
     return {
