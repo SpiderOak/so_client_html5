@@ -37,10 +37,7 @@ var spideroak = function() {
         storage_path: null,
         username: null,
         storage_web_url: null,  // Likely irrelevant - user's storage web UI.
-        storage: [],
-        shares: [],
     }
-    var devices = [];
 
     function set_account(username, host_url, storage_path, storage_web_url) {
         /* Register user-specific storage details. */
@@ -318,7 +315,7 @@ var spideroak = function() {
                                               server_host_url,
                                               defaults.storage_path,
                                               match[2]);
-                        spideroak.visit_storage_root();
+                        spideroak.visit("/");
                     }
                 },
                 error: function (xhr) {
@@ -328,9 +325,9 @@ var spideroak = function() {
         },
 
         /* Browse storage. */
-        visit_storage_root: function () {
+        visit: function (path) {
             /* Retrieve detailed data for users's devices and present them. */
-            var root = storage_node_manager.get("/");
+            var node = storage_node_manager.get("/");
             root.visit();
         },
     }
