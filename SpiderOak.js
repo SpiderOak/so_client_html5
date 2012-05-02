@@ -68,39 +68,39 @@ var spideroak = function () {
         if ( !(this instanceof StorageNode) )
             throw new Error("Constructor called as a function");
         if (path) {             // Skip if we're in prototype assignment.
-            this.path = path;
-            this.parent_path = parent ? parent.path : null;
-            this.device_path = parent ? parent.device_path : null;
-            this.is_container = true;
-            this.sub = []; // Paths of contained devices, directories.
-            this.files = [];         // Paths of contained files.
-            this.set_page_id();
-            this.lastfetched = false;
-            this.general_setup(path, parent);
-
-            // For type-specific setup, if any:
-            this.distinct_setup(path, parent);
+            this.generic_setup(path, parent);
         }
     }
-    // All of the derived objects use StorageNode's constructor.
-    function RootStorageNode(path, parent) {}
-    RootStorageNode.prototype = new StorageNode();
-    function DeviceStorageNode(path, parent) {}
-    DeviceStorageNode.prototype = new StorageNode();
-    function DirectoryStorageNode(path, parent) {}
-    DirectoryStorageNode.prototype = new StorageNode();
-    function FileStorageNode(path, parent) {}
-    FileStorageNode.prototype = new StorageNode();
+    StorageNode.prototype.generic_setup = function (path, parent) {
+        /* Setup likely to be used by all derivative objects. */
+        this.path = path;
+        this.parent_path = parent ? parent.path : null;
+        this.device_path = parent ? parent.device_path : null;
+        this.is_container = true;
+        this.sub = []; // Paths of contained devices, directories.
+        this.files = [];         // Paths of contained files.
+        this.set_page_id();
+        this.lastfetched = false;
+    }
 
-    StorageNode.prototype.distinct_setup = function (path, parent) {
-        /* Distinct setup to be overridden in derived objects that need it. */
-    }
-    FileStorageNode.prototype.distinct_setup = function (path, parent) {
-        // Distinguish from containers:
-        this.is_container = false;
-        delete this.sub;
-        delete this.files;
-    }
+    // All of the derived objects use StorageNode's constructor.
+    function RootStorageNode(path, parent) { this.generic_setup(path, parent);
+                                             this.stats = null;
+                                             delete this.files; }
+    RootStorageNode.prototype = new StorageNode();
+    function DeviceStorageNode(path, parent) { this.generic_setup(path,
+                                                                  parent);
+                                               // For offspring:
+                                               this.device_path = path; }
+    DeviceStorageNode.prototype = new StorageNode();
+    function DirectoryStorageNode(path, parent) { this.generic_setup(path,
+                                                                     parent); }
+    DirectoryStorageNode.prototype = new StorageNode();
+    function FileStorageNode(path, parent) { this.generic_setup(path, parent);
+                                             this.is_container = false;
+                                             delete this.sub;
+                                             delete this.files; }
+    FileStorageNode.prototype = new StorageNode();
 
     StorageNode.prototype.visit = function () {
         /* Get up-to-date with remote copy and show. */
