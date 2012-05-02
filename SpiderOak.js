@@ -83,13 +83,13 @@ var spideroak = function () {
         }
     }
     // All of the derived objects use StorageNode's constructor.
-    function RootStorageNode(path, parent) {};
+    function RootStorageNode(path, parent) {}
     RootStorageNode.prototype = new StorageNode();
-    function DeviceStorageNode(path, parent) {};
+    function DeviceStorageNode(path, parent) {}
     DeviceStorageNode.prototype = new StorageNode();
-    function DirectoryStorageNode(path, parent) {};
+    function DirectoryStorageNode(path, parent) {}
     DirectoryStorageNode.prototype = new StorageNode();
-    function FileStorageNode(path, parent) {};
+    function FileStorageNode(path, parent) {}
     FileStorageNode.prototype = new StorageNode();
 
     StorageNode.prototype.distinct_setup = function (path, parent) {
