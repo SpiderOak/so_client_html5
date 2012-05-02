@@ -145,16 +145,17 @@ var spideroak = function () {
     RootStorageNode.prototype.provision_populate = function (data, when) {
         /* Embody the root storage node with 'data'. */
         var mgr = storage_node_manager
-        var dev;
-        mgr.stats = data["stats"];
-        for (devdata in data["devices"]) {
+        var dev, devdata;
+        mgr.stats = data["stats"]; // We'll use this eventually.
+        for (i in data.devices) {
+            devdata = data.devices[i];
             path = "/" + devdata["encoded"]
             dev = mgr.get(path, this)
             dev.name = devdata["name"];
             dev.lastlogin = devdata["lastlogin"];
             dev.lastcommit = devdata["lastcommit"];
             dev.lastfetched = when;
-            if (! $.inArray(path, this.sub)) {
+            if (! ($.inArray(path, this.sub) >= 0)) {
                 this.sub.push(path);
             }
         }
@@ -162,10 +163,11 @@ var spideroak = function () {
 
     StorageNode.prototype.show = function () {
         /* Present self in the UI. */
-        var page = $("#" + this.get_page_id());
+        var page_id = this.get_page_id();
+        var page = $("#" + page_id);
         // >>>
-        alert(this + ".show(" + 
-              + "... on page" + page);
+        alert(this + ".show()" + 
+              + " on page " + page_id);
     }
     StorageNode.prototype.is_root = function () {
         /* True if the node is a storage device entry. */
@@ -328,7 +330,7 @@ var spideroak = function () {
         visit: function (path) {
             /* Retrieve detailed data for users's devices and present them. */
             var node = storage_node_manager.get("/");
-            root.visit();
+            node.visit();
         },
     }
 }();
