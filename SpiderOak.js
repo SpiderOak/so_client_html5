@@ -166,7 +166,7 @@ var spideroak = function () {
         var page_id = this.get_page_id();
         var page = $("#" + page_id);
         // >>>
-        alert(this + ".show()" + 
+        alert(this + ".show()" +
               + " on page " + page_id);
     }
     StorageNode.prototype.is_root = function () {
@@ -224,7 +224,7 @@ var spideroak = function () {
            "Getting" means finding existing ones or else allocating new ones.
         */
         // New node types are determined according to criteria specified in
-        // the get funtion. 
+        // the get funtion.
 
         // TODO: Delete node when ascending above them.
         // TODO Probably:
