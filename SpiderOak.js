@@ -265,10 +265,27 @@ var spideroak = function () {
         }
     }()
 
+    function handle_content_visit(e, data) {
+        /* Handler to intervene in visit:path UI clicks. */
+        console.log("handle_content_visit url: " + data.toPage);
+        if ( typeof data.toPage === "string" ) {
+	    var parsed = $.mobile.path.parseUrl(data.toPage);
+            if (parsed.protocol === "visit:") {
+                e.preventDefault();
+                alert("handle_content_visit visit detected: "
+                      + parsed.pathname);
+                spideroak.visit(parsed.pathname);
+            }
+        }
+    }
 
     /* public: */
     return {
-        init: function () {/* No init business yet. */},
+        init: function () {
+            /* Establish event handlers, etc. */
+            console.log("spideroak object init...");
+            $(document).bind("pagebeforechange", handle_content_visit);
+        },
         toString: function () {
             var user = (my.username ? my.username : "-");
             var storage = (my.storage.length ? my.storage : "-");
