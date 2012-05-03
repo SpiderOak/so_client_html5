@@ -87,8 +87,9 @@ function split_url(url) {
     return [splat.slice(0,3).join('/'), "/" + splat.slice(3).join('/')];
 }
 
-function blather(msg) {
+function blather(msg, do_alert) {
     if (SO_DEBUGGING) {
-        alert(msg);
+        if (do_alert) { alert(msg); }
+        else { console.log(msg); }
     }
 }
