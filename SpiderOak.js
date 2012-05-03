@@ -166,8 +166,7 @@ var spideroak = function () {
         var page_id = this.get_page_id();
         var page = $("#" + page_id);
         // >>>
-        alert(this + ".show()" +
-              + " on page " + page_id);
+        blather(this + ".show() " + this + " on page " + page_id);
     }
     StorageNode.prototype.is_root = function () {
         /* True if the node is a storage device entry. */
@@ -246,8 +245,10 @@ var spideroak = function () {
                         got = new RootStorageNode(path, parent);
                         root = got; }
                     else if (!root) {
-                        throw new Error( // Shouldn't happen.
-                            "Content visit before root established"); }
+                        // Shouldn't happen.
+                        throw new Error("storage_node_manager.get:"
+                                        + " Content visit before root"
+                                        + " established"); }
                     else if (parent === root) {
                         got = new DeviceStorageNode(path, parent); }
                     else if (is_file) {
@@ -270,13 +271,12 @@ var spideroak = function () {
 
     function handle_content_visit(e, data) {
         /* Handler to intervene in visit:path UI clicks. */
-        console.log("handle_content_visit url: " + data.toPage);
         if ( typeof data.toPage === "string" ) {
 	    var parsed = $.mobile.path.parseUrl(data.toPage);
             if (parsed.protocol === "visit:") {
                 e.preventDefault();
-                alert("handle_content_visit visit detected: "
-                      + parsed.pathname);
+                blather("handle_content_visit visit detected: "
+                                + parsed.pathname);
                 spideroak.visit(parsed.pathname);
             }
         }
@@ -286,7 +286,7 @@ var spideroak = function () {
     return {
         init: function () {
             /* Establish event handlers, etc. */
-            console.log("spideroak object init...");
+            blather("spideroak object init...");
             $(document).bind("pagebeforechange", handle_content_visit);
         },
         toString: function () {
