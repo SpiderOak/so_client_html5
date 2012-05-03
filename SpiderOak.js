@@ -245,6 +245,9 @@ var spideroak = function () {
                     if (path === "/") {
                         got = new RootStorageNode(path, parent);
                         root = got; }
+                    else if (!root) {
+                        throw new Error( // Shouldn't happen.
+                            "Content visit before root established"); }
                     else if (parent === root) {
                         got = new DeviceStorageNode(path, parent); }
                     else if (is_file) {
@@ -346,8 +349,8 @@ var spideroak = function () {
         /* Browse storage. */
         visit: function (path) {
             /* Retrieve detailed data for users's devices and present them. */
-            var node = storage_node_manager.get("/");
-            node.visit();
+            var node = storage_node_manager.get(path);
+            node.visit(path);
         },
     }
 }();
