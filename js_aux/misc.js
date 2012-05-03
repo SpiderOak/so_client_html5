@@ -80,13 +80,6 @@ function error_alert(purpose, status_code) {
     alert(translate(msg));
 }
 
-function split_url(url) {
-    /* Return two-element array with the ["proto://host.domain", "/path..."]
-       Very simple splitting and rejoining - no error checking, etc. */
-    var splat = url.split('/');
-    return [splat.slice(0,3).join('/'), "/" + splat.slice(3).join('/')];
-}
-
 function blather(msg, do_alert) {
     if (SO_DEBUGGING) {
         if (do_alert) { alert(msg); }

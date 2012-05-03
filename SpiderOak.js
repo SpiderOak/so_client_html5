@@ -305,10 +305,11 @@ var spideroak = function () {
                by recursive calls. See:
                https://spideroak.com/apis/partners/web_storage_api#Loggingin
              */
+            var parsed = $.mobile.path.parseUrl(url);
             var login_url;
             var server_host_url;
-            if (url && url.match("https?:")) {
-                server_host_url = split_url(url)[0];
+            if (url && $.inArray(parsed.protocol, ["http:", "https:"])) {
+                server_host_url = parsed.domain;
                 login_url = url;
             } else {
                 server_host_url = defaults.host_url;
