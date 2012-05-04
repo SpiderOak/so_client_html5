@@ -270,16 +270,19 @@ var spideroak = function () {
         }
     }()
 
+    function is_content_visit(url) {
+        /* True if url within content locations recognized in this session. */
+        for (var i in my.content_url_stems) {
+            var prospect = my.content_url_stems[i];
+            if (url.slice(0, prospect.length) === prospect) { return true; }}
+        return false; }
     function handle_content_visit(e, data) {
         /* Handler to intervene in visit:path UI clicks. */
-        if ( typeof data.toPage === "string" ) {
-	    var parsed = $.mobile.path.parseUrl(data.toPage);
-            if (parsed.protocol === "visit:") {
-                e.preventDefault();
-                blather("handle_content_visit visit detected: "
-                                + parsed.pathname);
-                spideroak.visit(parsed.pathname);
-            }
+        if (typeof data.toPage === "string" && is_content_visit(data.toPage)) {
+            var parsed = $.mobile.path.parseUrl(data.toPage);
+            e.preventDefault();
+            blather("handle_content_visit visit detected: " + parsed.pathname);
+            content_node_manager.get(parsed.pathname).visit();
         }
     }
 
@@ -345,13 +348,6 @@ var spideroak = function () {
                     error_alert("SpiderOak Login", xhr.status);
                 }
             });
-        },
-
-        /* Browse storage. */
-        visit: function (path) {
-            /* Retrieve detailed data for users's devices and present them. */
-            var node = content_node_manager.get(path);
-            node.visit(path);
         },
     }
 }();
