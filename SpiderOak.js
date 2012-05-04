@@ -233,35 +233,33 @@ var spideroak = function () {
         var by_path = {};
         var root;
         return {
-            get: function (path, parent, is_file) {
+            get: function (path, parent) {
                 /* Retrieve a node, according to 'path' and 'parent'.
                    This is where nodes are minted, when first encountered.
-                   Optional 'is_file' must be passed to distinguish types
-                   of items in non-root containers.
                  */
                 got = by_path[path];
                 if (! got) {
                     if (path === "/") {
-                        got = new RootStorageNode(path, parent);
+                        got = new RootContentNode(path, parent);
                         root = got; }
                     else if (!root) {
                         // Shouldn't happen.
-                        throw new Error("storage_node_manager.get:"
+                        throw new Error("content_node_manager.get:"
                                         + " Content visit before root"
                                         + " established"); }
                     else if (parent === root) {
-                        got = new DeviceStorageNode(path, parent); }
-                    else if (is_file) {
-                        got = new FileStorageNode(path, parent); }
+                        got = new DeviceContentNode(path, parent); }
+                    else if (path[path.length-1] !== "/") {
+                        got = new FileContentNode(path, parent); }
                     else {
-                        got = new DirectoryStorageNode(path, parent);
+                        got = new DirectoryContentNode(path, parent);
                     }
                     by_path[path] = got;
                 }
                 return got;
             },
             delete: function (node) {
-                /* Remove a storage node object, eliminating references
+                /* Remove a content node object, eliminating references
                    that could be circular and prevent GC. */
                 delete by_path[node.path];
                 delete node;
