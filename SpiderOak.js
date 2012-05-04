@@ -37,17 +37,21 @@ var spideroak = function () {
         storage_path: null,
         username: null,
         storage_web_url: null,  // Location of storage web UI for user.
+        // Accumulate content_url_stems on access to various content repos.
+        content_url_stems: [],  // Observed prefixes for user's content URLs.
     }
 
-    function set_account(username, host_url, storage_path, storage_web_url) {
-        /* Register user-specific storage details. */
+    function set_account(username, domain, storage_path, storage_web_url) {
+        /* Register user-specific storage details, returning storage root URL.
+        */
         my.username = username;
-        my.host_url = host_url;
-        my.storage_path = storage_path;
-        my.storage_root_url = (my.host_url
-                               + my.storage_path
-                               + b32encode_trim(username));
+        my.storage_domain = domain;
+        my.storage_root_path = storage_path + b32encode_trim(username) + "/";
+        my.storage_root_url = domain + my.storage_root_path;
+
+        my.content_url_stems.push(my.storage_root_url);
         my.storage_web_url = storage_web_url;
+        return my.storage_root_url;
     }
 
     /* Various content node types - the root, devices, directories, and
@@ -145,19 +149,19 @@ var spideroak = function () {
         /* Embody the root content item with 'data'. */
         var mgr = content_node_manager
         var dev, devdata;
-        mgr.stats = data["stats"]; // We'll use this eventually.
+        mgr.stats = data["stats"]; // TODO: We'll cook stats when UI is ready.
         for (var i in data.devices) {
             devdata = data.devices[i];
-            path = "/" + devdata["encoded"]
+            path = my.storage_root_path + devdata["encoded"]
             dev = mgr.get(path, this)
             dev.name = devdata["name"];
             dev.lastlogin = devdata["lastlogin"];
             dev.lastcommit = devdata["lastcommit"];
-            dev.lastfetched = when;
             if (! ($.inArray(path, this.sub) >= 0)) {
                 this.sub.push(path);
             }
         }
+        this.lastfetched = when;
     }
 
     ContentNode.prototype.show = function () {
@@ -165,11 +169,11 @@ var spideroak = function () {
         var page_id = this.get_page_id();
         var page = $("#" + page_id);
         // >>>
-        blather(this + ".show() " + this + " on page " + page_id);
+        blather(this + ".show() " + " on page " + page_id);
     }
-    ContentNode.prototype.is_root = function () {
+    ContentNode.prototype.is_storage_root = function () {
         /* True if the node is a storage root item. */
-        return (this.path === "/");
+        return (this.path === my.storage_root_path);
     }
     ContentNode.prototype.set_page_id = function () {
         /* Set the UI page id, acording to stored characteristics. */
@@ -199,11 +203,10 @@ var spideroak = function () {
            - Otherwise, 'failure_callback' invoked with XMLHttpResponse object.
         */
 
-        // XXX Refinement will be necessary for incorporating shares.
-        //     Probably will use full storage and shares paths, no "/" anywhere.
-        var storage_url = my.storage_root_url + this.path;
+        var storage_url = my.storage_domain + this.path;
         var when = new Date();
-        if (this.is_root()) {storage_url += defaults.devices_query_string; }
+        if (this.is_storage_root()) {
+            storage_url += defaults.devices_query_string; }
         $.ajax({url: storage_url,
                 type: 'GET',
                 dataType: 'json',
@@ -239,7 +242,7 @@ var spideroak = function () {
                  */
                 got = by_path[path];
                 if (! got) {
-                    if (path === "/") {
+                    if (path === my.storage_root_path) {
                         got = new RootContentNode(path, parent);
                         root = got; }
                     else if (!root) {
@@ -331,11 +334,11 @@ var spideroak = function () {
                         spideroak.remote_login(login_info, login_url);
                     } else {
                         // Browser haz auth cookies, we haz relative location.
-                        set_account(login_info['username'],
-                                              server_host_url,
-                                              defaults.storage_path,
-                                              match[2]);
-                        spideroak.visit("/");
+                        // Go there, and machinery will intervene to handle it.
+                        $.mobile.changePage(set_account(login_info['username'],
+                                                        server_host_url,
+                                                        defaults.storage_path,
+                                                        match[2]));
                     }
                 },
                 error: function (xhr) {
