@@ -146,7 +146,7 @@ var spideroak = function () {
         var mgr = content_node_manager
         var dev, devdata;
         mgr.stats = data["stats"]; // We'll use this eventually.
-        for (i in data.devices) {
+        for (var i in data.devices) {
             devdata = data.devices[i];
             path = "/" + devdata["encoded"]
             dev = mgr.get(path, this)
