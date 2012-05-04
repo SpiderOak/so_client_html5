@@ -7,6 +7,12 @@
  * - misc.js - b32encode_trim(), blather(), error_alert()
  */
 
+/*
+  This machinery intercepts navigation to content repository URLs and
+  it intervenes by means of binding handle_content_visit to jQuery mobile
+  "pagebeforechange" event.
+*/
+
 SO_DEBUGGING = true;            // for misc.js:blather()
 
 $(document).ready(function () {
@@ -253,10 +259,10 @@ var spideroak = function () {
                     else if (parent === root) {
                         got = new DeviceContentNode(path, parent); }
                     else if (path[path.length-1] !== "/") {
+                        // No trailing slash.
                         got = new FileContentNode(path, parent); }
                     else {
-                        got = new DirectoryContentNode(path, parent);
-                    }
+                        got = new DirectoryContentNode(path, parent); }
                     by_path[path] = got;
                 }
                 return got;
