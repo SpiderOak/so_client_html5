@@ -289,10 +289,9 @@ var spideroak = function () {
         },
         toString: function () {
             var user = (my.username ? my.username : "-");
-            var storage = (my.storage.length ? my.storage : "-");
-            var shares = (my.shares.length ? my.shares : "-");
-            return ("SpiderOak instance (user "
-                    +user+ ", storage " +storage+ ", shares " +shares+ ")");
+            var fetched = (Object.keys(content_node_manager).length || "-");
+            return ("SpiderOak instance for "
+                    + user + ", " + fetched + " items fetched");
         },
 
         /* Login and account/identity. */
