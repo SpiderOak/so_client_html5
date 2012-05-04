@@ -36,7 +36,7 @@ var spideroak = function () {
         host_url: null,
         storage_path: null,
         username: null,
-        storage_web_url: null,  // Likely irrelevant - user's storage web UI.
+        storage_web_url: null,  // Location of storage web UI for user.
     }
 
     function set_account(username, host_url, storage_path, storage_web_url) {
@@ -50,28 +50,28 @@ var spideroak = function () {
         my.storage_web_url = storage_web_url;
     }
 
-    /* Various storage node types - the root, devices, directories, and
-       files - are implemented based on a generic StorageNode object.
+    /* Various content node types - the root, devices, directories, and
+       files - are implemented based on a generic ContentNode object.
        Departures from the basic functionality are implemented as distinct
        prototype functions defined immediately after the generic ones.
 
-       The generic functions are for container-style nodes, since that is
-       the prevailing type.
+       The generic functions are for the more prevailent container-style nodes.
     */
 
-    function StorageNode(path, parent) {
-        /* Represent a storage device, directory, or file.
-           - 'path' is relative to the storage root, must start with '/'.
-           - 'parent' is containing StorageNode, unspecified (undefined) parent.
-           See below for 'Device storage node example json data'.
+    function ContentNode(path, parent) {
+        /* Basis for representing root, device, directory, file content items.
+           - 'path' is relative to the root node, must start with '/'.
+           - 'parent' is containing ContentNode derivative. The root parent is
+             unspecified (undefined).
+           See 'Device storage node example json data' below for example JSON.
         */
-        if ( !(this instanceof StorageNode) )
+        if ( !(this instanceof ContentNode) ) // Coding failsafe.
             throw new Error("Constructor called as a function");
         if (path) {             // Skip if we're in prototype assignment.
             this.generic_setup(path, parent);
         }
     }
-    StorageNode.prototype.generic_setup = function (path, parent) {
+    ContentNode.prototype.generic_setup = function (path, parent) {
         /* Setup likely to be used by all derivative objects. */
         this.path = path;
         this.parent_path = parent ? parent.path : null;
@@ -83,26 +83,25 @@ var spideroak = function () {
         this.lastfetched = false;
     }
 
-    // All of the derived objects use StorageNode's constructor.
-    function RootStorageNode(path, parent) { this.generic_setup(path, parent);
+    function RootContentNode(path, parent) { this.generic_setup(path, parent);
                                              this.stats = null;
                                              delete this.files; }
-    RootStorageNode.prototype = new StorageNode();
-    function DeviceStorageNode(path, parent) { this.generic_setup(path,
+    RootContentNode.prototype = new ContentNode();
+    function DeviceContentNode(path, parent) { this.generic_setup(path,
                                                                   parent);
                                                // For offspring:
                                                this.device_path = path; }
-    DeviceStorageNode.prototype = new StorageNode();
-    function DirectoryStorageNode(path, parent) { this.generic_setup(path,
+    DeviceContentNode.prototype = new ContentNode();
+    function DirectoryContentNode(path, parent) { this.generic_setup(path,
                                                                      parent); }
-    DirectoryStorageNode.prototype = new StorageNode();
-    function FileStorageNode(path, parent) { this.generic_setup(path, parent);
+    DirectoryContentNode.prototype = new ContentNode();
+    function FileContentNode(path, parent) { this.generic_setup(path, parent);
                                              this.is_container = false;
                                              delete this.sub;
                                              delete this.files; }
-    FileStorageNode.prototype = new StorageNode();
+    FileContentNode.prototype = new ContentNode();
 
-    StorageNode.prototype.visit = function () {
+    ContentNode.prototype.visit = function () {
         /* Get up-to-date with remote copy and show. */
         if (! this.up_to_date()) {
             // We use 'this_node' because 'this' gets overriden when
@@ -119,32 +118,32 @@ var spideroak = function () {
             this.show();
         }
     }
-    StorageNode.prototype.handle_failed_visit = function (xhr) {
+    ContentNode.prototype.handle_failed_visit = function (xhr) {
         /* Do error handling failed visit with 'xhr' XMLHttpResponse report. */
         // TODO: Proper error handling.
         error_alert("Failure reaching " + this.path, xhr.status);
     }
-    StorageNode.prototype.provision = function (data, when) {
+    ContentNode.prototype.provision = function (data, when) {
         /* Populate node with JSON 'data'. 'when' is the data's current-ness.
            'when' should be no more recent than the XMLHttpRequest.
         */
         this.provision_preliminaries(data, when);
         this.provision_populate(data, when);
     }
-    StorageNode.prototype.provision_preliminaries = function (data, when) {
+    ContentNode.prototype.provision_preliminaries = function (data, when) {
         /* Do provisioning stuff generally useful for derived types. */
         if (! when) {
             throw new Error("Node provisioning without reliable time stamp.");
         }
         this.up_to_date(when);
     }
-    StorageNode.prototype.provision_populate = function (data, when) {
+    ContentNode.prototype.provision_populate = function (data, when) {
         /* Stub, must be overridden by type-specific provisionings. */
         throw new Error("Type-specific provisioning implementaiton missing.")
     }
-    RootStorageNode.prototype.provision_populate = function (data, when) {
-        /* Embody the root storage node with 'data'. */
-        var mgr = storage_node_manager
+    RootContentNode.prototype.provision_populate = function (data, when) {
+        /* Embody the root content item with 'data'. */
+        var mgr = content_node_manager
         var dev, devdata;
         mgr.stats = data["stats"]; // We'll use this eventually.
         for (i in data.devices) {
@@ -161,29 +160,29 @@ var spideroak = function () {
         }
     }
 
-    StorageNode.prototype.show = function () {
+    ContentNode.prototype.show = function () {
         /* Present self in the UI. */
         var page_id = this.get_page_id();
         var page = $("#" + page_id);
         // >>>
         blather(this + ".show() " + this + " on page " + page_id);
     }
-    StorageNode.prototype.is_root = function () {
-        /* True if the node is a storage device entry. */
+    ContentNode.prototype.is_root = function () {
+        /* True if the node is a storage root item. */
         return (this.path === "/");
     }
-    StorageNode.prototype.set_page_id = function () {
+    ContentNode.prototype.set_page_id = function () {
         /* Set the UI page id, acording to stored characteristics. */
-        // TODO: Allocate and manage pages - probably per node.
+        // TODO: Actually allocate and manage pages per node.
         this.page_id = (this.parent
                         ? this.parent.get_page_id()
                         : defaults.storage_root_page_id);
     }
-    StorageNode.prototype.get_page_id = function () {
+    ContentNode.prototype.get_page_id = function () {
         /* Return the UI page id. */
         return this.page_id;
     }
-    StorageNode.prototype.up_to_date = function (when) {
+    ContentNode.prototype.up_to_date = function (when) {
         /* True if provisioned data is current.
            Optional 'when' specifies (new) time we were fetched. */
         if (when) {this.lastfetched = when;}
@@ -192,7 +191,7 @@ var spideroak = function () {
         //      device lastcommit time.
         else { return (this.lastfetched >= new Date().getTime()); }
     }
-    StorageNode.prototype.fetch_and_dispatch = function (success_callback,
+    ContentNode.prototype.fetch_and_dispatch = function (success_callback,
                                                          failure_callback) {
         /* Retrieve this node's data and conduct specified actions accordingly.
            - On success, 'success_callback' gets retrived data and Date() just
@@ -200,6 +199,8 @@ var spideroak = function () {
            - Otherwise, 'failure_callback' invoked with XMLHttpResponse object.
         */
 
+        // XXX Refinement will be necessary for incorporating shares.
+        //     Probably will use full storage and shares paths, no "/" anywhere.
         var storage_url = my.storage_root_url + this.path;
         var when = new Date();
         if (this.is_root()) {storage_url += defaults.devices_query_string; }
@@ -214,16 +215,15 @@ var spideroak = function () {
                 },
                })
     };
-    StorageNode.prototype.toString = function () {
-        return "<Storage node " + this.path + ">";
+    ContentNode.prototype.toString = function () {
+        return "<Content node " + this.path + ">";
     }
 
-    var storage_node_manager = function () {
-        /* A singleton utility for getting and removing storage node objects.
+    var content_node_manager = function () {
+        /* A singleton utility for getting and removing content node objects.
            "Getting" means finding existing ones or else allocating new ones.
         */
-        // New node types are determined according to criteria specified in
-        // the get funtion.
+        // Type of newly minted nodes are according to get parameters.
 
         // TODO: Delete node when ascending above them.
         // TODO Probably:
@@ -347,7 +347,7 @@ var spideroak = function () {
         /* Browse storage. */
         visit: function (path) {
             /* Retrieve detailed data for users's devices and present them. */
-            var node = storage_node_manager.get(path);
+            var node = content_node_manager.get(path);
             node.visit(path);
         },
     }
