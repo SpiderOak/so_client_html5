@@ -8,9 +8,12 @@
  */
 
 /*
-  This machinery intercepts navigation to content repository URLs and
-  it intervenes by means of binding handle_content_visit to jQuery mobile
-  "pagebeforechange" event.
+  NOTES
+
+  - Content visits:
+    We intercepts $.mobile.pageChange navigation to content repository URLs and
+    intervene by via binding of handle_content_visit to jQuery mobile
+    "pagebeforechange" event.
 */
 
 SO_DEBUGGING = true;            // for misc.js:blather()
@@ -209,7 +212,7 @@ var spideroak = function () {
         return (this.path === my.storage_root_path);
     }
     ContentNode.prototype.set_page_id = function () {
-        /* Set the UI page id, acording to stored characteristics. */
+        /* Set the UI page id, according to stored characteristics. */
         // TODO: Actually allocate and manage pages per node.
         this.page_id = (this.parent
                         ? this.parent.get_page_id()
@@ -220,18 +223,18 @@ var spideroak = function () {
         return this.page_id;
     }
     ContentNode.prototype.up_to_date = function (when) {
-        /* True if provisioned data is current.
+        /* True if provisioned data is considered current.
            Optional 'when' specifies (new) time we were fetched. */
-        if (when) {this.lastfetched = when;}
+        // The generic case offers no shortcut for determining up-to-date-ness.
+        if (when) { this.lastfetched = when; }
         if (! this.lastfetched) { return false; }
-        // XXX: Currently, never up to date! Must actually test against the
-        //      device lastcommit time.
-        else { return (this.lastfetched >= new Date().getTime()); }
+        return false;           // No smarts.
     }
+
     ContentNode.prototype.fetch_and_dispatch = function (success_callback,
                                                          failure_callback) {
         /* Retrieve this node's data and conduct specified actions accordingly.
-           - On success, 'success_callback' gets retrived data and Date() just
+           - On success, 'success_callback' gets retrieved data and Date() just
              prior to the retrieval.
            - Otherwise, 'failure_callback' invoked with XMLHttpResponse object.
         */
