@@ -283,7 +283,7 @@ var spideroak = function () {
                })
     };
     ContentNode.prototype.toString = function () {
-        return "<Content node " + this.path + ">";
+        return "<Content node " + this.url + ">";
     }
 
     var content_node_manager = function () {
