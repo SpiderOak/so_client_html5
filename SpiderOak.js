@@ -65,56 +65,81 @@ var spideroak = function () {
        Departures from the basic functionality are implemented as distinct
        prototype functions defined immediately after the generic ones.
 
-       The generic functions are for the more prevailent container-style nodes.
+       The generic functions are for the more prevalent container-style nodes.
     */
 
     function ContentNode(path, parent) {
-        /* Basis for representing root, device, directory, file content items.
-           - 'path' is relative to the root node, must start with '/'.
-           - 'parent' is containing ContentNode derivative. The root parent is
-             unspecified (undefined).
+        /* Basis for representing collections of remote content items.
+           - 'path' is relative to the collection's root (top) node.
+             All paths should start with '/'.
+           - 'parent' is containing node. The root's parent is null.
            See 'Device storage node example json data' below for example JSON.
         */
         if ( !(this instanceof ContentNode) ) // Coding failsafe.
             throw new Error("Constructor called as a function");
         if (path) {             // Skip if we're in prototype assignment.
-            this.generic_setup(path, parent);
+            this.path = path;
+            this.root_path = parent ? parent.root_path : path;
+            this.parent_path = parent ? parent.path : null;
+            this.is_container = true;
+            this.subdirs = []; // Paths of contained devices, directories.
+            this.files = [];         // Paths of contained files.
+            this.set_page_id();
+            this.lastfetched = false;
         }
     }
-    ContentNode.prototype.generic_setup = function (path, parent) {
-        /* Setup likely to be used by all derivative objects. */
-        this.path = path;
-        this.parent_path = parent ? parent.path : null;
+    function StorageNode(path, parent) {
+        ContentNode.call(this, path, parent);
+        // All but the root storage nodes are contained within a device.
+        // The DeviceStorageNode sets the device path, which will trickle
+        // down to all its contents.
         this.device_path = parent ? parent.device_path : null;
-        this.is_container = true;
-        this.sub = []; // Paths of contained devices, directories.
-        this.files = [];         // Paths of contained files.
-        this.set_page_id();
-        this.lastfetched = false;
     }
+    StorageNode.prototype = new ContentNode();
+    function ShareNode(path, parent) {
+        ContentNode.call(this, path, parent);
+        if (! parent) {
+            // This is a share room, which is the root of the collection.
+            this.root_path = path; }
+        else {
+            this.root_path = parent.root_path; }
+    }
+    ShareNode.prototype = new ContentNode();
 
-    function RootContentNode(path, parent) { this.generic_setup(path, parent);
-                                             this.stats = null;
-                                             delete this.files; }
-    RootContentNode.prototype = new ContentNode();
-    function DeviceContentNode(path, parent) { this.generic_setup(path,
-                                                                  parent);
-                                               // For offspring:
-                                               this.device_path = path; }
-    DeviceContentNode.prototype = new ContentNode();
-    function DirectoryContentNode(path, parent) { this.generic_setup(path,
-                                                                     parent); }
-    DirectoryContentNode.prototype = new ContentNode();
-    function FileContentNode(path, parent) { this.generic_setup(path, parent);
-                                             this.is_container = false;
-                                             delete this.sub;
-                                             delete this.files; }
-    FileContentNode.prototype = new ContentNode();
+    function RootStorageNode(path, parent) {
+        StorageNode.call(this, path, parent);
+        this.stats = null;
+        delete this.files; }
+    RootStorageNode.prototype = new StorageNode();
+    function RootShareNode(path, parent) {
+        ShareNode.call(this, path, parent); }
+    RootShareNode.prototype = new ShareNode();
+    function DeviceStorageNode(path, parent) {
+        StorageNode.call(this, path, parent);
+        this.device_path = path; }
+    DeviceStorageNode.prototype = new StorageNode();
+    function DirectoryStorageNode(path, parent) {
+        StorageNode.call(this, path, parent); }
+    function DirectoryShareNode(path, parent) {
+        ShareNode.call(this, path, parent); }
+    DirectoryShareNode.prototype = new ShareNode();
+    function FileStorageNode(path, parent) {
+        StorageNode.call(this, path, parent);
+        this.is_container = false;
+        delete this.subdirs;
+        delete this.files; }
+    FileStorageNode.prototype = new StorageNode();
+    function FileShareNode(path, parent) {
+        ShareNode.call(this, path, parent);
+        this.is_container = false;
+        delete this.subdirs;
+        delete this.files; }
+    FileShareNode.prototype = new ShareNode();
 
     ContentNode.prototype.visit = function () {
         /* Get up-to-date with remote copy and show. */
         if (! this.up_to_date()) {
-            // We use 'this_node' because 'this' gets overriden when
+            // We use 'this_node' because 'this' gets overridden when
             // success_handler is actually running, so we another
             // lexically scoped var.
             var this_node = this;
@@ -149,9 +174,9 @@ var spideroak = function () {
     }
     ContentNode.prototype.provision_populate = function (data, when) {
         /* Stub, must be overridden by type-specific provisionings. */
-        throw new Error("Type-specific provisioning implementaiton missing.")
+        throw new Error("Type-specific provisioning implementation missing.")
     }
-    RootContentNode.prototype.provision_populate = function (data, when) {
+    RootStorageNode.prototype.provision_populate = function (data, when) {
         /* Embody the root content item with 'data'. */
         var mgr = content_node_manager
         var dev, devdata;
@@ -249,7 +274,7 @@ var spideroak = function () {
                 got = by_path[path];
                 if (! got) {
                     if (path === my.storage_root_path) {
-                        got = new RootContentNode(path, parent);
+                        got = new RootStorageNode(path, parent);
                         root = got; }
                     else if (!root) {
                         // Shouldn't happen.
@@ -257,12 +282,12 @@ var spideroak = function () {
                                         + " Content visit before root"
                                         + " established"); }
                     else if (parent === root) {
-                        got = new DeviceContentNode(path, parent); }
+                        got = new DeviceStorageNode(path, parent); }
                     else if (path[path.length-1] !== "/") {
                         // No trailing slash.
-                        got = new FileContentNode(path, parent); }
+                        got = new FileStorageNode(path, parent); }
                     else {
-                        got = new DirectoryContentNode(path, parent); }
+                        got = new DirectoryStorageNode(path, parent); }
                     by_path[path] = got;
                 }
                 return got;
