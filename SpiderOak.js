@@ -36,33 +36,62 @@ var spideroak = function () {
         // XXX starting_host_url may vary according to brand package.
         starting_host_url: "https://spideroak.com",
         storage_login_path: "/browse/login",
-        storage_path: "/storage/",
-        share_path: "/share/",
+        storage_path_prefix: "/storage/",
+        share_path_prefix: "/share/",
         storage_root_page_id: "storage-root",
         devices_query_string: '?device_info=yes',
     }
     var my = {
         starting_host_url: null,
-        storage_path: null,
         username: null,
         storage_web_url: null,  // Location of storage web UI for user.
-        // Accumulate content_url_roots on access to various content repos
-        // - the storage repo root, various share rooms.
-        content_url_roots: [],  // Observed prefixes for user's content URLs.
+        // content_roots_urls are for discerning URLs of contained items.
+        // They're accumulated on access to storage repo root and share rooms.
+        content_root_urls: [],
+        storage_root_url: null,
+        share_root_urls: [],
     }
 
-    function set_account(username, domain, storage_path, storage_web_url) {
+    function handle_content_visit(e, data) {
+        /* Intercept URL visits and intervene for repository content. */
+        if (typeof data.toPage === "string" && is_content_url(data.toPage)) {
+            e.preventDefault();
+            blather("handle_content_visit triggered: " + data.toPage);
+            content_node_manager.get(data.toPage).visit();
+        }
+    }
+    function is_content_root_url(url) {
+        /* True if the 'url' is for one of the root content items.
+           Doesn't depend on an already established node for the url. */
+        return ($.inArray(url, my.content_root_urls) >= 0); }
+    function is_storage_url(url) {
+        /* True if the URL is for a content item in the user's storage area.
+           Doesn't depend on an already established node for the url. */
+        return (url.slice(0, my.storage_root_url.length)
+                === my.storage_root_url); }
+    function is_content_url(url) {
+        /* True if url within established content roots. */
+        for (var i in my.content_root_urls) {
+            var prospect = my.content_root_urls[i];
+            if (url.slice(0, prospect.length) === prospect) { return true; }}
+        return false; }
+
+    function set_storage_account(username, domain,
+                         storage_path_prefix, storage_web_url) {
         /* Register user-specific storage details, returning storage root URL.
         */
         my.username = username;
         my.storage_domain = domain;
-        my.storage_root_path = storage_path + b32encode_trim(username) + "/";
-        my.storage_root_url = domain + my.storage_root_path;
-
-        // content_url_roots are for discerning URLs of contained items.
-        my.content_url_roots.push(my.storage_root_url);
+        var url = my.storage_root_url = (domain + storage_path_prefix
+                                         + b32encode_trim(username) + "/");
+        if (! is_content_root_url(url)) {
+            my.content_root_urls.push(url); }
         my.storage_web_url = storage_web_url;
         return my.storage_root_url;
+    }
+    function set_share_room() {
+        /* */
+        // XXX Flesh this out, adding to my.content_root_urls in the process.
     }
 
     /* Various content node types - the root, devices, directories, and
@@ -73,69 +102,71 @@ var spideroak = function () {
        The generic functions are for the more prevalent container-style nodes.
     */
 
-    function ContentNode(path, parent) {
+    function ContentNode(url, parent) {
         /* Basis for representing collections of remote content items.
-           - 'path' is relative to the collection's root (top) node.
-             All paths should start with '/'.
+           - 'url' is absolute URL for the collection's root (top) node.
            - 'parent' is containing node. The root's parent is null.
            See 'Device storage node example json data' below for example JSON.
         */
         if ( !(this instanceof ContentNode) ) // Coding failsafe.
             throw new Error("Constructor called as a function");
-        if (path) {             // Skip if we're in prototype assignment.
-            this.path = path;
-            this.root_path = parent ? parent.root_path : path;
-            this.parent_path = parent ? parent.path : null;
-            this.is_container = true;
-            this.subdirs = []; // Paths of contained devices, directories.
-            this.files = [];         // Paths of contained files.
+        if (url) {             // Skip if we're in prototype assignment.
+            this.url = url;
+            this.root_url = parent ? parent.root_url : url;
+            this.query_qualifier = "";
+            this.parent_url = parent ? parent.url : null;
+            this.is_container = true; // Typically.
+            this.subdirs = [];  // Urls of contained devices, directories.
+            this.files = [];    // Urls of contained files.
             this.set_page_id();
             this.lastfetched = false;
         }
     }
-    function StorageNode(path, parent) {
-        ContentNode.call(this, path, parent);
+    function StorageNode(url, parent) {
+        ContentNode.call(this, url, parent);
         // All but the root storage nodes are contained within a device.
-        // The DeviceStorageNode sets the device path, which will trickle
+        // The DeviceStorageNode sets the device url, which will trickle
         // down to all its contents.
-        this.device_path = parent ? parent.device_path : null;
+        this.device_url = parent ? parent.device_url : null;
     }
     StorageNode.prototype = new ContentNode();
-    function ShareNode(path, parent) {
-        ContentNode.call(this, path, parent);
+    function ShareNode(url, parent) {
+        ContentNode.call(this, url, parent);
         if (! parent) {
             // This is a share room, which is the root of the collection.
-            this.root_path = path; }
+            this.root_url = url; }
         else {
-            this.root_path = parent.root_path; }
+            this.root_url = parent.root_url; }
     }
     ShareNode.prototype = new ContentNode();
 
-    function RootStorageNode(path, parent) {
-        StorageNode.call(this, path, parent);
+    function RootStorageNode(url, parent) {
+        StorageNode.call(this, url, parent);
+        // TODO: Do we really want to always get the root with devices details?
+        this.query_qualifier = defaults.devices_query_string;
         this.stats = null;
         delete this.files; }
     RootStorageNode.prototype = new StorageNode();
-    function RootShareNode(path, parent) {
-        ShareNode.call(this, path, parent); }
+    function RootShareNode(url, parent) {
+        ShareNode.call(this, url, parent); }
     RootShareNode.prototype = new ShareNode();
-    function DeviceStorageNode(path, parent) {
-        StorageNode.call(this, path, parent);
-        this.device_path = path; }
+    function DeviceStorageNode(url, parent) {
+        StorageNode.call(this, url, parent);
+        this.device_url = url; }
     DeviceStorageNode.prototype = new StorageNode();
-    function DirectoryStorageNode(path, parent) {
-        StorageNode.call(this, path, parent); }
-    function DirectoryShareNode(path, parent) {
-        ShareNode.call(this, path, parent); }
+    function DirectoryStorageNode(url, parent) {
+        StorageNode.call(this, url, parent); }
+    function DirectoryShareNode(url, parent) {
+        ShareNode.call(this, url, parent); }
     DirectoryShareNode.prototype = new ShareNode();
-    function FileStorageNode(path, parent) {
-        StorageNode.call(this, path, parent);
+    function FileStorageNode(url, parent) {
+        StorageNode.call(this, url, parent);
         this.is_container = false;
         delete this.subdirs;
         delete this.files; }
     FileStorageNode.prototype = new StorageNode();
-    function FileShareNode(path, parent) {
-        ShareNode.call(this, path, parent);
+    function FileShareNode(url, parent) {
+        ShareNode.call(this, url, parent);
         this.is_container = false;
         delete this.subdirs;
         delete this.files; }
@@ -161,7 +192,7 @@ var spideroak = function () {
     ContentNode.prototype.handle_failed_visit = function (xhr) {
         /* Do error handling failed visit with 'xhr' XMLHttpResponse report. */
         // TODO: Proper error handling.
-        error_alert("Failure reaching " + this.path, xhr.status);
+        error_alert("Failure reaching " + this.url, xhr.status);
     }
     ContentNode.prototype.provision = function (data, when) {
         /* Populate node with JSON 'data'. 'when' is the data's current-ness.
@@ -184,17 +215,17 @@ var spideroak = function () {
     RootStorageNode.prototype.provision_populate = function (data, when) {
         /* Embody the root content item with 'data'. */
         var mgr = content_node_manager
-        var dev, devdata;
+        var url, dev, devdata;
         mgr.stats = data["stats"]; // TODO: We'll cook stats when UI is ready.
         for (var i in data.devices) {
             devdata = data.devices[i];
-            path = my.storage_root_path + devdata["encoded"]
-            dev = mgr.get(path, this)
+            url = my.storage_root_url + devdata["encoded"]
+            dev = mgr.get(url, this)
             dev.name = devdata["name"];
             dev.lastlogin = devdata["lastlogin"];
             dev.lastcommit = devdata["lastcommit"];
-            if (! ($.inArray(path, this.subdirs) >= 0)) {
-                this.subdirs.push(path);
+            if (! ($.inArray(url, this.subdirs) >= 0)) {
+                this.subdirs.push(url);
             }
         }
         this.lastfetched = when;
@@ -205,11 +236,11 @@ var spideroak = function () {
         var page_id = this.get_page_id();
         var page = $("#" + page_id);
         // >>>
-        blather(this + ".show() " + " on page " + page_id);
+        blather(this + ".show() on page " + page_id);
     }
-    ContentNode.prototype.is_storage_root = function () {
-        /* True if the node is a storage root item. */
-        return (this.path === my.storage_root_path);
+    ContentNode.prototype.is_root = function () {
+        /* True if the node is a collections top-level item. */
+        return (this.url === this.root_url);
     }
     ContentNode.prototype.set_page_id = function () {
         /* Set the UI page id, according to stored characteristics. */
@@ -239,11 +270,8 @@ var spideroak = function () {
            - Otherwise, 'failure_callback' invoked with XMLHttpResponse object.
         */
 
-        var storage_url = my.storage_domain + this.path;
         var when = new Date();
-        if (this.is_storage_root()) {
-            storage_url += defaults.devices_query_string; }
-        $.ajax({url: storage_url,
+        $.ajax({url: this.url + this.query_qualifier,
                 type: 'GET',
                 dataType: 'json',
                 success: function (data) {
@@ -269,58 +297,49 @@ var spideroak = function () {
         // - prefetch offspring layer and defer release til 2 layers above.
         // - make fetch of multiple items contingent to device lastcommit time.
 
-        var by_path = {};
-        var root;
+        /* Private */
+        var by_url = {};
+
+        /* Public */
         return {
-            get: function (path, parent) {
-                /* Retrieve a node, according to 'path' and 'parent'.
-                   This is where nodes are minted, when first encountered.
+            get: function (url, parent) {
+                /* Retrieve a node according to 'url'.
+                   Identify 'parent' for production of new nodes.
+                   New nodes produced on first reference, but not provisioning.
                  */
-                got = by_path[path];
+                got = by_url[url];
                 if (! got) {
-                    if (path === my.storage_root_path) {
-                        got = new RootStorageNode(path, parent);
-                        root = got; }
-                    else if (!root) {
-                        // Shouldn't happen.
-                        throw new Error("content_node_manager.get:"
-                                        + " Content visit before root"
-                                        + " established"); }
-                    else if (parent === root) {
-                        got = new DeviceStorageNode(path, parent); }
-                    else if (path[path.length-1] !== "/") {
+                    if (is_content_root_url(url)) {
+                        if (url === my.storage_root_url) {
+                            got = new RootStorageNode(url, parent); }
+                        else { got = new RootShareNode(url, parent); }}
+                    else if (is_content_root_url(parent.url)
+                             && (parent.url === my.storage_root_url)) {
+                        got = new DeviceStorageNode(url, parent); }
+                    else if (url.charAt(url.length-1) !== "/") {
                         // No trailing slash.
-                        got = new FileStorageNode(path, parent); }
+                        if (is_storage_url(url)) {
+                            got = new FileStorageNode(url, parent); }
+                        else {
+                            got = new FileShareNode(url, parent); }}
                     else {
-                        got = new DirectoryStorageNode(path, parent); }
-                    by_path[path] = got;
+                        if (is_storage_url(url)) {
+                            got = new DirectoryStorageNode(url, parent); }
+                        else {
+                            got = new DirectoryShareNode(url, parent); }
+                    }
+                    by_url[url] = got;
                 }
                 return got;
             },
             delete: function (node) {
                 /* Remove a content node object, eliminating references
                    that could be circular and prevent GC. */
-                delete by_path[node.path];
+                delete by_url[node.url];
                 delete node;
             }
         }
     }()
-
-    function is_content_visit(url) {
-        /* True if url within content locations recognized in this session. */
-        for (var i in my.content_url_roots) {
-            var prospect = my.content_url_roots[i];
-            if (url.slice(0, prospect.length) === prospect) { return true; }}
-        return false; }
-    function handle_content_visit(e, data) {
-        /* Handler to intervene in visit:path UI clicks. */
-        if (typeof data.toPage === "string" && is_content_visit(data.toPage)) {
-            var parsed = $.mobile.path.parseUrl(data.toPage);
-            e.preventDefault();
-            blather("handle_content_visit visit detected: " + parsed.pathname);
-            content_node_manager.get(parsed.pathname).visit();
-        }
-    }
 
     /* public: */
     return {
@@ -374,10 +393,11 @@ var spideroak = function () {
                     } else {
                         // Browser haz auth cookies, we haz relative location.
                         // Go there, and machinery will intervene to handle it.
-                        $.mobile.changePage(set_account(login_info['username'],
-                                                        server_host_url,
-                                                        defaults.storage_path,
-                                                        match[2]));
+                        $.mobile.changePage(
+                            set_storage_account(login_info['username'],
+                                                server_host_url,
+                                                defaults.storage_path_prefix,
+                                                match[2]));
                     }
                 },
                 error: function (xhr) {
