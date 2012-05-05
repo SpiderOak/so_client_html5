@@ -11,8 +11,8 @@
   NOTES
 
   - Content visits:
-    We intercepts $.mobile.pageChange navigation to content repository URLs and
-    intervene by via binding of handle_content_visit to jQuery mobile
+    We intercept navigation to content (eg, $.mobile.pageChange) repository
+    URLs and intervene via binding of handle_content_visit to jQuery mobile
     "pagebeforechange" event.
 */
 
