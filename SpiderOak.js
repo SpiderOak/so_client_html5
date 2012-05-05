@@ -30,8 +30,8 @@ var spideroak = function () {
     /* private: */
     var defaults = {
         // API v1.
-        // XXX host_url may need variability according to brand package.
-        host_url: "https://spideroak.com",
+        // XXX starting_host_url may vary according to brand package.
+        starting_host_url: "https://spideroak.com",
         storage_login_path: "/browse/login",
         storage_path: "/storage/",
         share_path: "/share/",
@@ -39,12 +39,13 @@ var spideroak = function () {
         devices_query_string: '?device_info=yes',
     }
     var my = {
-        host_url: null,
+        starting_host_url: null,
         storage_path: null,
         username: null,
         storage_web_url: null,  // Location of storage web UI for user.
-        // Accumulate content_url_stems on access to various content repos.
-        content_url_stems: [],  // Observed prefixes for user's content URLs.
+        // Accumulate content_url_roots on access to various content repos
+        // - the storage repo root, various share rooms.
+        content_url_roots: [],  // Observed prefixes for user's content URLs.
     }
 
     function set_account(username, domain, storage_path, storage_web_url) {
@@ -55,7 +56,8 @@ var spideroak = function () {
         my.storage_root_path = storage_path + b32encode_trim(username) + "/";
         my.storage_root_url = domain + my.storage_root_path;
 
-        my.content_url_stems.push(my.storage_root_url);
+        // content_url_roots are for discerning URLs of contained items.
+        my.content_url_roots.push(my.storage_root_url);
         my.storage_web_url = storage_web_url;
         return my.storage_root_url;
     }
@@ -188,8 +190,8 @@ var spideroak = function () {
             dev.name = devdata["name"];
             dev.lastlogin = devdata["lastlogin"];
             dev.lastcommit = devdata["lastcommit"];
-            if (! ($.inArray(path, this.sub) >= 0)) {
-                this.sub.push(path);
+            if (! ($.inArray(path, this.subdirs) >= 0)) {
+                this.subdirs.push(path);
             }
         }
         this.lastfetched = when;
@@ -303,8 +305,8 @@ var spideroak = function () {
 
     function is_content_visit(url) {
         /* True if url within content locations recognized in this session. */
-        for (var i in my.content_url_stems) {
-            var prospect = my.content_url_stems[i];
+        for (var i in my.content_url_roots) {
+            var prospect = my.content_url_roots[i];
             if (url.slice(0, prospect.length) === prospect) { return true; }}
         return false; }
     function handle_content_visit(e, data) {
@@ -346,7 +348,7 @@ var spideroak = function () {
                 server_host_url = parsed.domain;
                 login_url = url;
             } else {
-                server_host_url = defaults.host_url;
+                server_host_url = defaults.starting_host_url;
                 login_url = (server_host_url + defaults.storage_login_path);
             }
             $.ajax({
