@@ -290,23 +290,50 @@ var spideroak = function () {
         /* Return the UI page id. */
         return this.page_id;
     }
-    ContentNode.prototype.show = function () {
-        /* Present self in the UI. */
-        var page = this.get_my_page();
-        // >>>
-        blather(this + ".show() on page " + page_id);
+    ContentNode.prototype.show = function (options) {
+        /* Trigger UI focus on our content layout. */
+        // We use whatever layout is already done.
+        var $page = this.$get_my_page();
+        blather(this + ".show() " + this.url + " on page " + this.page_id);
+        options.dataUrl = this.page_id;
+        $.mobile.changePage($page, options);
     }
-    ContentNode.prototype.layout_my_page = function () {
+    ContentNode.prototype.layout = function () {
+        /* Deploy content as markup on our page. */
+        var $page = this.$get_my_page();
+        if ($page.length === 0) {
+            // >>> Mint page:
+            throw new Error(".layout new page not yet implemented"); }
+        var my_url = this.url;
+        var superior_url = this.parent_url || defaults.home_page_id;
+        var $header = $page.children(":jqmData(role=header)");
+	var $content = $page.children(":jqmData(role=listview)");
+        var markup = "";
+        var list_open = "<ul data-role='listview' data-inset='true'>\n"
+        var i, sub;
+
+        markup += list_open
+        for (i in this.subdirs) {
+            sub = content_node_manager.get(this.subdirs[i]);
+            markup += ('<li><a href="' + sub.url + ">"
+                       + sub.name + "</a></li>"); };
+        markup += "</ul>\n" + list_open;
+        for (i in this.files) {
+            sub = content_node_manager.get(this.subdirs[i]);
+            markup += ('<li><a href="' + sub.url + ">"
+                       + sub.name + "</a></li>\n"); };
+	markup += "</ul>";
+
+        $page.find("h2").html(this.name);
+        $content.html(markup);
+        $page.page();
+        $content.find(":jqmData(role=listview)").listview();
+        this.constructed_page$ = $page;
+        return $page;
     }
-    ContentNode.prototype.get_my_page = function () {
-        /* Return a jQuery object for this node, allocating if necessary.
-           Connection to the parent, etc, is included.
-         */
-        var $got = $("#" + this.get_page_id());
-        if (! $got) {
-        }
-        return $got
-    }
+    ContentNode.prototype.$get_my_page = function () {
+        /* Return this node's jQuery object; empty if page not established. */
+        return this.constructed_page$ || $("#" + this.get_page_id());}
 
     /* Convenience: */
 
