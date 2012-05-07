@@ -45,7 +45,8 @@ var spideroak = function () {
         share_path_prefix: "/share/",
         storage_root_page_id: "storage-root",
         devices_query_string: '?device_info=yes',
-        home_page_id: 'Home',
+        home_page_id: 'home',
+        root_storage_node_label: "Devices",
     }
     var my = {
         /* Login session settings: */
@@ -131,6 +132,7 @@ var spideroak = function () {
             this.is_container = true; // Typically.
             this.subdirs = [];  // Urls of contained devices, directories.
             this.files = [];    // Urls of contained files.
+            this.constructed_page$;
             this.set_page_id();
             this.lastfetched = false;
         }}
@@ -233,6 +235,9 @@ var spideroak = function () {
         /* Embody the root content item with 'data'. */
         var mgr = content_node_manager
         var url, dev, devdata;
+        var possessive = (my.username.charAt(my.username.length-1) == "s"
+                          ? "' " : "'s ")
+        this.name = my.username + possessive + defaults.root_storage_node_label;
         mgr.stats = data["stats"]; // TODO: We'll cook stats when UI is ready.
         for (var i in data.devices) {
             devdata = data.devices[i];
@@ -277,7 +282,7 @@ var spideroak = function () {
                })
     };
 
-    /* Content node presentation/page management */
+    /* Content node page presentation */
 
     ContentNode.prototype.set_page_id = function () {
         /* Set the UI page id, according to stored characteristics. */
