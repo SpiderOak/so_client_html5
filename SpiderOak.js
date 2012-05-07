@@ -13,7 +13,10 @@
   - Content visits:
     We intercept navigation to content (eg, $.mobile.pageChange) repository
     URLs and intervene via binding of handle_content_visit to jQuery mobile
-    "pagebeforechange" event.
+    "pagebeforechange" event.  URLs are handled according to residing
+    within those registered on my.content_root_urls.
+  - My routines which return jQuery objects end in '$', and (following common
+    practice) my variables intended to contain jQuery objects start with '$'.
 */
 
 SO_DEBUGGING = true;            // for misc.js:blather()
