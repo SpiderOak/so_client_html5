@@ -66,7 +66,7 @@ var spideroak = function () {
         if (typeof data.toPage === "string" && is_content_url(data.toPage)) {
             e.preventDefault();
             blather("handle_content_visit triggered: " + data.toPage);
-            content_node_manager.get(data.toPage).visit(); }}
+            content_node_manager.get(data.toPage).visit(data.options); }}
 
     /* Node-independent URL classification: */
 
@@ -189,21 +189,21 @@ var spideroak = function () {
 
     /* Remote data access: */
 
-    ContentNode.prototype.visit = function () {
-        /* Get up-to-date with remote copy and show. */
+    ContentNode.prototype.visit = function (options) {
+        /* Get up-to-date with remote copy and show.
+           Options is the $.mobile.changePage() options object. */
         if (! this.up_to_date()) {
             // We use 'this_node' because 'this' gets overridden when
             // success_handler is actually running, so we another
             // lexically scoped var.
             var this_node = this;
-            var success_handler = function (data, when) {
-                this_node.provision(data, when);
-                this_node.show();
-            }
-            this.fetch_and_dispatch(success_handler,
+            this.fetch_and_dispatch(function (data, when)
+                                    { this_node.provision(data, when);
+                                      this_node.layout();
+                                      this_node.show(options); },
                                     this_node.handle_failed_visit);
         } else {
-            this.show();
+            this.show(options);
         }
     }
     ContentNode.prototype.handle_failed_visit = function (xhr) {
