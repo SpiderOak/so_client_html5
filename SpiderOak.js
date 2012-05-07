@@ -30,8 +30,13 @@ $(document).ready(function () {
 
 /* Modular singleton pattern: */
 var spideroak = function () {
-    /* private: */
+
+                              /* private: */
+
+    /* Object-wide settings: */
+
     var defaults = {
+        /* Settings not specific to a particular login session: */
         // API v1.
         // XXX starting_host_url may vary according to brand package.
         starting_host_url: "https://spideroak.com",
@@ -40,8 +45,10 @@ var spideroak = function () {
         share_path_prefix: "/share/",
         storage_root_page_id: "storage-root",
         devices_query_string: '?device_info=yes',
+        home_page_id: 'Home',
     }
     var my = {
+        /* Login session settings: */
         starting_host_url: null,
         username: null,
         storage_web_url: null,  // Location of storage web UI for user.
@@ -52,14 +59,17 @@ var spideroak = function () {
         share_root_urls: [],
     }
 
+    /* Navigation handlers: */
+
     function handle_content_visit(e, data) {
         /* Intercept URL visits and intervene for repository content. */
         if (typeof data.toPage === "string" && is_content_url(data.toPage)) {
             e.preventDefault();
             blather("handle_content_visit triggered: " + data.toPage);
-            content_node_manager.get(data.toPage).visit();
-        }
-    }
+            content_node_manager.get(data.toPage).visit(); }}
+
+    /* Node-independent URL classification: */
+
     function is_content_root_url(url) {
         /* True if the 'url' is for one of the root content items.
            Doesn't depend on an already established node for the url. */
@@ -76,6 +86,8 @@ var spideroak = function () {
             if (url.slice(0, prospect.length) === prospect) { return true; }}
         return false; }
 
+    /* Effect session state: */
+
     function set_storage_account(username, domain,
                          storage_path_prefix, storage_web_url) {
         /* Register user-specific storage details, returning storage root URL.
@@ -87,12 +99,13 @@ var spideroak = function () {
         if (! is_content_root_url(url)) {
             my.content_root_urls.push(url); }
         my.storage_web_url = storage_web_url;
-        return my.storage_root_url;
-    }
+        return my.storage_root_url; }
     function set_share_room() {
         /* */
         // XXX Flesh this out, adding to my.content_root_urls in the process.
     }
+
+    /* Content representation structures: */
 
     /* Various content node types - the root, devices, directories, and
        files - are implemented based on a generic ContentNode object.
@@ -120,15 +133,13 @@ var spideroak = function () {
             this.files = [];    // Urls of contained files.
             this.set_page_id();
             this.lastfetched = false;
-        }
-    }
+        }}
     function StorageNode(url, parent) {
         ContentNode.call(this, url, parent);
         // All but the root storage nodes are contained within a device.
         // The DeviceStorageNode sets the device url, which will trickle
         // down to all its contents.
-        this.device_url = parent ? parent.device_url : null;
-    }
+        this.device_url = parent ? parent.device_url : null;}
     StorageNode.prototype = new ContentNode();
     function ShareNode(url, parent) {
         ContentNode.call(this, url, parent);
@@ -136,8 +147,7 @@ var spideroak = function () {
             // This is a share room, which is the root of the collection.
             this.root_url = url; }
         else {
-            this.root_url = parent.root_url; }
-    }
+            this.root_url = parent.root_url; }}
     ShareNode.prototype = new ContentNode();
 
     function RootStorageNode(url, parent) {
@@ -171,6 +181,13 @@ var spideroak = function () {
         delete this.subdirs;
         delete this.files; }
     FileShareNode.prototype = new ShareNode();
+
+    ContentNode.prototype.is_root = function () {
+        /* True if the node is a collections top-level item. */
+        return (this.url === this.root_url);
+    }
+
+    /* Remote data access: */
 
     ContentNode.prototype.visit = function () {
         /* Get up-to-date with remote copy and show. */
@@ -230,29 +247,6 @@ var spideroak = function () {
         }
         this.lastfetched = when;
     }
-
-    ContentNode.prototype.show = function () {
-        /* Present self in the UI. */
-        var page_id = this.get_page_id();
-        var page = $("#" + page_id);
-        // >>>
-        blather(this + ".show() on page " + page_id);
-    }
-    ContentNode.prototype.is_root = function () {
-        /* True if the node is a collections top-level item. */
-        return (this.url === this.root_url);
-    }
-    ContentNode.prototype.set_page_id = function () {
-        /* Set the UI page id, according to stored characteristics. */
-        // TODO: Actually allocate and manage pages per node.
-        this.page_id = (this.parent
-                        ? this.parent.get_page_id()
-                        : defaults.storage_root_page_id);
-    }
-    ContentNode.prototype.get_page_id = function () {
-        /* Return the UI page id. */
-        return this.page_id;
-    }
     ContentNode.prototype.up_to_date = function (when) {
         /* True if provisioned data is considered current.
            Optional 'when' specifies (new) time we were fetched. */
@@ -282,9 +276,45 @@ var spideroak = function () {
                 },
                })
     };
+
+    /* Content node presentation/page management */
+
+    ContentNode.prototype.set_page_id = function () {
+        /* Set the UI page id, according to stored characteristics. */
+        // TODO: Actually allocate and manage pages per node.
+        this.page_id = (this.parent
+                        ? this.parent.get_page_id()
+                        : defaults.storage_root_page_id);
+    }
+    ContentNode.prototype.get_page_id = function () {
+        /* Return the UI page id. */
+        return this.page_id;
+    }
+    ContentNode.prototype.show = function () {
+        /* Present self in the UI. */
+        var page = this.get_my_page();
+        // >>>
+        blather(this + ".show() on page " + page_id);
+    }
+    ContentNode.prototype.layout_my_page = function () {
+    }
+    ContentNode.prototype.get_my_page = function () {
+        /* Return a jQuery object for this node, allocating if necessary.
+           Connection to the parent, etc, is included.
+         */
+        var $got = $("#" + this.get_page_id());
+        if (! $got) {
+        }
+        return $got
+    }
+
+    /* Convenience: */
+
     ContentNode.prototype.toString = function () {
         return "<Content node " + this.url + ">";
     }
+
+    /* Content node collection management: */
 
     var content_node_manager = function () {
         /* A singleton utility for getting and removing content node objects.
