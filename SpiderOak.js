@@ -13,10 +13,14 @@
   - Content visits:
     We intercept navigation to content (eg, $.mobile.pageChange) repository
     URLs and intervene via binding of handle_content_visit to jQuery mobile
-    "pagebeforechange" event.  URLs are handled according to residing
-    within those registered on my.content_root_urls.
-  - My routines which return jQuery objects end in '$', and (following common
-    practice) my variables intended to contain jQuery objects start with '$'.
+    "pagebeforechange" event. URLs included as href links must start with
+    '#' to trigger jQuery Mobile's navigation detection, which by default
+    tracks changes to location.hash.  handle_content_visit() dispatches those
+    URLs it receives that reside within the ones on my.content_root_urls,
+    to which the root URLs are registered by the root visiting routines.
+
+  - My routines which return jQuery objects end in '$', and - following common
+    practice - my variables intended to contain jQuery objects start with '$'.
 */
 
 SO_DEBUGGING = true;            // for misc.js:blather()
