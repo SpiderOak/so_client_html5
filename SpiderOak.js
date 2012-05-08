@@ -317,21 +317,29 @@ var spideroak = function () {
         var $header = $page.children(":jqmData(role=header)");
 	var $content = $page.children(":jqmData(role=listview)");
         var markup = "";
-        var list_open = "<ul data-role='listview' data-inset='true'>\n"
+        var ul_open = "<ul data-role='listview' data-inset='true'>\n"
+        var ul_close = "</ul>\n"
         var i, sub;
 
-        markup += list_open
-        for (i in this.subdirs) {
-            sub = content_node_manager.get(this.subdirs[i]);
-            markup += ('<li><a href="' + sub.url + '">'
-                       + sub.name + '</a></li>'); };
-        markup += "</ul>\n" + list_open;
-        for (i in this.files) {
-            sub = content_node_manager.get(this.subdirs[i]);
-            markup += ('<li><a href="' + sub.url + '">'
-                       + sub.name + '</a></li>\n'); };
-	markup += "</ul>";
-
+        if (! (this.subdirs || this.files)) {
+            markup += "<p> No contents. </p>"; }
+        else {
+            if (this.subdirs) {
+                markup += ul_open;
+                for (i in this.subdirs) {
+                    sub = content_node_manager.get(this.subdirs[i]);
+                    // Leading '#' on url so pageChange handler is triggered:
+                    markup += ('<li><a href="#' + sub.url + '">'
+                               + sub.name + '</a></li>'); };
+                markup += ul_close; }
+            if (this.files) {
+                markup += ul_open;
+                for (i in this.files) {
+                    sub = content_node_manager.get(this.subdirs[i]);
+                    markup += ('<li><a href="' + sub.url + '">'
+                               + sub.name + '</a></li>\n'); };
+                markup += ul_close; }
+        }
         $page.find("h2").html(this.name);
         $content.html(markup);
         $page.page();
