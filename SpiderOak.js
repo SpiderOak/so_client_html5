@@ -323,13 +323,13 @@ var spideroak = function () {
         markup += list_open
         for (i in this.subdirs) {
             sub = content_node_manager.get(this.subdirs[i]);
-            markup += ('<li><a href="' + sub.url + ">"
-                       + sub.name + "</a></li>"); };
+            markup += ('<li><a href="' + sub.url + '">'
+                       + sub.name + '</a></li>'); };
         markup += "</ul>\n" + list_open;
         for (i in this.files) {
             sub = content_node_manager.get(this.subdirs[i]);
-            markup += ('<li><a href="' + sub.url + ">"
-                       + sub.name + "</a></li>\n"); };
+            markup += ('<li><a href="' + sub.url + '">'
+                       + sub.name + '</a></li>\n'); };
 	markup += "</ul>";
 
         $page.find("h2").html(this.name);
