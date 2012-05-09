@@ -603,3 +603,19 @@ var spideroak = function () {
                 "name": " Server / Colorful",
                 "lastlogin": 1335464648, "lastcommit": 1335464699}]}
 */
+/* Directory (Folder) resource example json data:
+{dirs: [["display name of folder", "subfolder/"]],
+ files: [
+         {url: "relative url to download file",
+          name: "filename",
+          size: <file size in bytes>,
+          ctime: <unix timestamp creation time>,
+          mtime: <unix timestamp modification time>,
+          preview_25: "relative url of 25px file preview, if available",
+          preview_48: "relative url of 48px file preview, if available",
+          preview_228: "relative url of 228px file preview, if available",
+          preview_800: "relative url of 800px file preview, if available",
+          versions: <number of historical versions available>
+         }
+        ]}
+*/
