@@ -261,11 +261,13 @@ var spideroak = function () {
     }
     ContentNode.prototype.provision_populate = function (data, when) {
         /* Stub, must be overridden by type-specific provisionings. */
-        throw new Error("Type-specific provisioning implementation missing.")
+        error_alert("Not yet implemented",
+                   "Type-specific provisioning implementation missing.")
     }
     RootStorageNode.prototype.provision_populate = function (data, when) {
-        /* Embody the root content item with 'data'. */
-        var mgr = content_node_manager
+        /* Embody the root content item with 'data'.
+           'when' is time soon before data was fetched. */
+        var mgr = content_node_manager;
         var url, dev, devdata;
         var possessive = (my.username.charAt(my.username.length-1) == "s"
                           ? "' " : "'s ")
@@ -390,6 +392,7 @@ var spideroak = function () {
         var ul_open = "<ul data-role='listview' data-inset='true'>\n"
         var ul_close = "</ul>\n"
         var i, sub;
+        var mgr = content_node_manager;
 
         if (! (this.subdirs || this.files)) {
             markup += "<p> No contents. </p>"; }
@@ -397,7 +400,7 @@ var spideroak = function () {
             if (this.subdirs) {
                 markup += ul_open;
                 for (i in this.subdirs) {
-                    sub = content_node_manager.get(this.subdirs[i]);
+                    sub = mgr.get(this.subdirs[i]);
                     // Leading '#' on url so pageChange handler is triggered:
                     markup += ('<li><a href="#' + sub.url + '">'
                                + sub.emblem + " "
