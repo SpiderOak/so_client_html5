@@ -64,20 +64,24 @@ b32encode = function(s) {
     return parts.join("");
 }
 
-
 function error_alert(purpose, status_code) {
-    var msg = purpose + ": ";
-    if (status_code === 401) {
-        msg += 'Unauthorized.';
-    } else if (status_code === 403) {
-        msg += 'Incorrect username or password.';
-    } else if (status_code === 404) {
-        msg += 'Incorrect ShareID or RoomKey.';
-    } else {
-        msg += ('Temporary server failure. Please'
-                + ' try again in a few minutes.');
-    }
-    alert(translate(msg));
+    /* Post and alert and throw an error for 'purpose' with 'status_code'.
+       'purpose' should name the problem, and 'status_code' can be one
+       of a few SpiderOak web status codes, or text elaborating the problem. */
+    var msg;
+    if (typeof status_code === "string") {
+        msg = status_code; }
+    else if (status_code === 401) {
+        msg = 'Unauthorized.'; }
+    else if (status_code === 403) {
+        msg = 'Incorrect username or password.'; }
+    else if (status_code === 404) {
+        msg = 'Incorrect ShareID or RoomKey.'; }
+    else {
+        msg = ('Temporary server failure. Please try again later.'); }
+    msg = translate(purpose) + ": " + translate(msg);
+    alert(msg);
+    throw new Error(msg);
 }
 
 function blather(msg, do_alert) {
