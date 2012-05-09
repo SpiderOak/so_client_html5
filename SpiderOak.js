@@ -51,9 +51,11 @@ var spideroak = function () {
         storage_path_prefix: "/storage/",
         share_path_prefix: "/share/",
         storage_root_page_id: "storage-root",
-        devices_query_string: '?device_info=yes',
+        devices_query_expression: 'device_info=yes',
+        versions_query_expression: 'format=version_info',
         home_page_id: 'home',
         root_storage_node_label: "Devices",
+        preview_sizes: [25, 48, 228, 800],
         header_markup: '<div data-role="header">\
       <div class="ui-grid-c">\
         <div class="ui-block-a">\
@@ -177,7 +179,7 @@ var spideroak = function () {
     function RootStorageNode(url, parent) {
         StorageNode.call(this, url, parent);
         // TODO: Do we really want to always get the root with devices details?
-        this.query_qualifier = defaults.devices_query_string;
+        this.query_qualifier = "?" + defaults.devices_query_expression;
         this.emblem = "Root:";
         this.stats = null;
         delete this.files; }
