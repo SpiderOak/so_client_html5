@@ -54,6 +54,20 @@ var spideroak = function () {
         devices_query_string: '?device_info=yes',
         home_page_id: 'home',
         root_storage_node_label: "Devices",
+        header_markup: '<div data-role="header">\
+      <div class="ui-grid-c">\
+        <div class="ui-block-a">\
+          <img src="brand_images/named_logo.png" alt="Logo">\
+        </div>\
+        <div class="ui-block-b">\
+          <h2> ~general~ </h2>\
+        </div>\
+        <div class="ui-block-c">\
+          <h2> ~specific~ </h2>\
+        </div>\
+      </div>\
+    </div>',
+
     }
     var my = {
         /* Login session settings: */
@@ -342,22 +356,33 @@ var spideroak = function () {
                     sub = content_node_manager.get(this.subdirs[i]);
                     // Leading '#' on url so pageChange handler is triggered:
                     markup += ('<li><a href="#' + sub.url + '">'
+                               + sub.emblem + " "
                                + sub.name + '</a></li>'); };
                 markup += ul_close; }
             if (this.files) {
                 markup += ul_open;
                 for (i in this.files) {
                     sub = content_node_manager.get(this.subdirs[i]);
-                    markup += ('<li><a href="' + sub.url + '">'
+                    markup += ('<li><a href="#' + sub.url + '">'
+                               + sub.emblem + " "
                                + sub.name + '</a></li>\n'); };
                 markup += ul_close; }
         }
-        $page.find("h2").html(this.name);
+        $header.html(this.page_header_markup("path", this.name, 3));
         $content.html(markup);
         $page.page();
         $content.find(":jqmData(role=listview)").listview();
         this.constructed_page$ = $page;
         return $page;
+    }
+    ContentNode.prototype.page_header_markup = function(general, specific,
+                                                        level) {
+        /* Return markup with general and specific legend fields filled in.
+           Optional level is header level to use, instead of default. */
+        var got = defaults.header_markup;
+        got = got.replace(/~general~/, general).replace(/~specific~/, specific);
+        if (level) { got = got.replace(/h2>/g, "h" + level + ">"); }
+        return got;
     }
     ContentNode.prototype.$get_my_page = function () {
         /* Return this node's jQuery object; empty if page not established. */
