@@ -374,7 +374,7 @@ var spideroak = function () {
         /* Trigger UI focus on our content layout. */
         // We use whatever layout is already done.
         var $page = this.$get_my_page();
-        blather(this + ".show() " + this.url + " on page " + this.page_id);
+        blather(this + ".show() on page " + this.page_id);
         options.dataUrl = this.page_id;
         $.mobile.changePage($page, options);
     }
@@ -383,7 +383,7 @@ var spideroak = function () {
         var $page = this.$get_my_page();
         if ($page.length === 0) {
             // >>> Mint page:
-            throw new Error(".layout new page not yet implemented"); }
+            error_alert("Not yet implemented", ".layout() on new page"); }
         var my_url = this.url;
         var superior_url = this.parent_url || defaults.home_page_id;
         var $header = $page.children(":jqmData(role=header)");
@@ -558,8 +558,8 @@ var spideroak = function () {
                 success: function (data) {
                     var match = data.match(/^(login|location):(.+)$/m);
                     if (!match) {
-                        error_alert('Temporary server failure. Please'
-                                    + ' try again in a few minutes.');
+                        error_alert('Temporary server failure',
+                                    'Please try again later.');
                     } else if (match[1] === 'login') {
                         if (match[2].charAt(0) === "/") {
                             login_url = server_host_url + match[2];
@@ -578,7 +578,7 @@ var spideroak = function () {
                     }
                 },
                 error: function (xhr) {
-                    error_alert("SpiderOak Login", xhr.status);
+                    error_alert("Storage login", xhr.status);
                 }
             });
         },
