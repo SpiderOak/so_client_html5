@@ -194,6 +194,7 @@ var spideroak = function () {
     function DirectoryStorageNode(url, parent) {
         this.emblem = "Directory:";
         StorageNode.call(this, url, parent); }
+    DirectoryStorageNode.prototype = new StorageNode();
     function DirectoryShareNode(url, parent) {
         this.emblem = "Directory:";
         ShareNode.call(this, url, parent); }
@@ -281,6 +282,47 @@ var spideroak = function () {
         }
         this.lastfetched = when;
     }
+    DeviceStorageNode.prototype.provision_populate = function (data, when) {
+        /* Embody directory content items with 'data'.
+           'when' is time soon before data was fetched. */
+        return DirectoryStorageNode.prototype.provision_populate.call(this,
+                                                                      data,
+                                                                      when); }
+    DirectoryStorageNode.prototype.provision_populate = function (data, when) {
+        /* Embody directory content items with 'data'.
+           'when' is time soon before data was fetched. */
+        var mgr = content_node_manager;
+        var url, dir, dirdata, file, filedata;
+        for (var i in data.dirs) {
+            dirdata = data.dirs[i];
+            url = this.parent_url + dirdata[0] + "/";
+            // Get a node for the subdir:
+            dir = mgr.get(url, this)
+            dir.name = dirdata[0];
+            // Include, if not already present:
+            if (! ($.inArray(url, this.subdirs) >= 0)) {
+                this.subdirs.push(url); }}
+        for (var i in data.files) {
+            filedata = data.files[i];
+            url = this.parent_url + filedata['url'];
+            // Get a node for the file:
+            file = mgr.get(url, this);
+            var fields = ['name', 'size', 'ctime', 'mtime', 'versions'];
+            for (var nmi in fields) {
+                var name = fields[nmi];
+                if (name in filedata) { this[name] = filedata[name]; }}
+            for (var szi in defaults.preview_sizes) {
+                var sz = "preview_" + defaults.preview_sizes[szi];
+                if (sz in filedata) {
+                    file[sz] = filedata[sz]; }}
+            // Include, if not already present:
+            if (! ($.inArray(url, this.files) >= 0)) {
+                this.files.push(url); }}
+        this.lastfetched = when;
+    }
+    FileStorageNode.prototype.provision_populate = function (data, when) {
+        error_alert("Not yet implemented", "File preview"); }
+
     ContentNode.prototype.up_to_date = function (when) {
         /* True if provisioned data is considered current.
            Optional 'when' specifies (new) time we were fetched. */
@@ -362,19 +404,39 @@ var spideroak = function () {
             if (this.files) {
                 markup += ul_open;
                 for (i in this.files) {
-                    sub = content_node_manager.get(this.subdirs[i]);
+                    sub = mgr.get(this.subdirs[i]);
                     markup += ('<li><a href="#' + sub.url + '">'
                                + sub.emblem + " "
                                + sub.name + '</a></li>\n'); };
                 markup += ul_close; }
         }
-        $header.html(this.page_header_markup("path", this.name, 3));
+        $header.html(this.page_header_markup(this.containment_path(),
+                                             this.name,
+                                             3));
         $content.html(markup);
         $page.page();
         $content.find(":jqmData(role=listview)").listview();
         this.constructed_page$ = $page;
         return $page;
     }
+    ContentNode.prototype.containment_path = function() {
+        /* Return breadcrumbs-like containing path, per content type. */
+        return "SpiderOak"; }
+    RootStorageNode.prototype.containment_path = function() {
+        /* Return breadcrumbs-like containing path, per content type. */
+        return my.username; }
+    DeviceStorageNode.prototype.containment_path = function() {
+        /* Return breadcrumbs-like containing path, per content type. */
+        return my.username; }
+    DirectoryStorageNode.prototype.containment_path = function() {
+        /* Return breadcrumbs-like containing path, per content type. */
+        var parent = content_node_manager.get(this.parent_url);
+        if (parent.is_device()) {
+            return parent.name + " /" + this.name; }
+        else { return parent.containment_path() + "/" + this.name; }}
+    FileStorageNode.prototype.containment_path = function() {
+        /* Return breadcrumbs-like containing path, per content type. */
+        return DirectoryStorageNode.containment_path.call(this); }
     ContentNode.prototype.page_header_markup = function(general, specific,
                                                         level) {
         /* Return markup with general and specific legend fields filled in.
