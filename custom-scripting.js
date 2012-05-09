@@ -10,3 +10,9 @@ $(document).bind("mobileinit", function(){
         "defaultPageTransition": "fade",
     });
 });
+$.ajaxSetup({
+    beforeSend:function(){
+        $.mobile.showPageLoadingMsg(); },
+    complete:function(){
+        $.mobile.hidePageLoadingMsg(); }
+});
