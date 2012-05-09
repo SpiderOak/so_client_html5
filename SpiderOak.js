@@ -142,13 +142,14 @@ var spideroak = function () {
             this.constructed_page$;
             this.set_page_id();
             this.lastfetched = false;
+            this.emblem;        // TODO: Eventually, an icon, for now text.
         }}
     function StorageNode(url, parent) {
         ContentNode.call(this, url, parent);
         // All but the root storage nodes are contained within a device.
         // The DeviceStorageNode sets the device url, which will trickle
         // down to all its contents.
-        this.device_url = parent ? parent.device_url : null;}
+        this.device_url = parent ? parent.device_url : null; }
     StorageNode.prototype = new ContentNode();
     function ShareNode(url, parent) {
         ContentNode.call(this, url, parent);
@@ -163,28 +164,35 @@ var spideroak = function () {
         StorageNode.call(this, url, parent);
         // TODO: Do we really want to always get the root with devices details?
         this.query_qualifier = defaults.devices_query_string;
+        this.emblem = "Root:";
         this.stats = null;
         delete this.files; }
     RootStorageNode.prototype = new StorageNode();
     function RootShareNode(url, parent) {
+        this.emblem = "Room:";
         ShareNode.call(this, url, parent); }
     RootShareNode.prototype = new ShareNode();
     function DeviceStorageNode(url, parent) {
         StorageNode.call(this, url, parent);
+        this.emblem = "Device:";
         this.device_url = url; }
     DeviceStorageNode.prototype = new StorageNode();
     function DirectoryStorageNode(url, parent) {
+        this.emblem = "Directory:";
         StorageNode.call(this, url, parent); }
     function DirectoryShareNode(url, parent) {
+        this.emblem = "Directory:";
         ShareNode.call(this, url, parent); }
     DirectoryShareNode.prototype = new ShareNode();
     function FileStorageNode(url, parent) {
+        this.emblem = "File:";
         StorageNode.call(this, url, parent);
         this.is_container = false;
         delete this.subdirs;
         delete this.files; }
     FileStorageNode.prototype = new StorageNode();
     function FileShareNode(url, parent) {
+        this.emblem = "File:";
         ShareNode.call(this, url, parent);
         this.is_container = false;
         delete this.subdirs;
