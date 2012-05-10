@@ -388,7 +388,7 @@ var spideroak = function () {
         var superior_url = this.parent_url || defaults.home_page_id;
         var $header = $page.children(":jqmData(role=header)");
 	var $content = $page.children(":jqmData(role=listview)");
-        var markup = "";
+        var markup = "<div> <br/> </div>";
         var ul_open = "<ul data-role='listview' data-inset='true'>\n"
         var ul_close = "</ul>\n"
         var i, sub;
