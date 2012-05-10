@@ -412,14 +412,11 @@ var spideroak = function () {
                 for (i in this.files) {
                     sub = mgr.get(this.subdirs[i], this);
                     markup += ('<li><a href="#' + sub.url + '">'
-                               + sub.emblem + " "
+                               + sub.emblem + ": "
                                + sub.name + '</a></li>\n'); };
                 markup += ul_close; }
         }
-        $header.html(this.page_header_markup(this.containment_path(),
-                                             this.parent_url,
-                                             this.name,
-                                             3));
+        $header.html(this.page_header_markup(3));
         $content.html(markup);
         $page.page();
         $content.find(":jqmData(role=listview)").listview();
@@ -444,18 +441,23 @@ var spideroak = function () {
     FileStorageNode.prototype.containment_path = function() {
         /* Return breadcrumbs-like containing path, per content type. */
         return DirectoryStorageNode.containment_path.call(this); }
-    ContentNode.prototype.page_header_markup = function(general, general_url,
-                                                        specific, level) {
+    ContentNode.prototype.page_header_markup = function(header_level) {
         /* Return markup with general and specific legend fields and urls.
            Optional level is header level to use, instead of default. */
+        var container = this.containment_path();
+        var container_url = this.parent_url;
+        var here = this.emblem + ": " + this.name;
         var got = defaults.header_markup;
-        got = got.replace(/~specific~/, specific);
-        var newgen = general;
-        got = got.replace(/~general~/,
-                          (! general_url)
-                          ? general
-                          : '<a href="#' +general_url+ '">' +general+ '</a>');
-        if (level) { got = got.replace(/h2>/g, "h" + level + ">"); }
+        if (this.parent_url) {
+            container = "Up: " + container;
+            got = got.replace(/~general~/, ('<a href="#' +container_url+ '">'
+                                            + container + '</a>')); }
+        else { got = got.replace(/~general~/, container); }
+        // XXX This excessive current-location link is for Port Error debugging.
+        got = got.replace(/~specific~/,
+                          '<a href="#' + this.url + '">' + here + '</a>');
+        if (header_level) {
+            got = got.replace(/h2>/g, "h" + header_level + ">"); }
         return got;
     }
     ContentNode.prototype.$get_my_page = function () {
