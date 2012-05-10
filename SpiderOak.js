@@ -515,7 +515,9 @@ var spideroak = function () {
                    that could be circular and prevent GC. */
                 delete by_url[node.url];
                 delete node;
-            }
+            },
+            // Expose the by_url registry when debugging:
+            bu: (SO_DEBUGGING ? by_url : null),
         }
     }()
 
@@ -583,6 +585,8 @@ var spideroak = function () {
                 }
             });
         },
+        // Expose the content node manager for debugging:
+        cnm: (SO_DEBUGGING ? content_node_manager : null),
     }
 }();
 
