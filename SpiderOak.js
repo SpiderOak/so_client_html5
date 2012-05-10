@@ -62,7 +62,7 @@ var spideroak = function () {
           <img src="brand_images/named_logo.png" alt="Logo">\
         </div>\
         <div class="ui-block-b">\
-          <h2> ~general~ </h2>\
+          <h2> <a href="~generalurl~">~general~</a> </h2>\
         </div>\
         <div class="ui-block-c">\
           <h2> ~specific~ </h2>\
@@ -417,6 +417,7 @@ var spideroak = function () {
                 markup += ul_close; }
         }
         $header.html(this.page_header_markup(this.containment_path(),
+                                             this.parent_url,
                                              this.name,
                                              3));
         $content.html(markup);
@@ -443,12 +444,13 @@ var spideroak = function () {
     FileStorageNode.prototype.containment_path = function() {
         /* Return breadcrumbs-like containing path, per content type. */
         return DirectoryStorageNode.containment_path.call(this); }
-    ContentNode.prototype.page_header_markup = function(general, specific,
-                                                        level) {
-        /* Return markup with general and specific legend fields filled in.
+    ContentNode.prototype.page_header_markup = function(general, general_url,
+                                                        specific, level) {
+        /* Return markup with general and specific legend fields and urls.
            Optional level is header level to use, instead of default. */
         var got = defaults.header_markup;
         got = got.replace(/~general~/, general).replace(/~specific~/, specific);
+        got = got.replace(/~generalurl~/, '#' + general_url)
         if (level) { got = got.replace(/h2>/g, "h" + level + ">"); }
         return got;
     }
