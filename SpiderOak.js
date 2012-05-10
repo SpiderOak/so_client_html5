@@ -299,7 +299,7 @@ var spideroak = function () {
         var url, dir, dirdata, file, filedata;
         for (var i in data.dirs) {
             dirdata = data.dirs[i];
-            url = this.parent_url + dirdata[0] + "/";
+            url = this.url + dirdata[1];
             // Get a node for the subdir:
             dir = mgr.get(url, this)
             dir.name = dirdata[0];
@@ -308,7 +308,7 @@ var spideroak = function () {
                 this.subdirs.push(url); }}
         for (var i in data.files) {
             filedata = data.files[i];
-            url = this.parent_url + filedata['url'];
+            url = this.url + filedata['url'];
             // Get a node for the file:
             file = mgr.get(url, this);
             var fields = ['name', 'size', 'ctime', 'mtime', 'versions'];
