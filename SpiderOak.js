@@ -62,7 +62,7 @@ var spideroak = function () {
           <img src="brand_images/named_logo.png" alt="Logo">\
         </div>\
         <div class="ui-block-b">\
-          <h2> <a href="~generalurl~">~general~</a> </h2>\
+          <h2> ~general~ </h2>\
         </div>\
         <div class="ui-block-c">\
           <h2> ~specific~ </h2>\
@@ -449,8 +449,12 @@ var spideroak = function () {
         /* Return markup with general and specific legend fields and urls.
            Optional level is header level to use, instead of default. */
         var got = defaults.header_markup;
-        got = got.replace(/~general~/, general).replace(/~specific~/, specific);
-        got = got.replace(/~generalurl~/, '#' + general_url)
+        got = got.replace(/~specific~/, specific);
+        var newgen = general;
+        got = got.replace(/~general~/,
+                          (! general_url)
+                          ? general
+                          : '<a href="#' +general_url+ '">' +general+ '</a>');
         if (level) { got = got.replace(/h2>/g, "h" + level + ">"); }
         return got;
     }
