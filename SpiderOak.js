@@ -400,7 +400,7 @@ var spideroak = function () {
             if (this.subdirs) {
                 markup += ul_open;
                 for (i in this.subdirs) {
-                    sub = mgr.get(this.subdirs[i]);
+                    sub = mgr.get(this.subdirs[i], this);
                     // Leading '#' on url so pageChange handler is triggered:
                     markup += ('<li><a href="#' + sub.url + '">'
                                + sub.emblem + " "
@@ -409,7 +409,7 @@ var spideroak = function () {
             if (this.files) {
                 markup += ul_open;
                 for (i in this.files) {
-                    sub = mgr.get(this.subdirs[i]);
+                    sub = mgr.get(this.subdirs[i], this);
                     markup += ('<li><a href="#' + sub.url + '">'
                                + sub.emblem + " "
                                + sub.name + '</a></li>\n'); };
