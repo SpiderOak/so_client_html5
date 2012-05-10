@@ -235,7 +235,8 @@ var spideroak = function () {
                                     { this_node.provision(data, when);
                                       this_node.layout();
                                       this_node.show(options); },
-                                    this_node.handle_failed_visit);
+                                    function (data, when)
+                                    { this_node.handle_failed_visit; })
         } else {
             this.show(options);
         }
