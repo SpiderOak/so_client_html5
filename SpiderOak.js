@@ -180,36 +180,36 @@ var spideroak = function () {
         StorageNode.call(this, url, parent);
         // TODO: Do we really want to always get the root with devices details?
         this.query_qualifier = "?" + defaults.devices_query_expression;
-        this.emblem = "Root:";
+        this.emblem = "Root";
         this.stats = null;
         delete this.files; }
     RootStorageNode.prototype = new StorageNode();
     function RootShareNode(url, parent) {
-        this.emblem = "Room:";
+        this.emblem = "Room";
         ShareNode.call(this, url, parent); }
     RootShareNode.prototype = new ShareNode();
     function DeviceStorageNode(url, parent) {
         StorageNode.call(this, url, parent);
-        this.emblem = "Device:";
+        this.emblem = "Device";
         this.device_url = url; }
     DeviceStorageNode.prototype = new StorageNode();
     function DirectoryStorageNode(url, parent) {
-        this.emblem = "Directory:";
+        this.emblem = "Directory";
         StorageNode.call(this, url, parent); }
     DirectoryStorageNode.prototype = new StorageNode();
     function DirectoryShareNode(url, parent) {
-        this.emblem = "Directory:";
+        this.emblem = "Directory";
         ShareNode.call(this, url, parent); }
     DirectoryShareNode.prototype = new ShareNode();
     function FileStorageNode(url, parent) {
-        this.emblem = "File:";
+        this.emblem = "File";
         StorageNode.call(this, url, parent);
         this.is_container = false;
         delete this.subdirs;
         delete this.files; }
     FileStorageNode.prototype = new StorageNode();
     function FileShareNode(url, parent) {
-        this.emblem = "File:";
+        this.emblem = "File";
         ShareNode.call(this, url, parent);
         this.is_container = false;
         delete this.subdirs;
@@ -404,7 +404,7 @@ var spideroak = function () {
                     sub = mgr.get(this.subdirs[i], this);
                     // Leading '#' on url so pageChange handler is triggered:
                     markup += ('<li><a href="#' + sub.url + '">'
-                               + sub.emblem + " "
+                               + sub.emblem + ": "
                                + sub.name + '</a></li>'); };
                 markup += ul_close; }
             if (this.files) {
