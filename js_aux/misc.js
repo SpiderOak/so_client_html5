@@ -80,6 +80,8 @@ function error_alert(purpose, status_code) {
     else {
         msg = ('Temporary server failure. Please try again later.'); }
     msg = translate(purpose) + ": " + translate(msg);
+    if (typeof status_code !== "string") {
+        msg += " (" + status_code + ")"; }
     alert(msg);
     throw new Error(msg);
 }
