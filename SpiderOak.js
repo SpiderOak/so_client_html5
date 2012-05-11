@@ -91,6 +91,10 @@ var spideroak = function () {
             e.preventDefault();
             blather("handle_content_visit triggered: " + data.toPage);
             content_node_manager.get(data.toPage).visit(data.options); }}
+    function bind_traversal_handler() {
+        /* Establish page change event handler. */
+        $(document).bind("pagebeforechange", handle_content_visit);
+    }
 
     /* Node-independent URL classification: */
 
@@ -532,9 +536,9 @@ var spideroak = function () {
     /* public: */
     return {
         init: function () {
-            /* Establish event handlers, etc. */
+            /* Do preliminary setup - event handlers, etc. */
             blather("spideroak object init...");
-            $(document).bind("pagebeforechange", handle_content_visit);
+            bind_traversal_handler();
         },
         toString: function () {
             var user = (my.username ? my.username : "-");
