@@ -427,6 +427,10 @@ var spideroak = function () {
         this.constructed_page$ = $page;
         return $page;
     }
+    ContentNode.prototype.is_device = function() {
+        return false; }
+    DeviceStorageNode.prototype.is_device = function() {
+        return true; }
     ContentNode.prototype.containment_path = function() {
         /* Return breadcrumbs-like containing path, per content type. */
         return "SpiderOak"; }
