@@ -319,7 +319,7 @@ var spideroak = function () {
             var fields = ['name', 'size', 'ctime', 'mtime', 'versions'];
             for (var nmi in fields) {
                 var name = fields[nmi];
-                if (name in filedata) { this[name] = filedata[name]; }}
+                if (name in filedata) { file[name] = filedata[name]; }}
             for (var szi in defaults.preview_sizes) {
                 var sz = "preview_" + defaults.preview_sizes[szi];
                 if (sz in filedata) {
@@ -415,10 +415,9 @@ var spideroak = function () {
             if (this.files) {
                 markup += ul_open;
                 for (i in this.files) {
-                    sub = mgr.get(this.subfiles[i], this);
-                    markup += ('<li><a href="#' + sub.url + '">'
-                               + sub.emblem + ": "
-                               + sub.name + '</a></li>\n'); };
+                    sub = mgr.get(this.files[i], this);
+                    markup += ('<li>' + sub.emblem + ": "
+                               + sub.name + '</li>\n'); };
                 markup += ul_close; }
         }
         $header.html(this.page_header_markup(3));
