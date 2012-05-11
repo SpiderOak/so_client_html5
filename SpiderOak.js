@@ -95,7 +95,8 @@ var spideroak = function () {
             content_node_manager.get(data.toPage).visit(data.options); }}
     function bind_traversal_handler() {
         /* Establish page change event handler. */
-        $(document).bind("pagebeforechange", handle_content_visit);
+        // Gets registered on: $(document).data('events').pagebeforechange
+        $(document).bind("pagebeforechange.SpiderOak", handle_content_visit);
     }
 
     /* Node-independent URL classification: */
