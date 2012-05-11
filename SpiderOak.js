@@ -380,8 +380,9 @@ var spideroak = function () {
         // We use whatever layout is already done.
         var $page = this.$get_my_page();
         blather(this + ".show() on page " + this.page_id);
-        options.dataUrl = this.page_id;
-        $.mobile.changePage($page, options);
+        if ($.mobile.activePage[0].id !== this.page_id) {
+            options.dataUrl = '#' + this.page_id;
+            $.mobile.changePage($page, options); }
     }
     ContentNode.prototype.layout = function () {
         /* Deploy content as markup on our page. */
