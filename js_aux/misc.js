@@ -14,15 +14,6 @@ $(document).ready(function() {
     $.event.props = $.event.props.join('|').replace('layerX|layerY|', '').split('|');
 })
 
-/* Object instantiation convenience, per Douglas Crockford: */
-// if (typeof Object.beget !== 'function') {
-//      Object.beget = function (o) {
-//         var F = function () {};
-//          F.prototype = o;
-//          return new F();
-//   };
-// }
-
 /* from http://forthescience.org/blog/2010/11/30/base32-encoding-in-javascript/
    Unrestrained via "WTFPL": http://sam.zoy.org/wtfpl/
 */
