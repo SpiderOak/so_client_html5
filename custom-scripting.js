@@ -7,8 +7,8 @@ $(document).bind("mobileinit", function(){
 */
 $(document).bind("mobileinit", function(){
     $.extend($.mobile, {
-        "defaultPageTransition": "fade",
         "pushStateEnabled": false,
+        "defaultPageTransition": "fade",
     });
 });
 $.ajaxSetup({
