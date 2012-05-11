@@ -30,7 +30,7 @@ $(document).ready(function () {
     $('.nav_login_storage form').submit(function () {
         var username = $('input[name=username]', this).val();
         var password = $('input[name=password]', this).val();
-        spideroak.remote_login({username: username, password: password});
+        spideroak.storage_login({username: username, password: password});
         return false;
     });
 });
@@ -555,7 +555,7 @@ var spideroak = function () {
 
         /* Login and account/identity. */
 
-        remote_login: function (login_info, url) {
+        storage_login: function (login_info, url) {
             /* Login to storage account and commence browsing at the devices.
                We provide for redirection to specific alternative servers
                by recursive calls. See:
@@ -587,7 +587,7 @@ var spideroak = function () {
                         } else {
                             login_url = match[2];
                         }
-                        spideroak.remote_login(login_info, login_url);
+                        spideroak.storage_login(login_info, login_url);
                     } else {
                         // Browser haz auth cookies, we haz relative location.
                         // Go there, and machinery will intervene to handle it.
