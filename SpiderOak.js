@@ -410,7 +410,7 @@ var spideroak = function () {
             if (this.files) {
                 markup += ul_open;
                 for (i in this.files) {
-                    sub = mgr.get(this.subdirs[i], this);
+                    sub = mgr.get(this.subfiles[i], this);
                     markup += ('<li><a href="#' + sub.url + '">'
                                + sub.emblem + ": "
                                + sub.name + '</a></li>\n'); };
