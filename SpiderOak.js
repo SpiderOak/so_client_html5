@@ -59,7 +59,9 @@ var spideroak = function () {
         header_markup: '<div data-role="header">\
       <div class="ui-grid-c">\
         <div class="ui-block-a">\
-          <img src="brand_images/named_logo.png" alt="Logo">\
+          <a href="~homeurl~">\
+            <img src="brand_images/named_logo.png" alt="Logo">\
+          </a>\
         </div>\
         <div class="ui-block-b">\
           <h2> ~general~ </h2>\
@@ -456,14 +458,13 @@ var spideroak = function () {
         var container_url = this.parent_url;
         var here = this.emblem + ": " + this.name;
         var got = defaults.header_markup;
+        got = got.replace(/~homeurl~/, window.location.pathname);
         if (this.parent_url) {
             container = "Up: " + container;
             got = got.replace(/~general~/, ('<a href="#' +container_url+ '">'
                                             + container + '</a>')); }
         else { got = got.replace(/~general~/, container); }
-        // XXX This excessive current-location link is for Port Error debugging.
-        got = got.replace(/~specific~/,
-                          '<a href="#' + this.url + '">' + here + '</a>');
+        got = got.replace(/~specific~/, here);
         if (header_level) {
             got = got.replace(/h2>/g, "h" + header_level + ">"); }
         return got;
