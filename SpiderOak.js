@@ -50,28 +50,12 @@ var spideroak = function () {
         storage_login_path: "/browse/login",
         storage_path_prefix: "/storage/",
         share_path_prefix: "/share/",
-        storage_root_page_id: "storage-root",
+        storage_page_template_id: "storage-page-template",
         devices_query_expression: 'device_info=yes',
         versions_query_expression: 'format=version_info',
         home_page_id: 'home',
         root_storage_node_label: "Devices",
         preview_sizes: [25, 48, 228, 800],
-        header_markup: '<div data-role="header">\
-      <div class="ui-grid-c">\
-        <div class="ui-block-a">\
-          <a href="~homeurl~">\
-            <img src="brand_images/named_logo.png" alt="Logo">\
-          </a>\
-        </div>\
-        <div class="ui-block-b">\
-          <h2> ~general~ </h2>\
-        </div>\
-        <div class="ui-block-c">\
-          <h2> ~specific~ </h2>\
-        </div>\
-      </div>\
-    </div>',
-
     }
     var my = {
         /* Login session settings: */
