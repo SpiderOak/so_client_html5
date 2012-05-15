@@ -235,6 +235,7 @@ var spideroak = function () {
     ContentNode.prototype.handle_failed_visit = function (xhr) {
         /* Do error handling failed visit with 'xhr' XMLHttpResponse report. */
         // TODO: Proper error handling.
+        $.mobile.hidePageLoadingMsg();
         error_alert("Failure reaching " + this.url, xhr.status);
     }
     ContentNode.prototype.provision = function (data, when) {
@@ -570,6 +571,7 @@ var spideroak = function () {
                 success: function (data) {
                     var match = data.match(/^(login|location):(.+)$/m);
                     if (!match) {
+                        $.mobile.hidePageLoadingMsg();
                         error_alert('Temporary server failure',
                                     'Please try again later.');
                     } else if (match[1] === 'login') {
@@ -590,6 +592,7 @@ var spideroak = function () {
                     }
                 },
                 error: function (xhr) {
+                    $.mobile.hidePageLoadingMsg();
                     error_alert("Storage login", xhr.status);
                 }
             });
