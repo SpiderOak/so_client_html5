@@ -17,10 +17,10 @@ $(document).ready(function() {
 /* from http://forthescience.org/blog/2010/11/30/base32-encoding-in-javascript/
    Unrestrained via "WTFPL": http://sam.zoy.org/wtfpl/
 */
-b32encode_trim = function(s) {
+function b32encode_trim(s) {
     return b32encode(s).replace(/=+$/, '');
 }
-b32encode = function(s) {
+function b32encode(s) {
     /* encodes a string s to base32 and returns the encoded string */
     var alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
     var parts = [];
