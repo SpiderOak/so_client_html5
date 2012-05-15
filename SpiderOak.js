@@ -351,67 +351,64 @@ var spideroak = function () {
 
     /* Content node page presentation */
 
-    ContentNode.prototype.set_page_id = function () {
-        /* Set the UI page id, according to stored characteristics. */
-        // TODO: Actually allocate and manage pages per node.
-        this.page_id = (this.parent
-                        ? this.parent.get_page_id()
-                        : defaults.storage_root_page_id);
-    }
-    ContentNode.prototype.get_page_id = function () {
-        /* Return the UI page id. */
-        return this.page_id;
-    }
+    ContentNode.prototype.my_page_id = function () {
+        /* Set the UI page id, escaping special characters as necessary. */
+        return this.url; }
     ContentNode.prototype.show = function (options) {
         /* Trigger UI focus on our content layout. */
         // We use whatever layout is already done.
-        var $page = this.$get_my_page();
-        blather(this + ".show() on page " + this.page_id);
-        if ($.mobile.activePage[0].id !== this.page_id) {
-            options.dataUrl = '#' + this.page_id;
+        var $page = this.my_page$();
+        blather(this + ".show()");
+        if (! this.my_page_from_dom$().length) {
+            this.include_my_page(); }
+        if ($.mobile.activePage[0].id !== this.my_page_id()) {
+            options.dataUrl = '#' + this.my_page_id();
             $.mobile.changePage($page, options); }
     }
+    ContentNode.prototype.include_my_page = function() {
+        /* Include our page in the DOM. */
+        // We include after the storage page template.
+        this.get_storage_page_template$().after(this.my_page$()); }
     ContentNode.prototype.layout = function () {
         /* Deploy content as markup on our page. */
-        var $page = this.$get_my_page();
-        if ($page.length === 0) {
-            // >>> Mint page:
-            error_alert("Not yet implemented", ".layout() on new page"); }
+        var $page = this.my_page$();
         var my_url = this.url;
         var superior_url = this.parent_url || defaults.home_page_id;
-        var $header = $page.children(":jqmData(role=header)");
-	var $content = $page.children(":jqmData(role=listview)");
-        var markup = "<div> <br/> </div>";
-        var ul_open = "<ul data-role='listview' data-inset='true'>\n"
-        var ul_close = "</ul>\n"
-        var i, sub;
+        var $header = $page.find('[data-role="header"');
+	var $list = $page.find('[data-role="listview"]');
+        var $item, i, $cursor, c, subnode, children;
         var mgr = content_node_manager;
 
-        if (! (this.subdirs || this.files)) {
-            markup += "<p> No contents. </p>"; }
+        this.resolve_storage_page_header();
+        $list.empty();
+
+        function occupied(a) { return a && a.length; }
+        if (! (occupied(this.subdirs) || occupied(this.files))) {
+            $content.after('<p class="empty-sign" data-role="empty-sign">'
+                           + 'Empty. </p>'); }
         else {
-            if (this.subdirs) {
-                markup += ul_open;
+            $cursor = $list;
+            if (occupied(this.subdirs)) {
                 for (i in this.subdirs) {
-                    sub = mgr.get(this.subdirs[i], this);
-                    // Leading '#' on url so pageChange handler is triggered:
-                    markup += ('<li><a href="#' + sub.url + '">'
-                               + sub.emblem + ": "
-                               + sub.name + '</a></li>'); };
-                markup += ul_close; }
-            if (this.files) {
-                markup += ul_open;
+                    subnode = mgr.get(this.subdirs[i], this);
+                    $item = $('<li/>').append('<a href="#' + subnode.url + '">'
+                                              + subnode.emblem + ": "
+                                              + subnode.name + '</a>');
+                    if ($cursor === $list) { $cursor.append($item); }
+                    else { $cursor.after($item); }
+                    $cursor = $item; }
+            }
+            if (occupied(this.files)) {
                 for (i in this.files) {
-                    sub = mgr.get(this.files[i], this);
-                    markup += ('<li>' + sub.emblem + ": "
-                               + sub.name + '</li>\n'); };
-                markup += ul_close; }
+                    subnode = mgr.get(this.files[i], this);
+                    // TODO: Provide for visiting files.
+                    $item = $('<li/>').append(subnode.emblem + ": "
+                                              + subnode.name + '</li>');
+                    if ($cursor === $list) { $cursor.append($item); }
+                    else { $cursor.after($item); }
+                    $cursor = $item; }
+            };
         }
-        $header.html(this.page_header_markup(3));
-        $content.html(markup);
-        $page.page();
-        $content.find(":jqmData(role=listview)").listview();
-        this.constructed_page$ = $page;
         return $page;
     }
     ContentNode.prototype.is_device = function() {
@@ -419,44 +416,54 @@ var spideroak = function () {
     DeviceStorageNode.prototype.is_device = function() {
         return true; }
     ContentNode.prototype.containment_path = function() {
-        /* Return breadcrumbs-like containing path, per content type. */
+        /* Return '/' nested containing path, per content type. */
         return "SpiderOak"; }
     RootStorageNode.prototype.containment_path = function() {
-        /* Return breadcrumbs-like containing path, per content type. */
+        /* Return '/' nested containing path, per content type. */
         return my.username; }
     DeviceStorageNode.prototype.containment_path = function() {
-        /* Return breadcrumbs-like containing path, per content type. */
+        /* Return '/' nested containing path, per content type. */
         return my.username; }
     DirectoryStorageNode.prototype.containment_path = function() {
-        /* Return breadcrumbs-like containing path, per content type. */
+        /* Return '/' nested containing path, per content type. */
         var parent = content_node_manager.get(this.parent_url);
         if (parent.is_device()) {
             return parent.name + " /" + this.name; }
         else { return parent.containment_path() + "/" + this.name; }}
     FileStorageNode.prototype.containment_path = function() {
-        /* Return breadcrumbs-like containing path, per content type. */
+        /* Return '/' nested containing path, per content type. */
         return DirectoryStorageNode.containment_path.call(this); }
-    ContentNode.prototype.page_header_markup = function(header_level) {
-        /* Return markup with general and specific legend fields and urls.
-           Optional level is header level to use, instead of default. */
-        var container = this.containment_path();
+    ContentNode.prototype.resolve_storage_page_header = function() {
+        /* Return markup with general and specific legend fields and urls. */
+        var containment = this.containment_path();
         var container_url = this.parent_url;
-        var here = this.emblem + ": " + this.name;
-        var got = defaults.header_markup;
-        got = got.replace(/~homeurl~/, window.location.pathname);
-        if (this.parent_url) {
-            container = "Up: " + container;
-            got = got.replace(/~general~/, ('<a href="#' +container_url+ '">'
-                                            + container + '</a>')); }
-        else { got = got.replace(/~general~/, container); }
-        got = got.replace(/~specific~/, here);
-        if (header_level) {
-            got = got.replace(/h2>/g, "h" + header_level + ">"); }
-        return got;
+        var $page = this.my_page$();
+        var $container_href = $page.find(".container-href");
+        if (container_url) {
+            containment = "Up: " + containment;
+            $container_href.attr('href', '#' + container_url); }
+        $container_href.text(containment);
+        $page.find("this-header").text(this.emblem + ": " + this.name);
     }
-    ContentNode.prototype.$get_my_page = function () {
-        /* Return this node's jQuery object; empty if page not established. */
-        return this.constructed_page$ || $("#" + this.get_page_id());}
+    ContentNode.prototype.my_page_from_dom$ = function () {
+        return $('#' + fragment_quote(this.my_page_id())); }
+    ContentNode.prototype.my_page$ = function () {
+        /* Return this node's jQuery page object, getting a clone of the
+           storage page template if we don't already have something. */
+        if (! this.$page) {
+            var $template = this.get_storage_page_template$();
+            if (! $template) {
+                error_alert("Missing markup",
+                            "Expected page #"
+                            + defaults.storage_page_template_id
+                            + " not present."); }
+            this.$page = $template.clone();
+            this.$page.attr('id', this.my_page_id());
+            this.$page.attr('data-url', this.my_page_id()); }
+        return this.$page; }
+    ContentNode.prototype.get_storage_page_template$ = function() {
+        return $("#" + defaults.storage_page_template_id); }
+
 
     /* Convenience: */
 
