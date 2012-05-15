@@ -76,11 +76,27 @@
       sharing, and a rich command line and graphical interface. </div>
     <a href="#home" data-inline="true" data-role="button">Home</a>
   </div>
-  <div data-role="page" id="storage-root">
+  <div data-role="page" id="storage-page-template">
     <div data-role="header">
-      <img src="brand_images/named_logo.png" alt="Logo">
+      <div class="ui-grid-c">
+        <div class="ui-block-a">
+          <a href="#" class="logo-image-href">
+            <img class="logo-image"
+                 src="brand_images/named_logo.png" alt="Logo">
+          </a>
+        </div>
+        <div class="ui-block-b">
+          <h3 class="this-container-header">
+            <a href="#" class="container-href"> container </a>
+          </h3>
+        </div>
+        <div class="ui-block-c">
+          <h3 class="this-header"> here </h3>
+        </div>
+      </div>
     </div>
-    <ul data-role="listview">
+    <br/>
+    <ul data-role="listview" data-inset="true">
     </ul>
   </div>
 </body>
