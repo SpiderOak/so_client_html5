@@ -77,6 +77,12 @@ function error_alert(purpose, status_code) {
     throw new Error(msg);
 }
 
+function fragment_quote(id) {
+    /* Escape fragment selector chars to avoid jQuery mistaking for CSS
+       selector *or other* non-fragment constructs. */
+    // The '/' does need to be quoted, surprisingly.
+    return id.replace(/(:|\.|\/)/g,'\\$1'); }
+
 function blather(msg, do_alert) {
     if (SO_DEBUGGING) {
         if (do_alert) { alert(msg); }
