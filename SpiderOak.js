@@ -4,7 +4,9 @@
  * - jquery.mobile-1.0.1.css
  * - jquery-1.6.4.js
  * - jquery.mobile-1.0.1.js
- * - misc.js - b32encode_trim(), blather(), error_alert()
+ * - js_aux/misc.js - b32encode_trim(), blather(), fragment_quote(),
+ *                    error_alert()
+ * - custom-scripting.js - jqm settings and contextual configuration
  */
 
 /*
@@ -131,10 +133,10 @@ var spideroak = function () {
     */
 
     function ContentNode(url, parent) {
-        /* Basis for representing collections of remote content items.
+        /* Constructor for items representing stored content.
            - 'url' is absolute URL for the collection's root (top) node.
            - 'parent' is containing node. The root's parent is null.
-           See 'Device storage node example json data' below for example JSON.
+           See JSON data examples towards the bottom of this script.
         */
         if ( !(this instanceof ContentNode) ) // Coding failsafe.
             throw new Error("Constructor called as a function");
@@ -146,8 +148,8 @@ var spideroak = function () {
             this.is_container = true; // Typically.
             this.subdirs = [];  // Urls of contained devices, directories.
             this.files = [];    // Urls of contained files.
-            this.constructed_page$;
-            this.set_page_id();
+            // XXX ??? Store DOM elements if jQuery objects are expensive.
+            this.$page;         // jQuery-contained DOM page for this node.
             this.lastfetched = false;
             this.emblem;        // TODO: Eventually, an icon, for now text.
         }}
@@ -219,7 +221,7 @@ var spideroak = function () {
            Options is the $.mobile.changePage() options object. */
         if (! this.up_to_date()) {
             // We use 'this_node' because 'this' gets overridden when
-            // success_handler is actually running, so we another
+            // success_handler is actually running, so we need a distinct
             // lexically scoped var.
             var this_node = this;
             this.fetch_and_dispatch(function (data, when)
