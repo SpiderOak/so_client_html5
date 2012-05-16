@@ -458,6 +458,8 @@ var spideroak = function () {
         if (container_url) {
             containment = "Up: " + containment;
             $container_href.attr('href', '#' + container_url); }
+        else {
+            $container_href.replaceWith("Account: " + containment); }
         $container_href.text(containment);
         $page.find("this-header").text(this.emblem + ": " + this.name);
     }
