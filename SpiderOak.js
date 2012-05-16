@@ -418,8 +418,10 @@ var spideroak = function () {
                 for (i in this.files) {
                     subnode = mgr.get(this.files[i], this);
                     // TODO: Provide for visiting files.
-                    $item = $('<li/>').append(subnode.emblem + ": "
-                                              + subnode.name + '</li>');
+                    $item = $('<li/>').append('<a target="_blank" href="'
+                                              + subnode.url + '">'
+                                              + subnode.emblem + ": "
+                                              + subnode.name + '</a></li>');
                     if ($cursor === $list) { $cursor.append($item); }
                     else { $cursor.after($item); }
                     $cursor = $item; }
