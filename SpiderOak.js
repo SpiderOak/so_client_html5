@@ -13,7 +13,7 @@
   NOTES
 
   - Content visits:
-    We intercept navigation to content (eg, $.mobile.pageChange) repository
+    We intercept navigation to content (eg, $.mobile.changePage) repository
     URLs and intervene via binding of handle_content_visit to jQuery mobile
     "pagebeforechange" event. URLs included as href links must start with
     '#' to trigger jQuery Mobile's navigation detection, which by default
@@ -560,7 +560,6 @@ var spideroak = function () {
     return {
         init: function () {
             /* Do preliminary setup - event handlers, etc. */
-            blather("spideroak object init...");
             bind_traversal_handler();
         },
         toString: function () {
@@ -600,6 +599,7 @@ var spideroak = function () {
                         error_alert('Temporary server failure',
                                     'Please try again later.');
                     } else if (match[1] === 'login') {
+                        $.mobile.showPageLoadingMsg();
                         if (match[2].charAt(0) === "/") {
                             login_url = server_host_url + match[2];
                         } else {
