@@ -29,17 +29,26 @@ SO_DEBUGGING = true;            // for misc.js:blather()
 
 $(document).ready(function () {
     spideroak.init();
-    $('.nav_login_storage form').submit(function () {
+    var $form = $('.nav_login_storage form');
+    $form.submit(function () {
         var username = $('input[name=username]', this).val();
         var password = $('input[name=password]', this).val();
+        $form.find('input[name=password]').val("");
+        $form.fadeOut(1000).delay(4000).fadeIn(100);
         spideroak.storage_login({username: username, password: password});
         return false;
     });
+    // If the document is reloading on a storage node, all application
+    // state (except cookies) is gone - we have to start back at ground
+    // zero. Reload from the top-level entry point:
+    if (window.location.hash) {
+        window.location.hash = "";
+        $.mobile.changePage(window.location.href.split('#')[0]);
+        window.location.reload(); }
 });
 
 /* Modular singleton pattern: */
 var spideroak = function () {
-
                               /* private: */
 
     /* Object-wide settings: */
