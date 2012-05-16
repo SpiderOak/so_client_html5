@@ -86,7 +86,6 @@ var spideroak = function () {
         /* Intercept URL visits and intervene for repository content. */
         if (typeof data.toPage === "string" && is_content_url(data.toPage)) {
             e.preventDefault();
-            blather("handle_content_visit triggered: " + data.toPage);
             content_node_manager.get(data.toPage).visit(data.options); }}
     function bind_traversal_handler() {
         /* Establish page change event handler. */
@@ -373,7 +372,6 @@ var spideroak = function () {
         /* Trigger UI focus on our content layout. */
         // We use whatever layout is already done.
         var $page = this.my_page$();
-        blather(this + ".show()");
         if ($.mobile.activePage[0].id !== this.my_page_id()) {
             options.dataUrl = '#' + this.my_page_id();
             $.mobile.changePage($page, options); }
