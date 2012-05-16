@@ -15,5 +15,5 @@ $.ajaxSetup({
     beforeSend:function(){
         $.mobile.showPageLoadingMsg(); },
     complete:function(){
-        $.mobile.hidePageLoadingMsg(); }
+        $.mobile.hidePageLoadingMsg(); },
 });
