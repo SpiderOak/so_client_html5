@@ -33,7 +33,7 @@
         </div>
       </div>
     </div>
-    <div class="new_login_form nav_login_storage">
+    <div class="new_login_form nav_login_storage" data-role="content">
       <form method="POST">
         <ul data-role=​"listview" class=​"ui-listview" >​
           <li data-role="fieldcontain"
@@ -65,16 +65,18 @@
     <div data-role="header">
       <img src="brand_images/named_logo.png" alt="Logo">
     </div>
-    <h1> About </h1>
-    <div> SpiderOak All-Weather client 0.1 </div>
-    <div> Secure File Backup, Sync, and Sharing </div>
-    <div> SpiderOak is an advanced automated offsite backup system with a
-      "Zero Knowledge" approach to encryption and privacy.  Capabilities
-      include archiving multiple devices with a unified and de-duplicated
-      storage repository, preservation of historical versions and deleted
-      files, configurable multi-platform file synchronization, web file
-      sharing, and a rich command line and graphical interface. </div>
-    <a href="#home" data-inline="true" data-role="button">Home</a>
+    <div data-role="content">
+      <h1> About </h1>
+      <div> SpiderOak All-Weather client 0.1 </div>
+      <div> Secure File Backup, Sync, and Sharing </div>
+      <div> SpiderOak is an advanced automated offsite backup system with a
+        "Zero Knowledge" approach to encryption and privacy.  Capabilities
+        include archiving multiple devices with a unified and de-duplicated
+        storage repository, preservation of historical versions and deleted
+        files, configurable multi-platform file synchronization, web file
+        sharing, and a rich command line and graphical interface. </div>
+      <a href="#home" data-inline="true" data-role="button">Home</a>
+    </div>
   </div>
   <div data-role="page" id="storage-page-template">
     <div data-role="header">
@@ -95,9 +97,9 @@
         </div>
       </div>
     </div>
-    <br/>
-    <ul data-role="listview" data-inset="true">
-    </ul>
+    <div data-role="content">
+      <ul data-role="listview" data-inset="true"></ul>
+    </div>
   </div>
 </body>
 </html>
