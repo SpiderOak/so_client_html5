@@ -247,7 +247,10 @@ var spideroak = function () {
         /* Do error handling failed visit with 'xhr' XMLHttpResponse report. */
         // TODO: Proper error handling.
         $.mobile.hidePageLoadingMsg();
-        error_alert("Failure reaching " + this.url, xhr.status);
+        if (xhr.status === 401) {
+            // Probably expired cookies - return to the entry page:
+            $.mobile.changePage(window.location.href.split('#')[0]); }
+        else { error_alert("Failure reaching " + this.url, xhr.status); }
     }
     ContentNode.prototype.provision = function (data, when) {
         /* Populate node with JSON 'data'. 'when' is the data's current-ness.
