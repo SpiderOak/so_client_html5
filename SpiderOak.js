@@ -372,16 +372,19 @@ var spideroak = function () {
         this.get_storage_page_template$().after(this.my_page$()); }
     ContentNode.prototype.layout = function () {
         /* Deploy content as markup on our page. */
-        var $page = this.my_page$();
+        var $page = this.my_page$(true);
         var my_url = this.url;
         var superior_url = this.parent_url || defaults.home_page_id;
         var $header = $page.find('[data-role="header"');
-	var $list = $page.find('[data-role="listview"]');
+	var $content = $page.find('[data-role="content"]');
+	var $list;
         var $item, i, $cursor, c, subnode, children;
         var mgr = content_node_manager;
 
         this.resolve_storage_page_header();
-        $list.empty();
+
+        $list = $content.find('[data-role="listview"]');
+        if ($list.length) { $list.empty(); }
 
         function occupied(a) { return a && a.length; }
         if (! (occupied(this.subdirs) || occupied(this.files))) {
