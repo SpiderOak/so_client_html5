@@ -362,8 +362,6 @@ var spideroak = function () {
         // We use whatever layout is already done.
         var $page = this.my_page$();
         blather(this + ".show()");
-        if (! this.my_page_from_dom$().length) {
-            this.include_my_page(); }
         if ($.mobile.activePage[0].id !== this.my_page_id()) {
             options.dataUrl = '#' + this.my_page_id();
             $.mobile.changePage($page, options); }
@@ -450,9 +448,16 @@ var spideroak = function () {
     }
     ContentNode.prototype.my_page_from_dom$ = function () {
         return $('#' + fragment_quote(this.my_page_id())); }
-    ContentNode.prototype.my_page$ = function () {
+    ContentNode.prototype.my_page$ = function (reinit) {
         /* Return this node's jQuery page object, getting a clone of the
-           storage page template if we don't already have something. */
+           storage page template if we don't already have something.
+
+           Optional 'reinit' means to discard existing page and clone a new
+           copy.
+        */
+        if (reinit && this.$page) {
+            this.$page.remove();
+            delete this.$page; }
         if (! this.$page) {
             var $template = this.get_storage_page_template$();
             if (! $template) {
@@ -462,7 +467,8 @@ var spideroak = function () {
                             + " not present."); }
             this.$page = $template.clone();
             this.$page.attr('id', this.my_page_id());
-            this.$page.attr('data-url', this.my_page_id()); }
+            this.$page.attr('data-url', this.my_page_id());
+            this.include_my_page(); }
         return this.$page; }
     ContentNode.prototype.get_storage_page_template$ = function() {
         return $("#" + defaults.storage_page_template_id); }
