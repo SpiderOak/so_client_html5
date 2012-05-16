@@ -30,11 +30,13 @@ SO_DEBUGGING = true;            // for misc.js:blather()
 $(document).ready(function () {
     spideroak.init();
     var $form = $('.nav_login_storage form');
+    // Darn page loading message hiding happens too soon on login, inihibit:
+    $.ajaxSetup({complete: null});
     $form.submit(function () {
         var username = $('input[name=username]', this).val();
         var password = $('input[name=password]', this).val();
-        $form.find('input[name=password]').val("");
-        $form.fadeOut(1000).delay(4000).fadeIn(100);
+        $form.fadeOut(1000, function() {
+            $form.find('input[name=password]').val("");});
         spideroak.storage_login({username: username, password: password});
         return false;
     });
@@ -92,6 +94,12 @@ var spideroak = function () {
         // Gets registered on: $(document).data('events').pagebeforechange
         $(document).bind("pagebeforechange.SpiderOak", handle_content_visit);
     }
+
+    /* UI Controls */
+    function unhide_login_form(delay, fade) {
+        /* Remove login form fadeout, after 'delay' msecs then 'fade' msecs. */
+        $.ajaxSetup({complete: function() { $.mobile.hidePageLoadingMsg(); }});
+        $('.nav_login_storage form').delay(delay).fadeIn(fade); }
 
     /* Node-independent URL classification: */
 
@@ -595,11 +603,11 @@ var spideroak = function () {
                 success: function (data) {
                     var match = data.match(/^(login|location):(.+)$/m);
                     if (!match) {
+                        unhide_login_form(0, 500);
                         $.mobile.hidePageLoadingMsg();
                         error_alert('Temporary server failure',
                                     'Please try again later.');
                     } else if (match[1] === 'login') {
-                        $.mobile.showPageLoadingMsg();
                         if (match[2].charAt(0) === "/") {
                             login_url = server_host_url + match[2];
                         } else {
@@ -607,6 +615,7 @@ var spideroak = function () {
                         }
                         spideroak.storage_login(login_info, login_url);
                     } else {
+                        unhide_login_form(5000, 500);
                         // Browser haz auth cookies, we haz relative location.
                         // Go there, and machinery will intervene to handle it.
                         $.mobile.changePage(
@@ -617,9 +626,10 @@ var spideroak = function () {
                     }
                 },
                 error: function (xhr) {
+                    unhide_login_form(100, 100);
                     $.mobile.hidePageLoadingMsg();
                     error_alert("Storage login", xhr.status);
-                }
+                },
             });
         },
         // Expose the content node manager for debugging:
