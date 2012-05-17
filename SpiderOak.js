@@ -285,7 +285,7 @@ var spideroak = function () {
         var url, dev, devdata;
         var possessive = (my.username.charAt(my.username.length-1) == "s"
                           ? "' " : "'s ")
-        this.name = my.username + possessive + defaults.root_storage_node_label;
+        this.name = my.username;
         mgr.stats = data["stats"]; // TODO: We'll cook stats when UI is ready.
         for (var i in data.devices) {
             devdata = data.devices[i];
