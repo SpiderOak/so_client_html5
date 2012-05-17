@@ -33,14 +33,14 @@
         </div>
       </div>
     </div>
-    <div class="new_login_form nav_login_storage" data-role="content">
+    <div class="login_form nav_login_storage" data-role="content">
       <form method="POST">
         <ul data-role=​"listview" class=​"ui-listview" >​
           <li data-role="fieldcontain"
               class="ui-field-contain ui-body ui-li ui-li-static" >
             <label for="my_login_username">Username:</label>
             <input type="text" name="username" id="my_login_username"
-                   value class="ui-input-text ui-corner-all">
+                   value="klmtest" class="ui-input-text ui-corner-all">
           </li>
           <li data-role="fieldcontain"
               class="ui-field-contain ui-body ui-br ui-li ui-li-static" >
@@ -78,29 +78,52 @@
         sharing, and a rich command line and graphical interface. </div>
       <a href="#home" data-inline="true" data-role="button">Home</a>
     </div>
-  </div>
-  <div data-role="page" id="storage-page-template">
-    <div data-role="header">
-      <div class="ui-grid-c">
+    <div data-role="footer" data-theme="a">
+      <div class="ui-grid-b">
         <div class="ui-block-a">
-          <a href="#" class="logo-image-href">
-            <img class="logo-image"
-                 src="brand_images/named_logo.png" alt="Logo">
+          <a href="#">
+            Access
           </a>
         </div>
         <div class="ui-block-b">
-          <h3 class="this-container-header">
-            <a href="#" class="container-href"> container </a>
-          </h3>
+          <a href="#">
+            Settings
+          </a>
         </div>
-        <div class="ui-block-c">
+      </div>
+    </div><!-- /footer -->
+  </div>
+  <div data-role="page" id="storage-page-template">
+    <div data-role="header" data-theme="b">
+      <div class="ui-grid-b">
+        <div class="ui-block-a">
+          <p> <a href="#" class="container-href"
+                 data-icon="arrow-l" data-role="button">
+              container</a>
+          </p>
+        </div>
+        <div class="ui-block-b">
           <h3 class="this-header"> here </h3>
         </div>
       </div>
     </div>
     <div data-role="content">
-      <ul data-role="listview" data-inset="true"></ul>
+      <ul data-role="listview" data-autodividers="true" data-inset="true"></ul>
     </div>
+    <div data-role="footer" data-theme="a">
+      <div class="ui-grid-b">
+        <div class="ui-block-a">
+          <a href="#">
+            Access
+          </a>
+        </div>
+        <div class="ui-block-b">
+          <a href="#">
+            Settings
+          </a>
+        </div>
+      </div>
+    </div><!-- /footer -->
   </div>
 </body>
 </html>
