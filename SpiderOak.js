@@ -399,7 +399,7 @@ var spideroak = function () {
         var $item, i, $cursor, c, subnode, children;
         var mgr = content_node_manager;
 
-        this.resolve_storage_page_header();
+        this.layout_header();
 
         $list = $content.find('[data-role="listview"]');
         if ($list.length) { $list.empty(); }
@@ -435,6 +435,24 @@ var spideroak = function () {
         }
         return $page;
     }
+    ContentNode.prototype.layout_header = function() {
+        /* Return markup with general and specific legend fields and urls. */
+        var containment = this.containment_path();
+        var container_url = this.parent_url;
+        var container;
+        var $page = this.my_page$();
+        var $header = $page.find(".this-header");
+        var $container_href = $page.find(".container-href");
+        if (container_url) {
+            var container = content_node_manager.get(container_url);
+            $container_href.attr('href', '#' + container_url);
+            $header.text(this.name);
+            if (container.is_root()) { $container_href.text("Access"); }
+            else { $container_href.text(container.name); }}
+        else {
+            $container_href.remove();
+            $page.find(".this-header").text("* Access"); }
+    }
     ContentNode.prototype.is_device = function() {
         return false; }
     DeviceStorageNode.prototype.is_device = function() {
@@ -457,20 +475,6 @@ var spideroak = function () {
     FileStorageNode.prototype.containment_path = function() {
         /* Return '/' nested containing path, per content type. */
         return DirectoryStorageNode.containment_path.call(this); }
-    ContentNode.prototype.resolve_storage_page_header = function() {
-        /* Return markup with general and specific legend fields and urls. */
-        var containment = this.containment_path();
-        var container_url = this.parent_url;
-        var $page = this.my_page$();
-        var $container_href = $page.find(".container-href");
-        if (container_url) {
-            containment = "Up: " + containment;
-            $container_href.attr('href', '#' + container_url); }
-        else {
-            $container_href.replaceWith("Account: " + containment); }
-        $container_href.text(containment);
-        $page.find("this-header").text(this.emblem + ": " + this.name);
-    }
     ContentNode.prototype.my_page_from_dom$ = function () {
         return $('#' + fragment_quote(this.my_page_id())); }
     ContentNode.prototype.my_page$ = function (reinit) {
