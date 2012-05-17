@@ -414,8 +414,10 @@ var spideroak = function () {
                 for (i in this.subdirs) {
                     subnode = mgr.get(this.subdirs[i], this);
                     $item = $('<li/>').append('<a href="#' + subnode.url + '">'
-                                              + subnode.emblem + ": "
                                               + subnode.name + '</a>');
+                    $item.attr('data-filtertext',
+                               // Dir name sans trailing '/':
+                               subnode.name.split(/\//)[0]);
                     if ($cursor === $list) { $cursor.append($item); }
                     else { $cursor.after($item); }
                     $cursor = $item; }
@@ -424,10 +426,9 @@ var spideroak = function () {
                 for (i in this.files) {
                     subnode = mgr.get(this.files[i], this);
                     // TODO: Provide for visiting files.
-                    $item = $('<li/>').append('<a target="_blank" href="'
-                                              + subnode.url + '">'
-                                              + subnode.emblem + ": "
-                                              + subnode.name + '</a></li>');
+                    $item = $('<li/>').append('<a href="' + subnode.url + '">'
+                                              + subnode.name + '</a>');
+                    $item.attr('data-filtertext', subnode.name);
                     if ($cursor === $list) { $cursor.append($item); }
                     else { $cursor.after($item); }
                     $cursor = $item; }
