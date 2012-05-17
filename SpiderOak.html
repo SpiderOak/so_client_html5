@@ -5,7 +5,7 @@
   <meta charset="utf-8" />
   <title>SpiderOak</title>
   <!--[if lt IE 9]><script src="js_aux/html5.js"></script><![endif]-->
-  <meta name="viewport" content="width=device-width, initial-scale=1"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet"
         href="http://code.jquery.com/mobile/1.0.1/jquery.mobile-1.0.1.css"/>
   <script src="http://code.jquery.com/jquery-1.6.4.js"></script>
@@ -20,7 +20,7 @@
 <body>
 
   <div data-role="page" id="home">
-    <div data-role="header">
+    <div data-role="header" data-theme="c">
       <div class="ui-grid-c">
         <div class="ui-block-a">
           <img src="brand_images/named_logo.png" alt="Logo">
@@ -55,14 +55,15 @@
                    value="Login" name="Login">
           </div>
           <div class="ui-block-c">
-            <a href="#about" data-inline="true" data-role="button">About</a>
+            <a href="#about" data-inline="true" data-role="button"
+               data-transition="pop">About</a>
           </div>
         </div>
       </form>
     </div>
   </div>
   <div data-role="page" id="about">
-    <div data-role="header">
+    <div data-role="header" data-theme="c">
       <img src="brand_images/named_logo.png" alt="Logo">
     </div>
     <div data-role="content">
