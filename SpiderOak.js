@@ -69,6 +69,8 @@ var spideroak = function () {
         home_page_id: 'home',
         root_storage_node_label: "Devices",
         preview_sizes: [25, 48, 228, 800],
+        dividers_threshold: 10,
+        filter_threshold: 20,
     }
     var my = {
         /* Login session settings: */
@@ -396,6 +398,8 @@ var spideroak = function () {
         var $header = $page.find('[data-role="header"');
 	var $content = $page.find('[data-role="content"]');
 	var $list;
+        var do_dividers, lensubdirs, lenfiles;
+        var curinitial = "";
         var $item, i, $cursor, c, subnode, children;
         var mgr = content_node_manager;
 
@@ -404,34 +408,48 @@ var spideroak = function () {
         $list = $content.find('[data-role="listview"]');
         if ($list.length) { $list.empty(); }
 
+        lensubdirs = this.subdirs ? this.subdirs.length : 0;
+        lenfiles = this.files ? this.files.length : 0;
+        do_dividers = (lensubdirs + lenfiles) > defaults.dividers_threshold;
+        do_filter = (lensubdirs + lenfiles) > defaults.filter_threshold;
         function occupied(a) { return a && a.length; }
-        if (! (occupied(this.subdirs) || occupied(this.files))) {
+        if (lensubdirs + lenfiles === 0) {
             $content.after('<p class="empty-sign" data-role="empty-sign">'
                            + 'Empty. </p>'); }
         else {
             $cursor = $list;
-            if (occupied(this.subdirs)) {
+            function insert_item($cursor, $item, $list) {
+                if ($cursor === $list) { $cursor.append($item); }
+                else { $cursor.after($item); }
+                $cursor = $item; }
+            function conditionally_insert_divider(t) {
+                if (do_dividers && t && (t[0].toUpperCase() !== curinitial)) {
+                    curinitial = t[0].toUpperCase();
+                    $item = $('<li data-role="list-divider">'
+                              + curinitial + '</li>')
+                    insert_item($cursor, $item, $list); }}
+            if (do_filter) { $list.attr('data-filter', 'true'); }
+            if (lensubdirs) {
                 for (i in this.subdirs) {
                     subnode = mgr.get(this.subdirs[i], this);
+                    conditionally_insert_divider(subnode.name);
+                    // TODO: Include metadata in entry.
                     $item = $('<li/>').append('<a href="#' + subnode.url + '">'
                                               + subnode.name + '</a>');
-                    $item.attr('data-filtertext',
-                               // Dir name sans trailing '/':
-                               subnode.name.split(/\//)[0]);
-                    if ($cursor === $list) { $cursor.append($item); }
-                    else { $cursor.after($item); }
-                    $cursor = $item; }
+                    $item.attr('data-filtertext', subnode.name);
+                    insert_item($cursor, $item, $list); }
             }
-            if (occupied(this.files)) {
+            if (lenfiles) {
                 for (i in this.files) {
                     subnode = mgr.get(this.files[i], this);
-                    // TODO: Provide for visiting files.
+                    conditionally_insert_divider(subnode.name);
+                    // TODO: Provide more elaborately for visiting files.
+                    // TODO: Include metadata in entry.
                     $item = $('<li/>').append('<a href="' + subnode.url + '">'
                                               + subnode.name + '</a>');
                     $item.attr('data-filtertext', subnode.name);
-                    if ($cursor === $list) { $cursor.append($item); }
-                    else { $cursor.after($item); }
-                    $cursor = $item; }
+                    $item.attr('data-icon', "false");
+                    insert_item($cursor, $item, $list); }
             };
         }
         return $page;
