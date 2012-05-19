@@ -495,13 +495,16 @@ var spideroak = function () {
         /* Return '/' nested containing path, per content type. */
         return DirectoryStorageNode.containment_path.call(this); }
     ContentNode.prototype.my_page_from_dom$ = function () {
+        /* Find my page in the DOM, if it's there. */
         return $('#' + fragment_quote(this.my_page_id())); }
     ContentNode.prototype.my_page$ = function (reinit) {
-        /* Return this node's jQuery page object, getting a clone of the
-           storage page template if we don't already have something.
+        /* Return this node's jQuery page object, producing if not present.
 
-           Optional 'reinit' means to discard existing page and clone a new
-           copy.
+           Optional 'reinit' means to discard existing page, if any,
+           forcing clone of a new copy.
+
+           If not present, we get a clone of the storage page template, and
+           situate the clone after the storage page template.
         */
         if (reinit && this.$page) {
             this.$page.remove();
