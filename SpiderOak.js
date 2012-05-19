@@ -420,18 +420,20 @@ var spideroak = function () {
                 if (do_dividers && t && (t[0].toUpperCase() !== curinitial)) {
                     curinitial = t[0].toUpperCase();
                     $item = $('<li data-role="list-divider">'
-                              + curinitial + '</li>')
+                              + divider_prefix + curinitial + '</li>')
                     insert_item($item); }}
             function insert_subnode(suburl) {
-                var subnode = mgr.get(suburl, this);
+                var subnode = content_node_manager.get(suburl, this);
                 conditionally_insert_divider(subnode.name);
                 insert_item(subnode.layout_item$()); }
 
             if (do_filter) { $list.attr('data-filter', 'true'); }
             if (lensubdirs) {
+                divider_prefix = "/";
                 for (var i in this.subdirs) {
                     insert_subnode(this.subdirs[i]); }}
             if (lenfiles) {
+                divider_prefix = "";
                 for (var i in this.files) {
                     insert_subnode(this.files[i]); }}
         }
