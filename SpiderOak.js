@@ -386,38 +386,31 @@ var spideroak = function () {
             options.dataUrl = '#' + this.my_page_id();
             $.mobile.changePage($page, options); }
     }
-    ContentNode.prototype.include_my_page = function() {
-        /* Include our page in the DOM. */
-        // We include after the storage page template.
-        this.get_storage_page_template$().after(this.my_page$()); }
     ContentNode.prototype.layout = function () {
         /* Deploy content as markup on our page. */
+
+        // YUCK: We always start with a fresh clone, because re-enhancing
+        //       an existing listview isn't working.
         var $page = this.my_page$(true);
-        var my_url = this.url;
-        var superior_url = this.parent_url || defaults.home_page_id;
-        var $header = $page.find('[data-role="header"');
 	var $content = $page.find('[data-role="content"]');
-	var $list;
-        var do_dividers, lensubdirs, lenfiles;
-        var curinitial = "";
-        var $item, $cursor, children;
-        var mgr = content_node_manager;
+	var $list = $content.find('[data-role="listview"]');
 
         this.layout_header();
 
-        $list = $content.find('[data-role="listview"]');
         if ($list.length) { $list.empty(); }
 
-        lensubdirs = this.subdirs ? this.subdirs.length : 0;
-        lenfiles = this.files ? this.files.length : 0;
-        do_dividers = (lensubdirs + lenfiles) > defaults.dividers_threshold;
-        do_filter = (lensubdirs + lenfiles) > defaults.filter_threshold;
-        function occupied(a) { return a && a.length; }
+        var lensubdirs = this.subdirs ? this.subdirs.length : 0;
+        var lenfiles = this.files ? this.files.length : 0;
+        var do_dividers = (lensubdirs + lenfiles) > defaults.dividers_threshold;
+        var do_filter = (lensubdirs + lenfiles) > defaults.filter_threshold;
+
         if (lensubdirs + lenfiles === 0) {
             $content.after('<p class="empty-sign" data-role="empty-sign">'
                            + 'Empty. </p>'); }
         else {
-            $cursor = $list;
+            var $item;
+            var curinitial, dir_prefix = "";
+            var $cursor = $list;
 
             function insert_item($item) {
                 if ($cursor === $list) { $cursor.append($item); }
@@ -521,14 +514,13 @@ var spideroak = function () {
             this.$page = $template.clone();
             this.$page.attr('id', this.my_page_id());
             this.$page.attr('data-url', this.my_page_id());
-            this.include_my_page(); }
+            // Include our page in the DOM, after the storage page template:
+            this.get_storage_page_template$().after(this.my_page$()); }
         return this.$page; }
     ContentNode.prototype.get_storage_page_template$ = function() {
         return $("#" + defaults.storage_page_template_id); }
 
-
     /* Convenience: */
-
     ContentNode.prototype.toString = function () {
         return "<Content node " + this.url + ">";
     }
