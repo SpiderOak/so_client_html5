@@ -400,7 +400,7 @@ var spideroak = function () {
 	var $list;
         var do_dividers, lensubdirs, lenfiles;
         var curinitial = "";
-        var $item, i, $cursor, c, subnode, children;
+        var $item, $cursor, children;
         var mgr = content_node_manager;
 
         this.layout_header();
@@ -418,7 +418,8 @@ var spideroak = function () {
                            + 'Empty. </p>'); }
         else {
             $cursor = $list;
-            function insert_item($cursor, $item, $list) {
+
+            function insert_item($item) {
                 if ($cursor === $list) { $cursor.append($item); }
                 else { $cursor.after($item); }
                 $cursor = $item; }
@@ -427,33 +428,37 @@ var spideroak = function () {
                     curinitial = t[0].toUpperCase();
                     $item = $('<li data-role="list-divider">'
                               + curinitial + '</li>')
-                    insert_item($cursor, $item, $list); }}
+                    insert_item($item); }}
+            function insert_subnode(suburl) {
+                var subnode = mgr.get(suburl, this);
+                conditionally_insert_divider(subnode.name);
+                insert_item(subnode.layout_item$()); }
+
             if (do_filter) { $list.attr('data-filter', 'true'); }
             if (lensubdirs) {
-                for (i in this.subdirs) {
-                    subnode = mgr.get(this.subdirs[i], this);
-                    conditionally_insert_divider(subnode.name);
-                    // TODO: Include metadata in entry.
-                    $item = $('<li/>').append('<a href="#' + subnode.url + '">'
-                                              + subnode.name + '</a>');
-                    $item.attr('data-filtertext', subnode.name);
-                    insert_item($cursor, $item, $list); }
-            }
+                for (var i in this.subdirs) {
+                    insert_subnode(this.subdirs[i]); }}
             if (lenfiles) {
-                for (i in this.files) {
-                    subnode = mgr.get(this.files[i], this);
-                    conditionally_insert_divider(subnode.name);
-                    // TODO: Provide more elaborately for visiting files.
-                    // TODO: Include metadata in entry.
-                    $item = $('<li/>').append('<a href="' + subnode.url + '">'
-                                              + subnode.name + '</a>');
-                    $item.attr('data-filtertext', subnode.name);
-                    $item.attr('data-icon', "false");
-                    insert_item($cursor, $item, $list); }
-            };
+                for (var i in this.files) {
+                    insert_subnode(this.files[i]); }}
         }
         return $page;
     }
+    DeviceStorageNode.prototype.layout_item$ = function() {
+        return DirectoryStorageNode.prototype.layout_item$.call(this); }
+    DirectoryStorageNode.prototype.layout_item$ = function() {
+        /* Return a DirectoryStorageNode's presentation as a jQuery item. */
+        var $it = $('<li/>').append('<a href="#'
+                                   + this.url + '">' + this.name + '</a>');
+        $it.attr('data-filtertext', this.name);
+        return $it; }
+    FileStorageNode.prototype.layout_item$ = function() {
+        /* Return a FileStorageNode's presentation as a jQuery item. */
+        var $it = $('<li/>').append('<a href="#'
+                                   + this.url + '">' + this.name + '</a>');
+        $it.attr('data-filtertext', this.name);
+        $it.attr('data-icon', "false");
+        return $it; }
     ContentNode.prototype.layout_header = function() {
         /* Return markup with general and specific legend fields and urls. */
         var containment = this.containment_path();
