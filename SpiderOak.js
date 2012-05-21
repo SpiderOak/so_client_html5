@@ -409,7 +409,7 @@ var spideroak = function () {
                            + 'Empty. </p>'); }
         else {
             var $item;
-            var curinitial, dir_prefix = "";
+            var curinitial, divider_prefix, indicator = "";
             var $cursor = $list;
 
             function insert_item($item) {
@@ -419,8 +419,9 @@ var spideroak = function () {
             function conditionally_insert_divider(t) {
                 if (do_dividers && t && (t[0].toUpperCase() !== curinitial)) {
                     curinitial = t[0].toUpperCase();
-                    $item = $('<li data-role="list-divider">'
-                              + divider_prefix + curinitial + '</li>')
+                    indicator = divider_prefix + curinitial;
+                    $item = $('<li data-role="list-divider" id="divider-'
+                              + indicator + '">' + indicator + '</li>')
                     insert_item($item); }}
             function insert_subnode(suburl) {
                 var subnode = content_node_manager.get(suburl, this);
