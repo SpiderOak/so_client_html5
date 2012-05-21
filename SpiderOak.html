@@ -25,24 +25,44 @@
     </div>
     <div class="login_form nav_login_storage" data-role="content">
       <form method="POST">
-        <ul data-role="listview" class="ui-listview">
-          <li data-role="fieldcontain">
-            <input type="text" name="username" id="my_login_username"
-                   placeholder="Username"
-                   value class="ui-input-text ui-corner-all">
-          </li>
-          <li data-role="fieldcontain">
-            <input type="password" name="password" id="my_login_password"
-                   placeholder="Password">
-          </li>
-        </ul>
-        <div data-role="navbar">
-          <input type="submit" data-inline="true" data-role="button"
-                 value="Login" name="Login">
-          <a href="#about" data-inline="true" data-role="button"
-             data-transition="pop">About</a>
+        <div data-role="controlgroup">
+            <div data-role="fieldcontain" class="ui-hide-label">
+              <label for="my_login_username">Username:</label>
+              <input type="text" name="username" id="my_login_username"
+                     placeholder="Username"
+                     value class="ui-input-text ui-corner-all"
+                     ui-hide-label="true">
+            </div>
+            <div data-role="fieldcontain" class="ui-hide-label">
+              <label for="my_login_password">Password:</label>
+              <input type="password" name="password" id="my_login_password"
+                     placeholder="Password">
+            </div>
         </div>
+          <div class="ui-block-a" align="left">
+            <div data-role="controlgroup">
+              <select name="slider" id="remember-me" data-role="slider"
+                      XXX disabled="true" data-mini="true">
+	        <option value="off">Off</option default="true">
+	        <option value="on">On</option>
+              </select><br/>
+              <label for="remember-me" XXX style="font-size: small">
+                Remember&nbsp;Me
+              </label>
+            </div>
+          </div>
+          <div align="right">
+            <input type="submit" data-inline="true"
+                       value="Login" name="Login">
+          </div>
       </form>
+      <div data-role="content" align="right">
+        <small>
+          <a href="#about" data-inline="true"
+             align="right"
+             data-transition="pop">Learn more about SpiderOak...</a>
+        </small>
+      </div>
     </div>
   </div>
   <div data-role="page" id="about">
