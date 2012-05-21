@@ -57,10 +57,12 @@
                        value="Login" name="Login">
           </div>
       </form>
-      <div align="right">
-        <a href="#about" data-inline="true"
-           align="right"
-           data-transition="pop">Learn more about SpiderOak...</a>
+      <div data-role="footer" data-theme="c" data-position="fixed">
+        <div align="right">
+          <a href="#about" data-inline="true"
+             align="right"
+             data-transition="pop">Learn more about SpiderOak &gt;</a>
+        </div>
       </div>
     </div>
   </div>
@@ -107,14 +109,19 @@
          data-icon="arrow-l" data-role="button">
         container</a>
       <h3 class="this-header"> here </h3>
+      <a href="#" data-class="here-refresh" data-mini="true"
+         data-icon="refresh" data-iconpos="notext">Refresh
+      </a>
     </div>
     <div data-role="content">
       <ul data-role="listview" data-inset="true"></ul>
     </div>
     <div data-role="footer" data-theme="a" data-position="fixed">
       <div data-role="navbar">
-        <a href="#" data-role="button"> Access </a>
-        <a href="#" data-role="button"> Settings </a>
+        <ul>
+          <li> <a href="#"> Access </a> </li>
+          <li> <a href="#"> Settings </a> </li>
+        </ul>
       </div>
     </div><!-- /footer -->
   </div>

@@ -463,6 +463,8 @@ var spideroak = function () {
         var $page = this.my_page$();
         var $header = $page.find(".this-header");
         var $container_href = $page.find(".container-href");
+        var $refresh = $page.find('[data-class="here-refresh"]');
+        $refresh.attr('href', '#' + this.url);
         if (container_url) {
             var container = content_node_manager.get(container_url);
             $container_href.attr('href', '#' + container_url);
@@ -470,7 +472,7 @@ var spideroak = function () {
             if (container.is_root()) { $container_href.text("Access"); }
             else { $container_href.text(container.name); }}
         else {
-            $container_href.remove();
+            $container_href.hide();
             $page.find(".this-header").text("* Access"); }
     }
     ContentNode.prototype.is_device = function() {
