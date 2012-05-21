@@ -41,14 +41,13 @@
         </div>
           <div class="ui-block-a" align="left">
             <div data-role="controlgroup">
-              <-- XXX Enable slider when functionality  implemented -->
+              <!-- XXX Enable slider when functionality is implemented -->
               <select name="slider" id="remember-me" data-role="slider"
                       disabled="true" data-mini="true">
 	        <option value="off">Off</option default="true">
 	        <option value="on">On</option>
               </select><br/>
-              <-- XXX CSS instead of font-size! -->
-              <label for="remember-me" style="font-size: small">
+              <label for="remember-me">
                 Remember&nbsp;Me
               </label>
             </div>
@@ -57,15 +56,12 @@
             <input type="submit" data-inline="true"
                        value="Login" name="Login">
           </div>
-          <!-- XXX Is multiple 'data-role="content"' unkosher? -->
-          <div data-role="content" align="right">
-            <small>
-              <a href="#about" data-inline="true"
-                 align="right"
-                 data-transition="pop">Learn more about SpiderOak...</a>
-            </small>
-          </div>
       </form>
+      <div align="right">
+        <a href="#about" data-inline="true"
+           align="right"
+           data-transition="pop">Learn more about SpiderOak...</a>
+      </div>
     </div>
   </div>
   <div data-role="page" id="about">
