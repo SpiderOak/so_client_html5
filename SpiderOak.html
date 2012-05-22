@@ -25,21 +25,25 @@
     </div>
     <div class="login_form nav_login_storage" data-role="content">
       <form method="POST">
-        <div data-role="controlgroup">
-            <div data-role="fieldcontain" class="ui-hide-label">
+        <ul data-role="listview" data-inset="true" data-mini="true"
+            data-theme="d">
+            <li data-role="fieldcontain" class="ui-hide-label"
+                 data-inset="true" data-mini="true">
               <label for="my_login_username">Username:</label>
               <input type="text" name="username" id="my_login_username"
+                     data-inset="true"
                      placeholder="Username"
-                     value class="ui-input-text ui-corner-all"
-                     ui-hide-label="true">
-            </div>
-            <div data-role="fieldcontain" class="ui-hide-label">
+                     value>
+            </li>
+            <li data-role="fieldcontain" class="ui-hide-label"
+                 data-inset="true" data-mini="true">
               <label for="my_login_password">Password:</label>
               <input type="password" name="password" id="my_login_password"
+                     data-inset="true"
                      placeholder="Password">
-            </div>
-        </div>
-          <div class="ui-block-a" align="left">
+            </li>
+        </ul>
+        <div class="ui-block-a" align="left">
             <div data-role="controlgroup">
               <!-- XXX Enable slider when functionality is implemented -->
               <select name="slider" id="remember-me" data-role="slider"
