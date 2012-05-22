@@ -1,9 +1,10 @@
 [[PageOutline]]
-== HTML5 Client Architecture and Use ==
+= HTML5 Client Architecture and Use =
 
 Essential architectural and other technical details of the !SpiderOak HTML5
 application. See [[HTML5ClientProject]] for project status, etc.
 
+== Salient Architectural Details ==
 === Dynamic Pages ===
 Storage, Share Rooms are implemented as jQuery Mobile "pages" (`<div
 data-role="page>`) generated dynamically from cloned copies of static
@@ -39,8 +40,9 @@ file "nodes".
     * `DirectoryStorageNode`
     * `FileStorageNode`
   * `ShareNode` - Share Rooms - XXX not yet implemented
-=== Storage Login ===
-=== Share Rooms Authentication ===
+=== Storage Login and Share Rooms Authentication ===
+
+== Incidental Technical Details and Hanging Issues ==
 === Special Browser Requirements ===
 To get around CORS restrictions (without JSONP, which the SpiderOak storage
 repo does not accept), you need to run your browser with drastically
@@ -61,3 +63,18 @@ arguments:
 
 This approach will almost certainly change when the app is packaged for
 mobile and web deployment.
+=== Hanging issue: Failing to get reused page dynamic listview enhancments ===
+`As of 2012-05-22`
+
+`ContentNode.prototype.layout()` asks for a fresh clone of the
+storage-page-template every time to workaround inability to get
+`$list.listview()` to completely enhance the contents list.
+
+I expected to be able to reuse the cloned page, on revisits to a node, by
+first `.empty()` emptying the existing `data-role="listview"` element and
+using the `.listview()` enhancement routine on the rebuilt list jQuery
+object. The resulting lists lack properly rounded corners.  (I make sure
+that the list is reset to had to discvoer that the containing `$page`
+object must have had at least one `$page.page()` invoked for the
+`$list.listview()` method to run without an error, but some of the
+enhancements are neglected, including properly rounded list item corners.
