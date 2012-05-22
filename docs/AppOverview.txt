@@ -1,0 +1,59 @@
+[[PageOutline]]
+
+Essential architectural and other technical details of the !SpiderOak HTML5
+application.
+
+=== Dynamic Pages ===
+Storage, Share Rooms are implemented as jQuery Mobile "pages" (`<div
+data-role="page>`) generated dynamically from cloned copies of static
+template DOM nodes, upon in-app traversal of particular URLs.
+* The spideroak object's `.handle_content_visit()` method is assigned as a
+  handler to the jQuery Mobile `pagebeforechange` event, which tracks
+  changes to the browser's `location.hash` setting.
+* The handler discerns navigation to URLs with hash portions that are
+  within the user's !SpiderOak-managed content, and:
+  * Fetches a suitable `ContentNode`-based object for the node using
+    `spideroak.content_node_manager.get()`, which returns an already existing
+    node, if any, else manufactures a new one with suitable initial
+    settings.
+  * The respective `ContentNode` object uses its `.visit()` method to the
+    handle the visit.
+* `ContentNode.visit()`:
+  * Fetches the node contents from the server if necessary (''intially,
+    always necessary'')
+  * Gets a jQuery object for the node's data-role="page", cloning the
+    !SpiderOak.html id="storage-page-template" &lt;div&gt; and adjusts
+    the basic structure, if that's not already been done.
+  * Fills in the page header with the node's navigation context
+  * Populates the page listview with entries for the nodes contents
+=== `ContentNode` Geneology ===
+The `ContentNode` object hierarchy provides for shared and distinct
+functionality for obtaining, assimilating, and presenting the remote data
+describing !SpiderOak-managed user content items - devices, folders, and
+file "nodes".
+* `ContentNode` - Basis
+  * `StorageNode` - Backups content
+    * `RootStorageNode`
+    * `DeviceStorageNode`
+    * `DirectoryStorageNode`
+    * `FileStorageNode`
+  * `ShareNode` - Share Rooms - XXX not yet implemented
+=== Storage Login ===
+=== Share Rooms Authentication ===
+=== Special Browser Requirements ===
+To get around CORS restrictions (without JSONP, which the SpiderOak storage
+repo does not accept), you need to run your browser with drastically
+reduced security. I haven't figured out how to do that with Firefox (even
+when using the Force CORS addon - suggestions welcome). Based on
+suggestions from Chip, you can use Chrome by starting it with the these
+arguments:
+* `--allow-file-access-from-files --allow-http-access-from-files --disable-web-security --enable-file-cookies`
+
+* Since I generally use Chrome as my primary browser, I installed a copy
+  of [https://tools.google.com/dlpage/chromesxs Chrome Canary], so I can run
+  a separate, insecure session concurrent with my regular Chrome session. I
+  haven't hit any problems specific to running Canary, but I may have
+  been lucky in the
+  [https://spideroak.com/browse/share/klm/1n4c04lm1n3 particular MacOS Canary build]
+  that I'm using. If you hit odd problems, try restarting regular Chrome
+  with the arguments, just to see that things work.'
