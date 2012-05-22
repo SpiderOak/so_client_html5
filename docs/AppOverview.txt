@@ -1,7 +1,8 @@
 [[PageOutline]]
+== HTML5 Client Architecture and Use ==
 
 Essential architectural and other technical details of the !SpiderOak HTML5
-application.
+application. See [[HTML5ClientProject]] for project status, etc.
 
 === Dynamic Pages ===
 Storage, Share Rooms are implemented as jQuery Mobile "pages" (`<div
