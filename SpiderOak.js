@@ -407,6 +407,7 @@ var spideroak = function () {
         var do_filter = (lensubdirs + lenfiles) > defaults.filter_threshold;
 
         if (lensubdirs + lenfiles === 0) {
+            // XXX Need to convey that the container is empty more nicely.
             $content.after('<p class="empty-sign" data-role="empty-sign">'
                            + 'Empty. </p>'); }
         else {
