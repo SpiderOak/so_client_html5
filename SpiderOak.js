@@ -389,15 +389,16 @@ var spideroak = function () {
     ContentNode.prototype.layout = function () {
         /* Deploy content as markup on our page. */
 
-        // YUCK: We always start with a fresh clone, because re-enhancing
-        //       an existing listview isn't working.
+        // XXX: We always start with a fresh clone, because re-enhancing
+        //      an existing listview isn't quite working right. Yuck.
         var $page = this.my_page$(true);
 	var $content = $page.find('[data-role="content"]');
 	var $list = $content.find('[data-role="listview"]');
 
         this.layout_header();
 
-        if ($list.length) { $list.empty(); }
+        if ($list.children().length) {
+            $list.empty(); }
 
         var lensubdirs = this.subdirs ? this.subdirs.length : 0;
         var lenfiles = this.files ? this.files.length : 0;
@@ -438,6 +439,9 @@ var spideroak = function () {
                 for (var i in this.files) {
                     insert_subnode(this.files[i]); }}
         }
+        // XXX as of jQm 1.1.0, .listview("refresh") isn't rounding corners.
+        //$page.page();
+        //$list.listview("refresh");
         return $page;
     }
     DeviceStorageNode.prototype.layout_item$ = function() {
