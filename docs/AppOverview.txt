@@ -57,3 +57,6 @@ arguments:
   [https://spideroak.com/browse/share/klm/1n4c04lm1n3 particular MacOS Canary build]
   that I'm using. If you hit odd problems, try restarting regular Chrome
   with the arguments, just to see that things work.'
+
+This approach will almost certainly change when the app is packaged for
+mobile and web deployment.
