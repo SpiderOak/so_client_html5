@@ -32,6 +32,7 @@ $(document).ready(function () {
     var $form = $('.nav_login_storage form');
     // Darn page loading message hiding happens too soon on login, inihibit:
     $.ajaxSetup({complete: null});
+    $('#my_login_username').focus();
     $form.submit(function () {
         var username = $('input[name=username]', this).val();
         var password = $('input[name=password]', this).val();
