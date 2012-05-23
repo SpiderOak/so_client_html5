@@ -63,6 +63,47 @@ arguments:
 
 This approach will almost certainly change when the app is packaged for
 mobile and web deployment.
+=== Managing the UI Theme ===
+The default set of jQuery Mobile theme swatches get us near enough to
+Mike's designs to be worth building on. The jQm theme roller gets us
+closer, but unfortunately its too low resolution to avoid some custom
+tailoring and contortions to get us the rest of the way. It's necessary to
+know some details about using the tool in order to continue to leverage its
+benefits while preserving our custom tailoring.
+
+==== Maintaining our theme through the theme roller ====
+The most essential maintenance routine is feeding our tailored css back
+into the tool in order to use its minification feature, use the tool for
+the limited adjustments it can do, and eventually, use it to upgrade to
+subsequent jQm versions.
+
+To do so:
+* Visit the tool at http://jquerymobile.com/themeroller/
+* Open the "Import (or Upgrade)" activity
+* Enter our adjusted css/themes/spideroak.css in the text box and hit Import
+* Make adjustments
+* Use the "Download (theme zip file)" activity to get the zip file
+* Put in place copies of the desired artifacts - .css, .min.css, and incidentals
+
+==== Interspersing theme swatches on pages ====
+Because button and list item styles are used across theme swatch page
+elements (header, content, footer), we sometimes have to use different
+swatches for different parts of the same page.
+
+==== Generating our basic theme, in the first place ====
+In case we need to re-derive our theme, it's based closely on the default
+jQm theme, using the following procedure:
+
+0. Visit http://jquerymobile.com/themeroller/
+1. Use "Import or Upgrade" tab and "Import default theme"
+2. Turn swatch A to stark white:
+   - Copy the white patch to the header
+   - Set header/footer background gradient to be #ffffff to #ffffff
+   - Copy the white patch to the content body
+   - Set content background gradient to be #ffffff to #ffffff
+3. Download (with name "spideroak")
+4. Unzip in css subdir, or elsewhere and copy out the specific artifacts.
+
 === Hanging issue: Failing to get reused page dynamic listview enhancments ===
 `As of 2012-05-22`
 
