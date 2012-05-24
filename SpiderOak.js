@@ -451,15 +451,40 @@ var spideroak = function () {
     DirectoryStorageNode.prototype.layout_item$ = function() {
         /* Return a DirectoryStorageNode's presentation as a jQuery item. */
         var $it = $('<li/>').append('<a href="#'
-                                   + this.url + '">' + this.name + '</a>');
+                                    + this.url + '"><h3>'
+                                    + this.name + '</h3></a>');
         $it.attr('data-filtertext', this.name);
         return $it; }
     FileStorageNode.prototype.layout_item$ = function() {
         /* Return a FileStorageNode's presentation as a jQuery item. */
-        var $it = $('<li/>').append('<a href="#'
-                                   + this.url + '">' + this.name + '</a>');
+        var $it = $('<li data-mini="true"/>');
         $it.attr('data-filtertext', this.name);
+
+        var type = classify_file_by_name(this.name);
+        var pretty_type = type ? (type + ", ") : "";
+        var $details = $('<p>' + pretty_type + bytesToSize(this.size) +'</p>');
+
+        var date = new Date(this.mtime*1000);
+        var day_splat = date.toLocaleDateString().split(",");
+        $date = $('<p class="ul-li-aside">'
+                  + day_splat[1] + "," + day_splat[2]
+                  + " " + date.toLocaleTimeString()
+                  +'</p>');
+        var $table = $('<table width="100%"/>');
+        var $td = $('<td colspan="2"/>').append($('<h3>' + this.name +'</h3>'));
+        $table.append($('<tr/>').append($td));
+        var $tr = $('<tr/>');
+        $tr.append($('<td/>').append($details).attr('wrap', "none"));
+        $tr.append($('<td/>').append($date).attr('align', "right"));
+        $table.append($tr);
+        var $href = $('<a/>');
+        $href.attr('href', this.url);
+        $href.append($table);
+        $it.append($href);
+
+        // XXX use classification to select an icon:
         $it.attr('data-icon', "false");
+
         return $it; }
     ContentNode.prototype.layout_header = function() {
         /* Return markup with general and specific legend fields and urls. */
