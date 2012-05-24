@@ -389,10 +389,7 @@ var spideroak = function () {
     }
     ContentNode.prototype.layout = function () {
         /* Deploy content as markup on our page. */
-
-        // XXX: We always start with a fresh clone, because re-enhancing
-        //      an existing listview isn't quite working right. Yuck.
-        var $page = this.my_page$(true);
+        var $page = this.my_page$();
 	var $content = $page.find('[data-role="content"]');
 	var $list = $content.find('[data-role="listview"]');
 
@@ -441,9 +438,10 @@ var spideroak = function () {
                 for (var i in this.files) {
                     insert_subnode(this.files[i]); }}
         }
-        // XXX as of jQm 1.1.0, .listview("refresh") isn't rounding corners.
-        //$page.page();
-        //$list.listview("refresh");
+        // NOTE As of jQm 1.1.0, .listview("refresh") isn't properly rounding
+        //      list item corners, but our list items aren't inset, so it's ok.
+        $page.page();
+        $list.listview("refresh");
         return $page;
     }
     DeviceStorageNode.prototype.layout_item$ = function() {
