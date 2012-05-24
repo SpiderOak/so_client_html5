@@ -89,3 +89,61 @@ function blather(msg, do_alert) {
         else { console.log(msg); }
     }
 }
+
+FILE_TYPE_BY_SUFFIX = {txt: "Text",
+                      pdf: "Adobe PDF",
+                      doc: "MS Word", docx: "MS Word (Open XML)",
+                      xls: "MS Excel",
+                      ppt: "MS Powerpoint",
+                      png: "Image", jpg: "Image", jpeg: "Image", gif: "Image",
+                      ico: "MS Icon",
+                      svg: "Structured Vector Graphics",
+                      ps: "PostScript", eps: "Extended PostScript",
+                      avi: "Video", mpg: "Video", mpeg: "Video",
+                      mov: "Video",
+                      mp3: "MPEG Audio", ogg: "Ogg Vorbis Audio",
+                      wav: "Waveform Audio",
+                      exe: "Executable",
+                      o: "Linkable Object Code",
+                      c: "C Source Code",
+                      py: "Python Script",
+                      pl: "Perl Script",
+                      tcl: "TCL Script",
+                      js: "Javascript",
+                      bat: "MS Batch Script",
+                      zip: "Compressed Archive (zip)",
+                      gz: "Compressed (gzip)",
+                      tgz: "Compressed Archive (gzip)",
+                      jar: "Java Archive",
+                      htm: "HyperText", html: "HyperText",
+                      php: "PHP HyperText",
+                      xml: "Extensible Markup Language",
+                     }
+function classify_file_by_name(name) {
+    /* Return a string inferred from a file's name.
+       Return an empty string if fail to infer anything.
+     */
+    var splat = name.split('.');
+    var extension = splat[splat.length-1];
+    var is_backup = false;
+    var classification = FILE_TYPE_BY_SUFFIX[extension.toLowerCase()];
+    if (! classification) {
+        if (splat.length > 2 && (extension.match(/[0-9]/)
+                                 || extension.match("~")
+                                 || extension.match("#"))) {
+            is_backup = true;
+            var extension = splat[splat.length-2];
+            classification = FILE_TYPE_BY_SUFFIX[extension];
+        }}
+    return classification || "";
+}
+function bytesToSize(bytes) {
+    /* Return description of number of 'bytes' */
+    /* Adapted from an entry found on:
+       http://codeaid.net/javascript/convert-size-in-bytes-to-human-readable-format-(javascript) */
+    if (! bytes) { return "empty"; }
+    var sizes = [ 'n/a', 'bytes', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB'];
+    var i = +Math.floor(Math.log(bytes) / Math.log(1024));
+    return  ((bytes / Math.pow(1024, i)).toFixed(i ? 1 : 0)
+             + ' ' + sizes[isNaN(bytes) ? 0 : i+1]);
+}
