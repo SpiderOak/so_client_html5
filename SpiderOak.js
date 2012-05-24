@@ -389,7 +389,10 @@ var spideroak = function () {
     }
     ContentNode.prototype.layout = function () {
         /* Deploy content as markup on our page. */
-        var $page = this.my_page$();
+        // XXX Demand a new template clone, since some elements are getting
+        //     mangled on reuse - specifically the return button in the
+        //     header and the list item corners, if not inset.
+        var $page = this.my_page$(true);
 	var $content = $page.find('[data-role="content"]');
 	var $list = $content.find('[data-role="listview"]');
 
