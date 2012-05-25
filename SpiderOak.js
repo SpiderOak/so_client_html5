@@ -30,13 +30,14 @@ SO_DEBUGGING = true;            // for misc.js:blather()
 $(document).ready(function () {
     spideroak.init();
     var $form = $('.nav_login_storage form');
+    var $content = $('.nav_login_storage');
     // Darn page loading message hiding happens too soon on login, inihibit:
     $.ajaxSetup({complete: null});
     $('#my_login_username').focus();
     $form.submit(function () {
         var username = $('input[name=username]', this).val();
         var password = $('input[name=password]', this).val();
-        $form.fadeOut(1000, function() {
+        $content.fadeOut(1000, function() {
             $form.find('input[name=password]').val("");});
         spideroak.storage_login({username: username, password: password});
         return false;
