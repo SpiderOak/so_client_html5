@@ -44,24 +44,26 @@
                      placeholder="Password">
             </li>
         </ul>
-        <div class="ui-block-a" align="left">
-          <div data-role="controlgroup">
-            <!-- XXX Enable slider when functionality is implemented -->
-            <select name="slider" id="remember-me" data-role="slider"
-                    disabled="true" data-mini="true">
-	      <option value="off">Off</option default="true">
-	      <option value="on">On</option>
-            </select><br/>
-            <label for="remember-me">
-              <small>
-                Remember&nbsp;Me
-              </small>
-            </label>
+        <div class="ui-grid-a">
+          <div class="ui-block-a" align="left">
+            <div data-role="controlgroup">
+              <!-- XXX Enable slider when functionality is implemented -->
+              <select name="slider" id="remember-me" data-role="slider"
+                      disabled="true" data-mini="true">
+	        <option value="off">Off</option default="true">
+	        <option value="on">On</option>
+              </select><br/>
+              <label for="remember-me">
+                <small>
+                  Remember&nbsp;Me
+                </small>
+              </label>
+            </div>
           </div>
-        </div>
-        <div align="right">
-          <input type="submit" data-inline="true"
-                 value="Login" name="Login">
+          <div class="ui-block-b" align="right">
+            <input type="submit" data-inline="true"
+                   value="Login" name="Login">
+          </div>
         </div>
       </form>
       <h3 align="center">Or</h3>
@@ -150,10 +152,19 @@
                      placeholder="Password">
             </li>
         </ul>
-        <a href="#demo_shareroom" data-role="button" data-theme="f">
-          Demo ShareRoom</a>
-        <input type="submit" data-inline="true" value="Login" name="Login"
-               disabled="true">
+        <div class="ui-grid-a">
+          <div class="ui-block-a" align="left">
+            <a href="#demo_shareroom" data-role="button" data-inline="true"
+               data-theme="f">
+              Demo ShareRoom</a>
+          </div>
+          <div class="ui-block-b" align="right">
+            <input type="submit" data-inline="true" value="Login" name="Login"
+                   data-theme="f"
+                   disabled="true">
+          </div>
+        </div>
+      </form>
     </div>
     <div data-role="footer" data-position="fixed">
       <div align="right">
