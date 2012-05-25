@@ -26,7 +26,8 @@
     </div>
     <div class="login_form nav_login_storage" data-role="content">
       <form method="POST">
-        <ul data-role="listview" data-inset="true" data-mini="true">
+        <ul data-role="listview" data-inset="true" data-mini="true"
+            data-theme="c">
             <li data-role="fieldcontain" class="ui-hide-label"
                  data-inset="true" data-mini="true">
               <label for="my_login_username">Username:</label>
@@ -122,20 +123,22 @@
     <div data-role="header" data-position="fixed" data-theme="b">
       <a href="#home" data-icon="arrow-l" data-role="button">
         Back</a>
-      <h3> ShareRooms </h3>
+      <h3> ShareRooms - not yet implemented </h3>
     </div>
     <div class="share_form nav_login_share" data-role="content">
       <div align="center">
         <img src="brand_images/named_logo.png" alt="Logo">
       </div>
       <form method="POST">
-        <ul data-role="listview" data-inset="true" data-mini="true">
+        <ul data-role="listview" data-inset="true" data-mini="true"
+            data-theme="c">
             <li data-role="fieldcontain" class="ui-hide-label"
                  data-inset="true" data-mini="true">
               <label for="my_share_id">Share ID:</label>
               <input type="text" name="shareid" id="my_share_id"
                      data-inset="true"
                      placeholder="ShareID"
+                     disabled="true"
                      value>
             </li>
             <li data-role="fieldcontain" class="ui-hide-label"
@@ -143,12 +146,14 @@
               <label for="my_login_password">Password:</label>
               <input type="password" name="password" id="my_login_password"
                      data-inset="true"
+                     disabled="true"
                      placeholder="Password">
             </li>
         </ul>
         <a href="#demo_shareroom" data-role="button" data-theme="f">
           Demo ShareRoom</a>
-        <input type="submit" data-inline="true" value="Login" name="Login">
+        <input type="submit" data-inline="true" value="Login" name="Login"
+               disabled="true">
     </div>
     <div data-role="footer" data-position="fixed">
       <div align="right">
