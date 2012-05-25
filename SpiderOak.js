@@ -194,40 +194,43 @@ var spideroak = function () {
         // down to all its contents.
         this.device_url = parent ? parent.device_url : null; }
     StorageNode.prototype = new ContentNode();
-    function ShareNode(url, parent) {
+    function ShareRoomNode(url, parent) {
         ContentNode.call(this, url, parent);
         if (! parent) {
             // This is a share room, which is the root of the collection.
             this.root_url = url; }
         else {
             this.root_url = parent.root_url; }}
-    ShareNode.prototype = new ContentNode();
+    ShareRoomNode.prototype = new ContentNode();
 
     function RootStorageNode(url, parent) {
         StorageNode.call(this, url, parent);
-        // TODO: Do we really want to always get the root with devices details?
         this.query_qualifier = "?" + defaults.devices_query_expression;
         this.emblem = "Root";
         this.stats = null;
         delete this.files; }
     RootStorageNode.prototype = new StorageNode();
-    function RootShareNode(url, parent) {
+    function RootShareRoomNode(url, parent) {
         this.emblem = "Room";
-        ShareNode.call(this, url, parent); }
-    RootShareNode.prototype = new ShareNode();
+        ShareRoomNode.call(this, url, parent); }
+    RootShareRoomNode.prototype = new ShareRoomNode();
     function DeviceStorageNode(url, parent) {
         StorageNode.call(this, url, parent);
         this.emblem = "Device";
         this.device_url = url; }
+    function ShareRoomNode(url, parent) {
+        ContentNode.call(this, url, parent);
+        this.emblem = "Room";
+        this.room_url = url; }
     DeviceStorageNode.prototype = new StorageNode();
     function DirectoryStorageNode(url, parent) {
         this.emblem = "Directory";
         StorageNode.call(this, url, parent); }
     DirectoryStorageNode.prototype = new StorageNode();
-    function DirectoryShareNode(url, parent) {
+    function DirectoryShareRoomNode(url, parent) {
         this.emblem = "Directory";
-        ShareNode.call(this, url, parent); }
-    DirectoryShareNode.prototype = new ShareNode();
+        ShareRoomNode.call(this, url, parent); }
+    DirectoryShareRoomNode.prototype = new ShareRoomNode();
     function FileStorageNode(url, parent) {
         this.emblem = "File";
         StorageNode.call(this, url, parent);
@@ -235,13 +238,13 @@ var spideroak = function () {
         delete this.subdirs;
         delete this.files; }
     FileStorageNode.prototype = new StorageNode();
-    function FileShareNode(url, parent) {
+    function FileShareRoomNode(url, parent) {
         this.emblem = "File";
-        ShareNode.call(this, url, parent);
+        ShareRoomNode.call(this, url, parent);
         this.is_container = false;
         delete this.subdirs;
         delete this.files; }
-    FileShareNode.prototype = new ShareNode();
+    FileShareRoomNode.prototype = new ShareRoomNode();
 
     ContentNode.prototype.is_root = function () {
         /* True if the node is a collections top-level item. */
@@ -588,7 +591,7 @@ var spideroak = function () {
         */
         // Type of newly minted nodes are according to get parameters.
 
-        // TODO: Delete node when ascending above them.
+        // TODO: Cleanup? Remove nodes when ascending above them?
         // TODO Probably:
         // - prefetch offspring layer and defer release til 2 layers above.
         // - make fetch of multiple items contingent to device lastcommit time.
