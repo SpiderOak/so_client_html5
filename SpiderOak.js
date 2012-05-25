@@ -94,15 +94,37 @@ var spideroak = function () {
         $(document).bind("pagebeforechange.SpiderOak", handle_content_visit);
     }
 
-    /* UI Controls */
-    function unhide_login_forms(delay, fade) {
-        /* Remove login form fadeout, after 'delay' msecs then 'fade' msecs. */
-        $.ajaxSetup({complete: function() { $.mobile.hidePageLoadingMsg(); }});
-        $('.login-form').each(function () {
-            $(this).delay(delay).fadeIn(fade); }) }
+    /* Register navigation roots: */
+    function set_storage_account(username, host, storage_web_url) {
+        /* Register user-specific storage details, returning storage root URL.
+             'username': the account name
+             'host': the server for the account
+             'storage_path_prefix': the leading part of the storage path
+             'storage_web_url': the account's web UI entry address.
+        */
+        my.username = username;
+        my.storage_host = host;
+        var url = my.storage_root_url = (host + defaults.storage_path_prefix
+                                         + b32encode_trim(username) + "/");
+        if (! is_content_root_url(url)) {
+            my.content_root_urls.push(url); }
+        my.storage_web_url = storage_web_url;
+        return my.storage_root_url; }
+    function add_share_root(shareid, password, host) {
+        /* Register a share room root, returning the share's root URL.
+             'username': the account name
+             'host': the server for the account
+             'storage_path_prefix': the leading part of the storage path
+        */
+        var url = (host + defaults.share_path_prefix + b32encode_trim(shareid)
+                   + "/" + password + "/");
+        if (! is_content_root_url(url)) {
+            my.share_root_urls.push(url);
+            my.content_root_urls.push(url); }
+        return url;
+    }
 
     /* Node-independent URL classification: */
-
     function is_content_root_url(url) {
         /* True if the 'url' is for one of the root content items.
            Doesn't depend on an already established node for the url. */
@@ -110,8 +132,17 @@ var spideroak = function () {
     function is_storage_url(url) {
         /* True if the URL is for a content item in the user's storage area.
            Doesn't depend on an already established node for the url. */
-        return (url.slice(0, my.storage_root_url.length)
-                === my.storage_root_url); }
+        return (my.storage_root_url.length
+                && (url.slice(0, my.storage_root_url.length)
+                    === my.storage_root_url)); }
+    function is_share_root_url(url) {
+        /* True if the 'url' is for one of the root share rooms.
+           Doesn't depend on an already established node for the url. */
+        return ($.inArray(url, my.share_root_urls) >= 0); }
+    function is_share_url(url) {
+        /* True if the URL is for a content item in the user's storage area.
+           Doesn't depend on an already established node for the url. */
+        return (is_content_url(url) && ! is_storage_url(url)); }
     function is_content_url(url) {
         /* True if url within established content roots. */
         for (var i in my.content_root_urls) {
@@ -660,20 +691,28 @@ var spideroak = function () {
             })
         },
 
-        share_login: function (login_info, url) {
-            /* Login to share room.
-             */
+        share_root_visit: function (credentials) {
+            /* Visit share room root.
+               'credentials': Object including "shareid" and "password" attrs.
+            */
+            $.mobile.changePage(
+                add_share_root(credentials['shareid'], credentials['password'],
+                               defaults.share_host_url));
         },
         storage_login: function (login_info, url) {
             /* Login to storage account and commence browsing at devices.
+               'login_info': An object with "username" and "password" attrs.
+               'url': An optional url, else defaults.storage_login_path is used.
                We provide for redirection to specific alternative servers
                by recursive calls. See:
                https://spideroak.com/apis/partners/web_storage_api#Loggingin
              */
-            var parsed = $.mobile.path.parseUrl(url);
             var login_url;
             var server_host_url;
-            if (url && $.inArray(parsed.protocol, ["http:", "https:"])) {
+            var parsed;
+            if (url
+                && (parsed = $.mobile.path.parseUrl(url))
+                && $.inArray(parsed.protocol, ["http:", "https:"])) {
                 server_host_url = parsed.domain;
                 login_url = url;
             } else {
