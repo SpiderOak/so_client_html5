@@ -1,0 +1,60 @@
+[[PageOutline]]
+= Web Storage API JSON Data Structures =
+
+Representative or template examples of various web_storage_api, from the
+API v1, per https://spideroak.com/apis/partners/web_storage_api .
+
+(Proposed API v2: https://spideroak.com/pandora/wiki/NewJsonObjectApi .)
+
+== Device storage node ==
+
+{{{#!python
+  {"stats": {"firstname": "ken", "lastname": "manheimer",
+             "devices": 2, "backupsize": "1.784 GB",
+             "billing_url": "https://spideroak.com/user/validate?hmac=69...",
+             "size": 3},
+   "devices": [{"encoded": "Some%20Laptop%20Computer/",
+                "name": "Some Laptop Computer",
+                "lastlogin": 1335452245, "lastcommit": 1335464711},
+               {"encoded": "Server%20%2F%20Colorful/",
+                "name": " Server / Colorful",
+                "lastlogin": 1335464648, "lastcommit": 1335464699}]}
+}}}
+
+== Directory (Folder) resource ==
+
+{{{#!python
+  {dirs: [["display name of folder", "subfolder/"]],
+   files:
+    [{"url": "relative url to download file",
+      "name": "filename",
+      "size": <file size in bytes>,
+      "ctime": <unix timestamp creation time>,
+      "mtime": <unix timestamp modification time>,
+      "preview_25": "relative url of 25px file preview, if available",
+      "preview_48": "relative url of 48px file preview, if available",
+      "preview_228": "relative url of 228px file preview, if available",
+      "preview_800": "relative url of 800px file preview, if available",
+      "versions": <number of historical versions available>
+      }
+    ]
+  }
+}}}
+
+== !ShareRoom Root ==
+
+{{{#!python
+  {"stats": {
+    "start_date": null,
+    "room_name": "This is the name of the room",
+    "room_description": "This is a long multiline description of the room",
+    "number_of_files": <integer number of all files contained in the share>,
+    "number_of_folders": <integer number of all folders contained in the share>,
+    "firstname": "the users's first name",
+    "lastname": "the users's last name"
+  },
+  {"dirs": [
+            ["display name of folder", "path/to/folder/"]
+           ]
+  }
+}}}

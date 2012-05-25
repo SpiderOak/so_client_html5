@@ -749,38 +749,3 @@ var spideroak = function () {
         cnm: (SO_DEBUGGING ? content_node_manager : null),
     }
 }();
-
-/* Handy notes. */
-
-/* API v1: per https://spideroak.com/apis/partners/web_storage_api */
-/* Proposed API v2: https://spideroak.com/pandora/wiki/NewJsonObjectApi */
-
-/* Device storage node example json data:
-
-  {"stats": {"firstname": "ken", "lastname": "manheimer",
-             "devices": 2, "backupsize": "1.784 GB",
-             "billing_url": "https://spideroak.com/user/validate?hmac=69...",
-             "size": 3},
-   "devices": [{"encoded": "Some%20Laptop%20Computer/",
-                "name": "Some Laptop Computer",
-                "lastlogin": 1335452245, "lastcommit": 1335464711},
-               {"encoded": "Server%20%2F%20Colorful/",
-                "name": " Server / Colorful",
-                "lastlogin": 1335464648, "lastcommit": 1335464699}]}
-*/
-/* Directory (Folder) resource example json data:
-{dirs: [["display name of folder", "subfolder/"]],
- files: [
-         {url: "relative url to download file",
-          name: "filename",
-          size: <file size in bytes>,
-          ctime: <unix timestamp creation time>,
-          mtime: <unix timestamp modification time>,
-          preview_25: "relative url of 25px file preview, if available",
-          preview_48: "relative url of 48px file preview, if available",
-          preview_228: "relative url of 228px file preview, if available",
-          preview_800: "relative url of 800px file preview, if available",
-          versions: <number of historical versions available>
-         }
-        ]}
-*/
