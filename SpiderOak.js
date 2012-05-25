@@ -57,6 +57,7 @@ var spideroak = function () {
         // API v1.
         // XXX starting_host_url may vary according to brand package.
         starting_host_url: "https://spideroak.com",
+        share_host_url: "https://spideroak.com",
         storage_login_path: "/browse/login",
         storage_path_prefix: "/storage/",
         share_path_prefix: "/share/",
@@ -77,7 +78,7 @@ var spideroak = function () {
         // content_roots_urls are for discerning URLs of contained items.
         // They're accumulated on access to storage repo root and share rooms.
         content_root_urls: [],
-        storage_root_url: null,
+        storage_root_url: "",
         share_root_urls: [],
     }
 
@@ -150,33 +151,19 @@ var spideroak = function () {
             if (url.slice(0, prospect.length) === prospect) { return true; }}
         return false; }
 
-    /* Effect session state: */
+    /* UI Controls */
+    function unhide_login_forms(delay, fade) {
+        /* Remove login form fadeout, after 'delay' msecs then 'fade' msecs. */
+        $.ajaxSetup({complete: function() { $.mobile.hidePageLoadingMsg(); }});
+        $('.login-form').each(function () {
+            $(this).delay(delay).fadeIn(fade); }) }
 
-    function set_storage_account(username, domain,
-                         storage_path_prefix, storage_web_url) {
-        /* Register user-specific storage details, returning storage root URL.
-        */
-        my.username = username;
-        my.storage_domain = domain;
-        var url = my.storage_root_url = (domain + storage_path_prefix
-                                         + b32encode_trim(username) + "/");
-        if (! is_content_root_url(url)) {
-            my.content_root_urls.push(url); }
-        my.storage_web_url = storage_web_url;
-        return my.storage_root_url; }
-    function set_share_room() {
-        /* */
-        // XXX Flesh this out, adding to my.content_root_urls in the process.
-    }
+    /* Content representation: */
 
-    /* Content representation structures: */
-
-    /* Various content node types - the root, devices, directories, and
+    /* Various content node types - the roots, devices, directories, and
        files - are implemented based on a generic ContentNode object.
        Departures from the basic functionality are implemented as distinct
-       prototype functions defined immediately after the generic ones.
-
-       The generic functions are for the more prevalent container-style nodes.
+       prototype functions, defined immediately after the generic ones.
     */
 
     function ContentNode(url, parent) {
