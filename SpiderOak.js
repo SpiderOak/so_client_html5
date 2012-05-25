@@ -29,22 +29,17 @@ SO_DEBUGGING = true;            // for misc.js:blather()
 
 $(document).ready(function () {
     spideroak.init();
-    var $form = $('.nav_login_storage form');
-    var $content = $('.nav_login_storage');
     // Darn page loading message hiding happens too soon on login, inihibit:
     $.ajaxSetup({complete: null});
     $('#my_login_username').focus();
-    $form.submit(function () {
-        var username = $('input[name=username]', this).val();
-        var password = $('input[name=password]', this).val();
-        $content.fadeOut(1000, function() {
-            $form.find('input[name=password]').val("");});
-        spideroak.storage_login({username: username, password: password});
-        return false;
-    });
-    // If the document is reloading on a storage node, all application
-    // state (except cookies) is gone - we have to start back at ground
-    // zero. Reload from the top-level entry point:
+    var $content = $('.nav_login_storage');
+    spideroak.prep_login_form('.nav_login_storage', spideroak.storage_login,
+                              'username');
+    spideroak.prep_login_form('.nav_login_share', spideroak.share_login,
+                              'shareid');
+
+    // Development convenience: On full document reload, all application
+    // state (besides cookies) is gone - resume from top-level entry point:
     if (window.location.hash) {
         window.location.hash = "";
         $.mobile.changePage(window.location.href.split('#')[0]);
@@ -640,8 +635,36 @@ var spideroak = function () {
 
         /* Login and account/identity. */
 
+        prep_login_form: function (content_selector,
+                                   submit_handler, name_field) {
+            /* Instrument form within 'content_selector' to submit with
+               'submit_handler'. 'name_field' is the id of the form field
+               with the login name, "password" is assumed to be the
+               password field id.
+
+               The submit action fades the content and clears the password
+               value, so it can't be reused.
+            */
+            var $content = $(content_selector);
+            var $form = $(content_selector + " form");
+            $form.submit(function () {
+                var $password = $('input[name=password]', this);
+                var $name = $('input[name=' + name_field + ']', this);
+                var data = {};
+                data[name_field] = $name.val();
+                data['password'] = $password.val();
+                $content.fadeOut(1000, function() { $password.val("");});
+                submit_handler(data);
+                return false;
+            })
+        },
+
+        share_login: function (login_info, url) {
+            /* Login to share room.
+             */
+        },
         storage_login: function (login_info, url) {
-            /* Login to storage account and commence browsing at the devices.
+            /* Login to storage account and commence browsing at devices.
                We provide for redirection to specific alternative servers
                by recursive calls. See:
                https://spideroak.com/apis/partners/web_storage_api#Loggingin
