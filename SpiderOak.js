@@ -35,7 +35,7 @@ $(document).ready(function () {
     var $content = $('.nav_login_storage');
     spideroak.prep_login_form('.nav_login_storage', spideroak.storage_login,
                               'username');
-    spideroak.prep_login_form('.nav_login_share', spideroak.share_login,
+    spideroak.prep_login_form('.nav_login_share', spideroak.share_root_visit,
                               'shareid');
 
     // Development convenience: On full document reload, all application
@@ -619,9 +619,9 @@ var spideroak = function () {
                 got = by_url[url];
                 if (! got) {
                     if (is_content_root_url(url)) {
-                        if (url === my.storage_root_url) {
+                        if (is_storage_url(url)) {
                             got = new RootStorageNode(url, parent); }
-                        else { got = new RootShareNode(url, parent); }}
+                        else { got = new RootShareRoomNode(url, parent); }}
                     else if (is_content_root_url(parent.url)
                              && (parent.url === my.storage_root_url)) {
                         got = new DeviceStorageNode(url, parent); }
@@ -630,12 +630,12 @@ var spideroak = function () {
                         if (is_storage_url(url)) {
                             got = new FileStorageNode(url, parent); }
                         else {
-                            got = new FileShareNode(url, parent); }}
+                            got = new FileShareRoomNode(url, parent); }}
                     else {
                         if (is_storage_url(url)) {
                             got = new DirectoryStorageNode(url, parent); }
                         else {
-                            got = new DirectoryShareNode(url, parent); }
+                            got = new DirectoryShareRoomNode(url, parent); }
                     }
                     by_url[url] = got;
                 }
@@ -745,7 +745,6 @@ var spideroak = function () {
                         $.mobile.changePage(
                             set_storage_account(login_info['username'],
                                                 server_host_url,
-                                                defaults.storage_path_prefix,
                                                 match[2]));
                     }
                 },
