@@ -95,10 +95,11 @@ var spideroak = function () {
     }
 
     /* UI Controls */
-    function unhide_login_form(delay, fade) {
+    function unhide_login_forms(delay, fade) {
         /* Remove login form fadeout, after 'delay' msecs then 'fade' msecs. */
         $.ajaxSetup({complete: function() { $.mobile.hidePageLoadingMsg(); }});
-        $('.nav_login_storage form').delay(delay).fadeIn(fade); }
+        $('.login-form').each(function () {
+            $(this).delay(delay).fadeIn(fade); }) }
 
     /* Node-independent URL classification: */
 
@@ -687,7 +688,7 @@ var spideroak = function () {
                 success: function (data) {
                     var match = data.match(/^(login|location):(.+)$/m);
                     if (!match) {
-                        unhide_login_form(0, 500);
+                        unhide_login_forms(0, 500);
                         $.mobile.hidePageLoadingMsg();
                         error_alert('Temporary server failure',
                                     'Please try again later.');
@@ -699,7 +700,7 @@ var spideroak = function () {
                         }
                         spideroak.storage_login(login_info, login_url);
                     } else {
-                        unhide_login_form(5000, 500);
+                        unhide_login_forms(5000, 500);
                         // Browser haz auth cookies, we haz relative location.
                         // Go there, and machinery will intervene to handle it.
                         $.mobile.changePage(
@@ -710,7 +711,7 @@ var spideroak = function () {
                     }
                 },
                 error: function (xhr) {
-                    unhide_login_form(100, 100);
+                    unhide_login_forms(100, 100);
                     $.mobile.hidePageLoadingMsg();
                     error_alert("Storage login", xhr.status);
                 },
