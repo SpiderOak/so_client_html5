@@ -44,36 +44,40 @@
             </li>
         </ul>
         <div class="ui-block-a" align="left">
-            <div data-role="controlgroup">
-              <!-- XXX Enable slider when functionality is implemented -->
-              <select name="slider" id="remember-me" data-role="slider"
-                      disabled="true" data-mini="true">
-	        <option value="off">Off</option default="true">
-	        <option value="on">On</option>
-              </select><br/>
-              <label for="remember-me">
-                <small>
-                  Remember&nbsp;Me
-                </small>
-              </label>
-            </div>
+          <div data-role="controlgroup">
+            <!-- XXX Enable slider when functionality is implemented -->
+            <select name="slider" id="remember-me" data-role="slider"
+                    disabled="true" data-mini="true">
+	      <option value="off">Off</option default="true">
+	      <option value="on">On</option>
+            </select><br/>
+            <label for="remember-me">
+              <small>
+                Remember&nbsp;Me
+              </small>
+            </label>
           </div>
-          <div align="right">
-            <input type="submit" data-inline="true"
-                       value="Login" name="Login">
-          </div>
-      </form>
-      <div data-role="footer" data-position="fixed">
-        <div align="right">
-          <small>
-            <a href="#about" data-inline="true"
-               align="right"
-               data-transition="pop">Learn more about SpiderOak &gt;</a>
-          </small>
         </div>
+        <div align="right">
+          <input type="submit" data-inline="true"
+                 value="Login" name="Login">
+        </div>
+      </form>
+      <h3 align="center">Or</h3>
+      <a href="#share_home" data-role="button" data-theme="f">
+        Join a ShareRoom</a>
+    </div>
+    <div data-role="footer" data-position="fixed">
+      <div align="right">
+        <small>
+          <a href="#about" data-inline="true"
+             align="right"
+             data-transition="pop">Learn more about SpiderOak &gt;</a>
+        </small>
       </div>
     </div>
   </div>
+
   <div data-role="page" id="about" data-theme="c">
     <div data-role="header" data-position="fixed">
       <img src="brand_images/named_logo.png" alt="Logo">
@@ -113,6 +117,70 @@
       </div>
     </div><!-- /footer -->
   </div>
+
+  <div data-role="page" id="share_home" data-theme="a">
+    <div data-role="header" data-position="fixed" data-theme="b">
+      <a href="#home" data-icon="arrow-l" data-role="button">
+        Back</a>
+      <h3> ShareRooms </h3>
+    </div>
+    <div class="share_form nav_login_share" data-role="content">
+      <div align="center">
+        <img src="brand_images/named_logo.png" alt="Logo">
+      </div>
+      <form method="POST">
+        <ul data-role="listview" data-inset="true" data-mini="true">
+            <li data-role="fieldcontain" class="ui-hide-label"
+                 data-inset="true" data-mini="true">
+              <label for="my_share_id">Share ID:</label>
+              <input type="text" name="shareid" id="my_share_id"
+                     data-inset="true"
+                     placeholder="ShareID"
+                     value>
+            </li>
+            <li data-role="fieldcontain" class="ui-hide-label"
+                 data-inset="true" data-mini="true">
+              <label for="my_login_password">Password:</label>
+              <input type="password" name="password" id="my_login_password"
+                     data-inset="true"
+                     placeholder="Password">
+            </li>
+        </ul>
+        <a href="#demo_shareroom" data-role="button" data-theme="f">
+          Demo ShareRoom</a>
+        <input type="submit" data-inline="true" value="Login" name="Login">
+    </div>
+    <div data-role="footer" data-position="fixed">
+      <div align="right">
+        <small>
+          <a href="#share_about" data-inline="true"
+             align="right"
+             data-transition="pop">Learn more about ShareRooms &gt;</a>
+        </small>
+      </div>
+    </div>
+  </div>
+
+  <div data-role="page" id="share_about" data-theme="c">
+    <div data-role="header" data-position="fixed">
+      <img src="brand_images/named_logo.png" alt="Logo">
+    </div>
+    <div data-role="content">
+      <h1> About ShareRooms </h1>
+      <!-- XXX Get a spiel about Share Rooms -->
+      <p></p>
+      <a href="#share_home" data-inline="true" data-role="button">Back</a>
+    </div>
+    <div data-role="footer" data-position="fixed" data-theme="a">
+      <div data-role="navbar">
+        <ul>
+          <li> <a href="#"> Access </a> </li>
+          <li> <a href="#"> Settings </a> </li>
+        </ul>
+      </div>
+    </div><!-- /footer -->
+  </div>
+
   <div data-role="page" id="storage-page-template" data-theme="b">
     <div data-role="header" data-position="fixed" data-theme="b">
       <a href="#" class="container-href"
