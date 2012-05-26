@@ -407,6 +407,10 @@ var spideroak = function () {
 
     ContentNode.prototype.layout = function (settings) {
         /* Deploy content as markup on our page. */
+        // XXX We always clone a fresh copy, since some elements are getting
+        //     mangled on reuse.  Specifically: proper formatting of the header
+        //     back button; when lists are not inset, the corners don't round.
+        this.my_page$(true);
         this.layout_header(settings);
         this.layout_content(settings);
         this.layout_footer(settings); }
