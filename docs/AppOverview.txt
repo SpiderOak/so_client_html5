@@ -1,10 +1,10 @@
 [[PageOutline]]
 = HTML5 Client Architecture and Use =
 
-Essential architectural and other technical details of the !SpiderOak HTML5
-application. See [[HTML5ClientProject]] for project status, etc.
+Notable technical details of the !SpiderOak HTML5 application. See
+[[HTML5ClientProject]] for project status, etc.
 
-== Salient Architectural Details ==
+== Architecture ==
 === Dynamic Pages ===
 Storage, Share Rooms are implemented as jQuery Mobile "pages" (`<div
 data-role="page>`) generated dynamically from cloned copies of static
@@ -26,12 +26,23 @@ template DOM nodes, upon in-app traversal of particular URLs.
   * Gets a jQuery object for the node's data-role="page", cloning the
     !SpiderOak.html id="storage-page-template" &lt;div&gt; and adjusts
     the basic structure, if that's not already been done.
-  * Fills in the page header with the node's navigation context
-  * Populates the page listview with entries for the nodes contents
-=== `ContentNode` Geneology ===
-The `ContentNode` object hierarchy provides for shared and distinct
-functionality for obtaining, assimilating, and presenting the remote data
-describing !SpiderOak-managed user content items - devices, folders, and
+  * Fills in the page header and footer with node's-specific navigation
+    context.  The container return locations vary, and different types
+    of nodes have different actions associated with them.
+  * Populates the page listview with entries for the node's contents, or
+    special activities associated with the node.
+
+The storage and share room top levels, below the respective roots, have a
+crucial difference. The top level storage "devices" are all part of the
+single storage collection, while share rooms represent distinct
+collections, which can be added and removed from the UI.  Consequently we
+have to provide two modes for visiting a share room - one for managing the
+collection it represents, and the other for delving into its contents.
+
+=== `ContentNode` Prototype Hierarchy ===
+The `ContentNode` object hierarchy provides for obtaining, assimilating,
+and presenting the remote data describing !SpiderOak-managed user content
+items - storage devices versus share rooms, and their contained folders and
 file "nodes".
 * `ContentNode` - Basis
   * `StorageNode` - Backups content
@@ -39,8 +50,33 @@ file "nodes".
     * `DeviceStorageNode`
     * `DirectoryStorageNode`
     * `FileStorageNode`
-  * `ShareNode` - Share Rooms - XXX not yet implemented
-=== Storage Login and Share Rooms Authentication ===
+  * `ShareRoomNode` - Share Rooms
+    * `RootShareRoomNode`
+    * `RoomShareRoomNode`
+    * `DirectoryShareRoomNode`
+    * `FileShareRoomNode`
+
+(I expect to implement `DirectoryContentNode` and `FileContentNode`, to be
+used by the respective storage and share room nodes.)
+
+
+=== Storage and Share Rooms Access ===
+Storage access is much more complicated than share access for a couple of
+reasons:
+
+- While share room access includes something called a password, that's
+  actually a part of the path to the respective share room. That is, share
+  room access doesn't entail any session cookies - the "credentials" are
+  encoded in the access path.
+
+  The storage login password, on the other hand, is for authentication
+  against a user account.  It entails typical web session credentials,
+  conveyed by session cookies.
+- The login procedure includes a provision for redirecting the storage
+  attempt from the default server to secondary ones, for those accounts
+  that have their storage service provided by secondary servers.  This
+  redirection step is the reason for the elaborate storage_login function,
+  which recurses to the indicated server when required.
 
 == Incidental Technical Details and Hanging Issues ==
 === Special Browser Requirements ===
@@ -104,18 +140,24 @@ jQm theme, using the following procedure:
 3. Download (with name "spideroak")
 4. Unzip in css subdir, or elsewhere and copy out the specific artifacts.
 
-=== Hanging issue: Failing to get reused page dynamic listview enhancments ===
+I've added a theme swatch "f" to provide !SpiderOak orange buttons and
+other elements.
+
+At this point there are enough tweaks that you probably want to do any
+theme rolling
+[#Maintainingourthemethroughthethemeroller based on our existing code],
+rather than starting again from scratch.
+
+=== Hanging issue: Improper listview enhancements on reused content node pages ===
 `As of 2012-05-22`
 
 `ContentNode.prototype.layout()` asks for a fresh clone of the
 storage-page-template every time to workaround inability to get
-`$list.listview()` to completely enhance the contents list.
+`$list.listview()` to get completely correct enhancements.
 
-I expected to be able to reuse the cloned page, on revisits to a node, by
-first `.empty()` emptying the existing `data-role="listview"` element and
-using the `.listview()` enhancement routine on the rebuilt list jQuery
-object. The resulting lists lack properly rounded corners.  (I make sure
-that the list is reset to had to discover that the containing `$page`
-object must have had at least one `$page.page()` invoked for the
-`$list.listview()` method to run without an error, but some of the
-enhancements are neglected, including properly rounded list item corners.
+Currently, some buttons frames (the back button in the header) aren't
+properly formatted, and inset listview elements aren't properly rounded.
+
+This is despite, eg, emptying the lists and making sure at least one
+$page.page() precedes $list.listview() (.listview() raises an uncaught
+error, otherwise).
