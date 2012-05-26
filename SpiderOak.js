@@ -421,7 +421,8 @@ var spideroak = function () {
         var container_url = this.parent_url;
         var container;
         var $page = this.my_page$();
-        var $header = $page.find(".this-header");
+        var $header = $page.find('[data-role="header"]');
+        var $title = $header.find('.header-title');
         var $left_slot = $page.find(".header-left-slot");
         var $right_slot = $page.find('.header-right-slot');
         $right_slot.attr('href', '#' + add_query_parameter(this.url,
@@ -430,27 +431,24 @@ var spideroak = function () {
         if (container_url) {
             var container = content_node_manager.get(container_url);
             $left_slot.attr('href', '#' + container_url);
-            $header.text(this.name);
+            $title.html(this.name);
             if (container.is_root()) { $left_slot.text("Access"); }
             else { $left_slot.text(container.name); }}
         else {
             $left_slot.hide();
-            $page.find(".this-header").text("* Access"); }
+            $title.html("Access"); }
     }
     StorageNode.prototype.layout_header = function(settings) {
-        return ContentNode.prototype.layout_header.call(this); }
+        return ContentNode.prototype.layout_header.call(this, settings); }
     RootShareRoomNode.prototype.layout_header = function(settings) {
-        ContentNode.prototype.layout_header.call(this);
+        ContentNode.prototype.layout_header.call(this, settings);
         var $right_slot = $page.find('.header-right-slot');
         $right_slot.attr('href', '#' + add_query_parameter(this.url,
                                                            "edit", "true"));
         $right_slot.html("Edit"); }
 
     ContentNode.prototype.layout_content = function (settings) {
-        // XXX We always clone a fresh copy, since some elements are getting
-        //     mangled on reuse.  Specifically: proper formatting of the header
-        //     back button; when lists are not inset, the corners don't round.
-        var $page = this.my_page$(true);
+        var $page = this.my_page$();
 	var $content = $page.find('[data-role="content"]');
 	var $list = $content.find('[data-role="listview"]');
         if ($list.children().length) {
