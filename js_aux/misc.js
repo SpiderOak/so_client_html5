@@ -148,3 +148,9 @@ function bytesToSize(bytes) {
     return  ((bytes / Math.pow(1024, i)).toFixed(i ? 1 : 0)
              + ' ' + sizes[isNaN(bytes) ? 0 : i+1]);
 }
+
+function add_query_parameter(url, parameter, value) {
+    /* Include on 'url' query 'parameter' with 'value'. */
+    var parsed = $.mobile.path.parseUrl(url);
+    return url + (parsed.search ? "&" : "?") + parameter + "=" + value;
+}

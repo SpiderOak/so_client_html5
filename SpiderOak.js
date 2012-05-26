@@ -403,19 +403,52 @@ var spideroak = function () {
         var $page = this.my_page$();
         if ($.mobile.activePage[0].id !== this.my_page_id()) {
             options.dataUrl = '#' + this.my_page_id();
-            $.mobile.changePage($page, options); }
-    }
-    ContentNode.prototype.layout = function () {
+            $.mobile.changePage($page, options); } }
+
+    ContentNode.prototype.layout = function (settings) {
         /* Deploy content as markup on our page. */
-        // XXX Demand a new template clone, since some elements are getting
-        //     mangled on reuse - specifically the return button in the
-        //     header and the list item corners, if not inset.
+        this.layout_header(settings);
+        this.layout_content(settings);
+        this.layout_footer(settings); }
+
+    ContentNode.prototype.layout_header = function(settings) {
+        /* Return markup with general and specific legend fields and urls. */
+        var containment = this.containment_path();
+        var container_url = this.parent_url;
+        var container;
+        var $page = this.my_page$();
+        var $header = $page.find(".this-header");
+        var $left_slot = $page.find(".header-left-slot");
+        var $right_slot = $page.find('.header-right-slot');
+        $right_slot.attr('href', '#' + add_query_parameter(this.url,
+                                                           "refresh", "true"));
+        $right_slot.html("Refresh");
+        if (container_url) {
+            var container = content_node_manager.get(container_url);
+            $left_slot.attr('href', '#' + container_url);
+            $header.text(this.name);
+            if (container.is_root()) { $left_slot.text("Access"); }
+            else { $left_slot.text(container.name); }}
+        else {
+            $left_slot.hide();
+            $page.find(".this-header").text("* Access"); }
+    }
+    StorageNode.prototype.layout_header = function(settings) {
+        return ContentNode.prototype.layout_header.call(this); }
+    RootShareRoomNode.prototype.layout_header = function(settings) {
+        ContentNode.prototype.layout_header.call(this);
+        var $right_slot = $page.find('.header-right-slot');
+        $right_slot.attr('href', '#' + add_query_parameter(this.url,
+                                                           "edit", "true"));
+        $right_slot.html("Edit"); }
+
+    ContentNode.prototype.layout_content = function (settings) {
+        // XXX We always clone a fresh copy, since some elements are getting
+        //     mangled on reuse.  Specifically: proper formatting of the header
+        //     back button; when lists are not inset, the corners don't round.
         var $page = this.my_page$(true);
 	var $content = $page.find('[data-role="content"]');
 	var $list = $content.find('[data-role="listview"]');
-
-        this.layout_header();
-
         if ($list.children().length) {
             $list.empty(); }
 
@@ -447,7 +480,7 @@ var spideroak = function () {
             function insert_subnode(suburl) {
                 var subnode = content_node_manager.get(suburl, this);
                 conditionally_insert_divider(subnode.name);
-                insert_item(subnode.layout_item$()); }
+                insert_item(subnode.layout_item$(settings)); }
 
             if (do_filter) { $list.attr('data-filter', 'true'); }
             if (lensubdirs) {
@@ -465,16 +498,16 @@ var spideroak = function () {
         $list.listview("refresh");
         return $page;
     }
-    DeviceStorageNode.prototype.layout_item$ = function() {
+    DeviceStorageNode.prototype.layout_item$ = function(settings) {
         return DirectoryStorageNode.prototype.layout_item$.call(this); }
-    DirectoryStorageNode.prototype.layout_item$ = function() {
+    DirectoryStorageNode.prototype.layout_item$ = function(settings) {
         /* Return a DirectoryStorageNode's presentation as a jQuery item. */
         var $it = $('<li/>').append('<a href="#'
                                     + this.url + '"><h3>'
                                     + this.name + '</h3></a>');
         $it.attr('data-filtertext', this.name);
         return $it; }
-    FileStorageNode.prototype.layout_item$ = function() {
+    FileStorageNode.prototype.layout_item$ = function(settings) {
         /* Return a FileStorageNode's presentation as a jQuery item. */
         var $it = $('<li data-mini="true"/>');
         $it.attr('data-filtertext', this.name);
@@ -505,26 +538,11 @@ var spideroak = function () {
         $it.attr('data-icon', "false");
 
         return $it; }
-    ContentNode.prototype.layout_header = function() {
+
+    ContentNode.prototype.layout_footer = function(settings) {
         /* Return markup with general and specific legend fields and urls. */
-        var containment = this.containment_path();
-        var container_url = this.parent_url;
-        var container;
-        var $page = this.my_page$();
-        var $header = $page.find(".this-header");
-        var $container_href = $page.find(".container-href");
-        var $refresh = $page.find('[data-class="here-refresh"]');
-        $refresh.attr('href', '#' + this.url);
-        if (container_url) {
-            var container = content_node_manager.get(container_url);
-            $container_href.attr('href', '#' + container_url);
-            $header.text(this.name);
-            if (container.is_root()) { $container_href.text("Access"); }
-            else { $container_href.text(container.name); }}
-        else {
-            $container_href.hide();
-            $page.find(".this-header").text("* Access"); }
     }
+
     ContentNode.prototype.is_device = function() {
         return false; }
     DeviceStorageNode.prototype.is_device = function() {
