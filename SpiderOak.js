@@ -502,9 +502,10 @@ var spideroak = function () {
         return DirectoryStorageNode.prototype.layout_item$.call(this); }
     DirectoryStorageNode.prototype.layout_item$ = function(settings) {
         /* Return a DirectoryStorageNode's presentation as a jQuery item. */
-        var $it = $('<li/>').append('<a href="#'
-                                    + this.url + '"><h3>'
-                                    + this.name + '</h3></a>');
+        var $href = $('<a/>').attr('class', "compact-vertical");
+        $href.attr('href', "#" + this.url);
+        $href.html($('<h4/>').html(this.name));
+        var $it = $('<li/>').append($href);
         $it.attr('data-filtertext', this.name);
         return $it; }
     FileStorageNode.prototype.layout_item$ = function(settings) {
@@ -523,7 +524,7 @@ var spideroak = function () {
                   + " " + date.toLocaleTimeString()
                   +'</p>');
         var $table = $('<table width="100%"/>');
-        var $td = $('<td colspan="2"/>').append($('<h3>' + this.name +'</h3>'));
+        var $td = $('<td colspan="2"/>').append($('<h4/>').html(this.name));
         $table.append($('<tr/>').append($td));
         var $tr = $('<tr/>');
         $tr.append($('<td/>').append($details).attr('wrap', "none"));
@@ -531,6 +532,7 @@ var spideroak = function () {
         $table.append($tr);
         var $href = $('<a/>');
         $href.attr('href', this.url);
+        $href.attr('class', "compact-vertical");
         $href.append($table);
         $it.append($href);
 
