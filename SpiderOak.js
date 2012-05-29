@@ -203,43 +203,52 @@ var spideroak = function () {
             this.root_url = parent.root_url; }}
     ShareRoomNode.prototype = new ContentNode();
 
+    function DirectoryContentNode(url, parent) {
+        /* Stub, for situating intermediary methods. */ }
+    function FileContentNode(url, parent) {
+        /* Stub, for situating intermediary methods. */ }
+
     function RootStorageNode(url, parent) {
         StorageNode.call(this, url, parent);
         this.query_qualifier = "?" + defaults.devices_query_expression;
-        this.emblem = "Root";
+        this.emblem = "Root Storage";
         this.stats = null;
         delete this.files; }
     RootStorageNode.prototype = new StorageNode();
     function RootShareRoomNode(url, parent) {
-        this.emblem = "Room";
+        this.emblem = "Root Share Room";
         ShareRoomNode.call(this, url, parent); }
     RootShareRoomNode.prototype = new ShareRoomNode();
+
     function DeviceStorageNode(url, parent) {
         StorageNode.call(this, url, parent);
-        this.emblem = "Device";
+        this.emblem = "Storage Device";
         this.device_url = url; }
-    function ShareRoomNode(url, parent) {
-        ContentNode.call(this, url, parent);
-        this.emblem = "Room";
-        this.room_url = url; }
     DeviceStorageNode.prototype = new StorageNode();
+    function RoomShareRoomNode(url, parent) {
+        ShareRoomNode.call(this, url, parent);
+        this.emblem = "Share Room";
+        this.room_url = url; }
+    RoomShareRoomNode.prototype = new ShareRoomNode();
+
     function DirectoryStorageNode(url, parent) {
-        this.emblem = "Directory";
+        this.emblem = "Storgae Directory";
         StorageNode.call(this, url, parent); }
     DirectoryStorageNode.prototype = new StorageNode();
     function DirectoryShareRoomNode(url, parent) {
-        this.emblem = "Directory";
+        this.emblem = "Share Room Directory";
         ShareRoomNode.call(this, url, parent); }
     DirectoryShareRoomNode.prototype = new ShareRoomNode();
+
     function FileStorageNode(url, parent) {
-        this.emblem = "File";
+        this.emblem = "Storage File";
         StorageNode.call(this, url, parent);
         this.is_container = false;
         delete this.subdirs;
         delete this.files; }
     FileStorageNode.prototype = new StorageNode();
     function FileShareRoomNode(url, parent) {
-        this.emblem = "File";
+        this.emblem = "Share Room File";
         ShareRoomNode.call(this, url, parent);
         this.is_container = false;
         delete this.subdirs;
@@ -359,6 +368,36 @@ var spideroak = function () {
                 this.files.push(url); }}
         this.lastfetched = when;
     }
+    RootShareRoomNode.prototype.provision_populate = function (data, when) {
+        /* Embody the root share room with 'data'.
+           'when' is time soon before data was fetched. */
+        var mgr = content_node_manager;
+        var url, dev, devdata;
+        this.name = data.stats.room_name;
+        this.description = data.stats.description;
+        this.number_of_files = data.stats.number_of_files;
+        this.number_of_folders = data.stats.number_of_folders;
+        this.firstname = data.stats.firstname;
+        this.lastname = data.stats.lastname;
+        this.lastfetched = when;
+        DirectoryStorageNode.prototype
+                            .provision_populate.call(this, data, when);
+    }
+    DeviceStorageNode.prototype.provision_populate = function (data, when) {
+        /* Embody storage directory items with 'data'.
+           'when' is time soon before data was fetched. */
+        DirectoryStorageNode.prototype
+                            .provision_populate.call(this, data, when); }
+    DirectoryStorageNode.prototype.provision_populate = function (data, when) {
+        /* Embody storage directory items with 'data'.
+           'when' is time soon before data was fetched. */
+        DirectoryContentNode.prototype
+                            .provision_populate.call(this, data, when); }
+    DirectoryShareRoomNode.prototype.provision_populate = function (data, when){
+        /* Embody share room directory items with 'data'.
+           'when' is time soon before data was fetched. */
+        DirectoryContentNode.prototype
+                            .provision_populate.call(this, data, when); }
     FileStorageNode.prototype.provision_populate = function (data, when) {
         error_alert("Not yet implemented", "File preview"); }
 
@@ -500,18 +539,31 @@ var spideroak = function () {
         $list.listview("refresh");
         return $page;
     }
-    DeviceStorageNode.prototype.layout_item$ = function(settings) {
-        return DirectoryStorageNode.prototype.layout_item$.call(this); }
-    DirectoryStorageNode.prototype.layout_item$ = function(settings) {
-        /* Return a DirectoryStorageNode's presentation as a jQuery item. */
+    DirectoryContentNode.prototype.layout_item$ = function(settings) {
+        /* Return a directory-like content item's description as jQuery item. */
         var $href = $('<a/>').attr('class', "compact-vertical");
         $href.attr('href', "#" + this.url);
         $href.html($('<h4/>').html(this.name));
         var $it = $('<li/>').append($href);
         $it.attr('data-filtertext', this.name);
         return $it; }
-    FileStorageNode.prototype.layout_item$ = function(settings) {
-        /* Return a FileStorageNode's presentation as a jQuery item. */
+    DeviceStorageNode.prototype.layout_item$ = function(settings) {
+        /* Return a storage device's description as a jQuery item. */
+        return DirectoryStorageNode.prototype.layout_item$.call(this); }
+    DirectoryStorageNode.prototype.layout_item$ = function(settings) {
+        /* Return a storage directory's description as a jQuery item. */
+        return DirectoryContentNode.prototype.layout_item$.call(this,
+                                                                settings); }
+    DirectoryShareRoomNode.prototype.layout_item$ = function(settings) {
+        /* Return a share room directory's description as a jQuery item. */
+        return DirectoryContentNode.prototype.layout_item$.call(this,
+                                                                settings); }
+    RoomShareRoomNode.prototype.layout_item$ = function(settings) {
+        /* Return a share room's description as a jQuery item. */
+        return DirectoryShareRoomNode.prototype.layout_item$.call(this,
+                                                                  settings); }
+    FileContentNode.prototype.layout_item$ = function(settings) {
+        /* Return a file-like content node's description as a jQuery item. */
         var $it = $('<li data-mini="true"/>');
         $it.attr('data-filtertext', this.name);
 
@@ -542,6 +594,13 @@ var spideroak = function () {
         $it.attr('data-icon', "false");
 
         return $it; }
+
+    FileStorageNode.prototype.layout_item$ = function(settings) {
+        /* Return a storage file's description as a jQuery item. */
+        return FileContentNode.prototype.layout_item$.call(this, settings); }
+    FileShareRoomNode.prototype.layout_item$ = function(settings) {
+        /* Return a storage file's description as a jQuery item. */
+        return FileContentNode.prototype.layout_item$.call(this, settings); }
 
     ContentNode.prototype.layout_footer = function(settings) {
         /* Return markup with general and specific legend fields and urls. */
