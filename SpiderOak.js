@@ -652,7 +652,7 @@ var spideroak = function () {
 
     /* Convenience: */
     ContentNode.prototype.toString = function () {
-        return "<" + this.emblem + " content node " + this.url + ">";
+        return "<" + this.emblem + ": " + this.url + ">";
     }
 
     /* Content node collection management: */
