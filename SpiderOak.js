@@ -160,10 +160,10 @@ var spideroak = function () {
 
     /* Content representation: */
 
-    /* Various content node types - the roots, devices, directories, and
-       files - are implemented based on a generic ContentNode object.
-       Departures from the basic functionality are implemented as distinct
-       prototype functions, defined immediately after the generic ones.
+    /* Various content node types - the roots, devices, folders, and files
+       - are implemented based on a generic ContentNode object.  Departures
+       from the basic functionality are implemented as distinct prototype
+       functions, defined immediately after the generic ones.
     */
 
     function ContentNode(url, parent) {
@@ -204,7 +204,7 @@ var spideroak = function () {
             this.root_url = parent.root_url; }}
     ShareRoomNode.prototype = new ContentNode();
 
-    function DirectoryContentNode(url, parent) {
+    function FolderContentNode(url, parent) {
         /* Stub, for situating intermediary methods. */ }
     function FileContentNode(url, parent) {
         /* Stub, for situating intermediary methods. */ }
@@ -232,14 +232,14 @@ var spideroak = function () {
         this.room_url = url; }
     RoomShareRoomNode.prototype = new ShareRoomNode();
 
-    function DirectoryStorageNode(url, parent) {
-        this.emblem = "Storgae Directory";
+    function FolderStorageNode(url, parent) {
+        this.emblem = "Storage Folder";
         StorageNode.call(this, url, parent); }
-    DirectoryStorageNode.prototype = new StorageNode();
-    function DirectoryShareRoomNode(url, parent) {
-        this.emblem = "Share Room Directory";
+    FolderStorageNode.prototype = new StorageNode();
+    function FolderShareRoomNode(url, parent) {
+        this.emblem = "Share Room Folder";
         ShareRoomNode.call(this, url, parent); }
-    DirectoryShareRoomNode.prototype = new ShareRoomNode();
+    FolderShareRoomNode.prototype = new ShareRoomNode();
 
     function FileStorageNode(url, parent) {
         this.emblem = "Storage File";
@@ -329,8 +329,8 @@ var spideroak = function () {
         }
         this.lastfetched = when;
     }
-    DirectoryContentNode.prototype.provision_populate = function (data, when) {
-        /* Embody directory content items with 'data'.
+    FolderContentNode.prototype.provision_populate = function (data, when) {
+        /* Embody folder content items with 'data'.
            'when' is time soon before data was fetched. */
         var mgr = content_node_manager;
         var url, dir, dirdata, file, filedata;
@@ -373,24 +373,20 @@ var spideroak = function () {
         this.firstname = data.stats.firstname;
         this.lastname = data.stats.lastname;
         this.lastfetched = when;
-        DirectoryStorageNode.prototype
-                            .provision_populate.call(this, data, when);
+        FolderStorageNode.prototype.provision_populate.call(this, data, when);
     }
     DeviceStorageNode.prototype.provision_populate = function (data, when) {
-        /* Embody storage directory items with 'data'.
+        /* Embody storage folder items with 'data'.
            'when' is time soon before data was fetched. */
-        DirectoryStorageNode.prototype
-                            .provision_populate.call(this, data, when); }
-    DirectoryStorageNode.prototype.provision_populate = function (data, when) {
-        /* Embody storage directory items with 'data'.
+        FolderStorageNode.prototype.provision_populate.call(this, data, when); }
+    FolderStorageNode.prototype.provision_populate = function (data, when) {
+        /* Embody storage folder items with 'data'.
            'when' is time soon before data was fetched. */
-        DirectoryContentNode.prototype
-                            .provision_populate.call(this, data, when); }
-    DirectoryShareRoomNode.prototype.provision_populate = function (data, when){
-        /* Embody share room directory items with 'data'.
+        FolderContentNode.prototype.provision_populate.call(this, data, when); }
+    FolderShareRoomNode.prototype.provision_populate = function (data, when){
+        /* Embody share room folder items with 'data'.
            'when' is time soon before data was fetched. */
-        DirectoryContentNode.prototype
-                            .provision_populate.call(this, data, when); }
+        FolderContentNode.prototype.provision_populate.call(this, data, when); }
     FileStorageNode.prototype.provision_populate = function (data, when) {
         error_alert("Not yet implemented", "File preview"); }
 
@@ -534,8 +530,8 @@ var spideroak = function () {
         $list.listview("refresh");
         return $page;
     }
-    DirectoryContentNode.prototype.layout_item$ = function(settings) {
-        /* Return a directory-like content item's description as jQuery item. */
+    FolderContentNode.prototype.layout_item$ = function(settings) {
+        /* Return a folder-like content item's description as jQuery item. */
         var $href = $('<a/>').attr('class', "compact-vertical");
         $href.attr('href', "#" + this.url);
         $href.html($('<h4/>').html(this.name));
@@ -544,18 +540,18 @@ var spideroak = function () {
         return $it; }
     DeviceStorageNode.prototype.layout_item$ = function(settings) {
         /* Return a storage device's description as a jQuery item. */
-        return DirectoryStorageNode.prototype.layout_item$.call(this); }
-    DirectoryStorageNode.prototype.layout_item$ = function(settings) {
-        /* Return a storage directory's description as a jQuery item. */
-        return DirectoryContentNode.prototype.layout_item$.call(this,
+        return FolderStorageNode.prototype.layout_item$.call(this); }
+    FolderStorageNode.prototype.layout_item$ = function(settings) {
+        /* Return a storage folder's description as a jQuery item. */
+        return FolderContentNode.prototype.layout_item$.call(this,
                                                                 settings); }
-    DirectoryShareRoomNode.prototype.layout_item$ = function(settings) {
-        /* Return a share room directory's description as a jQuery item. */
-        return DirectoryContentNode.prototype.layout_item$.call(this,
+    FolderShareRoomNode.prototype.layout_item$ = function(settings) {
+        /* Return a share room folder's description as a jQuery item. */
+        return FolderContentNode.prototype.layout_item$.call(this,
                                                                 settings); }
     RoomShareRoomNode.prototype.layout_item$ = function(settings) {
         /* Return a share room's description as a jQuery item. */
-        return DirectoryShareRoomNode.prototype.layout_item$.call(this,
+        return FolderShareRoomNode.prototype.layout_item$.call(this,
                                                                   settings); }
     FileContentNode.prototype.layout_item$ = function(settings) {
         /* Return a file-like content node's description as a jQuery item. */
@@ -614,7 +610,7 @@ var spideroak = function () {
     DeviceStorageNode.prototype.containment_path = function() {
         /* Return '/' nested containing path, per content type. */
         return my.username; }
-    DirectoryStorageNode.prototype.containment_path = function() {
+    FolderStorageNode.prototype.containment_path = function() {
         /* Return '/' nested containing path, per content type. */
         var parent = content_node_manager.get(this.parent_url);
         if (parent.is_device()) {
@@ -622,7 +618,7 @@ var spideroak = function () {
         else { return parent.containment_path() + "/" + this.name; }}
     FileStorageNode.prototype.containment_path = function() {
         /* Return '/' nested containing path, per content type. */
-        return DirectoryStorageNode.containment_path.call(this); }
+        return FolderStorageNode.containment_path.call(this); }
     ContentNode.prototype.my_page_from_dom$ = function () {
         /* Find my page in the DOM, if it's there. */
         return $('#' + fragment_quote(this.my_page_id())); }
@@ -699,9 +695,9 @@ var spideroak = function () {
                             got = new FileShareRoomNode(url, parent); }}
                     else {
                         if (is_storage_url(url)) {
-                            got = new DirectoryStorageNode(url, parent); }
+                            got = new FolderStorageNode(url, parent); }
                         else {
-                            got = new DirectoryShareRoomNode(url, parent); }
+                            got = new FolderShareRoomNode(url, parent); }
                     }
                     by_url[url] = got;
                 }
