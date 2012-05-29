@@ -35,7 +35,7 @@ $(document).ready(function () {
     var $content = $('.nav_login_storage');
     spideroak.prep_login_form('.nav_login_storage', spideroak.storage_login,
                               'username');
-    spideroak.prep_login_form('.nav_login_share', spideroak.share_root_visit,
+    spideroak.prep_login_form('.nav_login_share', spideroak.visit_share_root,
                               'shareid');
 
     // Development convenience: On full document reload, all application
@@ -187,6 +187,7 @@ var spideroak = function () {
             this.lastfetched = false;
             this.emblem;        // TODO: Eventually, an icon, for now text.
         }}
+
     function StorageNode(url, parent) {
         ContentNode.call(this, url, parent);
         // All but the root storage nodes are contained within a device.
@@ -655,7 +656,7 @@ var spideroak = function () {
 
     /* Convenience: */
     ContentNode.prototype.toString = function () {
-        return "<Content node " + this.url + ">";
+        return "<" + this.emblem + " content node " + this.url + ">";
     }
 
     /* Content node collection management: */
@@ -756,12 +757,12 @@ var spideroak = function () {
             })
         },
 
-        share_root_visit: function (credentials) {
-            /* Visit share room root.
+        visit_share_root: function (credentials) {
+            /* Visit user's collection of share rooms.
                'credentials': Object including "shareid" and "password" attrs.
             */
             $.mobile.changePage(
-                add_share_root(credentials['shareid'], credentials['password'],
+                add_share_root(credentials.shareid, credentials.password,
                                defaults.share_host_url));
         },
         storage_login: function (login_info, url) {
