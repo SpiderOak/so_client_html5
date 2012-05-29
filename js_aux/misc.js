@@ -149,8 +149,18 @@ function bytesToSize(bytes) {
              + ' ' + sizes[isNaN(bytes) ? 0 : i+1]);
 }
 
-function add_query_parameter(url, parameter, value) {
+function add_query_param(url, parameter, value) {
     /* Include on 'url' query 'parameter' with 'value'. */
     var parsed = $.mobile.path.parseUrl(url);
     return url + (parsed.search ? "&" : "?") + parameter + "=" + value;
+}
+function query_params(url) {
+    /* Return an object with settings indicated by 'url' search parameters. */
+    var search = $.mobile.path.parseUrl(url).search;
+    var got = {};
+    if (search) {
+        search.slice(1,search.length).split('&').map(
+            function (combo) {
+                var pair = combo.split('='); got[pair[0]] = pair[1]; })};
+    return got;
 }
