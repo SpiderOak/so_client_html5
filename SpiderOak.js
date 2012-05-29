@@ -309,12 +309,10 @@ var spideroak = function () {
                    "Type-specific provisioning implementation missing.")
     }
     RootStorageNode.prototype.provision_populate = function (data, when) {
-        /* Embody the root content item with 'data'.
+        /* Embody the root storage node with 'data'.
            'when' is time soon before data was fetched. */
         var mgr = content_node_manager;
         var url, dev, devdata;
-        var possessive = (my.username.charAt(my.username.length-1) == "s"
-                          ? "' " : "'s ")
         this.name = my.username;
         mgr.stats = data["stats"]; // TODO: We'll cook stats when UI is ready.
         for (var i in data.devices) {
@@ -330,13 +328,7 @@ var spideroak = function () {
         }
         this.lastfetched = when;
     }
-    DeviceStorageNode.prototype.provision_populate = function (data, when) {
-        /* Embody directory content items with 'data'.
-           'when' is time soon before data was fetched. */
-        return DirectoryStorageNode.prototype.provision_populate.call(this,
-                                                                      data,
-                                                                      when); }
-    DirectoryStorageNode.prototype.provision_populate = function (data, when) {
+    DirectoryContentNode.prototype.provision_populate = function (data, when) {
         /* Embody directory content items with 'data'.
            'when' is time soon before data was fetched. */
         var mgr = content_node_manager;
@@ -480,13 +472,15 @@ var spideroak = function () {
     StorageNode.prototype.layout_header = function(settings) {
         return ContentNode.prototype.layout_header.call(this, settings); }
     RootShareRoomNode.prototype.layout_header = function(settings) {
+        /* Present this root share room by adjusting its DOM data-role="page" */
         ContentNode.prototype.layout_header.call(this, settings);
-        var $right_slot = $page.find('.header-right-slot');
+        var $right_slot = this.my_page$().find('.header-right-slot');
         $right_slot.attr('href', '#' + add_query_parameter(this.url,
                                                            "edit", "true"));
         $right_slot.html("Edit"); }
 
     ContentNode.prototype.layout_content = function (settings) {
+        /* Present this content node by adjusting its DOM data-role="page" */
         var $page = this.my_page$();
 	var $content = $page.find('[data-role="content"]');
 	var $list = $content.find('[data-role="listview"]');
