@@ -99,6 +99,11 @@ arguments:
 
 This approach will almost certainly change when the app is packaged for
 mobile and web deployment.
+
+This security inhibition means that we must assign handling of any
+uncontrolled URLs, not within the content managed by SpiderOak, to another,
+plain browser session.
+
 === Managing the UI Theme ===
 The default set of jQuery Mobile theme swatches get us near enough to
 Mike's designs to be worth building on. The jQm theme roller gets us
