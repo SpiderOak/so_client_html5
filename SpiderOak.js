@@ -61,7 +61,7 @@ var spideroak = function () {
         storage_login_path: "/browse/login",
         storage_path_prefix: "/storage/",
         share_path_prefix: "/share/",
-        storage_page_template_id: "storage-page-template",
+        content_page_template_id: "content-page-template",
         devices_query_expression: 'device_info=yes',
         versions_query_expression: 'format=version_info',
         home_page_id: 'home',
@@ -645,7 +645,7 @@ var spideroak = function () {
             if (! $template) {
                 error_alert("Missing markup",
                             "Expected page #"
-                            + defaults.storage_page_template_id
+                            + defaults.content_page_template_id
                             + " not present."); }
             this.$page = $template.clone();
             this.$page.attr('id', this.my_page_id());
@@ -654,7 +654,7 @@ var spideroak = function () {
             this.get_storage_page_template$().after(this.my_page$()); }
         return this.$page; }
     ContentNode.prototype.get_storage_page_template$ = function() {
-        return $("#" + defaults.storage_page_template_id); }
+        return $("#" + defaults.content_page_template_id); }
 
     /* Convenience: */
     ContentNode.prototype.toString = function () {
