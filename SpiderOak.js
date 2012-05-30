@@ -154,11 +154,15 @@ var spideroak = function () {
         return false; }
 
     /* UI Controls */
+
+    // XXX unhide_login_forms() should be superceded by the
+    // unhide_form_oneshot bound to "error", but that's not yet working.
     function unhide_login_forms(delay, fade) {
         /* Remove login form fadeout, after 'delay' msecs then 'fade' msecs. */
+        // Used for errors - pagechange binding unhides on successful traversal.
         $.ajaxSetup({complete: function() { $.mobile.hidePageLoadingMsg(); }});
-        $('.login-form').each(function () {
-            $(this).delay(delay).fadeIn(fade); }) }
+        $('.nav_login_storage').delay(delay).show(fade);
+        $('.nav_login_share').delay(delay).show(fade); }
 
     /* Content representation: */
 
@@ -800,6 +804,12 @@ var spideroak = function () {
                 data[name_field] = $name.val();
                 data['password'] = $password.val();
                 $content.fadeOut(1000, function() { $password.val("");});
+                var unhide_form_oneshot = function(event, data) {
+                    $content.show(1000);
+                    $(document).unbind("pagechange", unhide_form_oneshot);
+                    $(document).unbind("error", unhide_form_oneshot); }
+                $(document).bind("pagechange", unhide_form_oneshot)
+                $(document).bind("error", unhide_form_oneshot)
                 submit_handler(data);
                 return false;
             })
@@ -853,7 +863,6 @@ var spideroak = function () {
                         }
                         spideroak.storage_login(login_info, login_url);
                     } else {
-                        unhide_login_forms(5000, 500);
                         // Browser haz auth cookies, we haz relative location.
                         // Go there, and machinery will intervene to handle it.
                         $.mobile.changePage(
