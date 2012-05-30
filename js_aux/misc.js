@@ -169,3 +169,11 @@ function query_params(url) {
                 var pair = combo.split('='); got[pair[0]] = pair[1]; })};
     return got;
 }
+
+function replace_button_text($slot, label_text) {
+    /* Set a button contained in jquery '$slot' element to have 'label_text'.
+       We look for .ui-btn-txt within the slot, else replace the slot's html.
+     */
+    var $into = $slot.find('.ui-btn-text');
+    if (! $into.length) { $into = $slot; }
+    $into.html(label_text); }

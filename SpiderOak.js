@@ -480,9 +480,7 @@ var spideroak = function () {
                 if (! fields.right_label) {
                     $right_slot.hide(); }
                 else {
-                    $label = $right_slot.find('.ui-btn-text')
-                    if (! $label.length) { $label = $right_slot; }
-                    $label.html(fields.right_label);
+                    replace_button_text($right_slot, fields.right_label);
                     $right_slot.show(); }}}
 
         if ('left_url' in fields) {
@@ -495,9 +493,7 @@ var spideroak = function () {
                 if (! fields.left_label) {
                     $left_slot.hide(); }
                 else {
-                    $label = $left_slot.find('.ui-btn-text')
-                    if (! $label.length) { $label = $left_slot; }
-                    $label.html(fields.left_label);
+                    replace_button_text($left_slot, fields.left_label);
                     $left_slot.show(); }}}}
 
     StorageNode.prototype.layout_header = function(settings) {
@@ -544,10 +540,10 @@ var spideroak = function () {
     RootShareRoomNode.prototype.layout_header = function(settings) {
         /* Fill in header fields of .my_page$(). */
         ShareRoomNode.prototype.layout_header.call(this, settings);
-        var $right_slot = this.my_page$().find('.header-right-slot');
-        $right_slot.attr('href', '#' + add_query_param(this.url,
-                                                       "mode", "edit"));
-        $right_slot.html("Edit"); }
+        var fields = {'right_url': '#' + add_query_param(this.url,
+                                                         "mode", "edit"),
+                      'right_label': "Edit"};
+        this.layout_header_fields(fields); }
 
     ContentNode.prototype.layout_content = function (settings) {
         /* Present this content node by adjusting its DOM data-role="page" */
