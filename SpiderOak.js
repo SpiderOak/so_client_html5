@@ -510,12 +510,12 @@ var spideroak = function () {
             var container = content_node_manager.get(this.parent_url);
             fields.left_url = '#' + this.parent_url;
             fields.left_label = (container.is_root()
-                                 ? "Access" : container.name) };
+                                 ? "Storage Devices" : container.name) };
         this.layout_header_fields(fields); }
     RootStorageNode.prototype.layout_header = function(settings) {
         /* Fill in typical values for header fields of .my_page$(). */
         StorageNode.prototype.layout_header.call(this, settings);
-        this.layout_header_fields({'title': "Access",
+        this.layout_header_fields({'title': "Storage Devices",
                                    'left_label': "Login", 'left_url': "-"}); }
 
     ShareRoomNode.prototype.layout_header = function(settings) {
