@@ -323,6 +323,7 @@ var spideroak = function () {
         var url, dev, devdata;
         this.name = my.username;
         mgr.stats = data["stats"]; // TODO: We'll cook stats when UI is ready.
+        this.subdirs = [];
         for (var i in data.devices) {
             devdata = data.devices[i];
             url = my.storage_root_url + devdata["encoded"]
@@ -341,6 +342,7 @@ var spideroak = function () {
            'when' is time soon before data was fetched. */
         var mgr = content_node_manager;
         var url, dir, dirdata, file, filedata;
+        this.subdirs = [];
         for (var i in data.dirs) {
             dirdata = data.dirs[i];
             url = this.url + dirdata[1];
@@ -350,6 +352,7 @@ var spideroak = function () {
             // Include, if not already present:
             if (! ($.inArray(url, this.subdirs) >= 0)) {
                 this.subdirs.push(url); }}
+        this.files = [];
         for (var i in data.files) {
             filedata = data.files[i];
             url = this.url + filedata['url'];
@@ -461,7 +464,7 @@ var spideroak = function () {
            right_label: text for right-hand button, or empty to hide the button;
         */
         var $header = this.my_page$().find('[data-role="header"]');
-        var label;
+        var $label;
 
         if ('title' in fields) {
             $header.find('.header-title').html(fields.title); }
@@ -473,7 +476,8 @@ var spideroak = function () {
                 if (! fields.right_label) {
                     $right_slot.hide(); }
                 else {
-                    $label = $right_slot.find('.ui-btn-text') || $right_slot;
+                    $label = $right_slot.find('.ui-btn-text')
+                    if (! $label.length) { $label = $right_slot; }
                     $label.html(fields.right_label);
                     $right_slot.show(); }}}
 
@@ -487,7 +491,8 @@ var spideroak = function () {
                 if (! fields.left_label) {
                     $left_slot.hide(); }
                 else {
-                    $label = $left_slot.find('.ui-btn-text') || $left_slot;
+                    $label = $left_slot.find('.ui-btn-text')
+                    if (! $label.length) { $label = $left_slot; }
                     $label.html(fields.left_label);
                     $left_slot.show(); }}}}
 
@@ -709,7 +714,7 @@ var spideroak = function () {
             this.$page.attr('id', this.my_page_id());
             this.$page.attr('data-url', this.my_page_id());
             // Include our page in the DOM, after the storage page template:
-            this.get_storage_page_template$().after(this.my_page$()); }
+            $template.after(this.my_page$()); }
         return this.$page; }
     ContentNode.prototype.get_storage_page_template$ = function() {
         return $("#" + defaults.content_page_template_id); }
