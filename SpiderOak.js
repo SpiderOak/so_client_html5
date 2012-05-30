@@ -726,17 +726,18 @@ var spideroak = function () {
         return {
             get: function (url, parent) {
                 /* Retrieve a node according to 'url'.
-                   Identify 'parent' for production of new nodes.
-                   New nodes produced on first reference, but not provisioning.
+                   'parent' is required for production of new nodes,
+                   which are produced on first reference.
+                   Provisioning nodes with remote data is done elsewhere,
+                   not here.
                  */
-                got = by_url[url];
+                got = by_url[url.split('?')[0]];     // ... sans query string.
                 if (! got) {
                     if (is_content_root_url(url)) {
                         if (is_storage_url(url)) {
                             got = new RootStorageNode(url, parent); }
                         else { got = new RootShareRoomNode(url, parent); }}
-                    else if (is_content_root_url(parent.url)
-                             && (parent.url === my.storage_root_url)) {
+                    else if (parent && (parent.url === my.storage_root_url)) {
                         got = new DeviceStorageNode(url, parent); }
                     else if (url.charAt(url.length-1) !== "/") {
                         // No trailing slash.
