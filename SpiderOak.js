@@ -415,9 +415,13 @@ var spideroak = function () {
         */
 
         var when = new Date();
-        $.ajax({url: this.url + this.query_qualifier,
+        var url = this.url + this.query_qualifier;
+        var node_settings = query_params(url);
+        var cache = node_settings["refresh"] === "true";
+        $.ajax({url: url,
                 type: 'GET',
                 dataType: 'json',
+                cache: cache,
                 success: function (data) {
                     success_callback(data, when);
                 },

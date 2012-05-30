@@ -153,16 +153,22 @@ theme rolling
 [#Maintainingourthemethroughthethemeroller based on our existing code],
 rather than starting again from scratch.
 
-=== Hanging issue: Improper listview enhancements on reused content node pages ===
-`As of 2012-05-22`
+==== Special caution on reused content node pages ====
+jQuery Mobile DOM "enhancements" don't just involve adding class (and
+other) attributes to tags - structures are injected around things, as
+well.  This means that elements can be found in different places in the DOM
+before and after enhancement. For example the header button labels and
+icons get enveloped in structures, so that you have to look in the new spot
+before just changing the location where they were originally found.
 
-`ContentNode.prototype.layout()` asks for a fresh clone of the
-storage-page-template every time to workaround inability to get
-`$list.listview()` to get completely correct enhancements.
+As of 2012-05-30, ContentNode.prototype.layout_header_fields() shows
+examples of this elaboration.
 
-Currently, some buttons frames (the back button in the header) aren't
-properly formatted, and inset listview elements aren't properly rounded.
-
-This is despite, eg, emptying the lists and making sure at least one
-$page.page() precedes $list.listview() (.listview() raises an uncaught
-error, otherwise).
+==== Consequences of typical $.ajax() requests default caching ====
+Default caching of typical $.ajax() requests - including json ones - means
+that normal traversal of the content hierarchy won't update after first
+pass without explicitly asking for a refresh. We specifically override the
+cache on explicit refreshes, but not on return by traversal to already
+visited nodes. This seems like a good tradeoff, reducing server load by
+requiring that the user explicitly ask for an update, but we should warn
+the user about it.
