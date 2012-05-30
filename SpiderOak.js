@@ -535,9 +535,9 @@ var spideroak = function () {
             fields.title = this.name; }
         else {
             fields.right_url = '#' + add_query_param(this.url, "mode", "edit");
-            fields.right_label("Edit");
-            fields.left_url('#' + add_query_param(this.url, 'mode', "add"));
-            fields.left_label("+");
+            fields.right_label = "Edit";
+            fields.left_url = '#' + add_query_param(this.url, 'mode', "add");
+            fields.left_label = "+";
             fields.title = "ShareRooms"; }
         this.layout_header_fields(fields); }
 
