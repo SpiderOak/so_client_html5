@@ -670,24 +670,6 @@ var spideroak = function () {
         return false; }
     DeviceStorageNode.prototype.is_device = function() {
         return true; }
-    ContentNode.prototype.containment_path = function() {
-        /* Return '/' nested containing path, per content type. */
-        return "SpiderOak"; }
-    RootStorageNode.prototype.containment_path = function() {
-        /* Return '/' nested containing path, per content type. */
-        return my.username; }
-    DeviceStorageNode.prototype.containment_path = function() {
-        /* Return '/' nested containing path, per content type. */
-        return my.username; }
-    FolderStorageNode.prototype.containment_path = function() {
-        /* Return '/' nested containing path, per content type. */
-        var parent = content_node_manager.get(this.parent_url);
-        if (parent.is_device()) {
-            return parent.name + " /" + this.name; }
-        else { return parent.containment_path() + "/" + this.name; }}
-    FileStorageNode.prototype.containment_path = function() {
-        /* Return '/' nested containing path, per content type. */
-        return FolderStorageNode.containment_path.call(this); }
     ContentNode.prototype.my_page_from_dom$ = function () {
         /* Find my page in the DOM, if it's there. */
         return $('#' + fragment_quote(this.my_page_id())); }
