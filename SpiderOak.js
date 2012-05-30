@@ -277,11 +277,12 @@ var spideroak = function () {
                                     { this_node.provision(data, when,
                                                           node_settings);
                                       this_node.layout(node_settings);
-                                      this_node.show(changepage_options); },
+                                      this_node.show(changepage_options,
+                                                     node_settings); },
                                     function (xhr)
                                     { this_node.handle_failed_visit(xhr); })
         } else {
-            this.show(options);
+            this.show(options, node_settings);
         }
     }
     ContentNode.prototype.handle_failed_visit = function (xhr) {
@@ -431,55 +432,108 @@ var spideroak = function () {
     ContentNode.prototype.my_page_id = function () {
         /* Set the UI page id, escaping special characters as necessary. */
         return this.url; }
-    ContentNode.prototype.show = function (changepage_options) {
+    ContentNode.prototype.show = function (changepage_options, node_settings) {
         /* Trigger UI focus on our content layout. */
         // We use whatever layout is already done.
         var $page = this.my_page$();
         if ($.mobile.activePage[0].id !== this.my_page_id()) {
-            changepage_options.dataUrl = '#' + this.my_page_id();
             $.mobile.changePage($page, changepage_options); } }
 
     ContentNode.prototype.layout = function (settings) {
         /* Deploy content as markup on our page. */
-        // XXX We always clone a fresh copy, since some elements are getting
-        //     mangled on reuse.  Specifically: proper formatting of the header
-        //     back button; when lists are not inset, the corners don't round.
-        this.my_page$(true);
+        this.my_page$();
         this.layout_header(settings);
         this.layout_content(settings);
-        this.layout_footer(settings); }
-
-    ContentNode.prototype.layout_header = function(settings) {
-        /* Return markup with general and specific legend fields and urls. */
-        var containment = this.containment_path();
-        var container_url = this.parent_url;
-        var container;
-        var $page = this.my_page$();
-        var $header = $page.find('[data-role="header"]');
-        var $title = $header.find('.header-title');
-        var $left_slot = $page.find(".header-left-slot");
-        var $right_slot = $page.find('.header-right-slot');
-        $right_slot.attr('href', '#' + add_query_param(this.url,
-                                                       "refresh", "true"));
-        $right_slot.html("Refresh");
-        if (container_url) {
-            var container = content_node_manager.get(container_url);
-            $left_slot.attr('href', '#' + container_url);
-            $title.html(this.name);
-            if (container.is_root()) { $left_slot.text("Access"); }
-            else { $left_slot.text(container.name); }}
-        else {
-            $left_slot.hide();
-            $title.html("Access"); }
+        this.layout_footer(settings);
     }
+
+    ContentNode.prototype.layout_header_fields = function(fields) {
+        /* Populate this content node's page header with these fields settings:
+           field.title: html (or just text) with the page label;
+           left_url: left-hand button URL; if absent left button not changed;
+           left_label: text for left-hand button, or empty to hide the button;
+                       left_label = "-" => use the login URL;
+           right_url: right-hand button URL; if absent right button not changed;
+           right_label: text for right-hand button, or empty to hide the button;
+        */
+        var $header = this.my_page$().find('[data-role="header"]');
+        var label;
+
+        if ('title' in fields) {
+            $header.find('.header-title').html(fields.title); }
+
+        if ('right_url' in fields) {
+            var $right_slot = $header.find('.header-right-slot');
+            $right_slot.attr('href', fields.right_url);
+            if ('right_label' in fields) {
+                if (! fields.right_label) {
+                    $right_slot.hide(); }
+                else {
+                    $label = $right_slot.find('.ui-btn-text') || $right_slot;
+                    $label.html(fields.right_label);
+                    $right_slot.show(); }}}
+
+        if ('left_url' in fields) {
+            var $left_slot = $header.find('.header-left-slot');
+            if (fields.left_url === "-") {
+                var parsed = $.mobile.path.parseUrl(window.location.href);
+                fields.left_url = parsed.hrefNoHash; }
+            $left_slot.attr('href', fields.left_url);
+            if ('left_label' in fields) {
+                if (! fields.left_label) {
+                    $left_slot.hide(); }
+                else {
+                    $label = $left_slot.find('.ui-btn-text') || $left_slot;
+                    $label.html(fields.left_label);
+                    $left_slot.show(); }}}}
+
     StorageNode.prototype.layout_header = function(settings) {
-        return ContentNode.prototype.layout_header.call(this, settings); }
+        /* Fill in typical values for header fields of .my_page$().
+           Many storage node types will use these values as is, some will
+           replace them.
+         */
+        var fields = {};
+        fields.right_url = ('#' + add_query_param(this.url,
+                                                  "refresh", "true", true));
+        fields.right_label = "Refresh";
+        fields.title = this.name;
+        if (this.parent_url) {
+            var container = content_node_manager.get(this.parent_url);
+            fields.left_url = '#' + this.parent_url;
+            fields.left_label = (container.is_root()
+                                 ? "Access" : container.name) };
+        this.layout_header_fields(fields); }
+    RootStorageNode.prototype.layout_header = function(settings) {
+        /* Fill in typical values for header fields of .my_page$(). */
+        StorageNode.prototype.layout_header.call(this, settings);
+        this.layout_header_fields({'title': "Access",
+                                   'left_label': "Login", 'left_url': "-"}); }
+
+    ShareRoomNode.prototype.layout_header = function(settings) {
+        /* Fill in header fields of .my_page$(). */
+        var fields = {};
+        if (this.parent_url) {
+            var container = content_node_manager.get(this.parent_url);
+            fields.right_url = '#' + add_query_param(this.url,"refresh","true");
+            fields.right_label = "Refresh"
+            fields.left_url = '#' + this.parent_url;
+            fields.left_label = (container.is_root()
+                                 ? "ShareRoom" : container.name);
+            fields.title = this.name; }
+        else {
+            fields.right_url = '#' + add_query_param(this.url, "mode", "edit");
+            fields.right_label("Edit");
+            fields.left_url('#' + add_query_param(this.url, 'mode', "add"));
+            fields.left_label("+");
+            fields.title = "ShareRooms"; }
+        this.layout_header_fields(fields); }
+
     RootShareRoomNode.prototype.layout_header = function(settings) {
-        /* Present this root share room by adjusting its DOM data-role="page" */
-        ContentNode.prototype.layout_header.call(this, settings);
+        /* Fill in header fields of .my_page$(). */
+        ShareRoomNode.prototype.layout_header.call(this, settings);
         var $right_slot = this.my_page$().find('.header-right-slot');
         $right_slot.attr('href', '#' + add_query_param(this.url,
-                                                       "edit", "true"));
+                                                       "mode", "edit"));
         $right_slot.html("Edit"); }
 
     ContentNode.prototype.layout_content = function (settings) {

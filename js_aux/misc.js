@@ -149,10 +149,15 @@ function bytesToSize(bytes) {
              + ' ' + sizes[isNaN(bytes) ? 0 : i+1]);
 }
 
-function add_query_param(url, parameter, value) {
-    /* Include on 'url' query 'parameter' with 'value'. */
+function add_query_param(url, parameter, value, dither) {
+    /* Include on 'url' query 'parameter' with 'value'.
+       Optional 'dither', if true, adds 'dither=<9-digit random integer>' to
+       the query string, for a URL very likely to be distinct.
+     */
     var parsed = $.mobile.path.parseUrl(url);
-    return url + (parsed.search ? "&" : "?") + parameter + "=" + value;
+    var got = url + (parsed.search ? "&" : "?") + parameter + "=" + value;
+    if (dither) { got += '&dither=' + Math.floor(Math.random() * 1e9); }
+    return got;
 }
 function query_params(url) {
     /* Return an object with settings indicated by 'url' search parameters. */
