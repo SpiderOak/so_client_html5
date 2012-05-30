@@ -188,7 +188,7 @@ var spideroak = function () {
             this.is_container = true; // Typically.
             this.subdirs = [];  // Urls of contained devices, directories.
             this.files = [];    // Urls of contained files.
-            // XXX ??? Store DOM elements if jQuery objects are expensive.
+            // ??? Store DOM elements if jQuery objects are expensive.
             this.$page;         // jQuery-contained DOM page for this node.
             this.lastfetched = false;
             this.emblem;        // TODO: Eventually, an icon, for now text.
