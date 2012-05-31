@@ -448,7 +448,10 @@ var spideroak = function () {
         // We use whatever layout is already done.
         var $page = this.my_page$();
         if ($.mobile.activePage[0].id !== this.my_page_id()) {
-            $.mobile.changePage($page, changepage_options); } }
+            $.mobile.changePage($page, changepage_options); }
+        else if (("refresh" in node_settings) && (node_settings.refresh
+                                                  == "true")) {
+            $.mobile.hidePageLoadingMsg(); }}
 
     ContentNode.prototype.layout = function (settings) {
         /* Deploy content as markup on our page. */
