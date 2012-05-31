@@ -73,6 +73,7 @@ function error_alert(purpose, status_code) {
     msg = translate(purpose) + ": " + translate(msg);
     if (typeof status_code !== "string") {
         msg += " (" + status_code + ")"; }
+    $(document).trigger("error");
     alert(msg);
     throw new Error(msg);
 }

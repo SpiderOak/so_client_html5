@@ -153,17 +153,6 @@ var spideroak = function () {
             if (url.slice(0, prospect.length) === prospect) { return true; }}
         return false; }
 
-    /* UI Controls */
-
-    // XXX unhide_login_forms() should be superceded by the
-    // unhide_form_oneshot bound to "error", but that's not yet working.
-    function unhide_login_forms(delay, fade) {
-        /* Remove login form fadeout, after 'delay' msecs then 'fade' msecs. */
-        // Used for errors - pagechange binding unhides on successful traversal.
-        $.ajaxSetup({complete: function() { $.mobile.hidePageLoadingMsg(); }});
-        $('.nav_login_storage').delay(delay).show(fade);
-        $('.nav_login_share').delay(delay).show(fade); }
-
     /* Content representation: */
 
     /* Various content node types - the roots, devices, folders, and files
@@ -804,7 +793,8 @@ var spideroak = function () {
                 data['password'] = $password.val();
                 $content.fadeOut(1000, function() { $password.val("");});
                 var unhide_form_oneshot = function(event, data) {
-                    $content.show(1000);
+                    $content.show('fast');
+                    $.mobile.hidePageLoadingMsg();
                     $(document).unbind("pagechange", unhide_form_oneshot);
                     $(document).unbind("error", unhide_form_oneshot); }
                 $(document).bind("pagechange", unhide_form_oneshot)
@@ -850,8 +840,6 @@ var spideroak = function () {
                 success: function (data) {
                     var match = data.match(/^(login|location):(.+)$/m);
                     if (!match) {
-                        unhide_login_forms(0, 500);
-                        $.mobile.hidePageLoadingMsg();
                         error_alert('Temporary server failure',
                                     'Please try again later.');
                     } else if (match[1] === 'login') {
@@ -871,7 +859,6 @@ var spideroak = function () {
                     }
                 },
                 error: function (xhr) {
-                    unhide_login_forms(100, 100);
                     $.mobile.hidePageLoadingMsg();
                     error_alert("Storage login", xhr.status);
                 },
