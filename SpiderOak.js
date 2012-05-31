@@ -88,9 +88,9 @@ var spideroak = function () {
         /* Intercept URL visits and intervene for repository content. */
         if (typeof data.toPage === "string" && is_content_url(data.toPage)) {
             e.preventDefault();
-            var node_settings = query_params(data.toPage);
+            var node_opts = query_params(data.toPage);
             content_node_manager.get(data.toPage).visit(data.options,
-                                                        node_settings); }}
+                                                        node_opts); }}
     function bind_traversal_handler() {
         /* Establish page change event handler. */
         // Gets registered on: $(document).data('events').pagebeforechange
@@ -258,7 +258,7 @@ var spideroak = function () {
 
     /* Remote data access: */
 
-    ContentNode.prototype.visit = function (changepage_options, node_settings) {
+    ContentNode.prototype.visit = function (chngpg_opts, node_opts) {
         /* Get up-to-date with remote copy and show.
            Options is the $.mobile.changePage() options object. */
         if (! this.up_to_date()) {
@@ -268,14 +268,13 @@ var spideroak = function () {
             var this_node = this;
             this.fetch_and_dispatch(function (data, when)
                                     { this_node.provision(data, when,
-                                                          node_settings);
-                                      this_node.layout(node_settings);
-                                      this_node.show(changepage_options,
-                                                     node_settings); },
+                                                          node_opts);
+                                      this_node.layout(node_opts);
+                                      this_node.show(chngpg_opts, node_opts); },
                                     function (xhr)
                                     { this_node.handle_failed_visit(xhr); })
         } else {
-            this.show(options, node_settings);
+            this.show(options, node_opts);
         }
     }
     ContentNode.prototype.handle_failed_visit = function (xhr) {
@@ -287,15 +286,15 @@ var spideroak = function () {
             $.mobile.changePage(window.location.href.split('#')[0]); }
         else { error_alert("Failure reaching " + this.url, xhr.status); }
     }
-    ContentNode.prototype.provision = function (data, when, node_settings) {
+    ContentNode.prototype.provision = function (data, when, node_opts) {
         /* Populate node with JSON 'data'. 'when' is the data's current-ness.
            'when' should be no more recent than the XMLHttpRequest.
         */
-        this.provision_preliminaries(data, when, node_settings);
-        this.provision_populate(data, when, node_settings);
+        this.provision_preliminaries(data, when, node_opts);
+        this.provision_populate(data, when, node_opts);
     }
     ContentNode.prototype.provision_preliminaries = function (data, when,
-                                                              node_settings) {
+                                                              node_opts) {
         /* Do provisioning stuff generally useful for derived types. */
         if (! when) {
             throw new Error("Node provisioning without reliable time stamp.");
@@ -303,13 +302,13 @@ var spideroak = function () {
         this.up_to_date(when);
     }
     ContentNode.prototype.provision_populate = function (data, when,
-                                                         node_settings) {
+                                                         node_opts) {
         /* Stub, must be overridden by type-specific provisionings. */
         error_alert("Not yet implemented",
                    "Type-specific provisioning implementation missing.")
     }
     RootStorageNode.prototype.provision_populate = function (data, when,
-                                                             node_settings) {
+                                                             node_opts) {
         /* Embody the root storage node with 'data'.
            'when' is time soon before data was fetched. */
         var mgr = content_node_manager;
@@ -412,8 +411,8 @@ var spideroak = function () {
 
         var when = new Date();
         var url = this.url + this.query_qualifier;
-        var node_settings = query_params(url);
-        var cache = node_settings["refresh"] === "true";
+        var node_opts = query_params(url);
+        var cache = node_opts["refresh"] === "true";
         $.ajax({url: url,
                 type: 'GET',
                 dataType: 'json',
@@ -432,14 +431,13 @@ var spideroak = function () {
     ContentNode.prototype.my_page_id = function () {
         /* Set the UI page id, escaping special characters as necessary. */
         return this.url; }
-    ContentNode.prototype.show = function (changepage_options, node_settings) {
+    ContentNode.prototype.show = function (chngpg_opts, node_opts) {
         /* Trigger UI focus on our content layout. */
         // We use whatever layout is already done.
         var $page = this.my_page$();
         if ($.mobile.activePage[0].id !== this.my_page_id()) {
-            $.mobile.changePage($page, changepage_options); }
-        else if (("refresh" in node_settings) && (node_settings.refresh
-                                                  == "true")) {
+            $.mobile.changePage($page, chngpg_opts); }
+        else if (("refresh" in node_opts) && (node_opts.refresh == "true")) {
             $.mobile.hidePageLoadingMsg(); }}
 
     ContentNode.prototype.layout = function (settings) {
