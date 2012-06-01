@@ -1,7 +1,6 @@
 [[PageOutline]]
-= HTML5 Client Architecture and Use =
-
-Notable technical details of the !SpiderOak HTML5 application. See
+= HTML5 Client Technical Details =
+Noteworthy technical details of the !SpiderOak HTML5 application. See
 [[HTML5ClientProject]] for project status, etc.
 
 == Architecture ==
@@ -59,8 +58,17 @@ file "nodes".
 (I expect to implement `DirectoryContentNode` and `FileContentNode`, to be
 used by the respective storage and share room nodes.)
 
+=== Storage and Share Rooms ===
+Managed content is organized within two content roots:
 
-=== Storage and Share Rooms Access ===
+- the storage root, my.storage_root_url, determined by the user's account
+- the share root, which is the same across all accounts
+
+Content urls are recognized by virtue of beginning with one of the
+registered content roots. The storage root is registered when the user
+logs in. The share rooms root is registered upon the registration of
+any share room.
+
 Storage access is much more complicated than share access for a couple of
 reasons:
 
@@ -80,29 +88,31 @@ reasons:
 
 == Incidental Technical Details and Hanging Issues ==
 === Special Browser Requirements ===
-To get around CORS restrictions (without JSONP, which the SpiderOak storage
-repo does not accept), you need to run your browser with drastically
-reduced security. I haven't figured out how to do that with Firefox (even
-when using the Force CORS addon - suggestions welcome). Based on
-suggestions from Chip, you can use Chrome by starting it with the these
-arguments:
+While developing the html5 client app I did not have the luxury of
+situating the code to reside within the same domain as the storage
+servers.  To get around [HTML5ClientAppSameOriginIssues CORS restrictions]
+(without JSONP, which the SpiderOak storage repo does not accept), I needed
+to run my browser with drastically reduced security.  I used Chip Black's
+suggestions for doing so with Google Chrome (and haven't figured
+out how to do that with Firefox, even when using the Force CORS addon -
+suggestions welcome).
+
+Here are the options you need to pass to Chrome:
+
 * `--allow-file-access-from-files --allow-http-access-from-files --disable-web-security --enable-file-cookies`
 
-* Since I generally use Chrome as my primary browser, I installed a copy
-  of [https://tools.google.com/dlpage/chromesxs Chrome Canary], so I can run
-  a separate, insecure session concurrent with my regular Chrome session. I
-  haven't hit any problems specific to running Canary, but I may have
-  been lucky in the
-  [https://spideroak.com/browse/share/klm/1n4c04lm1n3 particular MacOS Canary build]
-  that I'm using. If you hit odd problems, try restarting regular Chrome
-  with the arguments, just to see that things work.'
+To avoid using an insecure browser as my primary browsing session, I
+installed a copy of
+[https://tools.google.com/dlpage/chromesxs Chrome Canary], so I can run a
+separate, insecure session concurrent with my regular one.  I haven't hit
+any problems specific to running Canary, but I may have been lucky in the
+[https://spideroak.com/browse/share/klm/coalmine particular MacOS Canary build]
+that I'm using.  If you hit odd problems trying to get Canary going, try
+restarting regular Chrome with the arguments, just to establish that things
+work.
 
-This approach will almost certainly change when the app is packaged for
-mobile and web deployment.
-
-This security inhibition means that we must assign handling of any
-uncontrolled URLs, not within the content managed by SpiderOak, to another,
-plain browser session.
+For more details about CORS restrictions and the project, see
+[[HTML5ClientAppSameOriginIssues]].
 
 === Managing the UI Theme ===
 The default set of jQuery Mobile theme swatches get us near enough to
@@ -156,10 +166,10 @@ rather than starting again from scratch.
 ==== Special caution on reused content node pages ====
 jQuery Mobile DOM "enhancements" don't just involve adding class (and
 other) attributes to tags - structures are injected around things, as
-well.  This means that elements can be found in different places in the DOM
-before and after enhancement. For example the header button labels and
-icons get enveloped in structures, so that you have to look in the new spot
-before just changing the location where they were originally found.
+well.  This means that elements location in the DOM may be different, before
+and after enhancement. For example, the header button labels and icons get
+enveloped in structures, so that you have to look in the new spot before
+just changing the location where they were originally found.
 
 As of 2012-05-30, ContentNode.prototype.layout_header_fields() shows
 examples of this elaboration.
