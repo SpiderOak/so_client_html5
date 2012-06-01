@@ -77,16 +77,18 @@ var spideroak = function () {
         storage_web_url: null,  // Location of storage web UI for user.
         // content_roots_urls are for discerning URLs of contained items.
         // They're accumulated on access to storage repo root and share rooms.
-        content_root_urls: [],
+        content_root_urls: {},
         storage_root_url: "",
-        share_root_urls: [],
+        share_rooms_root_url: "",
+        share_rooms_urls: {},
     }
 
     /* Navigation handlers: */
 
     function handle_content_visit(e, data) {
         /* Intercept URL visits and intervene for repository content. */
-        if (typeof data.toPage === "string" && is_content_url(data.toPage)) {
+        if ((typeof data.toPage === "string")
+            && is_content_url(data.toPage)) {
             e.preventDefault();
             var node_opts = query_params(data.toPage);
             content_node_manager.get(data.toPage).visit(data.options,
@@ -107,51 +109,76 @@ var spideroak = function () {
         */
         my.username = username;
         my.storage_host = host;
-        var url = my.storage_root_url = (host + defaults.storage_path_prefix
-                                         + b32encode_trim(username) + "/");
+        var url = register_storage_root_url(host + defaults.storage_path_prefix
+                                            + b32encode_trim(username) + "/");
         if (! is_content_root_url(url)) {
-            my.content_root_urls.push(url); }
+            register_content_root_url(url); }
         my.storage_web_url = storage_web_url;
-        return my.storage_root_url; }
-    function add_share_root(shareid, password, host) {
-        /* Register a share room root, returning the share's root URL.
+        return url; }
+    function add_share_room(shareid, password, host) {
+        /* Register a share room in the share root, returning its URL.
              'username': the account name
              'host': the server for the account
              'storage_path_prefix': the leading part of the storage path
         */
-        var url = (host + defaults.share_path_prefix + b32encode_trim(shareid)
-                   + "/" + password + "/");
-        if (! is_content_root_url(url)) {
-            my.share_root_urls.push(url);
-            my.content_root_urls.push(url); }
+
+        if (! my.share_rooms_root_url) {
+            // Establish the share rooms root.
+            register_share_rooms_root_url(host + defaults.share_path_prefix); }
+
+        var root = content_node_manager.get(my.share_rooms_root_url);
+        var url = (root.url + b32encode_trim(shareid) + "/" + password + "/");
+        register_share_room_url(url);
+        content_node_manager.get(url, root);
         return url;
     }
 
-    /* Node-independent URL classification: */
+    /* Node-independent URL identification - used for node assignment: */
+
+    // Managed content is organized within two content roots:
+    //
+    // - the storage root, my.storage_root_url, determined by the user's account
+    // - the share root, which is the same across all accounts
+    //
+    // Content urls are recognized by virtue of beginning with one of the
+    // registered content roots. The storage root is registered when the user
+    // logs in. The share rooms root is registered upon the registration of
+    // any share room.
+
+    function register_storage_root_url(url) {
+        /* Identify url as the storage root.  Returns the url. */
+        return my.storage_root_url = url; }
+    function register_share_rooms_root_url(url) {
+        /* Identify url as the share rooms root.  Returns the url. */
+        return my.share_rooms_root_url = url; }
+    function register_share_room_url(url) {
+        /* Include url among the registered content roots.  Returns the url. */
+        my.share_rooms_urls[url] = true;
+        return url; }
     function is_content_root_url(url) {
         /* True if the 'url' is for one of the root content items.
-           Doesn't depend on an already established node for the url. */
-        return ($.inArray(url, my.content_root_urls) >= 0); }
+           Doesn't depend on the url having an established node. */
+        return ((url === my.storage_root_url)
+                || (url === my.share_rooms_root_url)); }
+    function is_share_room_url(url) {
+        /* True if the 'url' is for one of the share rooms.
+           Doesn't depend on the url having an established node. */
+        return url in my.share_rooms_urls; }
     function is_storage_url(url) {
         /* True if the URL is for a content item in the user's storage area.
-           Doesn't depend on an already established node for the url. */
-        return (my.storage_root_url.length
+           Doesn't depend on the url having an established node. */
+        return (my.storage_root_url
                 && (url.slice(0, my.storage_root_url.length)
                     === my.storage_root_url)); }
-    function is_share_root_url(url) {
-        /* True if the 'url' is for one of the root share rooms.
-           Doesn't depend on an already established node for the url. */
-        return ($.inArray(url, my.share_root_urls) >= 0); }
     function is_share_url(url) {
         /* True if the URL is for a content item in the user's storage area.
-           Doesn't depend on an already established node for the url. */
-        return (is_content_url(url) && ! is_storage_url(url)); }
+           Doesn't depend on the url having an established node. */
+        return (my.share_rooms_root_url
+                && (url.slice(0, my.share_rooms_root_url.length)
+                    === my.share_rooms_root_url)); }
     function is_content_url(url) {
-        /* True if url within established content roots. */
-        for (var i in my.content_root_urls) {
-            var prospect = my.content_root_urls[i];
-            if (url.slice(0, prospect.length) === prospect) { return true; }}
-        return false; }
+        /* True if url within registered content roots. */
+        return is_storage_url(url) || is_share_url(url); }
 
     /* Content representation: */
 
@@ -193,10 +220,12 @@ var spideroak = function () {
     function ShareRoomNode(url, parent) {
         ContentNode.call(this, url, parent);
         if (! parent) {
-            // This is a share room, which is the root of the collection.
-            this.root_url = url; }
+            // This is the share room root.
+            this.root_url = url;
+            this.room_url = null; }
         else {
-            this.root_url = parent.root_url; }}
+            this.root_url = parent.root_url;
+            this.room_url = parent.room_url; }}
     ShareRoomNode.prototype = new ContentNode();
 
     function FolderContentNode(url, parent) {
@@ -375,12 +404,17 @@ var spideroak = function () {
         this.firstname = data.stats.firstname;
         this.lastname = data.stats.lastname;
         this.lastfetched = when;
-        FolderStorageNode.prototype.provision_populate.call(this, data, when);
+        FolderContentNode.prototype.provision_populate.call(this, data, when);
     }
     DeviceStorageNode.prototype.provision_populate = function (data, when) {
         /* Embody storage folder items with 'data'.
            'when' is time soon before data was fetched. */
         FolderStorageNode.prototype.provision_populate.call(this, data, when); }
+    RoomShareRoomNode.prototype.provision_populate = function (data, when) {
+        /* Embody storage folder items with 'data'.
+           'when' is time soon before data was fetched. */
+        FolderShareRoomNode.prototype.provision_populate.call(this, data,
+                                                              when); }
     FolderStorageNode.prototype.provision_populate = function (data, when) {
         /* Embody storage folder items with 'data'.
            'when' is time soon before data was fetched. */
@@ -602,16 +636,14 @@ var spideroak = function () {
         return FolderStorageNode.prototype.layout_item$.call(this); }
     FolderStorageNode.prototype.layout_item$ = function(settings) {
         /* Return a storage folder's description as a jQuery item. */
-        return FolderContentNode.prototype.layout_item$.call(this,
-                                                                settings); }
+        return FolderContentNode.prototype.layout_item$.call(this, settings); }
     FolderShareRoomNode.prototype.layout_item$ = function(settings) {
         /* Return a share room folder's description as a jQuery item. */
-        return FolderContentNode.prototype.layout_item$.call(this,
-                                                                settings); }
+        return FolderContentNode.prototype.layout_item$.call(this, settings); }
     RoomShareRoomNode.prototype.layout_item$ = function(settings) {
         /* Return a share room's description as a jQuery item. */
         return FolderShareRoomNode.prototype.layout_item$.call(this,
-                                                                  settings); }
+                                                               settings); }
     FileContentNode.prototype.layout_item$ = function(settings) {
         /* Return a file-like content node's description as a jQuery item. */
         var $it = $('<li data-mini="true"/>');
@@ -729,6 +761,8 @@ var spideroak = function () {
                         else { got = new RootShareRoomNode(url, parent); }}
                     else if (parent && (parent.url === my.storage_root_url)) {
                         got = new DeviceStorageNode(url, parent); }
+                    else if (is_share_room_url(url)) {
+                        got = new RoomShareRoomNode(url, parent); }
                     else if (url.charAt(url.length-1) !== "/") {
                         // No trailing slash.
                         if (is_storage_url(url)) {
@@ -802,12 +836,12 @@ var spideroak = function () {
             })
         },
 
-        visit_share_root: function (credentials) {
-            /* Visit user's collection of share rooms.
+        visit_share_room: function (credentials) {
+            /* Visit a specified share room.
                'credentials': Object including "shareid" and "password" attrs.
             */
             $.mobile.changePage(
-                add_share_root(credentials.shareid, credentials.password,
+                add_share_room(credentials.shareid, credentials.password,
                                defaults.share_host_url));
         },
         storage_login: function (login_info, url) {
