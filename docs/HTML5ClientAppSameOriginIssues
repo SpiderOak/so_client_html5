@@ -1,0 +1,40 @@
+=== Accommodating Cross Origin Resource Sharing (CORS) restrictions ===
+
+Contemporary web browsers implement a
+[http://en.wikipedia.org/wiki/Same_origin_policy same-origin security policy]
+to restrict abuse of remote web resources by rogue web pages.  This policy
+can be an obstacle to applications that have legitimate reasons for
+marshaling resources across separate domains.  ([#JSONP (JSONP)] Despite
+some assertions to the contrary, the !SpiderOak servers don't actually
+enable JSONP circumvention of CORS restrictions.)
+
+While developing the !SpiderOak html5 application, Ken bumped into this
+obstacle because he didn't have the luxury of locating the developing code
+within the official spideroak.com domain, where the storage servers are
+situated (spideroak.com and web-dc2.spideroak.com - both covered by the
+spideroak.com domain; the developer sandboxes are in spideroak.com:888,
+which constitutes a distinct domain as far as browser security is
+concerned). Hence the
+[https://spideroak.com/pandora/wiki/HTML5ClientArchitecture#SpecialBrowserRequirements special browser requirements]
+to exercise the preliminary app, as it develops.
+
+When actually deploying the html5 client, I expect we will have the option
+to originate the application code in the same domain as the storage
+servers.  However, at time of writing I don't know what potential mixes of
+storage services will be required for enterprise customers. Eg, whether all
+the storage hosting will be by / at !SpiderOak, or some enterprises will
+provide their own storage hosting, and/or (key question) whether there may
+eventually be need for combinations of hosting.  For that last question,
+it seems likely that proxy provisions and/or clever DNS arrangements could
+be used to satisfy the same-origin requirements for the clients.
+
+In any case, a hybrid-enabled application is likely to give us enough
+control over the browser widget to provide for any eventuality.
+
+> [=#JSONP (JSONP)] A mistaken notion of
+> [http://en.wikipedia.org/wiki/JSONP JSONP] has been supposed to be the
+> reason that the established !SpiderOak browser-based client could get
+> around the browser same-origin policy to access the storage sites.
+> The !SpiderOak servers actually do not reduce security by allowing JSONP.
+> Instead, the browser-based client depends for access on effectively
+> residing within the same domain as the storage servers.
