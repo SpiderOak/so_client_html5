@@ -35,7 +35,7 @@ $(document).ready(function () {
     var $content = $('.nav_login_storage');
     spideroak.prep_login_form('.nav_login_storage', spideroak.storage_login,
                               'username');
-    spideroak.prep_login_form('.nav_login_share', spideroak.visit_share_root,
+    spideroak.prep_login_form('.nav_login_share', spideroak.visit_share_room,
                               'shareid');
 
     // Development convenience: On full document reload, all application
@@ -207,7 +207,8 @@ var spideroak = function () {
             // ??? Store DOM elements if jQuery objects are expensive.
             this.$page;         // jQuery-contained DOM page for this node.
             this.lastfetched = false;
-            this.emblem;        // TODO: Eventually, an icon, for now text.
+            this.emblem;        // At least for debugging/.toString()
+            this.icon_path;
         }}
 
     function StorageNode(url, parent) {
@@ -334,7 +335,7 @@ var spideroak = function () {
                                                          node_opts) {
         /* Stub, must be overridden by type-specific provisionings. */
         error_alert("Not yet implemented",
-                   "Type-specific provisioning implementation missing.")
+                    this.emblem + " type-specific provisioning implementation")
     }
     RootStorageNode.prototype.provision_populate = function (data, when,
                                                              node_opts) {
