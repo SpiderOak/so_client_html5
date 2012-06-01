@@ -753,7 +753,8 @@ var spideroak = function () {
                    Provisioning nodes with remote data is done elsewhere,
                    not here.
                  */
-                got = by_url[url.split('?')[0]];     // ... sans query string.
+                url = url.split('?')[0];             // ... sans query string.
+                got = by_url[url];
                 if (! got) {
                     if (is_content_root_url(url)) {
                         if (is_storage_url(url)) {
