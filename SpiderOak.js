@@ -29,8 +29,11 @@ SO_DEBUGGING = true;            // for misc.js:blather()
 
 $(document).ready(function () {
     spideroak.init();
-    // Darn page loading message hiding happens too soon on login, inihibit:
-    $.ajaxSetup({complete: null});
+    // XXX We fadeIn the parts, instead of the whole page, to work around a bug,
+    //     disrupting subsequent transitions and put elements of the home page
+    //     on other pages (!).
+    $('#home [data-role="content"]').hide().fadeIn(2000);
+    $('#home [data-role="footer"]').hide().fadeIn(2000);
     $('#my_login_username').focus();
     var $content = $('.nav_login_storage');
     spideroak.prep_login_form('.nav_login_storage', spideroak.storage_login,
@@ -459,11 +462,9 @@ var spideroak = function () {
                 dataType: 'json',
                 cache: cache,
                 success: function (data) {
-                    success_callback(data, when);
-                },
+                    success_callback(data, when); },
                 error: function (xhr) {
-                    failure_callback(xhr)
-                },
+                    failure_callback(xhr)},
                })
     };
 
@@ -560,7 +561,7 @@ var spideroak = function () {
             fields.right_label = "Refresh"
             fields.left_url = '#' + this.parent_url;
             fields.left_label = (container.is_root()
-                                 ? "ShareRoom" : container.name);
+                                 ? "Share Rooms" : container.name);
             fields.title = this.name; }
         else {
             fields.right_url = '#' + add_query_param(this.url, "mode", "edit");
