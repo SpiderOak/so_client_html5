@@ -3,7 +3,7 @@
 Noteworthy technical details of the !SpiderOak HTML5 application. See
 [[HTML5ClientProject]] for project status, etc.
 
-== Architecture ==
+== Architectural Elements ==
 === Dynamic Pages ===
 Storage, Share Rooms are implemented as jQuery Mobile "pages" (`<div
 data-role="page>`) generated dynamically from cloned copies of static

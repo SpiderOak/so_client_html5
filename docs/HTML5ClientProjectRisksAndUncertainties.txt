@@ -1,0 +1,30 @@
+== Risks and Uncertainties ==
+=== Scaling and performance factors ===
+Issues:
+- DOM and memory footprint
+- unanticipated/unfamiliar jQuery and jQuery Mobile issues
+- really puny platforms that must be supported
+
+Mitigation:
+- Be vigilant, to notice the issues when they arise, and deal with them
+
+=== Full settlement of the same-origin issue ===
+See [[HTML5ClientAppSameOriginIssues]] for background.
+
+Issues:
+- Will !PhoneGap offer enough control? On all platforms?
+- What will prevent us from situating markup '''in''' same origin? Maybe
+  enterprise will present problems, etc?
+
+Mitigation
+- Both approaches are likely to offer avenues to viable solutions.
+
+=== Best approach for implementing addition of share rooms to collection? ===
+Issues:
+- Reuse storage navigation in special mode
+- ... vs implementing special picker
+
+Mitigation:
+- Infrastructure for modal navigation is implemented, works for trivial
+  case "refresh" button. Should make it easy to reuse storage nav reuse as
+  share room picker.
