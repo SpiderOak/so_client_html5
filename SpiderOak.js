@@ -502,7 +502,7 @@ var spideroak = function () {
         var $label;
 
         if ('title' in fields) {
-            $header.find('.header-title').html(fields.title); }
+            $header.find('.header-title').html(elide(fields.title, 25)); }
 
         if ('right_url' in fields) {
             var $right_slot = $header.find('.header-right-slot');
@@ -511,7 +511,8 @@ var spideroak = function () {
                 if (! fields.right_label) {
                     $right_slot.hide(); }
                 else {
-                    replace_button_text($right_slot, fields.right_label);
+                    replace_button_text($right_slot, elide(fields.right_label,
+                                                           15));
                     $right_slot.show(); }}}
 
         if ('left_url' in fields) {
@@ -524,7 +525,8 @@ var spideroak = function () {
                 if (! fields.left_label) {
                     $left_slot.hide(); }
                 else {
-                    replace_button_text($left_slot, fields.left_label);
+                    replace_button_text($left_slot, elide(fields.left_label,
+                                                          15));
                     $left_slot.show(); }}}}
 
     StorageNode.prototype.layout_header = function(settings) {

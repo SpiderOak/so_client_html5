@@ -178,3 +178,10 @@ function replace_button_text($slot, label_text) {
     var $into = $slot.find('.ui-btn-text');
     if (! $into.length) { $into = $slot; }
     $into.html(label_text); }
+
+function elide(text, limit) {
+    /* Return 'text', with any characters beyond 'limit' elided with "..."
+       elipsis. */
+    if (text.length <= limit) { return text; }
+    else { return text.slice(0, limit) + "..."; }}
+
