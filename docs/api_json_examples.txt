@@ -6,7 +6,7 @@ API v1, per https://spideroak.com/apis/partners/web_storage_api .
 
 (Proposed API v2: https://spideroak.com/pandora/wiki/NewJsonObjectApi .)
 
-== Device storage node ==
+== Root storage node ==
 
 {{{#!python
   {"stats": {"firstname": "ken", "lastname": "manheimer",
@@ -41,7 +41,7 @@ API v1, per https://spideroak.com/apis/partners/web_storage_api .
   }
 }}}
 
-== !ShareRoom Root ==
+== Share Room - !RoomShareRoom ==
 
 {{{#!python
   {"stats": {
