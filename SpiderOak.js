@@ -396,15 +396,13 @@ var spideroak = function () {
     RootShareRoomNode.prototype.provision_populate = function (data, when) {
         /* Embody the root share room with 'data'.
            'when' is time soon before data was fetched. */
-        var mgr = content_node_manager;
         var url, dev, devdata;
-        this.name = data.stats.room_name;
-        this.description = data.stats.description;
-        this.number_of_files = data.stats.number_of_files;
-        this.number_of_folders = data.stats.number_of_folders;
-        this.firstname = data.stats.firstname;
-        this.lastname = data.stats.lastname;
-        this.lastfetched = when;
+        this.name = "Share Rooms";
+
+        data.dirs = []
+        for (room_url in my.share_rooms_urls) {
+            data.dirs.push([content_node_manager.get(room_url), room_url]); }
+
         FolderContentNode.prototype.provision_populate.call(this, data, when);
     }
     DeviceStorageNode.prototype.provision_populate = function (data, when) {
@@ -415,7 +413,15 @@ var spideroak = function () {
         /* Embody storage folder items with 'data'.
            'when' is time soon before data was fetched. */
         FolderShareRoomNode.prototype.provision_populate.call(this, data,
-                                                              when); }
+                                                              when);
+        this.name = data.stats.room_name;
+        this.description = data.stats.description;
+        this.number_of_files = data.stats.number_of_files;
+        this.number_of_folders = data.stats.number_of_folders;
+        this.firstname = data.stats.firstname;
+        this.lastname = data.stats.lastname;
+        this.lastfetched = when; }
+
     FolderStorageNode.prototype.provision_populate = function (data, when) {
         /* Embody storage folder items with 'data'.
            'when' is time soon before data was fetched. */
