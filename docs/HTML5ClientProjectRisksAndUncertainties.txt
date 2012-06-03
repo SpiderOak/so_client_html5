@@ -9,7 +9,9 @@ Issues:
 - really puny platforms that must be supported
 
 Mitigation:
-- Be vigilant, to notice the issues when they arise, and deal with them
+- Find ways to measure browser memory and other load behaviors
+- Be attentive to algorithm choices
+- be alert for misbehaviors and reports of trouble.
 
 === Full settlement of the same-origin issue ===
 See [[HTML5ClientAppSameOriginIssues]] for background.
