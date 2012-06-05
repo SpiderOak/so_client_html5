@@ -550,7 +550,7 @@ var spideroak = function () {
         /* Fill in typical values for header fields of .my_page$(). */
         StorageNode.prototype.layout_header.call(this, settings);
         this.layout_header_fields({'title': "Storage Devices",
-                                   'left_label': "Login", 'left_url': "-"}); }
+                                   'left_label': "Home", 'left_url': "-"}); }
 
     ShareRoomNode.prototype.layout_header = function(settings) {
         /* Fill in header fields of .my_page$(). */
