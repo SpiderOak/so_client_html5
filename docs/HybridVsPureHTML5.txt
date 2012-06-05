@@ -1,12 +1,15 @@
 == What the html5 client can and can't do without hybrid enhancement ==
 
+Expectation of degree to which various necessary [[HTML5ClientProject]]
+functionalities are covered by pure HTML5:
+
 ||= Feature =||= Pure HTML5? =||= Comments =||
 || Filesystem access || no || html5 filesystem very limited - does not provide access to user regular files, system files ||
-|| Providing necessary native UI operation || limited || jQuery mobile goes pretty far, but? ||
-|| Cross browser capability || sketchy || would have to examine prospects ||
-|| Settings and persistent data || easy || html5 local storage. ([#lawnchair Lawnchair]?) ||
-|| Offline operation || easy || html5 cache manifest ||
-|| Circumventing CORS restrictions || depends || may be enough to colocate code in repository domain, but we may require substantial browser widget control ||
+|| Secure storage - keychain || no || No reliably secure native html5 local storage||
+|| Providing all necessary native UI operations || probably || jQm provides long-press (taphold), swipe, lots more. ||
+|| Settings and persistent data || yes || html5 local storage. ([#lawnchair Lawnchair]?) - but no secure storage ||
+|| Offline operation || yes || html5 cache manifest ||
+|| Circumventing CORS restrictions || no, but || we cannot circumvent CORS with just html5 (really, javascript) access without opening ploys that others can use - see [[HTML5ClientAppSameOriginIssues]] ||
 
 > ([=#lawnchair lawnchair] has a bunch of local storage adapters, for
 > identical persistent key/value operation across available storage modes
