@@ -19,7 +19,8 @@ See [[HTML5ClientAppSameOriginIssues]] for background.
 Issues:
 - Will !PhoneGap offer enough control? On all platforms?
 - What will prevent us from situating markup '''in''' same origin? Maybe
-  enterprise will present problems, etc?
+  enterprise will present problems, eg accounts with client enterprise,
+  storage at SpiderOak, etc?
 
 Mitigation
 - Both approaches are likely to offer avenues to viable solutions.
