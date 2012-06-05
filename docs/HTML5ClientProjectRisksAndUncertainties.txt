@@ -1,6 +1,6 @@
 [[PageOutline]]
 == Risks and Uncertainties ==
-Identified risks and uncertainties in the HTML5ClientProject
+Identified risks and uncertainties in the [[HTML5ClientProject]]
 
 === Scaling and performance factors ===
 Issues:
