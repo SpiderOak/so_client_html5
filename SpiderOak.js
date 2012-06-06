@@ -295,21 +295,17 @@ var spideroak = function () {
         /* Get up-to-date with remote copy and show.
            Options is the $.mobile.changePage() options object. */
         if (! this.up_to_date()) {
-            // We use 'this_node' because 'this' gets overridden when
-            // success_handler is actually running, so we need a distinct
-            // lexically scoped var.
-            var this_node = this;
-            this.fetch_and_dispatch(function (data, when)
-                                    { this_node.provision(data, when,
-                                                          node_opts);
-                                      this_node.layout(node_opts);
-                                      this_node.show(chngpg_opts, node_opts); },
-                                    function (xhr)
-                                    { this_node.handle_failed_visit(xhr); })
-        } else {
-            this.show(options, node_opts);
-        }
-    }
+            this.fetch_and_dispatch(
+                function (data, when) {
+                    this.provision(data, when,
+                                   node_opts);
+                    this.layout(node_opts);
+                    this.show(chngpg_opts, node_opts); }.bind(this),
+                function (xhr) {
+                    this.handle_failed_visit(xhr); }.bind(this)); }
+        else {
+            this.show(options, node_opts); }}
+
     ContentNode.prototype.handle_failed_visit = function (xhr) {
         /* Do error handling failed visit with 'xhr' XMLHttpResponse report. */
         // TODO: Proper error handling.
