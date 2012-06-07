@@ -28,10 +28,9 @@
 SO_DEBUGGING = true;            // for misc.js:blather()
 
 $(document).ready(function () {
-    spideroak.init();
-    // XXX We fadeIn the parts, instead of the whole page, to work around a bug,
-    //     disrupting subsequent transitions and put elements of the home page
-    //     on other pages (!).
+    // XXX We fadeIn the parts, instead of the whole page, to work around a bug.
+    //     The bug, if we do the whole page, makes subsequent transitions flaky
+    //     and puts ghosty (but clickable) home page elements on other pages!
     $('#home [data-role="content"]').hide().fadeIn(2000);
     $('#home [data-role="footer"]').hide().fadeIn(2000);
     $('#my_login_username').focus();
@@ -41,8 +40,10 @@ $(document).ready(function () {
     spideroak.prep_login_form('.nav_login_share', spideroak.visit_share_room,
                               'shareid');
 
-    // Development convenience: On full document reload, all application
-    // state (besides cookies) is gone - resume from top-level entry point:
+    spideroak.init();
+
+    // Development convenience, so we just return to home page on full document
+    // reload.
     if (window.location.hash) {
         window.location.hash = "";
         $.mobile.changePage(window.location.href.split('#')[0]);
@@ -98,19 +99,20 @@ var spideroak = function () {
                                                         node_opts); }}
     function bind_traversal_handler() {
         /* Establish page change event handler. */
-        // Gets registered on: $(document).data('events').pagebeforechange
         $(document).bind("pagebeforechange.SpiderOak", handle_content_visit);
     }
 
     /* Register navigation roots: */
-    function set_storage_account(username, host, storage_web_url) {
+    function set_storage_account(username, host, storage_web_url,
+                                 persist_credentials) {
         /* Register user-specific storage details, returning storage root URL.
              'username': the account name
              'host': the server for the account
-             'storage_path_prefix': the leading part of the storage path
              'storage_web_url': the account's web UI entry address.
+             'persist_credentials': if true, preserve username in localStorage.
         */
         my.username = username;
+        if (persist_credentials) { smgr.set('username', username); }
         my.storage_host = host;
         var url = register_storage_root_url(host + defaults.storage_path_prefix
                                             + b32encode_trim(username) + "/");
@@ -205,14 +207,21 @@ var spideroak = function () {
             this.query_qualifier = "";
             this.parent_url = parent ? parent.url : null;
             this.is_container = true; // Typically.
-            this.subdirs = [];  // Urls of contained devices, directories.
+            this.subdirs = [];  // Urls of contained devices, folders.
             this.files = [];    // Urls of contained files.
-            // ??? Store DOM elements if jQuery objects are expensive.
-            this.$page;         // jQuery-contained DOM page for this node.
+            this.$page;         // This node's jQuery-ified DOM data-role="page"
             this.lastfetched = false;
             this.emblem;        // At least for debugging/.toString()
-            this.icon_path;
-        }}
+            this.icon_path; }}
+
+    function ComboContentNode(url, parent) {
+        ContentNode.call(this, url, parent);
+        this.emblem = "Home";
+        delete this.subdirs, this.files;
+        this.storage_devices = [];
+        this.personal_shares = [];
+        this.public_shares = []; }
+    ComboContentNode.prototype = new ContentNode();
 
     function StorageNode(url, parent) {
         ContentNode.call(this, url, parent);
@@ -305,6 +314,12 @@ var spideroak = function () {
                     this.handle_failed_visit(xhr); }.bind(this)); }
         else {
             this.show(options, node_opts); }}
+
+    ComboContentNode.prototype.visit = function (chngpg_opts, node_opts) {
+        /* Do the special visit of the consolidated root combo node. */
+        // Fetch the respective root storage and personally shared nodes,
+        // and fetch the familiar public share nodes.
+    }
 
     ContentNode.prototype.handle_failed_visit = function (xhr) {
         /* Do error handling failed visit with 'xhr' XMLHttpResponse report. */
