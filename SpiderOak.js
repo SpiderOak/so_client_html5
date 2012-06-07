@@ -736,29 +736,34 @@ var spideroak = function () {
 
     /* Resource managers */
 
-    var SettingsManager = function () {
-        /* Maintain domain-specific persistent settings.
-           All values are returned as strings.
-           To establish a maintained setting, use .register(varname).
-           Settings assignment and retrieval work like object properties.
+    var settings_manager = {
+        /* Maintain domain-specific persistent settings, using localStorage.
+           - Value structure is maintained using JSON.
+           - Use .get(name) and .set(name, value).
+           - .keys() returns an array of all stored keys.
+           - .length returns the number of keys.
          */
-        // A bit convoluted - we establish getters and setters for
-        // each of the keys already present in localStorage, to maintain
-        // internal consistency with what this.keys() reports.
-        var keys = this.keys();
-        for (key in keys) { this.register(keys[key]); }}
+        get: function (name) {
+            /* Retrieve the value for 'name' from persistent storage. */
+            return JSON.parse(localStorage.getItem(name)); },
+        set: function (name, value) {
+            /* Preserve name and value in persistent storage.
+               Return the settings manager, for chaining.
+             */
+            localStorage.setItem(name, JSON.stringify(value));
+            return settings_manager; },
+        keys: function () { return Object.keys(localStorage); },
+        };
+    settings_manager.__defineGetter__('length',
+                                      function() {
+                                          return localStorage.length; });
+    smgr = settings_manager;
 
-    SettingsManager.prototype.register = function (name) {
-        this.__defineGetter__(name,
-                              function () {
-                                  return JSON.parse(localStorage[name]); });
-        this.__defineSetter__(name,
-                              function (value) { localStorage[name]
-                                                 = JSON.stringify(value); }); }
-    SettingsManager.prototype.keys = function () {
-        return Object.keys(localStorage); }
-    var sm = new SettingsManager();
-    sm.__defineGetter__('length', function () { return localStorage.length; });
+    if (!SO_DEBUGGING) {
+        error_alert("Not Yet Implemented", 
+                    "Faux secure_settings_manager used outside debugging."); }
+    var secure_settings_manager = smgr;
+        /* Maintain secure settings, like passwords. */
 
     var content_node_manager = function () {
         /* A singleton utility for getting and removing content node objects.
