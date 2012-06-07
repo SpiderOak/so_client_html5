@@ -948,6 +948,7 @@ var spideroak = function () {
             });
         },
         // Expose the content node manager for debugging:
-        cnm: (SO_DEBUGGING ? content_node_manager : null),
+        cnmgr: (SO_DEBUGGING ? content_node_manager : null),
+        smgr: (SO_DEBUGGING ? smgr : null),
     }
 }();
