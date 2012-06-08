@@ -60,6 +60,7 @@ var spideroak = function () {
         /* Settings not specific to a particular login session: */
         // API v1.
         // XXX starting_host_url may vary according to brand package.
+        combo_root_url: "SpiderOak",
         starting_host_url: "https://spideroak.com",
         share_host_url: "https://spideroak.com",
         storage_login_path: "/browse/login",
@@ -111,6 +112,7 @@ var spideroak = function () {
              'storage_web_url': the account's web UI entry address.
              'persist_credentials': if true, preserve username in localStorage.
         */
+        var root = content_node_manager.get(my.combo_root_url);
         my.username = username;
         if (persist_credentials) { smgr.set('username', username); }
         my.storage_host = host;
@@ -131,7 +133,8 @@ var spideroak = function () {
             // Establish the share rooms root.
             register_share_rooms_root_url(host + defaults.share_path_prefix); }
 
-        var root = content_node_manager.get(my.share_rooms_root_url);
+
+        var root = content_node_manager.get(my.combo_root_url);
         var url = (root.url + b32encode_trim(shareid) + "/" + password + "/");
         register_share_room_url(url);
         content_node_manager.get(url, root);
@@ -160,10 +163,13 @@ var spideroak = function () {
         /* Include url among the registered content roots.  Returns the url. */
         my.share_rooms_urls[url] = true;
         return url; }
+    function is_consolidated_root_url(url) {
+        return url === my.combo_root_url; }
     function is_content_root_url(url) {
         /* True if the 'url' is for one of the root content items.
            Doesn't depend on the url having an established node. */
-        return ((url === my.storage_root_url)
+        return ((url === my.combo_root_url)
+                || (url === my.storage_root_url)
                 || (url === my.share_rooms_root_url)); }
     function is_share_room_url(url) {
         /* True if the 'url' is for one of the share rooms.
@@ -209,19 +215,21 @@ var spideroak = function () {
             this.is_container = true; // Typically.
             this.subdirs = [];  // Urls of contained devices, folders.
             this.files = [];    // Urls of contained files.
-            this.$page;         // This node's jQuery-ified DOM data-role="page"
+            this.$page = null;  // This node's jQuery-ified DOM data-role="page"
             this.lastfetched = false;
-            this.emblem;        // At least for debugging/.toString()
-            this.icon_path; }}
+            this.emblem = "";   // At least for debugging/.toString()
+            this.icon_path = ""; }}
 
-    function ComboContentNode(url, parent) {
+    function RootContentNode(url, parent) {
+        /* Consolidated root of the storage and share content hierarchies. */
         ContentNode.call(this, url, parent);
+        this.root_url = url;
         this.emblem = "Home";
         delete this.subdirs, this.files;
         this.storage_devices = [];
         this.personal_shares = [];
         this.public_shares = []; }
-    ComboContentNode.prototype = new ContentNode();
+    RootContentNode.prototype = new ContentNode();
 
     function StorageNode(url, parent) {
         ContentNode.call(this, url, parent);
@@ -803,14 +811,25 @@ var spideroak = function () {
                    Provisioning nodes with remote data is done elsewhere,
                    not here.
                  */
-                url = url.split('?')[0];             // ... sans query string.
-                got = by_url[url];
+                url = url.split('?')[0];             // Strip query string.
+                var got = by_url[url];
                 if (! got) {
+
+                    // Roots:
                     if (is_content_root_url(url)) {
-                        if (is_storage_url(url)) {
-                            got = new RootStorageNode(url, parent); }
-                        else { got = new RootShareRoomNode(url, parent); }}
+                        if (is_consolidated_root_url(url)) {
+                            got = new RootContentNode(url, parent); }
+                        else {
+                            var cnm = content_node_manager;
+                            var parent = parent || cnm.get(my.combo_root_url);
+                            if (is_storage_url(url)) {
+                                got = new RootStorageNode(url, parent); }
+                            else { got = new RootShareRoomNode(url, parent); }}}
+
+                    // Contents:
                     else if (parent && (parent.url === my.storage_root_url)) {
+                        var cnm = content_node_manager;
+                        var parent = parent || cnm.get(my.combo_root_url);
                         got = new DeviceStorageNode(url, parent); }
                     else if (is_share_room_url(url)) {
                         got = new RoomShareRoomNode(url, parent); }
@@ -845,11 +864,25 @@ var spideroak = function () {
     return {
         init: function () {
             /* Do preliminary setup - event handlers, etc. */
-            bind_traversal_handler();
+
+            // Setup traversal hook: 
+            establish_traversal_handler();
+            // Get and deploy available credentials:
+            /*
+            *var password;
+            *var username = smgr.get('username');
+            *if (username) {
+            *    password = secure_settings_manager.get([username, 'password']);
+            *    }
+            */
+            // Attempt current node visit:
+            /* ... */
+            my.combo_root_url = defaults.combo_root_url;
+            var root = content_node_manager.get(my.combo_root_url, null);
         },
         toString: function () {
             var user = (my.username ? my.username : "-");
-            var fetched = (Object.keys(content_node_manager).length || "-");
+            var fetched = (content_node_manager.length || "-");
             return ("SpiderOak instance for "
                     + user + ", " + fetched + " items fetched");
         },
