@@ -98,7 +98,7 @@ var spideroak = function () {
             var node_opts = query_params(data.toPage);
             content_node_manager.get(data.toPage).visit(data.options,
                                                         node_opts); }}
-    function bind_traversal_handler() {
+    function establish_traversal_handler() {
         /* Establish page change event handler. */
         $(document).bind("pagebeforechange.SpiderOak", handle_content_visit);
     }
@@ -240,13 +240,8 @@ var spideroak = function () {
     StorageNode.prototype = new ContentNode();
     function ShareRoomNode(url, parent) {
         ContentNode.call(this, url, parent);
-        if (! parent) {
-            // This is the share room root.
-            this.root_url = url;
-            this.room_url = null; }
-        else {
-            this.root_url = parent.root_url;
-            this.room_url = parent.room_url; }}
+        this.root_url = parent ? parent.root_url : null;
+        this.room_url = parent ? parent.room_url : null; }
     ShareRoomNode.prototype = new ContentNode();
 
     function FolderContentNode(url, parent) {
@@ -323,8 +318,8 @@ var spideroak = function () {
         else {
             this.show(options, node_opts); }}
 
-    ComboContentNode.prototype.visit = function (chngpg_opts, node_opts) {
-        /* Do the special visit of the consolidated root combo node. */
+    RootContentNode.prototype.visit = function (chngpg_opts, node_opts) {
+        /* Do the special visit of the consolidated storage/share root. */
         // Fetch the respective root storage and personally shared nodes,
         // and fetch the familiar public share nodes.
     }
@@ -766,6 +761,9 @@ var spideroak = function () {
            - .keys() returns an array of all stored keys.
            - .length returns the number of keys.
          */
+        // XXX Compat: versions of android < 2.1 do not support localStorage.
+        //             They do support gears sqlite. lawnchair would make it
+        //             easy to switch between them.
         get: function (name) {
             /* Retrieve the value for 'name' from persistent storage. */
             return JSON.parse(localStorage.getItem(name)); },
@@ -780,13 +778,14 @@ var spideroak = function () {
     settings_manager.__defineGetter__('length',
                                       function() {
                                           return localStorage.length; });
+    // Compact name:
     smgr = settings_manager;
 
-    if (!SO_DEBUGGING) {
-        error_alert("Not Yet Implemented", 
-                    "Faux secure_settings_manager used outside debugging."); }
     var secure_settings_manager = smgr;
         /* Maintain secure settings, like passwords. */
+    if (!SO_DEBUGGING && (secure_settings_manager === smgr)) {
+        error_alert("Not Yet Implemented", 
+                    "Faux secure_settings_manager used outside debugging."); }
 
     var content_node_manager = function () {
         /* A singleton utility for getting and removing content node objects.
@@ -794,8 +793,8 @@ var spideroak = function () {
         */
         // Type of newly minted nodes are according to get parameters.
 
-        // TODO: Cleanup? Remove nodes when ascending above them?
-        // TODO Probably:
+        // ???: Cleanup? Remove nodes when ascending above them?
+        // ???:
         // - prefetch offspring layer and defer release til 2 layers above.
         // - make fetch of multiple items contingent to device lastcommit time.
 
