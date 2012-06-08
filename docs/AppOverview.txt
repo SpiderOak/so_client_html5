@@ -38,12 +38,14 @@ collections, which can be added and removed from the UI.  Consequently we
 have to provide two modes for visiting a share room - one for managing the
 collection it represents, and the other for delving into its contents.
 
-=== `ContentNode` Prototype Hierarchy ===
-The `ContentNode` object hierarchy provides for obtaining, assimilating,
-and presenting the remote data describing !SpiderOak-managed user content
-items - storage devices versus share rooms, and their contained folders and
-file "nodes".
+=== `ContentNode` Data Model ===
+The `ContentNode` object hierarchy provides a data model around which
+obtaining, assimilating, and presenting the remote data describing
+!SpiderOak-managed user content items is organized - storage devices versus
+share rooms, and their contained folders and file "nodes".
+
 * `ContentNode` - Basis
+  * `RootContentNode` - A consolidated container of storage and share roots
   * `StorageNode` - Backups content
     * `RootStorageNode`
     * `DeviceStorageNode`
