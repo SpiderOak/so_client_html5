@@ -37,7 +37,8 @@ $(document).ready(function () {
     var $content = $('.nav_login_storage');
     spideroak.prep_login_form('.nav_login_storage', spideroak.storage_login,
                               'username');
-    spideroak.prep_login_form('.nav_login_share', spideroak.visit_share_room,
+    spideroak.prep_login_form('.nav_login_share',
+                              spideroak.visit_public_share_room,
                               'shareid');
 
     spideroak.init();
@@ -65,7 +66,8 @@ var spideroak = function () {
         share_host_url: "https://spideroak.com",
         storage_login_path: "/browse/login",
         storage_path_prefix: "/storage/",
-        share_path_prefix: "/share/",
+        personal_share_path_suffix: "shares",
+        public_shares_path_suffix: "/share/",
         content_page_template_id: "content-page-template",
         devices_query_expression: 'device_info=yes',
         versions_query_expression: 'format=version_info',
@@ -84,7 +86,8 @@ var spideroak = function () {
         // They're accumulated on access to storage repo root and share rooms.
         content_root_urls: {},
         storage_root_url: "",
-        share_rooms_root_url: "",
+        personal_shares_root_url: "",
+        public_shares_root_url: "",
         share_rooms_urls: {},
     }
 
@@ -116,27 +119,32 @@ var spideroak = function () {
         my.username = username;
         if (persist_credentials) { smgr.set('username', username); }
         my.storage_host = host;
-        var url = register_storage_root_url(host + defaults.storage_path_prefix
-                                            + b32encode_trim(username) + "/");
-        if (! is_content_root_url(url)) {
-            register_content_root_url(url); }
+        var storage_url;
+        storage_url = register_storage_root_url(host
+                                                + defaults.storage_path_prefix
+                                                + b32encode_trim(username)
+                                                + "/");
+        if (! my.personal_shares_root_url) {
+            register_personal_shares_root_url(storage_url); }
+        if (! is_content_root_url(storage_url)) {
+            register_content_root_url(storage_url); }
         my.storage_web_url = storage_web_url;
-        return url; }
-    function add_share_room(shareid, password, host) {
-        /* Register a share room in the share root, returning its URL.
+        // Now lets direct the caller to the combo root:
+        return my.combo_root_url; }
+    function add_public_share_room(shareid, password, host) {
+        /* Register a public share room in the public share root, returning URL.
              'username': the account name
              'host': the server for the account
              'storage_path_prefix': the leading part of the storage path
         */
 
-        if (! my.share_rooms_root_url) {
+        if (! my.public_shares_root_url) {
             // Establish the share rooms root.
-            register_share_rooms_root_url(host + defaults.share_path_prefix); }
+            register_public_shares_root_url(host);}
 
-
-        var root = content_node_manager.get(my.combo_root_url);
+        var root = content_node_manager.get(my.public_shares_root_url);
         var url = (root.url + b32encode_trim(shareid) + "/" + password + "/");
-        register_share_room_url(url);
+        register_public_shares_url(url);
         content_node_manager.get(url, root);
         return url;
     }
@@ -154,16 +162,22 @@ var spideroak = function () {
     // any share room.
 
     function register_storage_root_url(url) {
-        /* Identify url as the storage root.  Returns the url. */
+        /* Identify url as the user's storage root.  Return url. */
         return my.storage_root_url = url; }
-    function register_share_rooms_root_url(url) {
-        /* Identify url as the share rooms root.  Returns the url. */
-        return my.share_rooms_root_url = url; }
-    function register_share_room_url(url) {
+    function register_public_shares_root_url(host) {
+        /* Use host to identify the public share rooms root.  Return url. */
+        var psps = defaults.public_shares_path_suffix;
+        return my.public_shares_root_url = host + "/" + psps; }
+    function register_personal_shares_root_url(storage_root) {
+        /* Use storage root to Identify personal share rooms root url.
+           Return the share rooms root. */
+        return (my.personal_shares_root_url =
+                storage_root + defaults.personal_shares_path_suffix); }
+    function register_public_shares_url(url) {
         /* Include url among the registered content roots.  Returns the url. */
         my.share_rooms_urls[url] = true;
         return url; }
-    function is_consolidated_root_url(url) {
+    function is_combo_root_url(url) {
         return url === my.combo_root_url; }
     function is_content_root_url(url) {
         /* True if the 'url' is for one of the root content items.
@@ -919,13 +933,13 @@ var spideroak = function () {
             })
         },
 
-        visit_share_room: function (credentials) {
+        visit_public_share_room: function (credentials) {
             /* Visit a specified share room.
                'credentials': Object including "shareid" and "password" attrs.
             */
             $.mobile.changePage(
-                add_share_room(credentials.shareid, credentials.password,
-                               defaults.share_host_url));
+                add_public_share_room(credentials.shareid, credentials.password,
+                                      defaults.share_host_url));
         },
         storage_login: function (login_info, url) {
             /* Login to storage account and commence browsing at devices.
