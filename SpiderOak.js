@@ -25,7 +25,8 @@
     practice - my variables intended to contain jQuery objects start with '$'.
 */
 
-SO_DEBUGGING = true;            // for misc.js:blather()
+// For misc.js:blather() and allowing dangerous stuff only during debugging.
+SO_DEBUGGING = true;
 
 $(document).ready(function () {
     // XXX We fadeIn the parts, instead of the whole page, to work around a bug.
@@ -921,11 +922,10 @@ var spideroak = function () {
     // Compact name:
     smgr = settings_manager;
 
-    var secure_settings_manager = smgr;
-        /* Maintain secure settings, like passwords. */
-    if (!SO_DEBUGGING && (secure_settings_manager === smgr)) {
-        error_alert("Not Yet Implemented", 
-                    "Faux secure_settings_manager used outside debugging."); }
+    if (SO_DEBUGGING) {
+        var secure_settings_manager = smgr; }
+    else {
+        alert("No secure_settings_manager"); }
 
     var content_node_manager = function () {
         /* A singleton utility for getting and removing content node objects.
