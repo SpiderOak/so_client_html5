@@ -98,9 +98,9 @@ var spideroak = function () {
         if ((typeof data.toPage === "string")
             && is_content_url(data.toPage)) {
             e.preventDefault();
-            var node_opts = query_params(data.toPage);
+            var mode_opts = query_params(data.toPage);
             content_node_manager.get(data.toPage).visit(data.options,
-                                                        node_opts); }}
+                                                        mode_opts); }}
     function establish_traversal_handler() {
         /* Establish page change event handler. */
         $(document).bind("pagebeforechange.SpiderOak", handle_content_visit);
@@ -349,15 +349,15 @@ var spideroak = function () {
             $.mobile.changePage(window.location.href.split('#')[0]); }
         else { error_alert("Failure reaching " + this.url, xhr.status); }
     }
-    ContentNode.prototype.provision = function (data, when, node_opts) {
+    ContentNode.prototype.provision = function (data, when, mode_opts) {
         /* Populate node with JSON 'data'. 'when' is the data's current-ness.
            'when' should be no more recent than the XMLHttpRequest.
         */
-        this.provision_preliminaries(data, when, node_opts);
-        this.provision_populate(data, when, node_opts);
+        this.provision_preliminaries(data, when, mode_opts);
+        this.provision_populate(data, when, mode_opts);
     }
     ContentNode.prototype.provision_preliminaries = function (data, when,
-                                                              node_opts) {
+                                                              mode_opts) {
         /* Do provisioning stuff generally useful for derived types. */
         if (! when) {
             throw new Error("Node provisioning without reliable time stamp.");
@@ -365,13 +365,13 @@ var spideroak = function () {
         this.up_to_date(when);
     }
     ContentNode.prototype.provision_populate = function (data, when,
-                                                         node_opts) {
+                                                         mode_opts) {
         /* Stub, must be overridden by type-specific provisionings. */
         error_alert("Not yet implemented",
                     this.emblem + " type-specific provisioning implementation")
     }
     RootStorageNode.prototype.provision_populate = function (data, when,
-                                                             node_opts) {
+                                                             mode_opts) {
         /* Embody the root storage node with 'data'.
            'when' is time soon before data was fetched. */
         var mgr = content_node_manager;
@@ -485,8 +485,8 @@ var spideroak = function () {
 
         var when = new Date();
         var url = this.url + this.query_qualifier;
-        var node_opts = query_params(url);
-        var cache = node_opts["refresh"] === "true";
+        var mode_opts = query_params(url);
+        var cache = mode_opts["refresh"] === "true";
         $.ajax({url: url,
                 type: 'GET',
                 dataType: 'json',
@@ -503,21 +503,24 @@ var spideroak = function () {
     ContentNode.prototype.my_page_id = function () {
         /* Set the UI page id, escaping special characters as necessary. */
         return this.url; }
-    ContentNode.prototype.show = function (chngpg_opts, node_opts) {
-        /* Trigger UI focus on our content layout. */
-        // We use whatever layout is already done.
+    ContentNode.prototype.show = function (chngpg_opts, mode_opts) {
+        /* Trigger UI focus on our content layout.
+           If mode_opts "passive" === true, don't do a changePage.
+         */
         var $page = this.my_page$();
-        if ($.mobile.activePage[0].id !== this.my_page_id()) {
+        if (($.mobile.activePage[0].id !== this.my_page_id())
+            && (!mode_opts.passive)) {
             $.mobile.changePage($page, chngpg_opts); }
-        else if (("refresh" in node_opts) && (node_opts.refresh == "true")) {
-            $.mobile.hidePageLoadingMsg(); }}
+        // Just in case, eg of refresh:
+        $.mobile.hidePageLoadingMsg(); }
 
-    ContentNode.prototype.layout = function (settings) {
+    ContentNode.prototype.layout = function (mode_opts) {
         /* Deploy content as markup on our page. */
-        this.my_page$();
-        this.layout_header(settings);
-        this.layout_content(settings);
-        this.layout_footer(settings);
+        if (! mode_opts.content_only_in) {
+            this.layout_header(mode_opts); }
+        this.layout_content(mode_opts);
+        if (! mode_opts.content_only_in) {
+            this.layout_footer(mode_opts); }
     }
 
     ContentNode.prototype.layout_header_fields = function(fields) {
@@ -560,11 +563,12 @@ var spideroak = function () {
                                                           15));
                     $left_slot.show(); }}}}
 
-    StorageNode.prototype.layout_header = function(settings) {
+    StorageNode.prototype.layout_header = function(mode_opts) {
         /* Fill in typical values for header fields of .my_page$().
            Many storage node types will use these values as is, some will
            replace them.
          */
+        if (mode_opts.content_only_in) { return; }
         var fields = {};
         fields.right_url = ('#' + add_query_param(this.url,
                                                   "refresh", "true", true));
@@ -576,14 +580,16 @@ var spideroak = function () {
             fields.left_label = (container.is_root()
                                  ? "Storage Devices" : container.name) };
         this.layout_header_fields(fields); }
-    RootStorageNode.prototype.layout_header = function(settings) {
+    RootStorageNode.prototype.layout_header = function(mode_opts) {
         /* Fill in typical values for header fields of .my_page$(). */
-        StorageNode.prototype.layout_header.call(this, settings);
+        if (mode_opts.content_only_in) { return; }
+        StorageNode.prototype.layout_header.call(this, mode_opts);
         this.layout_header_fields({'title': "Storage Devices",
                                    'left_label': "Home", 'left_url': "-"}); }
 
-    ShareRoomNode.prototype.layout_header = function(settings) {
+    ShareRoomNode.prototype.layout_header = function(mode_opts) {
         /* Fill in header fields of .my_page$(). */
+        if (mode_opts.content_only_in) { return; }
         var fields = {};
         if (this.parent_url) {
             var container = content_node_manager.get(this.parent_url);
@@ -601,18 +607,23 @@ var spideroak = function () {
             fields.title = "ShareRooms"; }
         this.layout_header_fields(fields); }
 
-    RootShareRoomNode.prototype.layout_header = function(settings) {
+    RootShareRoomNode.prototype.layout_header = function(mode_opts) {
         /* Fill in header fields of .my_page$(). */
-        ShareRoomNode.prototype.layout_header.call(this, settings);
+        if (mode_opts.content_only_in) { return; }
+        ShareRoomNode.prototype.layout_header.call(this, mode_opts);
         var fields = {'right_url': '#' + add_query_param(this.url,
                                                          "mode", "edit"),
                       'right_label': "Edit"};
         this.layout_header_fields(fields); }
 
-    ContentNode.prototype.layout_content = function (settings) {
+    ContentNode.prototype.layout_content = function (mode_opts) {
         /* Present this content node by adjusting its DOM data-role="page" */
-        var $page = this.my_page$();
-	var $content = $page.find('[data-role="content"]');
+        var $page = (mode_opts.use_page
+                     ? $(mode_opts.use_page)
+                     : this.my_page$());
+	var $content = (mode_opts.content_only_in
+                        ? $page.find(mode_opts.content_only_in)
+                        : $page.find('[data-role="content"]'));
 	var $list = $content.find('[data-role="listview"]');
         if ($list.children().length) {
             $list.empty(); }
@@ -645,7 +656,7 @@ var spideroak = function () {
             function insert_subnode(suburl) {
                 var subnode = content_node_manager.get(suburl, this);
                 conditionally_insert_divider(subnode.name);
-                insert_item(subnode.layout_item$(settings)); }
+                insert_item(subnode.layout_item$(mode_opts)); }
 
             if (do_filter) { $list.attr('data-filter', 'true'); }
             if (lensubdirs) {
@@ -663,7 +674,7 @@ var spideroak = function () {
         $list.listview("refresh");
         return $page;
     }
-    FolderContentNode.prototype.layout_item$ = function(settings) {
+    FolderContentNode.prototype.layout_item$ = function(mode_opts) {
         /* Return a folder-like content item's description as jQuery item. */
         var $href = $('<a/>').attr('class', "compact-vertical");
         $href.attr('href', "#" + this.url);
@@ -671,20 +682,20 @@ var spideroak = function () {
         var $it = $('<li/>').append($href);
         $it.attr('data-filtertext', this.name);
         return $it; }
-    DeviceStorageNode.prototype.layout_item$ = function(settings) {
+    DeviceStorageNode.prototype.layout_item$ = function(mode_opts) {
         /* Return a storage device's description as a jQuery item. */
         return FolderStorageNode.prototype.layout_item$.call(this); }
-    FolderStorageNode.prototype.layout_item$ = function(settings) {
+    FolderStorageNode.prototype.layout_item$ = function(mode_opts) {
         /* Return a storage folder's description as a jQuery item. */
-        return FolderContentNode.prototype.layout_item$.call(this, settings); }
-    FolderShareRoomNode.prototype.layout_item$ = function(settings) {
+        return FolderContentNode.prototype.layout_item$.call(this, mode_opts); }
+    FolderShareRoomNode.prototype.layout_item$ = function(mode_opts) {
         /* Return a share room folder's description as a jQuery item. */
-        return FolderContentNode.prototype.layout_item$.call(this, settings); }
-    RoomShareRoomNode.prototype.layout_item$ = function(settings) {
+        return FolderContentNode.prototype.layout_item$.call(this, mode_opts); }
+    RoomShareRoomNode.prototype.layout_item$ = function(mode_opts) {
         /* Return a share room's description as a jQuery item. */
         return FolderShareRoomNode.prototype.layout_item$.call(this,
-                                                               settings); }
-    FileContentNode.prototype.layout_item$ = function(settings) {
+                                                               mode_opts); }
+    FileContentNode.prototype.layout_item$ = function(mode_opts) {
         /* Return a file-like content node's description as a jQuery item. */
         var $it = $('<li data-mini="true"/>');
         $it.attr('data-filtertext', this.name);
@@ -717,15 +728,16 @@ var spideroak = function () {
 
         return $it; }
 
-    FileStorageNode.prototype.layout_item$ = function(settings) {
+    FileStorageNode.prototype.layout_item$ = function(mode_opts) {
         /* Return a storage file's description as a jQuery item. */
-        return FileContentNode.prototype.layout_item$.call(this, settings); }
-    FileShareRoomNode.prototype.layout_item$ = function(settings) {
+        return FileContentNode.prototype.layout_item$.call(this, mode_opts); }
+    FileShareRoomNode.prototype.layout_item$ = function(mode_opts) {
         /* Return a storage file's description as a jQuery item. */
-        return FileContentNode.prototype.layout_item$.call(this, settings); }
+        return FileContentNode.prototype.layout_item$.call(this, mode_opts); }
 
-    ContentNode.prototype.layout_footer = function(settings) {
+    ContentNode.prototype.layout_footer = function(mode_opts) {
         /* Return markup with general and specific legend fields and urls. */
+        if (mode_opts.content_only_in) { return; }
     }
 
     ContentNode.prototype.is_device = function() {
