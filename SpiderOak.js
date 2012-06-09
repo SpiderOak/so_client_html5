@@ -319,25 +319,137 @@ var spideroak = function () {
 
     /* Remote data access: */
 
-    ContentNode.prototype.visit = function (chngpg_opts, node_opts) {
+    ContentNode.prototype.visit = function (chngpg_opts, mode_opts,
+                                            alt_success_handler,
+                                            alt_failure_handler) {
         /* Get up-to-date with remote copy and show.
-           Options is the $.mobile.changePage() options object. */
-        if (! this.up_to_date()) {
-            this.fetch_and_dispatch(
-                function (data, when) {
-                    this.provision(data, when,
-                                   node_opts);
-                    this.layout(node_opts);
-                    this.show(chngpg_opts, node_opts); }.bind(this),
-                function (xhr) {
-                    this.handle_failed_visit(xhr); }.bind(this)); }
-        else {
-            this.show(options, node_opts); }}
+           Options is the $.mobile.changePage() options object.
 
-    RootContentNode.prototype.visit = function (chngpg_opts, node_opts) {
+           'chngpg_opts': options for .changePage
+           'mode_opts': modal settings for node behavior methods
+           'alt_success_handler': custom success handler, overrides the default
+           'alt_failure_handler': custom failure handler, ...
+
+           NOTE WELL: Inside custom alt_*_handlers, mode_opts and
+           chngpg_opts are conveyed as properties of 'this', and *not* from
+           the handler's lexical closure.
+        */
+
+        function default_success_handler(data, when) {
+            this.provision(data, when, mode_opts);
+            this.layout(mode_opts);
+            this.show(chngpg_opts, mode_opts); }
+
+        function default_failure_handler(xhr) {this.handle_failed_visit(xhr); }
+
+        success_handler = (alt_success_handler
+                           ? alt_success_handler.bind(this)
+                           : default_success_handler.bind(this));
+        failure_handler = (alt_failure_handler
+                           ? alt_failure_handler.bind(this)
+                           : default_failure_handler.bind(this));
+
+        if (! this.up_to_date()) {
+            if (alt_success_handler || alt_failure_handler) {
+                // Bizarre bug is causing the alternative handlers to lose
+                // access to bindings of their containing lexical closures.
+                // Implementing a bad workaround for reference, will fix next.
+                this.mode_opts = mode_opts;
+                this.chngpg_opts = chngpg_opts; }
+            this.fetch_and_dispatch(success_handler, failure_handler); }
+        else {
+            this.show(chngpg_opts, mode_opts); }}
+
+    RootContentNode.prototype.visit = function (chngpg_opts, mode_opts) {
         /* Do the special visit of the consolidated storage/share root. */
+
         // Fetch the respective root storage and personally shared nodes,
         // and fetch the familiar public share nodes.
+
+        // We do not follow the typical fetch/provision/layout/show
+        // pattern. Instead, we do some convoluted footwork, in order to
+        // use the respective root content-type nodes to populate our page,
+        // via the fetch_and_dispatch() ajax callbacks:
+        //
+        // - Try the storage root fetch and provide intricate handling:
+        //   - if successful:
+        //     - Hide the login-form section
+        //     - Show the storage-root and share-root sections, grayed to
+        //       indicate update happening
+        //     - Direct the storage root to update,
+        //       - but "passively" - no $.mobile.pageChange()),
+        //       - to our page, rather than their default pages
+        //       - and to a specific content selectors within our page
+        //     - Fetch and similarly update the share room root, using
+        //       a different section of the page
+        //   - if not succesful, Show the login-form section
+        // - In any case, populate the familiar public share rooms
+        //
+        // See docs/AppOverview.txt "Content Node navigation modes" for
+        // details about mode controls.
+
+        var use_page = "#home";
+        var $page = this.my_page$();
+
+        var dependent_visits = [[content_node_manager.get(my.storage_root_url),
+                                 ".storage-contents"],
+                                [content_node_manager.get(
+                                    my.personal_shares_root_url),
+                                 ".personal-shareroom-contents"]];
+        var mode_opts_adjusted;
+        function do_next_dependent_visit() {
+            /* Do the next step in visiting login-sensitive roots. */
+            var next = dependent_visits.shift();
+            // Adjust crucial content_selector parameter in distinct copy:
+            var mode_opts_adjusted = $.extend({content_only_in: next[1],
+                                               use_page: use_page,
+                                               passive: true},
+                                              mode_opts);
+            next[0].visit(chngpg_opts, mode_opts_adjusted,
+                          handle_fetch_success, handle_fetch_failure); }
+        function handle_fetch_success(data, when) {
+            /* Special handling of various content root visits as part of
+               RootContentNode visit, with mode_opts adjusted accordingly. */
+            // 'mode_opts' had to be buried in the context object because the
+            // proper lexical closure is not available - maybe a $.ajax() bug.
+            var local_mode_opts = this.mode_opts,
+                local_chngpg_opts = this.chngpg_opts;
+            delete this.mode_opts; delete this.chngpg_opts;
+            var $page = $(mode_opts.use_page);
+            if (dependent_visits.length) {
+                $page.find(".login-form").hide();
+                $page.find(".my-content-section").show();
+                // XXX Signal that fetch of share room section is pending
+                }
+            this.provision(data, when, local_mode_opts);
+            this.layout(local_mode_opts);
+            this.show(local_chngpg_opts, local_mode_opts);
+            if (dependent_visits.length) {
+                // (Callbacks + recursion => non-euclidean topologies. %-)
+                do_next_dependent_visit(); }}
+
+        function handle_fetch_failure(xhr) {
+            // 'mode_opts' had to be buried in the context object because the
+            // fetch method's .bind(this) severs our lexical closure.
+            var local_mode_opts = this.mode_opts,
+                local_chngpg_opts = this.chngpg_opts;
+            delete this.mode_opts; delete this.chngpg_opts;
+            var $page = $(local_mode_opts.use_page);
+            $page.find(".login-form").show();
+            $page.find(".my-content-section").hide();
+            // XXX Signal that authentication failed in the form.
+        }
+
+        // Here we go!
+        try {
+            do_next_dependent_visit(); }
+        finally {
+            // XXX These failsafes should be in error handlers:
+            $('.nav_login_storage').fadeIn('slow');
+            $.mobile.hidePageLoadingMsg(); }
+
+        // XXX Populate the familiar public share rooms.
+        // XXX Provide edit and "+" add controls - here or in separate page.
     }
 
     ContentNode.prototype.handle_failed_visit = function (xhr) {
