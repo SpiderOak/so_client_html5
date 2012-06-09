@@ -203,7 +203,9 @@ var spideroak = function () {
                     === my.share_rooms_root_url)); }
     function is_content_url(url) {
         /* True if url within registered content roots. */
-        return is_storage_url(url) || is_share_url(url); }
+        return (is_storage_url(url)
+                || is_share_url(url)
+                || is_combo_root_url(url)); }
 
     /* Content representation: */
 
@@ -830,7 +832,7 @@ var spideroak = function () {
 
                     // Roots:
                     if (is_content_root_url(url)) {
-                        if (is_consolidated_root_url(url)) {
+                        if (is_combo_root_url(url)) {
                             got = new RootContentNode(url, parent); }
                         else {
                             var cnm = content_node_manager;
@@ -881,17 +883,16 @@ var spideroak = function () {
             // Setup traversal hook: 
             establish_traversal_handler();
             // Get and deploy available credentials:
-            /*
+            /* XXX With sufficient credentials, we'll do storage_login().
             *var password;
             *var username = smgr.get('username');
             *if (username) {
             *    password = secure_settings_manager.get([username, 'password']);
             *    }
             */
-            // Attempt current node visit:
-            /* ... */
             my.combo_root_url = defaults.combo_root_url;
-            var root = content_node_manager.get(my.combo_root_url, null);
+            var combo_root = content_node_manager.get(my.combo_root_url, null);
+            combo_root.visit();
         },
         toString: function () {
             var user = (my.username ? my.username : "-");
