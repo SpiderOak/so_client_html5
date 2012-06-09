@@ -4,10 +4,34 @@ Noteworthy technical details of the !SpiderOak HTML5 application. See
 [[HTML5ClientProject]] for project status, etc.
 
 == Architectural Elements ==
+
+=== `ContentNode` Data Model ===
+The `ContentNode` object hierarchy provides a data model around which
+obtaining, assimilating, and presenting the !SpiderOak-managed user content
+data is organized - storage devices versus share rooms, and their contained
+folders and file "nodes".
+
+* `ContentNode` - Basis
+  * `RootContentNode` - A consolidated container of storage and share roots
+  * `FolderContentNode` - General behaviors used by storage and share folders
+  * `FileContentNode` - General behaviors used by storage and share files
+  * `StorageNode` - Backups content
+    * `RootStorageNode`
+    * `DeviceStorageNode`
+    * `DirectoryStorageNode`
+    * `FileStorageNode`
+  * `ShareRoomNode` - Share Rooms
+    * `RootShareRoomNode`
+    * `RoomShareRoomNode`
+    * `DirectoryShareRoomNode`
+    * `FileShareRoomNode`
+
 === Dynamic Pages ===
-Storage, Share Rooms are implemented as jQuery Mobile "pages" (`<div
-data-role="page>`) generated dynamically from cloned copies of static
-template DOM nodes, upon in-app traversal of particular URLs.
+Content nodes (backup storage folders and files, share rooms, and an
+encompassing root node - see [#ContentNodePrototypeHierarchy the data
+model]) are presented as jQuery Mobile "pages" (`<div data-role="page>`)
+generated dynamically from cloned copies of static template DOM nodes, upon
+in-app traversal of particular URLs.
 * The spideroak object's `.handle_content_visit()` method is assigned as a
   handler to the jQuery Mobile `pagebeforechange` event, which tracks
   changes to the browser's `location.hash` setting.
@@ -38,55 +62,42 @@ collections, which can be added and removed from the UI.  Consequently we
 have to provide two modes for visiting a share room - one for managing the
 collection it represents, and the other for delving into its contents.
 
-=== `ContentNode` Data Model ===
-The `ContentNode` object hierarchy provides a data model around which
-obtaining, assimilating, and presenting the remote data describing
-!SpiderOak-managed user content items is organized - storage devices versus
-share rooms, and their contained folders and file "nodes".
+=== Content Node navigation modes ===
+Special navigation behaviors are supported using query (search) parameters
+on the node hash locations, translated to the node_opts parameter passed
+through the .visit(), .provision*(), and .show()/.layout*() node methods.
+(Some modes are only used internally, via node_opts, and not passed via
+the URL query parameters.)
 
-* `ContentNode` - Basis
-  * `RootContentNode` - A consolidated container of storage and share roots
-  * `StorageNode` - Backups content
-    * `RootStorageNode`
-    * `DeviceStorageNode`
-    * `DirectoryStorageNode`
-    * `FileStorageNode`
-  * `ShareRoomNode` - Share Rooms
-    * `RootShareRoomNode`
-    * `RoomShareRoomNode`
-    * `DirectoryShareRoomNode`
-    * `FileShareRoomNode`
-
-(I expect to implement `DirectoryContentNode` and `FileContentNode`, to be
-used by the respective storage and share room nodes.)
+Currently implemented modes include:
+* `passive`: when showing a node, just adjust the DOM $page, don't do
+  $.mobile.changePage(). Useful for page updates in the background, or for
+  the `RootContentNode` composite page, which articulates multiple subnode
+  updates.
+* `use_page`: the nodes layout their data on a specified page, rather than
+  their default
+* `content_only_in`: the nodes do not do header and footer layout, and do
+  their content layout in the part of the page's DOM specified by the CSS
+  selector.
+* `refresh`: refetch the data for the node.
 
 === Storage and Share Rooms ===
-Managed content is organized within two content roots:
-
-- the storage root, my.storage_root_url, determined by the user's account
-- the share root, which is the same across all accounts
-
 Content urls are recognized by virtue of beginning with one of the
-registered content roots. The storage root is registered when the user
-logs in. The share rooms root is registered upon the registration of
-any share room.
+registered content roots.
 
-Storage access is much more complicated than share access for a couple of
-reasons:
+The storage root is registered when the user logs in.
 
-- While share room access includes something called a password, that's
-  actually a part of the path to the respective share room. That is, share
-  room access doesn't entail any session cookies - the "credentials" are
-  encoded in the access path.
+The client keeps track of two share rooms roots:
+* the collection of share rooms that belongs to the logged-in account,
+  known here as "personally owned share rooms", or "personal share rooms",
+* the collection of share rooms that the client has been used to visit,
+  or familiar "public share rooms".
 
-  The storage login password, on the other hand, is for authentication
-  against a user account.  It entails typical web session credentials,
-  conveyed by session cookies.
-- The login procedure includes a provision for redirecting the storage
-  attempt from the default server to secondary ones, for those accounts
-  that have their storage service provided by secondary servers.  This
-  redirection step is the reason for the elaborate storage_login function,
-  which recurses to the indicated server when required.
+The account login procedure includes a provision for redirecting the
+storage access from the default server to secondary ones, for those
+accounts that have their storage service provided by secondary servers.
+This redirection step is the reason for the elaborate storage_login
+function, which recurses to the indicated server when required.
 
 == Incidental Technical Details and Hanging Issues ==
 === Special Browser Requirements ===
