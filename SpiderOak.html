@@ -24,69 +24,77 @@
         <img src="brand_images/named_logo.png" alt="Logo">
       </div>
     </div>
-    <div class="login_form nav_login_storage" data-role="content">
-      <ul data-role="listview" class="roots">
-        <li data-role="list-divider" data-mini="true"
-            id="storage-devices-leader">
-          <div align="center"> My Storage and Share Rooms </div>
-        </li>
-        <form method="POST" id="storage-login-form" class="login-form">
-          <ul data-role="listview" data-inset="true" data-mini="true"
-              data-theme="c">
-            <li data-role="fieldcontain" class="ui-hide-label"
-                data-inset="true" data-mini="true">
-              <label for="my_login_username">Username:</label>
-              <input type="text" name="username" id="my_login_username"
-                     data-inset="true"
-                     placeholder="Username"
-                     value>
-            </li>
-            <li data-role="fieldcontain" class="ui-hide-label"
-                data-inset="true" data-mini="true">
-              <label data-mini="true" for="my_login_password">Password:</label>
-              <input type="password" name="password" id="my_login_password"
-                     data-inset="true" data-mini="true"
-                     placeholder="Password">
+    <div class="nav_login_storage login-section" data-role="content">
+      <div class="login-section">
+        <form method="POST" id="root-login-form" class="login-form">
+          <ul data-role="listview" class="roots">
+            <li data-role="list-divider" data-mini="true"
+                id="storage-devices-leader">
+              <div align="center"> My Storage and Share Rooms </div>
             </li>
           </ul>
-          <div class="ui-grid-a">
-            <div class="ui-block-a" align="left">
-              <div data-role="controlgroup">
-                <!-- XXX Enable slider when functionality is implemented -->
-                <select name="slider" id="remember-me" data-role="slider"
-                        disabled="true" data-mini="true">
-	          <option value="off">Off</option default="true">
-	          <option value="on">On</option>
-                </select><br/>
-                <label for="remember-me">
-                  <small>
-                    Remember&nbsp;Me
-                  </small>
-                </label>
+          <div>&nbsp;</div>
+          <ul data-role="listview" data-inset="true">
+            <li data-role="fieldcontain" class="ui-hide-label">
+                <label for="my_login_username">Username:</label>
+                <input type="text" name="username" id="my_login_username"
+                       placeholder="Username"
+                       value>
+                <label for="my_login_password"> Password:</label>
+                <input type="password" name="password" id="my_login_password"
+                       placeholder="Password">
+            </li>
+          </ul>
+          <fieldset data-role="controlgroup">
+            <div class="ui-grid-a">
+              <div class="ui-block-a" align="left">
+                <div data-role="controlgroup">
+                  <!-- XXX Enable slider when functionality is implemented -->
+                  <select name="slider" id="remember-me" data-role="slider"
+                          disabled="true" data-mini="true">
+	            <option value="off">Off</option default="true">
+	            <option value="on">On</option>
+                  </select><br/>
+                  <label for="remember-me">
+                    <small>
+                      Remember&nbsp;Me
+                    </small>
+                  </label>
+                </div>
+              </div>
+              <div class="ui-block-b" align="right">
+                <input type="submit" data-inline="true"  data-theme="f"
+                       value="Login" name="Login">
               </div>
             </div>
-            <div class="ui-block-b" align="right">
-              <input type="submit" data-inline="true"  data-theme="f"
-                     value="Login" name="Login">
-            </div>
-          </div>
+          </fieldset>
         </form>
-        <li data-role="list-divider" id="public-rooms-leader">
-          <div align="center"> Public Share Rooms </div>
-        </li>
-      </ul>
-      <ul data-inset="true" data-role="listview" class="roots"
-          style="display: none">
-        <li data-role="list-divider" data-mini="true"
-            id="storage-devices-leader">
-          <div align="center"> My Storage </div>
-        </li>
-        <li data-role="list-divider" id="my-rooms-leder">
-          <div align="center"> My ShareRooms </div>
-        </li>
-        <li data-role="list-divider" id="public-rooms-leader">
-          <div align="center"> Public ShareRooms </div>
-        </li>
+       </div>
+       <div class="my-content-section">
+         <ul data-role="listview">
+           <li data-role="list-divider" id="my-storage-leader">
+             <div align="center"> My Storage </div>
+           </li>
+         </ul>
+         <div class="storage-contents">
+           <ul data-role="listview"/>
+         </div>
+         <ul data-role="listview">
+           <li data-role="list-divider" id="my-rooms-leader">
+             My Share Rooms
+           </li>
+         </ul>
+         <div class="personal-shareroom-contents">
+           <ul data-role="listview"/>
+         </div>
+       </div>
+       <div class="public-content-section">
+         <ul data-role="listview">
+           <li data-role="list-divider" id="public-rooms-leader">
+               Public Share Rooms
+           </li>
+         </ul>
+       </div>
       </ul>
     </div>
     <div data-role="footer" data-position="fixed" data-theme="a">
