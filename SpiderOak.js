@@ -78,7 +78,7 @@ var spideroak = function () {
         preview_sizes: [25, 48, 228, 800],
         dividers_threshold: 10,
         filter_threshold: 20,
-    }
+    };
     var my = {
         /* Login session settings: */
         starting_host_url: null,
@@ -91,7 +91,7 @@ var spideroak = function () {
         personal_shares_root_url: "",
         public_shares_root_url: "",
         share_rooms_urls: {},
-    }
+    };
 
     /* Navigation handlers: */
 
@@ -493,8 +493,10 @@ var spideroak = function () {
            'when' is time soon before data was fetched. */
         var mgr = content_node_manager;
         var url, dev, devdata;
+
         this.name = my.username;
         mgr.stats = data["stats"]; // TODO: We'll cook stats when UI is ready.
+
         this.subdirs = [];
         for (var i in data.devices) {
             devdata = data.devices[i];
@@ -514,6 +516,7 @@ var spideroak = function () {
            'when' is time soon before data was fetched. */
         var mgr = content_node_manager;
         var url, dir, dirdata, file, filedata;
+
         this.subdirs = [];
         for (var i in data.dirs) {
             dirdata = data.dirs[i];
@@ -524,6 +527,7 @@ var spideroak = function () {
             // Include, if not already present:
             if (! ($.inArray(url, this.subdirs) >= 0)) {
                 this.subdirs.push(url); }}
+
         this.files = [];
         for (var i in data.files) {
             filedata = data.files[i];
@@ -542,8 +546,8 @@ var spideroak = function () {
             // Include, if not already present:
             if (! ($.inArray(url, this.files) >= 0)) {
                 this.files.push(url); }}
-        this.lastfetched = when;
-    }
+
+        this.lastfetched = when; }
     RootShareRoomNode.prototype.provision_populate = function (data, when) {
         /* Embody the root share room with 'data'.
            'when' is time soon before data was fetched. */
@@ -554,8 +558,7 @@ var spideroak = function () {
         for (room_url in my.share_rooms_urls) {
             data.dirs.push([content_node_manager.get(room_url), room_url]); }
 
-        FolderContentNode.prototype.provision_populate.call(this, data, when);
-    }
+        FolderContentNode.prototype.provision_populate.call(this, data, when); }
     DeviceStorageNode.prototype.provision_populate = function (data, when) {
         /* Embody storage folder items with 'data'.
            'when' is time soon before data was fetched. */
