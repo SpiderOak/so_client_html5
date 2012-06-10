@@ -162,22 +162,22 @@ var spideroak = function () {
 
     function register_storage_root_url(url) {
         /* Identify url as the user's storage root.  Return url. */
-        return my.storage_root_url = url; }
+        return (my.storage_root_url = url); }
     function register_public_shares_root_url(host) {
         /* Use host to identify the public share rooms root.  Return url. */
         var psps = defaults.public_shares_path_suffix;
-        return my.public_shares_root_url = host + "/" + psps; }
+        return (my.public_shares_root_url = (host + "/" + psps)); }
     function register_personal_shares_root_url(storage_root) {
         /* Use storage root to Identify personal share rooms root url.
            Return the share rooms root. */
         return (my.personal_shares_root_url =
-                storage_root + defaults.personal_shares_path_suffix); }
+                (storage_root + defaults.personal_shares_path_suffix)); }
     function register_public_shares_url(url) {
         /* Include url among the registered content roots.  Returns the url. */
         my.share_rooms_urls[url] = true;
         return url; }
     function is_combo_root_url(url) {
-        return url === my.combo_root_url; }
+        return (url === my.combo_root_url); }
     function is_content_root_url(url) {
         /* True if the 'url' is for one of the root content items.
            Doesn't depend on the url having an established node. */
@@ -187,7 +187,7 @@ var spideroak = function () {
     function is_share_room_url(url) {
         /* True if the 'url' is for one of the share rooms.
            Doesn't depend on the url having an established node. */
-        return url in my.share_rooms_urls; }
+        return (my.share_rooms_urls.hasOwnProperty(url)); }
     function is_storage_url(url) {
         /* True if the URL is for a content item in the user's storage area.
            Doesn't depend on the url having an established node. */
@@ -206,13 +206,13 @@ var spideroak = function () {
                 || is_share_url(url)
                 || is_combo_root_url(url)); }
 
-    /* Content representation: */
 
-    /* Various content node types - the roots, devices, folders, and files
-       - are implemented based on a generic ContentNode object.  Departures
-       from the basic functionality are implemented as distinct prototype
-       functions, defined immediately after the generic ones.
-    */
+                             /* Data model */
+
+    /* SpiderOak content includes storage (backups) and share rooms. The
+       data model distinguishes different kinds of those things - the
+       roots, devices, folders, and files - and wraps them in abstract
+       general types - the ContentNode and variants of it, where useful. */
 
     function ContentNode(url, parent) {
         /* Constructor for items representing stored content.
@@ -220,8 +220,9 @@ var spideroak = function () {
            - 'parent' is containing node. The root's parent is null.
            See JSON data examples towards the bottom of this script.
         */
-        if ( !(this instanceof ContentNode) ) // Coding failsafe.
+        if ( !(this instanceof ContentNode) ) {      // Coding failsafe.
             throw new Error("Constructor called as a function");
+        }
         if (url) {             // Skip if we're in prototype assignment.
             this.url = url;
             this.root_url = parent ? parent.root_url : url;
@@ -527,7 +528,8 @@ var spideroak = function () {
             var fields = ['name', 'size', 'ctime', 'mtime', 'versions'];
             for (var nmi in fields) {
                 var name = fields[nmi];
-                if (name in filedata) { file[name] = filedata[name]; }}
+                if (filedata.hasOwnProperty(name)) {
+                    file[name] = filedata[name]; }}
             for (var szi in defaults.preview_sizes) {
                 var sz = "preview_" + defaults.preview_sizes[szi];
                 if (sz in filedata) {
@@ -636,13 +638,13 @@ var spideroak = function () {
                                                            15));
                     $right_slot.show(); }}}
 
-        if ('left_url' in fields) {
+        if (fields.hasOwnProperty('left_url')) {
             var $left_slot = $header.find('.header-left-slot');
             if (fields.left_url === "-") {
                 var parsed = $.mobile.path.parseUrl(window.location.href);
                 fields.left_url = parsed.hrefNoHash; }
             $left_slot.attr('href', fields.left_url);
-            if ('left_label' in fields) {
+            if (fields.hasOwnProperty('left_label')) {
                 if (! fields.left_label) {
                     $left_slot.hide(); }
                 else {
