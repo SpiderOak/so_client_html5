@@ -606,11 +606,9 @@ var spideroak = function () {
 
     ContentNode.prototype.layout = function (mode_opts) {
         /* Deploy content as markup on our page. */
-        if (! mode_opts.content_only_in) {
-            this.layout_header(mode_opts); }
+        this.layout_header(mode_opts);
         this.layout_content(mode_opts);
-        if (! mode_opts.content_only_in) {
-            this.layout_footer(mode_opts); }
+        this.layout_footer(mode_opts);
     }
 
     ContentNode.prototype.layout_header_fields = function(fields) {
@@ -625,13 +623,13 @@ var spideroak = function () {
         var $header = this.my_page$().find('[data-role="header"]');
         var $label;
 
-        if ('title' in fields) {
+        if (fields.hasOwnProperty('title')) {
             $header.find('.header-title').html(elide(fields.title, 25)); }
 
-        if ('right_url' in fields) {
+        if (fields.hasOwnProperty('right_url')) {
             var $right_slot = $header.find('.header-right-slot');
             $right_slot.attr('href', fields.right_url);
-            if ('right_label' in fields) {
+            if (fields.hasOwnProperty('right_label')) {
                 if (! fields.right_label) {
                     $right_slot.hide(); }
                 else {
@@ -658,7 +656,6 @@ var spideroak = function () {
            Many storage node types will use these values as is, some will
            replace them.
          */
-        if (mode_opts.content_only_in) { return; }
         var fields = {};
         fields.right_url = ('#' + add_query_param(this.url,
                                                   "refresh", "true", true));
@@ -672,14 +669,12 @@ var spideroak = function () {
         this.layout_header_fields(fields); }
     RootStorageNode.prototype.layout_header = function(mode_opts) {
         /* Fill in typical values for header fields of .my_page$(). */
-        if (mode_opts.content_only_in) { return; }
         StorageNode.prototype.layout_header.call(this, mode_opts);
         this.layout_header_fields({'title': "Storage Devices",
                                    'left_label': "Home", 'left_url': "-"}); }
 
     ShareRoomNode.prototype.layout_header = function(mode_opts) {
         /* Fill in header fields of .my_page$(). */
-        if (mode_opts.content_only_in) { return; }
         var fields = {};
         if (this.parent_url) {
             var container = content_node_manager.get(this.parent_url);
@@ -699,7 +694,6 @@ var spideroak = function () {
 
     RootShareRoomNode.prototype.layout_header = function(mode_opts) {
         /* Fill in header fields of .my_page$(). */
-        if (mode_opts.content_only_in) { return; }
         ShareRoomNode.prototype.layout_header.call(this, mode_opts);
         var fields = {'right_url': '#' + add_query_param(this.url,
                                                          "mode", "edit"),
@@ -708,13 +702,9 @@ var spideroak = function () {
 
     ContentNode.prototype.layout_content = function (mode_opts) {
         /* Present this content node by adjusting its DOM data-role="page" */
-        var $page = (mode_opts.use_page
-                     ? $(mode_opts.use_page)
-                     : this.my_page$());
-	var $content = (mode_opts.content_only_in
-                        ? $page.find(mode_opts.content_only_in)
-                        : $page.find('[data-role="content"]'));
-	var $list = $content.find('[data-role="listview"]');
+        var $page = this.my_page$();
+	var $content = $page.find('[data-role="content"]');
+	var $list = this.my_contents_listview$();
         if ($list.children().length) {
             $list.empty(); }
 
@@ -827,7 +817,7 @@ var spideroak = function () {
 
     ContentNode.prototype.layout_footer = function(mode_opts) {
         /* Return markup with general and specific legend fields and urls. */
-        if (mode_opts.content_only_in) { return; }
+        // XXX Not yet implemented.
     }
 
     ContentNode.prototype.is_device = function() {
