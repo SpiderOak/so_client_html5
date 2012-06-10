@@ -72,13 +72,11 @@ the URL query parameters.)
 Currently implemented modes include:
 * `passive`: when showing a node, just adjust the DOM $page, don't do
   $.mobile.changePage(). Useful for page updates in the background, or for
-  the `RootContentNode` composite page, which articulates multiple subnode
+  the `RootContentNode` composite page, which is informed by combined subnode
   updates.
-* `use_page`: the nodes layout their data on a specified page, rather than
-  their default
-* `content_only_in`: the nodes do not do header and footer layout, and do
-  their content layout in the part of the page's DOM specified by the CSS
-  selector.
+* `notify`: report visit data-fetch success or failure using a provided
+  callback and token. The report includes the token and, on success, the
+  listview of the assimilated data, or on failure, the failure message.
 * `refresh`: refetch the data for the node.
 
 === Storage and Share Rooms ===
