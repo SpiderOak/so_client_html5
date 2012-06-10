@@ -35,7 +35,6 @@ $(document).ready(function () {
     $('#home [data-role="content"]').hide().fadeIn(2000);
     $('#home [data-role="footer"]').hide().fadeIn(2000);
     $('#my_login_username').focus();
-    var $content = $('.nav_login_storage');
     spideroak.prep_login_form('.nav_login_storage', spideroak.storage_login,
                               'username');
     spideroak.prep_login_form('.nav_login_share',
@@ -116,7 +115,6 @@ var spideroak = function () {
              'storage_web_url': the account's web UI entry address.
              'persist_credentials': if true, preserve username in localStorage.
         */
-        var root = content_node_manager.get(my.combo_root_url);
         my.username = username;
         if (persist_credentials) { smgr.set('username', username); }
         my.storage_host = host;
@@ -242,7 +240,8 @@ var spideroak = function () {
         ContentNode.call(this, url, parent);
         this.root_url = url;
         this.emblem = "Home";
-        delete this.subdirs, this.files;
+        delete this.subdirs;
+        delete this.files;
         this.storage_devices = [];
         this.personal_shares = [];
         this.public_shares = []; }
