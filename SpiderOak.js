@@ -899,8 +899,7 @@ var spideroak = function () {
     settings_manager.__defineGetter__('length',
                                       function() {
                                           return localStorage.length; });
-    // Compact name:
-    smgr = settings_manager;
+    smgr = settings_manager;    // Alias for convience.
 
     if (SO_DEBUGGING) {
         var secure_settings_manager = smgr; }
@@ -939,16 +938,14 @@ var spideroak = function () {
                         if (is_combo_root_url(url)) {
                             got = new RootContentNode(url, parent); }
                         else {
-                            var cnm = content_node_manager;
-                            var parent = parent || cnm.get(my.combo_root_url);
+                            var parent = parent || cnmgr.get(my.combo_root_url);
                             if (is_storage_url(url)) {
                                 got = new RootStorageNode(url, parent); }
                             else { got = new RootShareRoomNode(url, parent); }}}
 
                     // Contents:
                     else if (parent && (parent.url === my.storage_root_url)) {
-                        var cnm = content_node_manager;
-                        var parent = parent || cnm.get(my.combo_root_url);
+                        var parent = parent || cnmgr.get(my.combo_root_url);
                         got = new DeviceStorageNode(url, parent); }
                     else if (is_share_room_url(url)) {
                         got = new RoomShareRoomNode(url, parent); }
@@ -1102,7 +1099,7 @@ var spideroak = function () {
             });
         },
         // Expose the content node manager for debugging:
-        cnmgr: (SO_DEBUGGING ? content_node_manager : null),
+        cnmgr: (SO_DEBUGGING ? cnmgr : null),
         smgr: (SO_DEBUGGING ? smgr : null),
     }
 }();
