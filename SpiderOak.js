@@ -48,14 +48,16 @@ $(document).ready(function () {
     if (window.location.hash) {
         window.location.hash = "";
         $.mobile.changePage(window.location.href.split('#')[0]);
-        window.location.reload(); }
+        window.location.reload();
+    }
 });
 
-/* Modular singleton pattern: */
 var spideroak = function () {
-                              /* private: */
+    /* SpiderOak application object, as a modular singleton. */
 
-    /* Object-wide settings: */
+    /* Private elements: */
+
+                        /* Object-wide settings */
 
     var defaults = {
         /* Settings not specific to a particular login session: */
@@ -106,7 +108,9 @@ var spideroak = function () {
         $(document).bind("pagebeforechange.SpiderOak", handle_content_visit);
     }
 
-    /* Register navigation roots: */
+
+                      /* Content Root Registration */
+
     function set_storage_account(username, host, storage_web_url,
                                  persist_credentials) {
         /* Register user-specific storage details, returning storage root URL.
@@ -148,7 +152,8 @@ var spideroak = function () {
         return url;
     }
 
-    /* Node-independent URL identification - used for node assignment: */
+
+                   /* Node-independent URL assignment */
 
     // Managed content is organized within two content roots:
     //
@@ -853,15 +858,21 @@ var spideroak = function () {
             // Include our page in the DOM, after the storage page template:
             $template.after(this.my_page$()); }
         return this.$page; }
+    ContentNode.prototype.my_contents_listview$ = function () {
+        /* Return this node's jQuery contents litview object. */
+        return this.my_page$().find('[data-role="listview"]'); }
     ContentNode.prototype.get_storage_page_template$ = function() {
         return $("#" + defaults.content_page_template_id); }
 
-    /* Convenience: */
+
+                             /* Convenience */
+
     ContentNode.prototype.toString = function () {
         return "<" + this.emblem + ": " + this.url + ">";
     }
 
-    /* Resource managers */
+
+                          /* Resource managers */
 
     var settings_manager = {
         /* Maintain domain-specific persistent settings, using localStorage.
@@ -966,8 +977,11 @@ var spideroak = function () {
             bu: (SO_DEBUGGING ? by_url : null),
         }
     }()
+    var cnmgr = content_node_manager; // Alias for when short name is needed.
 
-    /* public: */
+
+    /* Public interface: */
+
     return {
         init: function () {
             /* Do preliminary setup - event handlers, etc. */
