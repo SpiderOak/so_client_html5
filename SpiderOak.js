@@ -757,8 +757,6 @@ var spideroak = function () {
                 for (var i in this.files) {
                     insert_subnode(this.files[i]); }}
         }
-        // NOTE As of jQm 1.1.0, .listview("refresh") isn't properly rounding
-        //      list item corners, but our list items aren't inset, so it's ok.
         $page.page();
         $list.listview("refresh");
         return $page;
@@ -834,7 +832,7 @@ var spideroak = function () {
     DeviceStorageNode.prototype.is_device = function() {
         return true; }
     ContentNode.prototype.my_page_from_dom$ = function () {
-        /* Find my page in the DOM, if it's there. */
+        /* Return a jquery DOM search for my page, by id. */
         return $('#' + fragment_quote(this.my_page_id())); }
     ContentNode.prototype.my_page$ = function (reinit) {
         /* Return this node's jQuery page object, producing if not present.
