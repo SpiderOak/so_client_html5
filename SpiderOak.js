@@ -241,18 +241,6 @@ var spideroak = function () {
             this.emblem = "";   // At least for debugging/.toString()
             this.icon_path = ""; }}
 
-    function RootContentNode(url, parent) {
-        /* Consolidated root of the storage and share content hierarchies. */
-        ContentNode.call(this, url, parent);
-        this.root_url = url;
-        this.emblem = "Home";
-        delete this.subdirs;
-        delete this.files;
-        this.storage_devices = [];
-        this.personal_shares = [];
-        this.public_shares = []; }
-    RootContentNode.prototype = new ContentNode();
-
     function StorageNode(url, parent) {
         ContentNode.call(this, url, parent);
         // All but the root storage nodes are contained within a device.
@@ -266,10 +254,17 @@ var spideroak = function () {
         this.room_url = parent ? parent.room_url : null; }
     ShareRoomNode.prototype = new ContentNode();
 
-    function FolderContentNode(url, parent) {
-        /* Stub, for situating intermediary methods. */ }
-    function FileContentNode(url, parent) {
-        /* Stub, for situating intermediary methods. */ }
+    function RootContentNode(url, parent) {
+        /* Consolidated root of the storage and share content hierarchies. */
+        ContentNode.call(this, url, parent);
+        this.root_url = url;
+        this.emblem = "Home";
+        delete this.subdirs;
+        delete this.files;
+        this.storage_devices = [];
+        this.personal_shares = [];
+        this.public_shares = []; }
+    RootContentNode.prototype = new ContentNode();
 
     function RootStorageNode(url, parent) {
         StorageNode.call(this, url, parent);
@@ -293,6 +288,11 @@ var spideroak = function () {
         this.emblem = "Share Room";
         this.room_url = url; }
     RoomShareRoomNode.prototype = new ShareRoomNode();
+
+    function FolderContentNode(url, parent) {
+        /* Stub, for situating intermediary methods. */ }
+    function FileContentNode(url, parent) {
+        /* Stub, for situating intermediary methods. */ }
 
     function FolderStorageNode(url, parent) {
         this.emblem = "Storage Folder";
@@ -722,6 +722,22 @@ var spideroak = function () {
         var do_dividers = (lensubdirs + lenfiles) > defaults.dividers_threshold;
         var do_filter = (lensubdirs + lenfiles) > defaults.filter_threshold;
 
+        function insert_item($item) {
+            if ($cursor === $list) { $cursor.append($item); }
+            else { $cursor.after($item); }
+            $cursor = $item; }
+        function conditionally_insert_divider(t) {
+            if (do_dividers && t && (t[0].toUpperCase() !== curinitial)) {
+                curinitial = t[0].toUpperCase();
+                indicator = divider_prefix + curinitial;
+                $item = $('<li data-role="list-divider" id="divider-'
+                          + indicator + '">' + indicator + '</li>')
+                insert_item($item); }}
+        function insert_subnode(suburl) {
+            var subnode = content_node_manager.get(suburl, this);
+            conditionally_insert_divider(subnode.name);
+            insert_item(subnode.layout_item$(mode_opts)); }
+
         if (lensubdirs + lenfiles === 0) {
             // XXX Need to convey that the container is empty more nicely.
             $content.after('<p class="empty-sign" data-role="empty-sign">'
@@ -827,10 +843,6 @@ var spideroak = function () {
         // XXX Not yet implemented.
     }
 
-    ContentNode.prototype.is_device = function() {
-        return false; }
-    DeviceStorageNode.prototype.is_device = function() {
-        return true; }
     ContentNode.prototype.my_page_from_dom$ = function () {
         /* Return a jquery DOM search for my page, by id. */
         return $('#' + fragment_quote(this.my_page_id())); }
