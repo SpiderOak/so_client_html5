@@ -32,6 +32,8 @@ $(document).ready(function () {
     // XXX We fadeIn the parts, instead of the whole page, to work around a bug.
     //     The bug, if we do the whole page, makes subsequent transitions flaky
     //     and puts ghosty (but clickable) home page elements on other pages!
+    "use strict";
+
     $('#home [data-role="content"]').hide().fadeIn(2000);
     $('#home [data-role="footer"]').hide().fadeIn(2000);
     $('#my_login_username').focus();
@@ -54,6 +56,8 @@ $(document).ready(function () {
 
 var spideroak = function () {
     /* SpiderOak application object, as a modular singleton. */
+
+    "use strict";
 
     /* Private elements: */
 
@@ -747,22 +751,6 @@ var spideroak = function () {
             var curinitial, divider_prefix, indicator = "";
             var $cursor = $list;
 
-            function insert_item($item) {
-                if ($cursor === $list) { $cursor.append($item); }
-                else { $cursor.after($item); }
-                $cursor = $item; }
-            function conditionally_insert_divider(t) {
-                if (do_dividers && t && (t[0].toUpperCase() !== curinitial)) {
-                    curinitial = t[0].toUpperCase();
-                    indicator = divider_prefix + curinitial;
-                    $item = $('<li data-role="list-divider" id="divider-'
-                              + indicator + '">' + indicator + '</li>')
-                    insert_item($item); }}
-            function insert_subnode(suburl) {
-                var subnode = content_node_manager.get(suburl, this);
-                conditionally_insert_divider(subnode.name);
-                insert_item(subnode.layout_item$(mode_opts)); }
-
             if (do_filter) { $list.attr('data-filter', 'true'); }
             if (lensubdirs) {
                 divider_prefix = "/";
@@ -981,7 +969,6 @@ var spideroak = function () {
                 /* Remove a content node object, eliminating references
                    that could be circular and prevent GC. */
                 delete by_url[node.url];
-                delete node;
             },
             // Expose the by_url registry when debugging:
             bu: (SO_DEBUGGING ? by_url : null),
