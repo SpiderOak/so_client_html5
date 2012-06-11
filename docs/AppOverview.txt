@@ -20,11 +20,26 @@ folders and file "nodes".
     * `DeviceStorageNode`
     * `DirectoryStorageNode`
     * `FileStorageNode`
-  * `ShareRoomNode` - Share Rooms
+  * `ShareRoomNode` - Share Rooms - public and personal
     * `RootShareRoomNode`
     * `RoomShareRoomNode`
     * `DirectoryShareRoomNode`
     * `FileShareRoomNode`
+
+Note that public and personal share rooms collections are represented by
+the same object types, based on `ShareRoomNode`, but have some different
+operational concerns.  The content items are structured identically, but
+access to personal share rooms requires login authentication, while public
+share rooms access is not tied to a !SpiderOak account.  Access to the
+different types affords different management options.
+
+* Public share rooms: Beyond navigating them, the user can only
+  add and discard public share rooms to their collection.
+* Personal share rooms: Among other things, users can change the
+  availability of their personal share rooms, and change which items in
+  their storage constitutes the share rooms.  (I have yet to get to the
+  share room password protection feature, but expect that will be set here,
+  as well.)
 
 === Dynamic Pages ===
 Content nodes (backup storage folders and files, share rooms, and an
