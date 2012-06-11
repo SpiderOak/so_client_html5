@@ -157,12 +157,14 @@ var spideroak = function () {
     }
 
 
-                   /* Node-independent URL assignment */
+             /* Node-independent content URL categorization */
 
     // Managed content is organized within two content roots:
     //
     // - the storage root, my.storage_root_url, determined by the user's account
-    // - the share root, which is the same across all accounts
+    // - the public share root, which is the same across all accounts
+    //
+    // A third category, the personal share root, resides in the storage root.
     //
     // Content urls are recognized by virtue of beginning with one of the
     // registered content roots. The storage root is registered when the user
@@ -322,10 +324,16 @@ var spideroak = function () {
         delete this.files; }
     FileShareRoomNode.prototype = new ShareRoomNode();
 
+                  /* Content type and role predicates */
+
     ContentNode.prototype.is_root = function () {
         /* True if the node is a collections top-level item. */
         return (this.url === this.root_url); }
 
+    ContentNode.prototype.is_device = function() {
+        return false; }
+    DeviceStorageNode.prototype.is_device = function() {
+        return true; }
 
                          /* Remote data access */
 
