@@ -28,32 +28,6 @@
 // For misc.js:blather() and allowing dangerous stuff only during debugging.
 SO_DEBUGGING = true;
 
-$(document).ready(function () {
-    // XXX We fadeIn the parts, instead of the whole page, to work around a bug.
-    //     The bug, if we do the whole page, makes subsequent transitions flaky
-    //     and puts ghosty (but clickable) home page elements on other pages!
-    "use strict";
-
-    $('#home [data-role="content"]').hide().fadeIn(2000);
-    $('#home [data-role="footer"]').hide().fadeIn(2000);
-    $('#my_login_username').focus();
-    spideroak.prep_login_form('.nav_login_storage', spideroak.storage_login,
-                              'username');
-    spideroak.prep_login_form('.nav_login_share',
-                              spideroak.visit_public_share_room,
-                              'shareid');
-
-    spideroak.init();
-
-    // Development convenience, so we just return to home page on full document
-    // reload.
-    if (window.location.hash) {
-        window.location.hash = "";
-        $.mobile.changePage(window.location.href.split('#')[0]);
-        window.location.reload();
-    }
-});
-
 var spideroak = function () {
     /* SpiderOak application object, as a modular singleton. */
 
@@ -375,11 +349,12 @@ var spideroak = function () {
                 success: function (data, status, xhr) {
                     this.handle_visit_success(data, when,
                                               chngpg_opts, mode_opts,
-                                              status, xhr); },
+                                              status, xhr); }.bind(this),
                 error: function (xhr, chngpg_opts, mode_opts,
                                  status, exception_thrown) {
                     this.handle_visit_failure(xhr, chngpg_opts, mode_opts,
-                                              status, exception_thrown)},
+                                              status,
+                                              exception_thrown)}.bind(this),
                })};
 
     RootContentNode.prototype.visit = function (chngpg_opts, mode_opts) {
@@ -1103,10 +1078,37 @@ var spideroak = function () {
                     $.mobile.hidePageLoadingMsg();
                     error_alert("Storage login", xhr.status);
                 },
-            });
-        },
+            }); },
+
         // Expose the content node manager for debugging:
         cnmgr: (SO_DEBUGGING ? cnmgr : null),
         smgr: (SO_DEBUGGING ? smgr : null),
     }
 }();
+
+$(document).ready(function () {
+    // XXX We fadeIn the parts, instead of the whole page, to work around a bug.
+    //     The bug, if we do the whole page, makes subsequent transitions flaky
+    //     and puts ghosty (but clickable) home page elements on other pages!
+
+    "use strict";
+
+    $('#home [data-role="content"]').hide().fadeIn(2000);
+    $('#home [data-role="footer"]').hide().fadeIn(2000);
+    $('#my_login_username').focus();
+    spideroak.prep_login_form('.nav_login_storage', spideroak.storage_login,
+                              'username');
+    spideroak.prep_login_form('.nav_login_share',
+                              spideroak.visit_public_share_room,
+                              'shareid');
+
+    spideroak.init();
+
+    // Development convenience, so we just return to home page on full document
+    // reload.
+    if (window.location.hash) {
+        window.location.hash = "";
+        $.mobile.changePage(window.location.href.split('#')[0]);
+        window.location.reload();
+    }
+});
