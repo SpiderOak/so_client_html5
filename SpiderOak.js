@@ -1011,7 +1011,7 @@ var spideroak = function () {
             else if (typeof disposition === "undefined") {
                 return persistence_manager.get("remember_me") || false; }
             else {
-                for (var key in persistence_manager.fields) {
+                for (var key in remember_manager.fields) {
                     persistence_manager.remove(key); }
                 return persistence_manager.set("remember_me", false); }},
 
