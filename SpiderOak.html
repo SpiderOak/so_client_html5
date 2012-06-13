@@ -33,7 +33,11 @@
               <div align="center"> My Storage and Share Rooms </div>
             </li>
           </ul>
-          <div>&nbsp;</div>
+          <ul data-role="listview" data-inset="true"
+              class="error-status-message">
+            <li>
+            </li>
+          </ul>
           <ul data-role="listview" data-inset="true">
             <li data-role="fieldcontain" class="ui-hide-label">
                 <label for="my_login_username">Username:</label>
@@ -49,9 +53,8 @@
             <div class="ui-grid-a">
               <div class="ui-block-a" align="left">
                 <div data-role="controlgroup">
-                  <!-- XXX Enable slider when functionality is implemented -->
                   <select name="slider" id="remember-me" data-role="slider"
-                          disabled="true" data-mini="true">
+                          data-mini="true">
 	            <option value="off">Off</option default="true">
 	            <option value="on">On</option>
                   </select><br/>
