@@ -885,10 +885,10 @@ var spideroak = function () {
 
         var date = new Date(this.mtime*1000);
         var day_splat = date.toLocaleDateString().split(",");
-        $date = $('<p class="ul-li-aside">'
-                  + day_splat[1] + "," + day_splat[2]
-                  + " " + date.toLocaleTimeString()
-                  +'</p>');
+        var $date = $('<p class="ul-li-aside">'
+                      + day_splat[1] + "," + day_splat[2]
+                      + " " + date.toLocaleTimeString()
+                      +'</p>');
         var $table = $('<table width="100%"/>');
         var $td = $('<td colspan="2"/>').append($('<h4/>').html(this.name));
         $table.append($('<tr/>').append($td));
@@ -1100,7 +1100,7 @@ var spideroak = function () {
             clear_hierarchy: function (url) {
                 /* Free node at 'url' and its recursively contained nodes. */
                 var it = this.get(url);
-                suburls = it.contained_urls();
+                var suburls = it.contained_urls();
                 for (var i in suburls) { this.clear_hierarchy(suburls[i]); }
                 this.free(it); },
 
