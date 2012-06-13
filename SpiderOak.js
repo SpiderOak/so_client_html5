@@ -41,7 +41,7 @@ var spideroak = function () {
         /* Settings not specific to a particular login session: */
         // API v1.
         // XXX starting_host_url may vary according to brand package.
-        combo_root_url: "SpiderOak",
+        combo_root_url: "home",
         starting_host_url: "https://spideroak.com",
         share_host_url: "https://spideroak.com",
         storage_login_path: "/browse/login",
@@ -64,11 +64,11 @@ var spideroak = function () {
         storage_web_url: null,  // Location of storage web UI for user.
         // content_roots_urls are for discerning URLs of contained items.
         // They're accumulated on access to storage repo root and share rooms.
-        content_root_urls: {},
-        storage_root_url: "",
-        personal_shares_root_url: "",
-        public_shares_root_url: "",
-        share_rooms_urls: {},
+        storage_root_url: null,
+        personal_shares_root_url: null,
+        public_shares_root_url: null,
+        public_share_room_urls: {},
+        personal_share_room_urls: {},
     };
 
     /* Navigation handlers: */
@@ -260,6 +260,10 @@ var spideroak = function () {
             this.lastfetched = false;
             this.emblem = "";   // At least for debugging/.toString()
             this.icon_path = ""; }}
+    ContentNode.prototype.free = function () {
+        /* Free composite content to make available for garbage collection. */
+        this.$page.remove();
+        this.$page = null; }
 
     function StorageNode(url, parent) {
         ContentNode.call(this, url, parent);
@@ -686,12 +690,16 @@ var spideroak = function () {
     ContentNode.prototype.my_page_id = function () {
         /* Set the UI page id, escaping special characters as necessary. */
         return this.url; }
+    RootContentNode.prototype.my_page_id = function () {
+        /* Set the UI page id, escaping special characters as necessary. */
+        return "home"; }
     ContentNode.prototype.show = function (chngpg_opts, mode_opts) {
         /* Trigger UI focus on our content layout.
            If mode_opts "passive" === true, don't do a changePage.
          */
         var $page = this.my_page$();
-        if (($.mobile.activePage[0].id !== this.my_page_id())
+        if ($.mobile.activePage
+            && ($.mobile.activePage[0].id !== this.my_page_id())
             && (!mode_opts.passive)) {
             $.mobile.changePage($page, chngpg_opts); }
         // Just in case, eg of refresh:
