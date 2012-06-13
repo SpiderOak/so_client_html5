@@ -1111,6 +1111,119 @@ var spideroak = function () {
     var cnmgr = content_node_manager; // Compact name, for convenience.
 
 
+                                /* Login */
+
+    function storage_login(login_info, url) {
+        /* Login to storage account and commence browsing at devices.
+           'login_info': An object with "username" and "password" attrs.
+           'url': An optional url, else defaults.storage_login_path is used.
+           We provide for redirection to specific alternative servers
+           by recursive calls. See:
+           https://spideroak.com/apis/partners/web_storage_api#Loggingin
+        */
+        var login_url;
+        var server_host_url;
+        var parsed;
+
+        if (url
+            && (parsed = $.mobile.path.parseUrl(url))
+            && ["http:", "https:"].indexOf(parsed.protocol) !== -1) {
+            server_host_url = parsed.domain;
+            login_url = url; }
+
+        else {
+            server_host_url = defaults.starting_host_url;
+            login_url = (server_host_url + defaults.storage_login_path); }
+
+        $.ajax({
+            url: login_url,
+            type: 'POST',
+            dataType: 'text',
+            data: login_info,
+            success: function (data) {
+                var match = data.match(/^(login|location):(.+)$/m);
+                if (!match) {
+                    error_alert('Temporary server failure',
+                                'Please try again later.');
+                } else if (match[1] === 'login') {
+                    if (match[2].charAt(0) === "/") {
+                        login_url = server_host_url + match[2];
+                    } else {
+                        login_url = match[2];
+                    }
+                    storage_login(login_info, login_url);
+                } else {
+                    // Browser haz auth cookies, we haz relative location.
+                    // Go there, and machinery will intervene to handle it.
+                    $.mobile.changePage(
+                        set_storage_account(login_info['username'],
+                                            server_host_url,
+                                            match[2]));
+                }},
+
+            error: function (xhr) {
+                $.mobile.hidePageLoadingMsg();
+                error_alert("Storage login", xhr.status); },
+
+        }); }
+
+    function visit_public_share_room(credentials) {
+        /* Visit a specified share room.
+           'credentials': Object including "shareid" and "password" attrs.
+        */
+        $.mobile.changePage(
+            add_public_share_room(credentials.shareid, credentials.password,
+                                  defaults.share_host_url)); }
+
+    function prep_login_form(content_selector, submit_handler, name_field) {
+        /* Instrument form within 'content_selector' to submit with
+           'submit_handler'. 'name_field' is the id of the form field
+           with the login name, "password" is assumed to be the
+           password field id.
+
+           The submit action fades the content and clears the password
+           value, so it can't be reused.
+        */
+        var $content = $(content_selector);
+        var $form = $(content_selector + " form");
+
+        var $esm = $form.find(".error-status-messge");
+        $esm.hide();
+
+        var $name = $('input[name=' + name_field + ']', this);
+        var $remember_widget = $form.find('#remember-me');
+        var name_field_val = pmgr.get(name_field);
+        if (name_field_val
+            && ($remember_widget.length > 0)
+            && ($remember_widget.val() === "on")) {
+            $name.attr('value',name_field_val); }
+
+        $form.submit(function () {
+            var $remember_widget = $form.find('#remember-me');
+            var $name = $('input[name=' + name_field + ']', this);
+            var $password = $('input[name=password]', this);
+            var data = {};
+            data[name_field] = $name.val();
+            if ($remember_widget.length > 0) {
+                // Preserve whether or not we're remembering, so on a
+                // successful visits we'll know whether to preserve data:
+                if ($remember_widget.val() === "on") {
+                    remember_manager.active(true); }
+                else {
+                    remember_manager.active(false); }}
+
+            data['password'] = $password.val();
+            $content.fadeOut(1000, function() { $password.val("");});
+            var unhide_form_oneshot = function(event, data) {
+                $content.show('fast');
+                $.mobile.hidePageLoadingMsg();
+                $(document).unbind("pagechange", unhide_form_oneshot);
+                $(document).unbind("error", unhide_form_oneshot); }
+            $(document).bind("pagechange", unhide_form_oneshot)
+            $(document).bind("error", unhide_form_oneshot)
+            submit_handler(data);
+            return false; }); }
+
                           /* Public interface */
 
     // ("expose" because "public" is reserved in strict mode.)
@@ -1126,12 +1239,9 @@ var spideroak = function () {
             $('#home [data-role="footer"]').hide().fadeIn(2000);
 
             // Equip various login forms with 
-            spideroak.prep_login_form('.nav_login_storage',
-                                      spideroak.storage_login,
-                                      'username');
-            spideroak.prep_login_form('.nav_login_share',
-                                      spideroak.visit_public_share_room,
-                                      'shareid');
+            prep_login_form('.nav_login_storage', storage_login, 'username');
+            prep_login_form('.nav_login_share', visit_public_share_room,
+                            'shareid');
             $('#my_login_username').focus();
 
             my.combo_root_url = defaults.combo_root_url;
@@ -1147,141 +1257,21 @@ var spideroak = function () {
 
             combo_root.visit({}, {}); },
 
-        toString: function () {
-            var user = (my.username ? my.username : "-");
-            var fetched = (content_node_manager.length || "-");
-            return ("SpiderOak instance for "
-                    + user + ", " + fetched + " items fetched"); },
-
-        /* Login and account/identity. */
-
-        prep_login_form: function (content_selector,
-                                   submit_handler, name_field) {
-            /* Instrument form within 'content_selector' to submit with
-               'submit_handler'. 'name_field' is the id of the form field
-               with the login name, "password" is assumed to be the
-               password field id.
-
-               The submit action fades the content and clears the password
-               value, so it can't be reused.
-            */
-            var $content = $(content_selector);
-            var $form = $(content_selector + " form");
-
-            var $esm = $form.find(".error-status-messge");
-            $esm.hide();
-
-            var $name = $('input[name=' + name_field + ']', this);
-            var $remember_widget = $form.find('#remember-me');
-            var name_field_val = pmgr.get(name_field);
-            if (name_field_val
-                && ($remember_widget.length > 0)
-                && ($remember_widget.val() === "on")) {
-                $name.attr('value',name_field_val); }
-
-            $form.submit(function () {
-                var $remember_widget = $form.find('#remember-me');
-                var $name = $('input[name=' + name_field + ']', this);
-                var $password = $('input[name=password]', this);
-                var data = {};
-                data[name_field] = $name.val();
-                if ($remember_widget.length > 0) {
-                    // Preserve whether or not we're remembering, so on a
-                    // successful visits we'll know whether to preserve data:
-                    if ($remember_widget.val() === "on") {
-                        remember_manager.active(true); }
-                    else {
-                        remember_manager.active(false); }}
-
-                data['password'] = $password.val();
-                $content.fadeOut(1000, function() { $password.val("");});
-                var unhide_form_oneshot = function(event, data) {
-                    $content.show('fast');
-                    $.mobile.hidePageLoadingMsg();
-                    $(document).unbind("pagechange", unhide_form_oneshot);
-                    $(document).unbind("error", unhide_form_oneshot); }
-                $(document).bind("pagechange", unhide_form_oneshot)
-                $(document).bind("error", unhide_form_oneshot)
-                submit_handler(data);
-                return false;
-            }); },
-
-        visit_public_share_room: function (credentials) {
-            /* Visit a specified share room.
-               'credentials': Object including "shareid" and "password" attrs.
-            */
-            $.mobile.changePage(
-                add_public_share_room(credentials.shareid, credentials.password,
-                                      defaults.share_host_url)); },
-
-        storage_login: function (login_info, url) {
-            /* Login to storage account and commence browsing at devices.
-               'login_info': An object with "username" and "password" attrs.
-               'url': An optional url, else defaults.storage_login_path is used.
-               We provide for redirection to specific alternative servers
-               by recursive calls. See:
-               https://spideroak.com/apis/partners/web_storage_api#Loggingin
-             */
-            var login_url;
-            var server_host_url;
-            var parsed;
-
-            if (url
-                && (parsed = $.mobile.path.parseUrl(url))
-                && ["http:", "https:"].indexOf(parsed.protocol) !== -1) {
-                server_host_url = parsed.domain;
-                login_url = url; }
-
-            else {
-                server_host_url = defaults.starting_host_url;
-                login_url = (server_host_url + defaults.storage_login_path); }
-
-            $.ajax({
-                url: login_url,
-                type: 'POST',
-                dataType: 'text',
-                data: login_info,
-                success: function (data) {
-                    var match = data.match(/^(login|location):(.+)$/m);
-                    if (!match) {
-                        error_alert('Temporary server failure',
-                                    'Please try again later.');
-                    } else if (match[1] === 'login') {
-                        if (match[2].charAt(0) === "/") {
-                            login_url = server_host_url + match[2];
-                        } else {
-                            login_url = match[2];
-                        }
-                        spideroak.storage_login(login_info, login_url);
-                    } else {
-                        // Browser haz auth cookies, we haz relative location.
-                        // Go there, and machinery will intervene to handle it.
-                        $.mobile.changePage(
-                            set_storage_account(login_info['username'],
-                                                server_host_url,
-                                                match[2]));
-                    }},
-
-                error: function (xhr) {
-                    $.mobile.hidePageLoadingMsg();
-                    error_alert("Storage login", xhr.status); },
-
-            }); },
     }
 
 
                              /* Convenience */
 
     ContentNode.prototype.toString = function () {
-        return "<" + this.emblem + ": " + this.url + ">";
-    }
+        return "<" + this.emblem + ": " + this.url + ">"; }
+
     if (SO_DEBUGGING) {
         // Expose the managers for access while debugging:
         expose.cnmgr = cnmgr;
         expose.pmgr = pmgr; }
 
 
-                            /* Here we are: */
+                            /* Here we go: */
     return expose;
 }();
 
