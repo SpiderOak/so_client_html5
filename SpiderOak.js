@@ -18,7 +18,7 @@
     "pagebeforechange" event. URLs included as href links must start with
     '#' to trigger jQuery Mobile's navigation detection, which by default
     tracks changes to location.hash.  handle_content_visit() dispatches those
-    URLs it receives that reside within the ones on my.content_root_urls,
+    URLs it receives that reside within the ones satisfy .is_content_root_url(),
     to which the root URLs are registered by the root visiting routines.
 
   - My routines which return jQuery objects end in '$', and - following common
@@ -30,8 +30,8 @@ SO_DEBUGGING = true;
 
 var spideroak = function () {
     /* SpiderOak application object, as a modular singleton. */
+    "use strict";               // ECMAScript 5
 
-    "use strict";
 
     /* Private elements: */
 
@@ -363,8 +363,7 @@ var spideroak = function () {
     ContentNode.prototype.visit = function (chngpg_opts, mode_opts) {
         /* Fetch current data from server, provision, layout, and present.
            'chngpg_opts': framework changePage() options,
-           'mode_opts': node provisioning and layout modal settings.
-        */
+           'mode_opts': node provisioning and layout modal settings. */
 
         if (! this.up_to_date()) {
             this.fetch_and_dispatch(chngpg_opts, mode_opts); }
@@ -1211,8 +1210,8 @@ var spideroak = function () {
             */
             $.mobile.changePage(
                 add_public_share_room(credentials.shareid, credentials.password,
-                                      defaults.share_host_url));
-        },
+                                      defaults.share_host_url)); },
+
         storage_login: function (login_info, url) {
             /* Login to storage account and commence browsing at devices.
                'login_info': An object with "username" and "password" attrs.
@@ -1224,15 +1223,17 @@ var spideroak = function () {
             var login_url;
             var server_host_url;
             var parsed;
+
             if (url
                 && (parsed = $.mobile.path.parseUrl(url))
                 && $.inArray(parsed.protocol, ["http:", "https:"])) {
                 server_host_url = parsed.domain;
-                login_url = url;
-            } else {
+                login_url = url; }
+
+            else {
                 server_host_url = defaults.starting_host_url;
-                login_url = (server_host_url + defaults.storage_login_path);
-            }
+                login_url = (server_host_url + defaults.storage_login_path); }
+
             $.ajax({
                 url: login_url,
                 type: 'POST',
@@ -1257,43 +1258,32 @@ var spideroak = function () {
                             set_storage_account(login_info['username'],
                                                 server_host_url,
                                                 match[2]));
-                    }
-                },
+                    }},
+
                 error: function (xhr) {
                     $.mobile.hidePageLoadingMsg();
-                    error_alert("Storage login", xhr.status);
-                },
-            }); },
+                    error_alert("Storage login", xhr.status); },
 
-        // Expose the content node manager for debugging:
-        cnmgr: (SO_DEBUGGING ? cnmgr : null),
-        smgr: (SO_DEBUGGING ? smgr : null),
+            }); },
     }
+
+
+                             /* Convenience */
+
+    ContentNode.prototype.toString = function () {
+        return "<" + this.emblem + ": " + this.url + ">";
+    }
+    if (SO_DEBUGGING) {
+        // Expose the managers for access while debugging:
+        expose.cnmgr = cnmgr;
+        expose.pmgr = pmgr; }
+
+
+                            /* Here we are: */
+    return expose;
 }();
 
 $(document).ready(function () {
-    // XXX We fadeIn the parts, instead of the whole page, to work around a bug.
-    //     The bug, if we do the whole page, makes subsequent transitions flaky
-    //     and puts ghosty (but clickable) home page elements on other pages!
-
-    "use strict";
-
-    $('#home [data-role="content"]').hide().fadeIn(2000);
-    $('#home [data-role="footer"]').hide().fadeIn(2000);
-    $('#my_login_username').focus();
-    spideroak.prep_login_form('.nav_login_storage', spideroak.storage_login,
-                              'username');
-    spideroak.prep_login_form('.nav_login_share',
-                              spideroak.visit_public_share_room,
-                              'shareid');
-
+    "use strict";               // ECMAScript 5
     spideroak.init();
-
-    // Development convenience, so we just return to home page on full document
-    // reload.
-    if (window.location.hash) {
-        window.location.hash = "";
-        $.mobile.changePage(window.location.href.split('#')[0]);
-        window.location.reload();
-    }
 });
