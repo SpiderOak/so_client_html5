@@ -586,7 +586,7 @@ var spideroak = function () {
         mgr.stats = data["stats"]; // TODO: We'll cook stats when UI is ready.
 
         this.subdirs = [];
-        for (var i in data.devices) {
+        for (var i=0; i < data.devices.length; i++) {
             devdata = data.devices[i];
             url = my.storage_root_url + devdata["encoded"]
             dev = mgr.get(url, this)
@@ -606,7 +606,7 @@ var spideroak = function () {
         var url, dir, dirdata, file, filedata;
 
         this.subdirs = [];
-        for (var i in data.dirs) {
+        for (var i=0; i < data.dirs.length; i++) {
             dirdata = data.dirs[i];
             url = this.url + dirdata[1];
             // Get a node for the subdir:
@@ -617,17 +617,17 @@ var spideroak = function () {
                 this.subdirs.push(url); }}
 
         this.files = [];
-        for (var i in data.files) {
+        for (var i=0; i < data.files.length; i++) {
             filedata = data.files[i];
             url = this.url + filedata['url'];
             // Get a node for the file:
             file = mgr.get(url, this);
             var fields = ['name', 'size', 'ctime', 'mtime', 'versions'];
-            for (var nmi in fields) {
+            for (var nmi=0; nmi < fields.length; nmi++) {
                 var name = fields[nmi];
                 if (filedata.hasOwnProperty(name)) {
                     file[name] = filedata[name]; }}
-            for (var szi in defaults.preview_sizes) {
+            for (var szi=0; szi < defaults.preview_sizes.length; szi++) {
                 var sz = "preview_" + defaults.preview_sizes[szi];
                 if (sz in filedata) {
                     file[sz] = filedata[sz]; }}
@@ -842,11 +842,11 @@ var spideroak = function () {
             if (do_filter) { $list.attr('data-filter', 'true'); }
             if (lensubdirs) {
                 divider_prefix = "/";
-                for (var i in this.subdirs) {
+                for (var i=0; i < this.subdirs.length; i++) {
                     insert_subnode(this.subdirs[i]); }}
             if (lenfiles) {
                 divider_prefix = "";
-                for (var i in this.files) {
+                for (var i=0; i < this.files.length; i++) {
                     insert_subnode(this.files[i]); }}
         }
         $page.page();
@@ -1101,7 +1101,8 @@ var spideroak = function () {
                 /* Free node at 'url' and its recursively contained nodes. */
                 var it = this.get(url);
                 var suburls = it.contained_urls();
-                for (var i in suburls) { this.clear_hierarchy(suburls[i]); }
+                for (var i=0; i < suburls.length; i++) {
+                    this.clear_hierarchy(suburls[i]); }
                 this.free(it); },
 
             // Expose the by_url registry when debugging:
