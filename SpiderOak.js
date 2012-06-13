@@ -89,29 +89,44 @@ var spideroak = function () {
 
                       /* Content Root Registration */
 
-    function set_storage_account(username, host, storage_web_url,
-                                 persist_credentials) {
-        /* Register user-specific storage details, returning storage root URL.
-             'username': the account name
-             'host': the server for the account
-             'storage_web_url': the account's web UI entry address.
-             'persist_credentials': if true, preserve username in localStorage.
+    function set_storage_account(username, storage_host, storage_web_url) {
+        /* Register confirmed user-specific storage details.  Return the
+           storage root URL.
+           'username' - the account name
+           'storage_host' - the server for the account
+           'storage_web_url' - the account's web UI entry address
         */
-        my.username = username;
-        if (persist_credentials) { smgr.set('username', username); }
-        my.storage_host = host;
-        var storage_url;
-        storage_url = register_storage_root_url(host
-                                                + defaults.storage_path_prefix
-                                                + b32encode_trim(username)
-                                                + "/");
-        if (! my.personal_shares_root_url) {
-            register_personal_shares_root_url(storage_url); }
+
+        var storage_url = register_storage_root(storage_host, username,
+                                                storage_web_url);
         if (! is_content_root_url(storage_url)) {
             register_content_root_url(storage_url); }
-        my.storage_web_url = storage_web_url;
-        // Now lets direct the caller to the combo root:
+
+        if (remember_manager.active()) {
+            remember_manager.store({username: username,
+                                    storage_host: storage_host,
+                                    storage_web_url: storage_web_url}); }
+
+        // Now let's direct the caller to the combo root:
         return my.combo_root_url; }
+    function clear_storage_account() {
+        /* Obliterate internal settings and all content nodes for a clean slate.
+           All share artifacts, personal and public, are removed, as well
+           as registered storage.  We do not remove persistent settings. */
+
+        // Empty strings instead of null to distinguish from initial settings.
+
+        if (my.personal_shares_root_url) {
+            content_node_manager.clear_hierarchy(my.personal_shares_root_url); }
+        my.personal_shares_root_url = "";
+        if (my.storage_root_url) {
+            content_node_manager.clear_hierarchy(my.storage_root_url); }
+        my.storage_root_url = "";
+
+        my.username = "";
+        my.storage_host = "";
+        my.storage_web_url = ""; }
+
     function add_public_share_room(shareid, password, host) {
         /* Register a public share room in the public share root, returning URL.
              'username': the account name
@@ -907,19 +922,12 @@ var spideroak = function () {
         return $("#" + defaults.content_page_template_id); }
 
 
-                             /* Convenience */
-
-    ContentNode.prototype.toString = function () {
-        return "<" + this.emblem + ": " + this.url + ">";
-    }
-
-
                           /* Resource managers */
 
-    var settings_manager = {
+    var persistence_manager = {
         /* Maintain domain-specific persistent settings, using localStorage.
            - Value structure is maintained using JSON.
-           - Use .get(name) and .set(name, value).
+           - Use .get(name), .set(name, value), and .remove(name).
            - .keys() returns an array of all stored keys.
            - .length returns the number of keys.
          */
@@ -931,21 +939,59 @@ var spideroak = function () {
             return JSON.parse(localStorage.getItem(name)); },
         set: function (name, value) {
             /* Preserve name and value in persistent storage.
-               Return the settings manager, for chaining.
-             */
+               Return the settings manager, for chaining. */
             localStorage.setItem(name, JSON.stringify(value));
-            return settings_manager; },
+            return persistence_manager; },
+        remove: function (name) {
+            /* Delete persistent storage of name. */
+            localStorage.removeItem(name); },
         keys: function () { return Object.keys(localStorage); },
         };
-    settings_manager.__defineGetter__('length',
-                                      function() {
-                                          return localStorage.length; });
-    smgr = settings_manager;    // Alias for convience.
+    // Gratuitous 'persistence_manager.length' getter, for a technical example:
+    persistence_manager.__defineGetter__('length',
+                                         function() {
+                                             return localStorage.length; });
+    var pmgr = persistence_manager;            // Compact name.
 
-    if (SO_DEBUGGING) {
-        var secure_settings_manager = smgr; }
-    else {
-        alert("No secure_settings_manager"); }
+    var remember_manager = {
+        /* Maintain user account info in persistent storage. */
+
+        // "remember_me" field not in fields, so only it is retained when
+        // remembering is disabled:
+        fields: {username: "", storage_host: "", storage_web_url: ""},
+
+        active: function (disposition) {
+            /* Report or set "Remember Me" persistent account info retention.
+               'disposition':
+                 - activate if truthy,
+                 - return status if not passed in, ie undefined,
+                 - deactivate otherwise.
+               Deactivating entails wiping the retained account info settings.
+            */
+            if (disposition) {
+                return persistence_manager.set("remember_me", true); }
+            else if (typeof disposition === "undefined") {
+                return persistence_manager.get("remember_me") || false; }
+            else {
+                for (var key in fields) { persistence_manager.remove(key); }
+                return persistence_manager.set("remember_me", false); }},
+
+        fetch: function () {
+            /* Return remembered account info . */
+            var got = {};
+            for (var key in remember_manager.fields) {
+                got[key] = persistence_manager.get(key); }
+            return got; },
+
+        store: function (obj) {
+            /* Preserve account info, obtaining specific fields from 'obj'.
+               Error is thrown if obj lacks any fields. */
+            for (var key in remember_manager.fields) {
+                if (! obj.hasOwnProperty(key)) {
+                    throw new Error("Missing field: " + key); }
+                persistence_manager.set(key, obj[key]); }},
+    };
+    var remgr = remember_manager;                 // Compact name.
 
     var content_node_manager = function () {
         /* A singleton utility for getting and removing content node objects.
@@ -1004,46 +1050,69 @@ var spideroak = function () {
                     }
                     by_url[url] = got;
                 }
-                return got;
-            },
-            delete: function (node) {
-                /* Remove a content node object, eliminating references
-                   that could be circular and prevent GC. */
-                delete by_url[node.url];
-            },
+                return got; },
+
+            free: function (node) {
+                /* Remove a content node from index and free it for gc. */
+                if (by_url.hasOwnProperty(node.url)) {
+                    delete by_url[node.url]; }
+                node.free(); },
+
+            clear_hierarchy: function (url) {
+                /* Free node at 'url' and its recursively contained nodes. */
+                var it = this.get(url);
+                suburls = it.contained_urls();
+                for (var i in suburls) { this.clear_hierarchy(suburls[i]); }
+                this.free(it); },
+
             // Expose the by_url registry when debugging:
             bu: (SO_DEBUGGING ? by_url : null),
         }
     }()
-    var cnmgr = content_node_manager; // Alias for when short name is needed.
+    var cnmgr = content_node_manager; // Compact name, for convenience.
 
 
-    /* Public interface: */
+                          /* Public interface */
 
-    return {
+    // ("expose" because "public" is reserved in strict mode.)
+    var expose = {
         init: function () {
-            /* Do preliminary setup - event handlers, etc. */
+            /* Do preliminary setup and launch into the combo root. */
 
-            // Setup traversal hook: 
+            // Setup traversal hook:
             establish_traversal_handler();
-            // Get and deploy available credentials:
-            /* XXX With sufficient credentials, we'll do storage_login().
-            *var password;
-            *var username = smgr.get('username');
-            *if (username) {
-            *    password = secure_settings_manager.get([username, 'password']);
-            *    }
-            */
+
+            // Gradual fade-in of everything below the banner:
+            $('#home [data-role="content"]').hide().fadeIn(2000);
+            $('#home [data-role="footer"]').hide().fadeIn(2000);
+
+            // Equip various login forms with 
+            spideroak.prep_login_form('.nav_login_storage',
+                                      spideroak.storage_login,
+                                      'username');
+            spideroak.prep_login_form('.nav_login_share',
+                                      spideroak.visit_public_share_room,
+                                      'shareid');
+            $('#my_login_username').focus();
+
             my.combo_root_url = defaults.combo_root_url;
             var combo_root = content_node_manager.get(my.combo_root_url, null);
-            combo_root.visit();
-        },
+
+            // Collect persistent settings
+            if (remember_manager.active()) {
+                var settings = remember_manager.fetch();
+                if (settings.username && settings.storage_host) {
+                    set_storage_account(settings.username,
+                                        settings.storage_host,
+                                        settings.storage_web_url); }}
+
+            combo_root.visit({}, {}); },
+
         toString: function () {
             var user = (my.username ? my.username : "-");
             var fetched = (content_node_manager.length || "-");
             return ("SpiderOak instance for "
-                    + user + ", " + fetched + " items fetched");
-        },
+                    + user + ", " + fetched + " items fetched"); },
 
         /* Login and account/identity. */
 
@@ -1059,11 +1128,32 @@ var spideroak = function () {
             */
             var $content = $(content_selector);
             var $form = $(content_selector + " form");
+
+            var $esm = $form.find(".error-status-messge");
+            $esm.hide();
+
+            var $name = $('input[name=' + name_field + ']', this);
+            var $remember_widget = $form.find('#remember-me');
+            var name_field_val = pmgr.get(name_field);
+            if (name_field_val
+                && ($remember_widget.length > 0)
+                && ($remember_widget.val() === "on")) {
+                $name.attr('value',name_field_val); }
+
             $form.submit(function () {
-                var $password = $('input[name=password]', this);
+                var $remember_widget = $form.find('#remember-me');
                 var $name = $('input[name=' + name_field + ']', this);
+                var $password = $('input[name=password]', this);
                 var data = {};
                 data[name_field] = $name.val();
+                if ($remember_widget.length > 0) {
+                    // Preserve whether or not we're remembering, so on a
+                    // successful visits we'll know whether to preserve data:
+                    if ($remember_widget.val() === "on") {
+                        remember_manager.active(true); }
+                    else {
+                        remember_manager.active(false); }}
+
                 data['password'] = $password.val();
                 $content.fadeOut(1000, function() { $password.val("");});
                 var unhide_form_oneshot = function(event, data) {
@@ -1075,8 +1165,7 @@ var spideroak = function () {
                 $(document).bind("error", unhide_form_oneshot)
                 submit_handler(data);
                 return false;
-            })
-        },
+            }); },
 
         visit_public_share_room: function (credentials) {
             /* Visit a specified share room.
