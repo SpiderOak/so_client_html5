@@ -262,8 +262,9 @@ var spideroak = function () {
             this.icon_path = ""; }}
     ContentNode.prototype.free = function () {
         /* Free composite content to make available for garbage collection. */
-        this.$page.remove();
-        this.$page = null; }
+        if (this.$page) {
+            this.$page.remove(); 
+            this.$page = null; }}
 
     function StorageNode(url, parent) {
         ContentNode.call(this, url, parent);
