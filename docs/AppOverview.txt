@@ -89,10 +89,15 @@ Currently implemented modes include:
   $.mobile.changePage(). Useful for page updates in the background, or for
   the `RootContentNode` composite page, which is informed by combined subnode
   updates.
-* `notify`: report visit data-fetch success or failure using a provided
-  callback and token. The report includes the token and, on success, the
-  listview of the assimilated data, or on failure, the failure message.
+* `notify_callback`: report visit success or failure to this callback.
+  The callback requires: the visit success (true or false), the
+  accompanying value of `notify_token`, and on success, the jQuery DOM of
+  the presented data or, on failure, the xhr result object.
+* `notify_token`: transaction token to be passed to `notify_callback`
 * `refresh`: refetch the data for the node.
+
+=== Application Entry/Init ===
+This needs to be filled in.
 
 === Storage and Share Rooms ===
 Content urls are recognized by virtue of beginning with one of the
