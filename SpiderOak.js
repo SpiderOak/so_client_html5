@@ -593,7 +593,7 @@ var spideroak = function () {
             dev.name = devdata["name"];
             dev.lastlogin = devdata["lastlogin"];
             dev.lastcommit = devdata["lastcommit"];
-            if (! ($.inArray(url, this.subdirs) >= 0)) {
+            if (this.subdirs.indexOf(url) === -1) {
                 this.subdirs.push(url);
             }
         }
@@ -613,7 +613,7 @@ var spideroak = function () {
             dir = mgr.get(url, this)
             dir.name = dirdata[0];
             // Include, if not already present:
-            if (! ($.inArray(url, this.subdirs) >= 0)) {
+            if (this.subdirs.indexOf(url) === -1) {
                 this.subdirs.push(url); }}
 
         this.files = [];
@@ -632,7 +632,7 @@ var spideroak = function () {
                 if (sz in filedata) {
                     file[sz] = filedata[sz]; }}
             // Include, if not already present:
-            if (! ($.inArray(url, this.files) >= 0)) {
+            if (this.files.indexOf(url) === -1) {
                 this.files.push(url); }}
 
         this.lastfetched = when; }
@@ -1228,7 +1228,7 @@ var spideroak = function () {
 
             if (url
                 && (parsed = $.mobile.path.parseUrl(url))
-                && $.inArray(parsed.protocol, ["http:", "https:"])) {
+                && ["http:", "https:"].indexOf(parsed.protocol) !== -1) {
                 server_host_url = parsed.domain;
                 login_url = url; }
 
