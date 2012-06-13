@@ -1285,5 +1285,13 @@ var spideroak = function () {
 
 $(document).ready(function () {
     "use strict";               // ECMAScript 5
+
+    // Development convenience: Go back to start page on full document reload.
+    // All the internal application state is gone, anyway.
+    if (window.location.hash) {
+        window.location.hash = "";
+        $.mobile.changePage(window.location.href.split('#')[0]);
+        window.location.reload(); }
+
     spideroak.init();
 });
