@@ -368,61 +368,60 @@ var spideroak = function () {
         // See docs/AppOverview.txt "Content Node navigation modes" for
         // details about mode controls.
 
-        try {
+        if (! my.storage_root_url) {
+            // No storge root - not enough info to try authenticating:
+            this.authenticated(false);
+            this.show(chngpg_opts, mode_opts); }
+        else {
             var storage_root = content_node_manager.get(my.storage_root_url);
-            var notify_equipment = [this.notify_visit_status,
-                                    '.storage-contents'];
-            storage_root.visit(chngpg_opts,
-                               $.extend({passive: true,
-                                         notify: notify_equipment})); }
-        finally {
-            // XXX These failsafes should be in error handlers:
-            this.authentication_challenge(true, 'Unknown', "System error"); }
-        // XXX Populate the familiar public share rooms.
-        // XXX Provide public share edit and "+" add controls - somewhere.
-    }
+            $.extend({passive: true,
+                      notify_callback: this.notify_subvisit_status,
+                      notify_token: 'storage'}, mode_opts);
+            try {
+                // Will chain via notify_callback:
+                storage_root.visit(chngpg_opts, mode_opts); }
+            catch (err) {
+                // XXX These failsafes should be in error handlers:
+                this.authenticated(false,
+                                   {status: 0, statusText: "System error"},
+                                   err); }
+            // XXX Populate the familiar public share rooms.
+            // XXX Provide public share edit and "+" add controls - somewhere.
+            }}
 
-    RootContentNode.prototype.notify_visit_status = function(status,
-                                                             token,
-                                                             content) {
-        /* Callback passed to content nodes to signal their update conclusion.
-           'status': true for success, false for failure.
-           'content': for success: the jquery $(dom) for the populated content, 
-                      for failure: error description text. */
+    RootContentNode.prototype.notify_subvisit_status = function(succeeded,
+                                                                token,
+                                                                content) {
+        /* Callback passed to subordinate root content nodes to signal their
+           update disposition:
+           'succeeded': true for success, false for failure.
+           'token': token they were passed to identify the transaction,
+           'content': on success: the jquery $(dom) for the populated content,
+                      for failure: the resulting XHR object. */
         $.mobile.hidePageLoadingMsg();
         var $page = this.my_page$();
         if (! status) {
-            // XXX present something that conveys the error.
-            this.authentication_challenge(true, content); }
+            this.authenticated(false, xhr); }
         else {
-            var $section = $page.find(token);
+            this.authenticated(true);
+            var section_class = ((token === 'storage')
+                                 ? ".storage-contents"
+                                 : ".personal-share-contents");
+            var $section = $page.find(section_class);
+            // Inject the duplicated content and show it:
+            $section.fadeOut('fast');
             $section.empty();
             $section.append(content);
-            $('.nav_login_storage').fadeIn();
-            if (token === '.storage-contents') {
+            $section.fadeIn('fast');
+            if (token === 'storage') {
+                // Continue chaining to PersonalShareRoomNode:
+                $.extend({notify_callback: this.notify_subvisit_status,
+                          notify_token: 'personal-share'},
+                         mode_opts)
+                $('.nav_login_storage').fadeIn();
+                this.authenticated(true, content);
                 var psroot = cnmgr.get(my.personal_shares_root_url);
-                var notify_equipment = [this.notify_visit_status,
-                                        '.personal-share-contents'];
-                storage_root.visit(chngpg_opts,
-                                   {passive: true, notify: notify_equipment}); }
-            this.authentication_challenge(false); }
-    }
-    // XXX Eventually, every node type will have .authentication_challenge()
-    RootContentNode.prototype.authentication_challenge = function (activate,
-                                                                   message) {
-        /* Activate or deactivate presenting login instead of content.
-           'activate': true means present login, false means present content.
-           'message': description of condition requiring login.
-         */
-        var $page = this.my_page$();
-        if (activate) {
-            $('.nav_login_storage').hide();
-            $page.find('.login-section').fadeIn('slow');
-            // XXX Indicate the situation in the form.
-        }
-        else {
-            $page.find('.login-section').hide(0);
-            $('.nav_login_storage').fadeIn('slow'); }
+                storage_root.visit(chngpg_opts, mode_opts); }}
     }
     ContentNode.prototype.handle_visit_success = function (data, when,
                                                            chngpg_opts,
@@ -438,18 +437,71 @@ var spideroak = function () {
             var notify_token = mode_opts.notify[1];
             notify_callback(this.my_contents_listview$(), notify_token); }}
 
-    ContentNode.prototype.handle_visit_failure = function (xhr, status,
+    ContentNode.prototype.handle_visit_failure = function (xhr,
                                                            chngpg_opts,
                                                            mode_opts,
                                                            exception) {
         /* Do failed visit error handling with 'xhr' XMLHttpResponse report. */
-
+        // Currently, defer to the ComboRootNode visit failure routine:
         var combo_root = content_node_manager.get(my.combo_root_url);
-        combo_root.authentication_challenge(true, xhr.statusText);
-        alert("Failure reaching " + this.url, xhr.statusText);
-        // XXX Eventually, present the challenge in place.
-        $.mobile.changePage(window.location.href.split('#')[0]); }
+        combo_root.handle_visit_failure(xhr, chngpg_opts, mode_opts,
+                                        exception); }
+    RootContentNode.prototype.handle_visit_failure = function (xhr,
+                                                               chngpg_opts,
+                                                               mode_opts,
+                                                               exception) {
+        /* Do failed visit error handling with 'xhr' XMLHttpResponse report. */
+        this.authenticated(false, xhr, exception); }
 
+    RootContentNode.prototype.authenticated = function (succeeded, content,
+                                                        exception) {
+        /* Present login challenge versus content, depending on access success.
+           'succeeded': true for success, false for failure.
+           'content': on success: the jquery $(dom) for the populated content,
+                      for failure: the resulting XHR object, if any.
+           'exception': on failure, exception caught by ajax machinery, if any.
+         */
+        var $page = this.my_page$();
+        var $content_section = $page.find('.my-content-section');
+        var $login_section = $page.find('.login-section');
+        if (succeeded) {
+            $login_section.hide(0);
+            $content_section.fadeIn('fast');
+            if (remember_manager.active()) {
+                // remember_manager will store just the relevant fields.
+                remember_manager.store(my); }}
+        else {
+            // Include the xhr.statusText in the form.
+            var $status = $page.find('error-status-message');
+            if (content) {
+                var error_message = content.statusText;
+                if (exception) {
+                    error_message += " - " + exception.message; }
+                $status.text(error_message);
+                $status.show();
+                if (content.status === 401) {
+                    // Unauthorized - expunge all privileged info:
+                    clear_storage_account(); }}
+            else { $status.hide(); }
+            // Hide the storage and personal shares sections
+            $content_section.hide();
+            // Show the form
+            $login_section.fadeIn('fast'); }}
+
+
+                             /* Containment */
+
+    ContentNode.prototype.contained_urls = function () {
+        return this.subdirs.concat(this.files); }
+    RootContentNode.prototype.contained_urls = function () {
+        return this.storage_devices.concat(this.personal_shares,
+                                           this.public_shares); }
+    RootStorageNode.prototype.contained_urls = function () {
+        return this.subdirs.concat([]); }
+    FileStorageNode.prototype.contained_urls = function () {
+        return []; }
+    FileShareRoomNode.prototype.contained_urls = function () {
+        return []; }
 
        /* "Provisioning": Data model assimilation of fetched data */
 
@@ -842,6 +894,12 @@ var spideroak = function () {
             // Include our page in the DOM, after the storage page template:
             $template.after(this.my_page$()); }
         return this.$page; }
+    RootContentNode.prototype.my_page$ = function () {
+        /* Return the special case of the root content nodes actual page. */
+        return (this.$page
+                ? this.$page
+                : (this.$page = $(this.my_page_id()))); }
+
     ContentNode.prototype.my_contents_listview$ = function () {
         /* Return this node's jQuery contents litview object. */
         return this.my_page$().find('[data-role="listview"]'); }
