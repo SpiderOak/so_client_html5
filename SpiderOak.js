@@ -41,7 +41,7 @@ var spideroak = function () {
         /* Settings not specific to a particular login session: */
         // API v1.
         // XXX starting_host_url may vary according to brand package.
-        combo_root_url: "home",
+        combo_root_url: "https://home",
         starting_host_url: "https://spideroak.com",
         share_host_url: "https://spideroak.com",
         storage_login_path: "/browse/login",
@@ -784,7 +784,9 @@ var spideroak = function () {
         /* Fill in typical values for header fields of .my_page$(). */
         StorageNode.prototype.layout_header.call(this, mode_opts);
         this.layout_header_fields({'title': "Storage Devices",
-                                   'left_label': "Home", 'left_url': "-"}); }
+                                   'left_label': "Home",
+                                   // XXX use from the combo-root, instead:
+                                   'left_url': "#https://home"}); }
 
     ShareRoomNode.prototype.layout_header = function(mode_opts) {
         /* Fill in header fields of .my_page$(). */
