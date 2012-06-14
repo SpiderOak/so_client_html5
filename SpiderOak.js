@@ -786,7 +786,7 @@ var spideroak = function () {
         this.layout_header_fields({'title': "Storage Devices",
                                    'left_label': "Home",
                                    // XXX use from the combo-root, instead:
-                                   'left_url': "#https://home"}); }
+                                   'left_url': "#" + this.parent_url}); }
 
     ShareRoomNode.prototype.layout_header = function(mode_opts) {
         /* Fill in header fields of .my_page$(). */
