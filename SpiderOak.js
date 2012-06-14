@@ -863,8 +863,8 @@ var spideroak = function () {
         }
         $page.page();
         $list.listview("refresh");
-        return $page;
-    }
+        return $page; }
+
     FolderContentNode.prototype.layout_item$ = function(mode_opts) {
         /* Return a folder-like content item's description as jQuery item. */
         var $href = $('<a/>').attr('class', "compact-vertical");
@@ -1024,7 +1024,8 @@ var spideroak = function () {
                 return persistence_manager.get("remember_me") || false; }
             else {
                 for (var key in remember_manager.fields) {
-                    persistence_manager.remove(key); }
+                    if (remember_manager.fields.hasOwnProperty(key)) {
+                        persistence_manager.remove(key); }}
                 return persistence_manager.set("remember_me", false); }},
 
         fetch: function () {
@@ -1038,9 +1039,10 @@ var spideroak = function () {
             /* Preserve account info, obtaining specific fields from 'obj'.
                Error is thrown if obj lacks any fields. */
             for (var key in remember_manager.fields) {
-                if (! obj.hasOwnProperty(key)) {
-                    throw new Error("Missing field: " + key); }
-                persistence_manager.set(key, obj[key]); }},
+                if (remember_manager.fields.hasOwnProperty(key)) {
+                    if (! obj.hasOwnProperty(key)) {
+                        throw new Error("Missing field: " + key); }
+                    persistence_manager.set(key, obj[key]); }}},
     };
     var remgr = remember_manager;                 // Compact name.
 
@@ -1255,8 +1257,8 @@ var spideroak = function () {
 
                           /* Public interface */
 
-    // ("expose" because "public" is reserved in strict mode.)
-    var expose = {
+    // ("public_interface" because "public" is reserved in strict mode.)
+    var public_interface = {
         init: function () {
             /* Do preliminary setup and launch into the combo root. */
 
@@ -1296,12 +1298,12 @@ var spideroak = function () {
 
     if (SO_DEBUGGING) {
         // Expose the managers for access while debugging:
-        expose.cnmgr = cnmgr;
-        expose.pmgr = pmgr; }
+        public_interface.cnmgr = cnmgr;
+        public_interface.pmgr = pmgr; }
 
 
                             /* Here we go: */
-    return expose;
+    return public_interface;
 }();
 
 $(document).ready(function () {
