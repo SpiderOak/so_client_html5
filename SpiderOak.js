@@ -417,10 +417,12 @@ var spideroak = function () {
         // See docs/AppOverview.txt "Content Node navigation modes" for
         // details about mode controls.
 
+        this.veil(true);
+
         if (! my.storage_root_url) {
             // No storge root - not enough info to try authenticating:
             this.authenticated(false);
-            this.show(chngpg_opts, mode_opts); }
+            this.show(chngpg_opts, {}); }
         else {
             var storage_root = content_node_manager.get(my.storage_root_url);
             var our_mode_opts = {passive: true,
@@ -461,7 +463,8 @@ var spideroak = function () {
         $.mobile.hidePageLoadingMsg();
         var $page = this.my_page$();
         if (! succeeded) {
-            this.authenticated(false, content); }
+            this.authenticated(false, content);
+            this.show({}, {}); }
         else {
             var $leader = $page.find((token === 'storage')
                                      ? "#my-storage-leader"
@@ -471,6 +474,7 @@ var spideroak = function () {
             $leader.next().replaceWith(content.children());
             $leader.parent().hide().fadeIn('fast');
             if (token === 'storage') {
+                this.show({}, {});
                 // Continue chaining to PersonalShareRoomNode:
                 var our_mode_opts = {passive: true, // Already has passive, but.
                                      notify_callback:
@@ -532,7 +536,7 @@ var spideroak = function () {
                 remember_manager.store(my); }}
         else {
             // Include the xhr.statusText in the form.
-            adjust_selection_disclosure('#home [data-role="content"]', true);
+            this.veil(false);
             var $status = $page.find('.error-status-message');
             if (content) {
                 var error_message = content.statusText;
@@ -1192,13 +1196,15 @@ var spideroak = function () {
             add_public_share_room(credentials.shareid, credentials.password,
                                   defaults.share_host_url)); }
 
-    function adjust_selection_disclosure(selector, state) {
-        /* Adjust visibility of 'selector' dom element according to 'state'.
-           'state': true, reveal slowly; false, hide immediately. */
-        if (! state) {
+    RootContentNode.prototype.veil = function (conceal) {
+        /* If 'conceal' is true, conceal our baudy body.  Otherwise, gradually
+           reveal and position the cursor in the username field. */
+        var selector = '#home [data-role="content"]';
+        if (conceal) {
             $(selector).hide(0); }
         else {
-            $(selector).fadeIn(2000); }}
+            $(selector).fadeIn(2000, function () {
+                $('#my_login_username').focus(); }); }}
 
     function prep_login_form(content_selector, submit_handler, name_field) {
         /* Instrument form within 'content_selector' to submit with
@@ -1267,18 +1273,14 @@ var spideroak = function () {
             // Setup traversal hook:
             establish_traversal_handler();
 
-            // Gradual fade-in of everything below the banner:
-            adjust_selection_disclosure('#home [data-role="content"]', false);
-            adjust_selection_disclosure('#home [data-role="footer"]', false);
-
             // Equip various login forms with 
             prep_login_form('.nav_login_storage', storage_login, 'username');
-            prep_login_form('.nav_login_share', visit_public_share_room,
-                            'shareid');
-            $('#my_login_username').focus();
 
             my.combo_root_url = defaults.combo_root_url;
             var combo_root = content_node_manager.get(my.combo_root_url, null);
+
+            // Hide everything below the banner, for later veil:
+            combo_root.veil(false);
 
             // Collect persistent settings
             if (remember_manager.active()) {
