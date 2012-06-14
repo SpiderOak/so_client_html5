@@ -1290,7 +1290,7 @@ var spideroak = function () {
                                         settings.storage_host,
                                         settings.storage_web_url); }}
 
-            combo_root.visit({}, {}); },
+            $.mobile.changePage(combo_root.url); },
 
     }
 
@@ -1317,8 +1317,7 @@ $(document).ready(function () {
     // All the internal application state is gone, anyway.
     if (window.location.hash) {
         window.location.hash = "";
-        $.mobile.changePage(window.location.href.split('#')[0]);
-        window.location.reload(); }
+        $.mobile.changePage(window.location.href.split('#')[0]); }
 
     spideroak.init();
 });
