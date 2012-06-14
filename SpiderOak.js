@@ -423,12 +423,14 @@ var spideroak = function () {
             this.show(chngpg_opts, mode_opts); }
         else {
             var storage_root = content_node_manager.get(my.storage_root_url);
-            $.extend({passive: true,
-                      notify_callback: this.notify_subvisit_status,
-                      notify_token: 'storage'}, mode_opts);
+            var our_mode_opts = {passive: true,
+                                 notify_callback:
+                                     this.notify_subvisit_status.bind(this),
+                                 notify_token: 'storage'};
+            $.extend(our_mode_opts, mode_opts);
             try {
                 // Will chain via notify_callback:
-                storage_root.visit(chngpg_opts, mode_opts); }
+                storage_root.visit(chngpg_opts, our_mode_opts); }
             catch (err) {
                 // XXX These failsafes should be in error handlers:
                 this.authenticated(false,
@@ -447,30 +449,37 @@ var spideroak = function () {
            'token': token they were passed to identify the transaction,
            'content': on success: the jquery $(dom) for the populated content,
                       for failure: the resulting XHR object. */
+        function remove_contents($item) {
+            /* Remove this '$item' and subsequent until one that has
+               class "section-trailer". */
+            // Remove tail before current.
+            if ($item.attr('class') === "section-trailer") { return; }
+            remove_contents($item.next());
+            $item.remove(); }
+        this.authenticated(true);
+
         $.mobile.hidePageLoadingMsg();
         var $page = this.my_page$();
-        if (! status) {
-            this.authenticated(false, xhr); }
+        if (! succeeded) {
+            this.authenticated(false, content); }
         else {
-            this.authenticated(true);
-            var section_class = ((token === 'storage')
-                                 ? ".storage-contents"
-                                 : ".personal-share-contents");
-            var $section = $page.find(section_class);
+            var $leader = $page.find((token === 'storage')
+                                     ? "#my-storage-leader"
+                                     : "#my-rooms-leader");
             // Inject the duplicated content and show it:
-            $section.fadeOut('fast');
-            $section.empty();
-            $section.append(content);
-            $section.fadeIn('fast');
+            remove_contents($leader.next().next())
+            $leader.next().replaceWith(content.children());
+            $leader.parent().hide().fadeIn('fast');
             if (token === 'storage') {
                 // Continue chaining to PersonalShareRoomNode:
-                $.extend({notify_callback: this.notify_subvisit_status,
-                          notify_token: 'personal-share'},
-                         mode_opts)
+                var our_mode_opts = {passive: true, // Already has passive, but.
+                                     notify_callback:
+                                       this.notify_subvisit_status.bind(this),
+                                     notify_token: 'personal-share'};
                 $('.nav_login_storage').fadeIn();
                 this.authenticated(true, content);
-                var psroot = cnmgr.get(my.personal_shares_root_url);
-                storage_root.visit(chngpg_opts, mode_opts); }}
+                var ps_root = cnmgr.get(my.personal_shares_root_url);
+                ps_root.visit({}, our_mode_opts); }}
     }
     ContentNode.prototype.handle_visit_success = function (data, when,
                                                            chngpg_opts,
@@ -481,10 +490,11 @@ var spideroak = function () {
         this.provision(data, when, mode_opts);
         this.layout(mode_opts);
         this.show(chngpg_opts, mode_opts);
-        if (mode_opts.notify) {
-            var notify_callback = mode_opts.notify[0];
-            var notify_token = mode_opts.notify[1];
-            notify_callback(this.my_contents_listview$(), notify_token); }}
+        if (mode_opts.notify_callback) {
+            var cloned_listview = this.my_contents_listview$().clone(true);
+            mode_opts.notify_callback(true,
+                                      mode_opts.notify_token,
+                                      cloned_listview); }}
 
     ContentNode.prototype.handle_visit_failure = function (xhr,
                                                            chngpg_opts,
@@ -493,8 +503,9 @@ var spideroak = function () {
         /* Do failed visit error handling with 'xhr' XMLHttpResponse report. */
         // Currently, defer to the ComboRootNode visit failure routine:
         var combo_root = content_node_manager.get(my.combo_root_url);
-        combo_root.handle_visit_failure(xhr, chngpg_opts, mode_opts,
-                                        exception); }
+        if (mode_opts.notify_callback) {
+            mode_opts.notify_callback(false, mode_opts.notify_token, xhr); }}
+
     RootContentNode.prototype.handle_visit_failure = function (xhr,
                                                                chngpg_opts,
                                                                mode_opts,
