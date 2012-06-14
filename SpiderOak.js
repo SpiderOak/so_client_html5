@@ -532,7 +532,8 @@ var spideroak = function () {
                 remember_manager.store(my); }}
         else {
             // Include the xhr.statusText in the form.
-            var $status = $page.find('error-status-message');
+            adjust_selection_disclosure('#home [data-role="content"]', true);
+            var $status = $page.find('.error-status-message');
             if (content) {
                 var error_message = content.statusText;
                 if (exception) {
@@ -962,7 +963,7 @@ var spideroak = function () {
         /* Return the special case of the root content nodes actual page. */
         return (this.$page
                 ? this.$page
-                : (this.$page = $(this.my_page_id()))); }
+                : (this.$page = $("#" + this.my_page_id()))); }
 
     ContentNode.prototype.my_contents_listview$ = function () {
         /* Return this node's jQuery contents litview object. */
@@ -1187,6 +1188,14 @@ var spideroak = function () {
             add_public_share_room(credentials.shareid, credentials.password,
                                   defaults.share_host_url)); }
 
+    function adjust_selection_disclosure(selector, state) {
+        /* Adjust visibility of 'selector' dom element according to 'state'.
+           'state': true, reveal slowly; false, hide immediately. */
+        if (! state) {
+            $(selector).hide(0); }
+        else {
+            $(selector).fadeIn(2000); }}
+
     function prep_login_form(content_selector, submit_handler, name_field) {
         /* Instrument form within 'content_selector' to submit with
            'submit_handler'. 'name_field' is the id of the form field
@@ -1199,11 +1208,19 @@ var spideroak = function () {
         var $content = $(content_selector);
         var $form = $(content_selector + " form");
 
-        var $esm = $form.find(".error-status-messge");
+        var $esm = $form.find(".error-status-message");
         $esm.hide();
 
         var $name = $('input[name=' + name_field + ']', this);
         var $remember_widget = $form.find('#remember-me');
+        var remembering = remgr.active();
+        if (remembering && ($remember_widget.val() !== "on")) {
+            $remember_widget.find('option[value="on"]').attr('selected',
+                                                             'selected');
+            $remember_widget.val("on");
+            // I believe the reason we need to also .change() is because
+            // the presented slider is just tracking the actual select widget.
+            $remember_widget.trigger('change'); }
         var name_field_val = pmgr.get(name_field);
         if (name_field_val
             && ($remember_widget.length > 0)
@@ -1247,8 +1264,8 @@ var spideroak = function () {
             establish_traversal_handler();
 
             // Gradual fade-in of everything below the banner:
-            $('#home [data-role="content"]').hide().fadeIn(2000);
-            $('#home [data-role="footer"]').hide().fadeIn(2000);
+            adjust_selection_disclosure('#home [data-role="content"]', false);
+            adjust_selection_disclosure('#home [data-role="footer"]', false);
 
             // Equip various login forms with 
             prep_login_form('.nav_login_storage', storage_login, 'username');

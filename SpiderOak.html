@@ -20,11 +20,13 @@
 
   <div data-role="page" id="home" data-theme="a">
     <div data-role="header">
+      <a data-role="button" data-icon="delete" data-iconpos="notext"
+         data-theme="c" href="#logout">Logout</a>
       <div align="center">
         <img src="brand_images/named_logo.png" alt="Logo">
       </div>
     </div>
-    <div class="nav_login_storage login-section" data-role="content">
+    <div class="nav_login_storage" data-role="content">
       <div class="login-section">
         <form method="POST" id="root-login-form" class="login-form">
           <ul data-role="listview" class="roots">
@@ -72,38 +74,37 @@
             </div>
           </fieldset>
         </form>
-       </div>
-       <div class="my-content-section">
-         <ul data-role="listview">
-           <li data-role="list-divider" id="my-storage-leader">
-             My Storage
-           </li>
-           <div class="storage-contents">
-             <li align="center">
-               <em> <small> Empty / Fetching... </small> </em>
-             </li>
-           </div>
-           <li data-role="list-divider" id="my-rooms-leader">
-             My Share Rooms
-           </li>
-           <div class="personal-shareroom-contents">
-             <li align="center">
-               <em> <small> Empty / Fetching... </small> </em>
-             </li>
-           </div>
-           <li data-role="list-divider" id="public-rooms-leader">
-               Public Share Rooms
-           </li>
-           <div class="public-content-section">
-             <div class="personal-shares-contents">
-               <li align="center">
-                 <em> <small> Empty / Fetching... </small> </em>
-               </li>
-             </div>
-           </div>
-         </ul>
-       </div>
-      </ul>
+      </div>
+      <div class="content-section">
+        <ul data-role="listview" class="my-content-section">
+          <li data-role="list-divider" data-inset="true"
+              id="my-storage-leader">
+            My Storage
+          </li>
+          <li align="center">
+            <p> <em> Empty / Fetching... </em> </p>
+          </li>
+          <div class="section-trailer"> &nbsp; </div>
+        </ul>
+        <ul data-role="listview" class="my-content-section">
+          <li data-role="list-divider" id="my-rooms-leader">
+            My Share Rooms
+          </li>
+          <li align="center">
+            <p> <em> Empty / Fetching... </em> </p>
+          </li>
+          <div class="section-trailer"> &nbsp; </div>
+        </ul>
+        <ul data-role="listview" class="public-content-section">
+          <li data-role="list-divider" id="public-rooms-leader">
+            Public Share Rooms
+          </li>
+          <li align="center">
+            <p> <em> ... </em> </p>
+          </li>
+          <div class="section-trailer"> &nbsp; </div>
+        </ul>
+      </div>
     </div>
     <div data-role="footer" data-position="fixed" data-theme="a">
       <div data-role="navbar">
