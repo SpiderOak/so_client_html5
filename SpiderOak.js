@@ -263,7 +263,7 @@ var spideroak = function () {
     ContentNode.prototype.free = function () {
         /* Free composite content to make available for garbage collection. */
         if (this.$page) {
-            this.$page.remove(); 
+            this.$page.remove();
             this.$page = null; }}
 
     function StorageNode(url, parent) {
@@ -291,6 +291,14 @@ var spideroak = function () {
         this.personal_shares = [];
         this.public_shares = []; }
     RootContentNode.prototype = new ContentNode();
+    RootContentNode.prototype.free = function () {
+        /* Free composite content to make available for garbage collection. */
+        if (this.$page) {
+            // Do not .remove() the page - it's the original, not a clone.
+            this.$page = null; }}
+    RootContentNode.prototype.loggedin_ish = function () {
+        /* True if we have enough info to be able to use session credentials. */
+        return (my.username && true); }
 
     function RootStorageNode(url, parent) {
         StorageNode.call(this, url, parent);
@@ -505,7 +513,7 @@ var spideroak = function () {
                                                            exception) {
         /* Do failed visit error handling with 'xhr' XMLHttpResponse report. */
         // Currently, defer to the ComboRootNode visit failure routine:
-        var combo_root = content_node_manager.get(my.combo_root_url);
+        var combo_root = content_node_manager.get_combo_root();
         if (mode_opts.notify_callback) {
             mode_opts.notify_callback(false, mode_opts.notify_token, xhr); }}
 
@@ -1083,6 +1091,9 @@ var spideroak = function () {
 
         /* Public */
         return {
+            get_combo_root: function () {
+                return this.get(my.combo_root_url, null); },
+
             get: function (url, parent) {
                 /* Retrieve a node according to 'url'.
                    'parent' is required for production of new nodes,
