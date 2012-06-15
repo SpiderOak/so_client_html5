@@ -41,10 +41,11 @@ var spideroak = function () {
         /* Settings not specific to a particular login session: */
         // API v1.
         // XXX starting_host_url may vary according to brand package.
-        combo_root_url: "https://home",
         starting_host_url: "https://spideroak.com",
         share_host_url: "https://spideroak.com",
+        combo_root_url: "https://home",
         storage_login_path: "/browse/login",
+        storage_logout_suffix: "logout",
         storage_path_prefix: "/storage/",
         personal_share_path_suffix: "shares",
         public_shares_path_suffix: "/share/",
@@ -122,6 +123,8 @@ var spideroak = function () {
         if (my.storage_root_url) {
             content_node_manager.clear_hierarchy(my.storage_root_url); }
         my.storage_root_url = "";
+
+        content_node_manager.free(content_node_manager.get_combo_root());
 
         my.username = "";
         my.storage_host = "";
@@ -426,8 +429,10 @@ var spideroak = function () {
 
         this.veil(true);
 
-        if (! my.storage_root_url) {
-            // No storge root - not enough info to try authenticating:
+        this.layout_header();
+
+        if (! this.loggedin_ish()) {
+            // Not enough registered info to try authenticating:
             this.authenticated(false);
             this.show(chngpg_opts, {}); }
         else {
@@ -458,6 +463,7 @@ var spideroak = function () {
            'token': token they were passed to identify the transaction,
            'content': on success: the jquery $(dom) for the populated content,
                       for failure: the resulting XHR object. */
+
         function remove_contents($item) {
             /* Remove this '$item' and subsequent until one that has
                class "section-trailer". */
@@ -465,21 +471,32 @@ var spideroak = function () {
             if ($item.attr('class') === "section-trailer") { return; }
             remove_contents($item.next());
             $item.remove(); }
+
+        function replace_following_items($leader, $replacements) {
+            /* Replace items following '$leader' with '$replacments'.
+               We replace items until the one with class "section-trailer". */
+            remove_contents($leader.next().next());
+            $leader.next().replaceWith($replacements);
+            $leader.parent().hide().fadeIn('fast'); }
+
         this.authenticated(true);
 
         $.mobile.hidePageLoadingMsg();
         var $page = this.my_page$();
+        var $leader = $page.find((token === 'storage')
+                                 ? "#my-storage-leader"
+                                 : "#my-rooms-leader");
         if (! succeeded) {
-            this.authenticated(false, content);
-            this.show({}, {}); }
+            replace_following_items($leader,
+                                    $('<li/>').html('<p> <em>'
+                                                    + content.statusText
+                                                    + '</em> </p>'));
+            if (token === "storage") {
+                this.authenticated(false, content);
+                this.show({}, {}); }}
         else {
-            var $leader = $page.find((token === 'storage')
-                                     ? "#my-storage-leader"
-                                     : "#my-rooms-leader");
             // Inject the duplicated content and show it:
-            remove_contents($leader.next().next())
-            $leader.next().replaceWith(content.children());
-            $leader.parent().hide().fadeIn('fast');
+            replace_following_items($leader, content.children())
             if (token === 'storage') {
                 this.show({}, {});
                 // Continue chaining to PersonalShareRoomNode:
@@ -540,7 +557,8 @@ var spideroak = function () {
             $content_section.fadeIn('fast');
             if (remember_manager.active()) {
                 // remember_manager will store just the relevant fields.
-                remember_manager.store(my); }}
+                remember_manager.store(my);
+                this.layout_header(); }}
         else {
             // Include the xhr.statusText in the form.
             this.veil(false);
@@ -1328,13 +1346,13 @@ var spideroak = function () {
             // Setup traversal hook:
             establish_traversal_handler();
 
-            // Equip various login forms with 
+            // Properly furnish login form:
             prep_login_form('.nav_login_storage', storage_login, 'username');
 
             my.combo_root_url = defaults.combo_root_url;
-            var combo_root = content_node_manager.get(my.combo_root_url, null);
+            var combo_root = content_node_manager.get_combo_root();
 
-            // Hide everything below the banner, for later veil:
+            // Hide everything below the banner, for subsequent unveiling:
             combo_root.veil(false);
 
             // Collect persistent settings
