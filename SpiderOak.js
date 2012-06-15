@@ -377,14 +377,14 @@ var spideroak = function () {
            'chngpg_opts' - Options for the framework's changePage function
            'mode_opts': node provisioning and layout modal settings.
 
-           - On success, call this.visit_success_handler() with the retrieved
+           - On success, call this.handle_visit_success() with the retrieved
              JSON data, new Date() just prior to the retrieval, chngpg_opts,
              mode_opts, a text status categorization, and the XMLHttpRequest
              object.
-           - Otherwise, this.visit_failure_handler() is called with the
+           - Otherwise, this.handle_visit_failure() is called with the
              XMLHttpResponse object, chngpg_opts, mode_opts, the text status
-             categorization, and an optional exception object, if an exception
-             was thrown.
+             categorization, and an exception object, present if an exception
+             was caught.
 
            See the jQuery.ajax() documentation for XMLHttpResponse details.
         */
@@ -399,11 +399,10 @@ var spideroak = function () {
                     this.handle_visit_success(data, when,
                                               chngpg_opts, mode_opts,
                                               status, xhr); }.bind(this),
-                error: function (xhr, chngpg_opts, mode_opts,
-                                 status, exception_thrown) {
+                error: function (xhr, statusText, thrown) {
                     this.handle_visit_failure(xhr, chngpg_opts, mode_opts,
-                                              status,
-                                              exception_thrown)}.bind(this),
+                                              statusText,
+                                              thrown)}.bind(this),
                })};
 
     RootContentNode.prototype.visit = function (chngpg_opts, mode_opts) {
