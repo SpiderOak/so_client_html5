@@ -767,6 +767,22 @@ var spideroak = function () {
                                                           15));
                     $left_slot.show(); }}}}
 
+    RootContentNode.prototype.layout_header = function (mode_opts) {
+        /* Do special RootContentNode header layout. */
+        var $header = this.my_page$().find('[data-role="header"]');
+        var $logout_button = $header.find('.logout-button');
+        if (! this.loggedin_ish()) {
+            $logout_button.hide(); }
+        else {
+            // Only add the click handler if not already present!
+            var events = $logout_button.data("events");
+            if (! (events && events.hasOwnProperty("click"))) {
+                $logout_button.bind("click",
+                                    function (eventObj) {
+                                        storage_logout(); })};
+            $logout_button.show();
+        }}
+
     StorageNode.prototype.layout_header = function(mode_opts) {
         /* Fill in typical values for header fields of .my_page$().
            Many storage node types will use these values as is, some will
@@ -1133,6 +1149,12 @@ var spideroak = function () {
 
                                 /* Login */
 
+    function go_to_entrance() {
+        /* Visit the entrance page. Depending on session state, it might
+           present a login challenge or it might present the top-level
+           contents associated with the logged-in account. */
+        $.mobile.changePage(content_node_manager.get_combo_root().url); }
+
     function storage_login(login_info, url) {
         /* Login to storage account and commence browsing at devices.
            'login_info': An object with "username" and "password" attrs.
@@ -1186,6 +1208,29 @@ var spideroak = function () {
                 error_alert("Storage login", xhr.status); },
 
         }); }
+
+    function storage_logout() {
+        /* Conclude storage login, clearing credentials and stored data.
+           Wind up back on the main entry page.
+         */
+        function finish() {
+            clear_storage_account();
+            go_to_entrance(); }
+
+        if (! content_node_manager.get_combo_root().loggedin_ish()) {
+            // Can't reach logout location without server - just clear and bail.
+            finish(); }
+        else {
+            // SpiderOak's logout url doesn't (as of 2012-06-15) remove cookies!
+            $.ajax({url: my.storage_root_url + defaults.storage_logout_suffix,
+                    type: 'GET',
+                    success: function (data) {
+                        finish(); },
+                    error: function (xhr) {
+                        console.log("Logout ajax fault: "
+                                    + xhr.status
+                                    + " (" + xhr.statusText + ")");
+                        finish(); }}); }}
 
     function visit_public_share_room(credentials) {
         /* Visit a specified share room.
