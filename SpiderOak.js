@@ -35,7 +35,7 @@ var spideroak = function () {
 
     /* Private elements: */
 
-                        /* Object-wide settings */
+    /* ==== Object-wide settings ===== */
 
     var defaults = {
         /* Settings not specific to a particular login session: */
@@ -88,7 +88,7 @@ var spideroak = function () {
     }
 
 
-                      /* Content Root Registration */
+    /*  ===== Content Root Registration =====  */
 
     function set_storage_account(username, storage_host, storage_web_url) {
         /* Register confirmed user-specific storage details.  Return the
@@ -149,7 +149,7 @@ var spideroak = function () {
     }
 
 
-             /* Node-independent content URL categorization */
+    /* ===== Node-independent content URL categorization ===== */
 
     // Managed content is organized within two content roots:
     //
@@ -235,7 +235,7 @@ var spideroak = function () {
                 || is_combo_root_url(url)); }
 
 
-                             /* Data model */
+    /* ===== Data model ===== */
 
     /* SpiderOak content includes storage (backups) and share rooms. The
        data model distinguishes different kinds of those things - the
@@ -359,7 +359,7 @@ var spideroak = function () {
         delete this.files; }
     FileShareRoomNode.prototype = new ShareRoomNode();
 
-                  /* Content type and role predicates */
+    /* ===== Content type and role predicates ===== */
 
     ContentNode.prototype.is_root = function () {
         /* True if the node is a collections top-level item. */
@@ -370,7 +370,7 @@ var spideroak = function () {
     DeviceStorageNode.prototype.is_device = function() {
         return true; }
 
-                         /* Remote data access */
+    /* ===== Remote data access ===== */
 
     ContentNode.prototype.visit = function (chngpg_opts, mode_opts) {
         /* Fetch current data from server, provision, layout, and present.
@@ -413,8 +413,7 @@ var spideroak = function () {
                 error: function (xhr, statusText, thrown) {
                     this.handle_visit_failure(xhr, chngpg_opts, mode_opts,
                                               statusText,
-                                              thrown)}.bind(this),
-               })};
+                                              thrown)}.bind(this), })};
 
     RootContentNode.prototype.visit = function (chngpg_opts, mode_opts) {
         /* Do the special visit of the consolidated storage/share root. */
@@ -507,8 +506,8 @@ var spideroak = function () {
                 $('.nav_login_storage').fadeIn();
                 this.authenticated(true, content);
                 var ps_root = cnmgr.get(my.personal_shares_root_url);
-                ps_root.visit({}, our_mode_opts); }}
-    }
+                ps_root.visit({}, our_mode_opts); }}}
+
     ContentNode.prototype.handle_visit_success = function (data, when,
                                                            chngpg_opts,
                                                            mode_opts,
@@ -579,7 +578,7 @@ var spideroak = function () {
             $login_section.fadeIn('fast'); }}
 
 
-                             /* Containment */
+    /* ===== Containment ===== */
 
     ContentNode.prototype.contained_urls = function () {
         return this.subdirs.concat(this.files); }
@@ -600,22 +599,23 @@ var spideroak = function () {
            'when' should be no more recent than the XMLHttpRequest.
         */
         this.provision_preliminaries(data, when, mode_opts);
-        this.provision_populate(data, when, mode_opts);
-    }
+        this.provision_populate(data, when, mode_opts); }
+
     ContentNode.prototype.provision_preliminaries = function (data, when,
                                                               mode_opts) {
         /* Do provisioning stuff generally useful for derived types. */
         if (! when) {
             throw new Error("Node provisioning without reliable time stamp.");
         }
-        this.up_to_date(when);
-    }
+        this.up_to_date(when); }
+
     ContentNode.prototype.provision_populate = function (data, when,
                                                          mode_opts) {
         /* Stub, must be overridden by type-specific provisionings. */
         error_alert("Not yet implemented",
-                    this.emblem + " type-specific provisioning implementation")
-    }
+                    this.emblem
+                    + " type-specific provisioning implementation"); }
+
     RootStorageNode.prototype.provision_populate = function (data, when,
                                                              mode_opts) {
         /* Embody the root storage node with 'data'.
@@ -638,8 +638,8 @@ var spideroak = function () {
                 this.subdirs.push(url);
             }
         }
-        this.lastfetched = when;
-    }
+        this.lastfetched = when; }
+
     FolderContentNode.prototype.provision_populate = function (data, when) {
         /* Embody folder content items with 'data'.
            'when' is time soon before data was fetched. */
@@ -722,11 +722,11 @@ var spideroak = function () {
         // The generic case offers no shortcut for determining up-to-date-ness.
         if (when) { this.lastfetched = when; }
         if (! this.lastfetched) { return false; }
-        return false;           // No smarts.
-    }
+        // No intelligence yet.
+        return false; }
 
 
-                   /* Content node page presentation */
+    /* ===== Content node page presentation ===== */
 
     ContentNode.prototype.my_page_id = function () {
         /* Set the UI page id, escaping special characters as necessary. */
@@ -1019,7 +1019,7 @@ var spideroak = function () {
         return $("#" + defaults.content_page_template_id); }
 
 
-                          /* Resource managers */
+    /* ===== Resource managers ===== */
 
     var persistence_manager = {
         /* Maintain domain-specific persistent settings, using localStorage.
@@ -1049,6 +1049,7 @@ var spideroak = function () {
                                          function() {
                                              return localStorage.length; });
     var pmgr = persistence_manager;            // Compact name.
+
 
     var remember_manager = {
         /* Maintain user account info in persistent storage. */
@@ -1091,7 +1092,8 @@ var spideroak = function () {
                         throw new Error("Missing field: " + key); }
                     persistence_manager.set(key, obj[key]); }}},
     };
-    var remgr = remember_manager;                 // Compact name.
+    var remgr = remember_manager;
+
 
     var content_node_manager = function () {
         /* A singleton utility for getting and removing content node objects.
@@ -1176,7 +1178,7 @@ var spideroak = function () {
     var cnmgr = content_node_manager; // Compact name, for convenience.
 
 
-                                /* Login */
+    /* ===== Login ===== */
 
     function go_to_entrance() {
         /* Visit the entrance page. Depending on session state, it might
@@ -1336,7 +1338,9 @@ var spideroak = function () {
             submit_handler(data);
             return false; }); }
 
-                          /* Public interface */
+
+
+    /* ===== Public interface ===== */
 
     // ("public_interface" because "public" is reserved in strict mode.)
     var public_interface = {
@@ -1368,7 +1372,7 @@ var spideroak = function () {
     }
 
 
-                             /* Convenience */
+    /* ===== Convenience ===== */
 
     ContentNode.prototype.toString = function () {
         return "<" + this.emblem + ": " + this.url + ">"; }
@@ -1379,9 +1383,11 @@ var spideroak = function () {
         public_interface.pmgr = pmgr; }
 
 
-                            /* Here we go: */
+    /* ===== Here we go: ===== */
     return public_interface;
 }();
+
+
 
 $(document).ready(function () {
     "use strict";               // ECMAScript 5
