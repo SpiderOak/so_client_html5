@@ -276,12 +276,12 @@ var spideroak = function () {
         // down to all its contents.
         this.device_url = parent ? parent.device_url : null; }
     StorageNode.prototype = new ContentNode();
-    // XXX Should be "ShareNode", because it includes shares below the room.
-    function ShareRoomNode(url, parent) {
+    function ShareNode(url, parent) {
+        /* Share room abstract prototype for collections, rooms, and contents */
         ContentNode.call(this, url, parent);
         this.root_url = parent ? parent.root_url : null;
         this.room_url = parent ? parent.room_url : null; }
-    ShareRoomNode.prototype = new ContentNode();
+    ShareNode.prototype = new ContentNode();
 
     function RootContentNode(url, parent) {
         /* Consolidated root of the storage and share content hierarchies. */
@@ -310,25 +310,25 @@ var spideroak = function () {
         this.stats = null;
         delete this.files; }
     RootStorageNode.prototype = new StorageNode();
-    function RootShareRoomNode(url, parent) {
+    function RootShareNode(url, parent) {
         this.emblem = "Root Share Room";
-        ShareRoomNode.call(this, url, parent); }
-    RootShareRoomNode.prototype = new ShareRoomNode();
+        ShareNode.call(this, url, parent); }
+    RootShareNode.prototype = new ShareNode();
 
     function DeviceStorageNode(url, parent) {
         StorageNode.call(this, url, parent);
         this.emblem = "Storage Device";
         this.device_url = url; }
     DeviceStorageNode.prototype = new StorageNode();
-    function RoomShareRoomNode(url, parent) {
-        ShareRoomNode.call(this, url, parent);
+    function RoomShareNode(url, parent) {
+        ShareNode.call(this, url, parent);
         this.emblem = "Share Room";
         this.room_url = url; }
-    function PublicRoomShareRoomNode(url, parent) {
-        ShareRoomNode.call(this, url, parent);
+    function PublicRoomShareNode(url, parent) {
+        ShareNode.call(this, url, parent);
         this.emblem = "Share Room";
         this.room_url = url; }
-    RoomShareRoomNode.prototype = new ShareRoomNode();
+    RoomShareNode.prototype = new ShareNode();
 
     function FolderContentNode(url, parent) {
         /* Stub, for situating intermediary methods. */ }
@@ -339,10 +339,10 @@ var spideroak = function () {
         this.emblem = "Storage Folder";
         StorageNode.call(this, url, parent); }
     FolderStorageNode.prototype = new StorageNode();
-    function FolderShareRoomNode(url, parent) {
+    function FolderShareNode(url, parent) {
         this.emblem = "Share Room Folder";
-        ShareRoomNode.call(this, url, parent); }
-    FolderShareRoomNode.prototype = new ShareRoomNode();
+        ShareNode.call(this, url, parent); }
+    FolderShareNode.prototype = new ShareNode();
 
     function FileStorageNode(url, parent) {
         this.emblem = "Storage File";
@@ -351,13 +351,13 @@ var spideroak = function () {
         delete this.subdirs;
         delete this.files; }
     FileStorageNode.prototype = new StorageNode();
-    function FileShareRoomNode(url, parent) {
+    function FileShareNode(url, parent) {
         this.emblem = "Share Room File";
-        ShareRoomNode.call(this, url, parent);
+        ShareNode.call(this, url, parent);
         this.is_container = false;
         delete this.subdirs;
         delete this.files; }
-    FileShareRoomNode.prototype = new ShareRoomNode();
+    FileShareNode.prototype = new ShareNode();
 
     /* ===== Content type and role predicates ===== */
 
@@ -498,7 +498,7 @@ var spideroak = function () {
             replace_following_items($leader, content.children())
             if (token === 'storage') {
                 this.show({}, {});
-                // Continue chaining to PersonalShareRoomNode:
+                // Continue chaining to PersonalShareNode:
                 var our_mode_opts = {passive: true, // Already has passive, but.
                                      notify_callback:
                                        this.notify_subvisit_status.bind(this),
@@ -589,7 +589,7 @@ var spideroak = function () {
         return this.subdirs.concat([]); }
     FileStorageNode.prototype.contained_urls = function () {
         return []; }
-    FileShareRoomNode.prototype.contained_urls = function () {
+    FileShareNode.prototype.contained_urls = function () {
         return []; }
 
        /* "Provisioning": Data model assimilation of fetched data */
@@ -677,7 +677,7 @@ var spideroak = function () {
                 this.files.push(url); }}
 
         this.lastfetched = when; }
-    RootShareRoomNode.prototype.provision_populate = function (data, when) {
+    RootShareNode.prototype.provision_populate = function (data, when) {
         /* Embody the root share room with 'data'.
            'when' is time soon before data was fetched. */
         var url, dev, devdata;
@@ -692,10 +692,10 @@ var spideroak = function () {
         /* Embody storage folder items with 'data'.
            'when' is time soon before data was fetched. */
         FolderStorageNode.prototype.provision_populate.call(this, data, when); }
-    RoomShareRoomNode.prototype.provision_populate = function (data, when) {
+    RoomShareNode.prototype.provision_populate = function (data, when) {
         /* Embody storage folder items with 'data'.
            'when' is time soon before data was fetched. */
-        FolderShareRoomNode.prototype.provision_populate.call(this, data,
+        FolderShareNode.prototype.provision_populate.call(this, data,
                                                               when);
         this.name = data.stats.room_name;
         this.description = data.stats.description;
@@ -709,7 +709,7 @@ var spideroak = function () {
         /* Embody storage folder items with 'data'.
            'when' is time soon before data was fetched. */
         FolderContentNode.prototype.provision_populate.call(this, data, when); }
-    FolderShareRoomNode.prototype.provision_populate = function (data, when){
+    FolderShareNode.prototype.provision_populate = function (data, when){
         /* Embody share room folder items with 'data'.
            'when' is time soon before data was fetched. */
         FolderContentNode.prototype.provision_populate.call(this, data, when); }
@@ -833,7 +833,7 @@ var spideroak = function () {
                                    // XXX use from the combo-root, instead:
                                    'left_url': "#" + this.parent_url}); }
 
-    ShareRoomNode.prototype.layout_header = function(mode_opts) {
+    ShareNode.prototype.layout_header = function(mode_opts) {
         /* Fill in header fields of .my_page$(). */
         var fields = {};
         if (this.parent_url) {
@@ -852,9 +852,9 @@ var spideroak = function () {
             fields.title = "ShareRooms"; }
         this.layout_header_fields(fields); }
 
-    RootShareRoomNode.prototype.layout_header = function(mode_opts) {
+    RootShareNode.prototype.layout_header = function(mode_opts) {
         /* Fill in header fields of .my_page$(). */
-        ShareRoomNode.prototype.layout_header.call(this, mode_opts);
+        ShareNode.prototype.layout_header.call(this, mode_opts);
         var fields = {'right_url': '#' + add_query_param(this.url,
                                                          "mode", "edit"),
                       'right_label': "Edit"};
@@ -926,12 +926,12 @@ var spideroak = function () {
     FolderStorageNode.prototype.layout_item$ = function(mode_opts) {
         /* Return a storage folder's description as a jQuery item. */
         return FolderContentNode.prototype.layout_item$.call(this, mode_opts); }
-    FolderShareRoomNode.prototype.layout_item$ = function(mode_opts) {
+    FolderShareNode.prototype.layout_item$ = function(mode_opts) {
         /* Return a share room folder's description as a jQuery item. */
         return FolderContentNode.prototype.layout_item$.call(this, mode_opts); }
-    RoomShareRoomNode.prototype.layout_item$ = function(mode_opts) {
+    RoomShareNode.prototype.layout_item$ = function(mode_opts) {
         /* Return a share room's description as a jQuery item. */
-        return FolderShareRoomNode.prototype.layout_item$.call(this,
+        return FolderShareNode.prototype.layout_item$.call(this,
                                                                mode_opts); }
     FileContentNode.prototype.layout_item$ = function(mode_opts) {
         /* Return a file-like content node's description as a jQuery item. */
@@ -969,7 +969,7 @@ var spideroak = function () {
     FileStorageNode.prototype.layout_item$ = function(mode_opts) {
         /* Return a storage file's description as a jQuery item. */
         return FileContentNode.prototype.layout_item$.call(this, mode_opts); }
-    FileShareRoomNode.prototype.layout_item$ = function(mode_opts) {
+    FileShareNode.prototype.layout_item$ = function(mode_opts) {
         /* Return a storage file's description as a jQuery item. */
         return FileContentNode.prototype.layout_item$.call(this, mode_opts); }
 
@@ -1139,25 +1139,25 @@ var spideroak = function () {
                             var parent = parent || cnmgr.get(my.combo_root_url);
                             if (is_storage_url(url)) {
                                 got = new RootStorageNode(url, parent); }
-                            else { got = new RootShareRoomNode(url, parent); }}}
+                            else { got = new RootShareNode(url, parent); }}}
 
                     // Contents:
                     else if (parent && (parent.url === my.storage_root_url)) {
                         var parent = parent || cnmgr.get(my.combo_root_url);
                         got = new DeviceStorageNode(url, parent); }
                     else if (is_public_share_room_url(url)) {
-                        got = new RoomShareRoomNode(url, parent); }
+                        got = new RoomShareNode(url, parent); }
                     else if (url.charAt(url.length-1) !== "/") {
                         // No trailing slash.
                         if (is_storage_url(url)) {
                             got = new FileStorageNode(url, parent); }
                         else {
-                            got = new FileShareRoomNode(url, parent); }}
+                            got = new FileShareNode(url, parent); }}
                     else {
                         if (is_storage_url(url)) {
                             got = new FolderStorageNode(url, parent); }
                         else {
-                            got = new FolderShareRoomNode(url, parent); }
+                            got = new FolderShareNode(url, parent); }
                     }
                     by_url[url] = got;
                 }
