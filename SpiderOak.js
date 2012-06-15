@@ -1091,6 +1091,12 @@ var spideroak = function () {
                     if (! obj.hasOwnProperty(key)) {
                         throw new Error("Missing field: " + key); }
                     persistence_manager.set(key, obj[key]); }}},
+
+        remove_storage_host: function () {
+            /* The means to inhibit auto-login, without losing the
+               convenience of a remembered username, in the absence of the
+               means to remove the authentication cookies. */
+            persistence_manager.remove('storage_host'); },
     };
     var remgr = remember_manager;
 
@@ -1246,6 +1252,12 @@ var spideroak = function () {
          */
         function finish() {
             clear_storage_account();
+            if (remember_manager.active()) {
+                // The storage server doesn't remove cookies, so we inhibit
+                // relogin by removing the persistent info about the
+                // storage host. This leaves the username intact as a
+                // "remember" convenience for the user.
+                remember_manager.remove_storage_host(); }
             go_to_entrance(); }
 
         if (! content_node_manager.get_combo_root().loggedin_ish()) {
