@@ -463,43 +463,34 @@ var spideroak = function () {
            'content': on success: the jquery $(dom) for the populated content,
                       for failure: the resulting XHR object. */
 
-        function remove_contents($item) {
-            /* Remove this '$item' and subsequent until one that has
-               class "section-trailer". */
-            // Remove tail before current.
-            if ($item.attr('class') === "section-trailer") { return; }
-            remove_contents($item.next());
-            $item.remove(); }
-
-        function replace_following_items($leader, $replacements) {
-            /* Replace items following '$leader' with '$replacments'.
-               We replace items until the one with class "section-trailer". */
-            remove_contents($leader.next().next());
-            $leader.next().replaceWith($replacements);
-            $leader.parent().hide().fadeIn('fast'); }
-
         this.authenticated(true);
 
         $.mobile.hidePageLoadingMsg();
         var $page = this.my_page$();
-        var $leader = $page.find((token === 'storage')
-                                 ? "#my-storage-leader"
-                                 : "#my-rooms-leader");
+        var selector = ((token === 'storage')
+                        ? "#my-storage-leader"
+                        : "#my-rooms-leader")
+        var $leader = $(selector);
+
         if (! succeeded) {
-            replace_following_items($leader,
-                                    $('<li/>').html('<p> <em>'
-                                                    + content.statusText
-                                                    + '</em> </p>'));
+            $(selector + " + li").remove(); // Remove the leader's li siblings.
+            $leader.after($('<li/>').html('<p> <em> Error: '
+                                          + content.statusText
+                                          + '</em> </p>'));
             if (token === "storage") {
                 this.authenticated(false, content);
                 this.show({}, {}); }}
         else {
-            // Inject the duplicated content and show it:
-            replace_following_items($leader, content.children())
+            // Inject the duplicated content and show it, or hide the
+            // section if empty:
+            $(selector + " + li").remove(); // Remove the leader's li siblings.
+            $(selector).after(content.children());
             if (token === 'storage') {
+                // Take browser focus:
                 this.show({}, {});
+
                 // Continue chaining to PersonalShareNode:
-                var our_mode_opts = {passive: true, // Already has passive, but.
+                var our_mode_opts = {passive: true,
                                      notify_callback:
                                        this.notify_subvisit_status.bind(this),
                                      notify_token: 'personal-share'};
