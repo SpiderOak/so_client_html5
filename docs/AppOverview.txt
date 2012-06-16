@@ -20,26 +20,62 @@ folders and file "nodes".
     * `DeviceStorageNode`
     * `DirectoryStorageNode`
     * `FileStorageNode`
-  * `ShareRoomNode` - Share Rooms - public and personal
-    * `RootShareRoomNode`
-    * `RoomShareRoomNode`
-    * `DirectoryShareRoomNode`
-    * `FileShareRoomNode`
+  * `ShareNode` - Share Rooms and their contents
+    * `PersonalRootShareNode` - share rooms published by the account
+    * `PublicRootShareNode` - public share rooms registered with the UI
+    * `RoomShareNode` - a public or personal share room
+    * `DirectoryShareNode`
+    * `FileShareNode`
 
-Note that public and personal share rooms collections are represented by
-the same object types, based on `ShareRoomNode`, but have some different
-operational concerns.  The content items are structured identically, but
-access to personal share rooms requires login authentication, while public
-share rooms access is not tied to a !SpiderOak account.  Access to the
-different types affords different management options.
+==== Content Access ====
+
+Public and personal share rooms collections are structurally similar, but
+have different behaviors.  The personal share rooms are those share rooms
+published by the account, and privileges to access the collection listing
+and management depends on account login.  The public share rooms are just
+those publicly available share rooms that have been visited using the app.
 
 * Public share rooms: Beyond navigating them, the user can only
   add and discard public share rooms to their collection.
-* Personal share rooms: Among other things, users can change the
-  availability of their personal share rooms, and change which items in
-  their storage constitutes the share rooms.  (I have yet to get to the
+* Personal share rooms: Among other things, users can change which of their
+  storage items constitutes a share room.  (I have yet to get to the
   share room password protection feature, but expect that will be set here,
   as well.)
+
+==== Organization of Content Navigation ====
+
+There are a few kinds of structural connections by which users navigate the
+content nodes.
+
+* Navigation into contained items goes according to layout presentation of
+  contained nodes.
+
+  Typically, this is by virtue of a directory node presenting its contents
+  for navigation.
+
+  The one exception is the consolidated root node, `RootContentNode`, which
+  arranges to present the contents of the respective actual content roots,
+  the `RootStorageNode`, `PersonalRootShareNode`, and
+  `PublicRootShareNode`. Thus the `RootContentNode` effectively shares
+  downward-navigation containment of the actual content roots.
+
+* Navigation from more contained nodes to less contained ones depends on
+  registration of the parent node ids in the offspring when the offspring
+  nodes are minted.
+
+  Outwards navigation is rigged so that ascending from top-level content
+  nodes goes to the combined `RootContentNode`, rather than to the actual
+  content-specific roots.
+
+Thus, for normal navigation the content-specific root nodes are
+skipped. This frees them up for providing management activity for their
+respective collections:
+
+* `RootStorageNode`: (eventually) adjusting backup coverage
+* `PersonalRootShareNode`: managing the share rooms published by the account
+* `PublicRootShareNode`: adding to and omitting from the locally familiar
+  collection of public share rooms.
+  collection
 
 === Dynamic Pages ===
 Content nodes (backup storage folders and files, share rooms, and an
