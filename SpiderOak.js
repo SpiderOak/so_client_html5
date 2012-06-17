@@ -475,6 +475,7 @@ var spideroak = function () {
 
         if (! succeeded) {
             $(selector + " + li").remove(); // Remove the leader's li siblings.
+            // TODO Make pretty:
             $leader.after($('<li/>').html('<p> <em> Error: '
                                           + content.statusText
                                           + '</em> </p>'));
@@ -485,12 +486,17 @@ var spideroak = function () {
             // Inject the duplicated content and show it, or hide the
             // section if empty:
             $(selector + " + li").remove(); // Remove the leader's li siblings.
-            $(selector).after(content.children());
+            var $children = content.children();
+            if ($children.length) {
+                $(selector).after($children); }
+            else {
+                // TODO Make pretty:
+                $leader.after($('<li/>').html('<p> <em> Empty </em> </p>')); }
             if (token === 'storage') {
-                // Take browser focus:
+                // Ensure we're current page and chain to personal shares root.
+
                 this.show({}, {});
 
-                // Continue chaining to PersonalShareNode:
                 var our_mode_opts = {passive: true,
                                      notify_callback:
                                        this.notify_subvisit_status.bind(this),
