@@ -650,24 +650,25 @@ var spideroak = function () {
             if (this.subdirs.indexOf(url) === -1) {
                 this.subdirs.push(url); }}
 
-        this.files = [];
-        for (var i=0; i < data.files.length; i++) {
-            filedata = data.files[i];
-            url = this.url + filedata['url'];
-            // Get a node for the file:
-            file = mgr.get(url, this);
-            var fields = ['name', 'size', 'ctime', 'mtime', 'versions'];
-            for (var nmi=0; nmi < fields.length; nmi++) {
-                var name = fields[nmi];
-                if (filedata.hasOwnProperty(name)) {
-                    file[name] = filedata[name]; }}
-            for (var szi=0; szi < defaults.preview_sizes.length; szi++) {
-                var sz = "preview_" + defaults.preview_sizes[szi];
-                if (sz in filedata) {
-                    file[sz] = filedata[sz]; }}
-            // Include, if not already present:
-            if (this.files.indexOf(url) === -1) {
-                this.files.push(url); }}
+        if (data.files) {
+            this.files = [];
+            for (var i=0; i < data.files.length; i++) {
+                filedata = data.files[i];
+                url = this.url + filedata['url'];
+                // Get a node for the file:
+                file = mgr.get(url, this);
+                var fields = ['name', 'size', 'ctime', 'mtime', 'versions'];
+                for (var nmi=0; nmi < fields.length; nmi++) {
+                    var name = fields[nmi];
+                    if (filedata.hasOwnProperty(name)) {
+                        file[name] = filedata[name]; }}
+                for (var szi=0; szi < defaults.preview_sizes.length; szi++) {
+                    var sz = "preview_" + defaults.preview_sizes[szi];
+                    if (sz in filedata) {
+                        file[sz] = filedata[sz]; }}
+                // Include, if not already present:
+                if (this.files.indexOf(url) === -1) {
+                    this.files.push(url); }}}
 
         this.lastfetched = when; }
 
