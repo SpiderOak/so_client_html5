@@ -422,7 +422,7 @@ var spideroak = function () {
         // Trigger visits to the respective root content nodes in 'passive'
         // mode so they do not focus the browser on themselves. 'notify' mode
         // is also provoked, so they report their success or failure to our
-        // notify_visit_status() method.
+        // notify_subvisit_status() method.
         //
         // See docs/AppOverview.txt "Content Node navigation modes" for
         // details about mode controls.
