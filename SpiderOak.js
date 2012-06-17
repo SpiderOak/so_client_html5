@@ -47,7 +47,7 @@ var spideroak = function () {
         storage_login_path: "/browse/login",
         storage_logout_suffix: "logout",
         storage_path_prefix: "/storage/",
-        personal_share_path_suffix: "shares",
+        personal_shares_path_suffix: "shares",
         public_shares_path_suffix: "/share/",
         content_page_template_id: "content-page-template",
         devices_query_expression: 'device_info=yes',
@@ -189,8 +189,7 @@ var spideroak = function () {
         /* Identify personal share rooms root url. Depends on established
            storage root.  Return the url. */
         my.personal_shares_root_url =
-            (my.storage_root_url + defaults.personal_shares_path_suffix)
-        ; }
+            (my.storage_root_url + defaults.personal_shares_path_suffix); }
     function register_public_share_room_url(url) {
         /* Include url among the registered public rooms.  Returns the url. */
         my.public_share_room_urls[url] = true;
@@ -206,8 +205,8 @@ var spideroak = function () {
            Doesn't depend on the url having an established node. */
         return ((url === my.combo_root_url)
                 || (url === my.storage_root_url)
-                || (url === my.personal_share_rooms_root_url)
-                || (url === my.public_share_rooms_root_url)); }
+                || (url === my.personal_shares_root_url)
+                || (url === my.public_shares_root_url)); }
     function is_public_share_room_url(url) {
         /* True if the 'url' is for one of the familiar public share rooms.
            Doesn't depend on the url having an established node. */
