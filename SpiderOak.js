@@ -1146,18 +1146,23 @@ var spideroak = function () {
                     if (is_content_root_url(url)) {
                         if (is_combo_root_url(url)) {
                             got = new RootContentNode(url, parent); }
+                        else if (url === my.storage_root_url) {
+                            got = new RootStorageNode(url, parent); }
+                        else if (url === my.personal_shares_root_url) {
+                            got = new PersonalRootShareNode(url, parent); }
+                        else if (url === my.public_shares_root_url) {
+                            got = new PublicRootShareNode(url, parent); }
                         else {
-                            var parent = parent || cnmgr.get(my.combo_root_url);
-                            if (is_storage_url(url)) {
-                                got = new RootStorageNode(url, parent); }
-                            else { got = new RootShareNode(url, parent); }}}
+                            throw new Error("Content model management error");}}
 
                     // Contents:
-                    else if (parent && (parent.url === my.storage_root_url)) {
-                        var parent = parent || cnmgr.get(my.combo_root_url);
-                        got = new DeviceStorageNode(url, parent); }
-                    else if (is_public_share_room_url(url)) {
-                        got = new RoomShareNode(url, parent); }
+                    else if (parent && (is_combo_root_url(parent.url))) {
+                        // Content node just below a root:
+                        if (is_storage_url(url)) {
+                            got = new DeviceStorageNode(url, parent); }
+                        else {
+                            // XXX Distinguish between public and personal??
+                            got = new RoomShareNode(url, parent); }}
                     else if (url.charAt(url.length-1) !== "/") {
                         // No trailing slash.
                         if (is_storage_url(url)) {
