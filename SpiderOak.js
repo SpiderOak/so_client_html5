@@ -289,10 +289,7 @@ var spideroak = function () {
         this.root_url = url;
         this.emblem = "Home";
         delete this.subdirs;
-        delete this.files;
-        this.storage_devices = [];
-        this.personal_shares = [];
-        this.public_shares = []; }
+        delete this.files; }
     RootContentNode.prototype = new ContentNode();
     RootContentNode.prototype.free = function () {
         /* Free composite content to make available for garbage collection. */
@@ -311,9 +308,16 @@ var spideroak = function () {
         delete this.files; }
     RootStorageNode.prototype = new StorageNode();
     function RootShareNode(url, parent) {
-        this.emblem = "Root Share Room";
-        ShareNode.call(this, url, parent); }
+        this.emblem = "Root Share";
+        this.root_url = url;
+        ShareNode.call(this, url, this); }
     RootShareNode.prototype = new ShareNode();
+    function PublicRootShareNode(url, parent) {
+        RootShareNode.call(this, url, parent);
+        this.emblem = "Familiar Public Share Rooms"; }
+    function PersonalRootShareNode(url, parent) {
+        RootShareNode.call(this, url, parent);
+        this.emblem = "Personally Published Share Rooms"; }
 
     function DeviceStorageNode(url, parent) {
         StorageNode.call(this, url, parent);
@@ -321,10 +325,6 @@ var spideroak = function () {
         this.device_url = url; }
     DeviceStorageNode.prototype = new StorageNode();
     function RoomShareNode(url, parent) {
-        ShareNode.call(this, url, parent);
-        this.emblem = "Share Room";
-        this.room_url = url; }
-    function PublicRoomShareNode(url, parent) {
         ShareNode.call(this, url, parent);
         this.emblem = "Share Room";
         this.room_url = url; }
@@ -496,7 +496,7 @@ var spideroak = function () {
                                      notify_token: 'personal-share'};
                 $('.nav_login_storage').fadeIn();
                 this.authenticated(true, content);
-                var ps_root = cnmgr.get(my.personal_shares_root_url);
+                var ps_root = cnmgr.get(my.personal_shares_root_url, this);
                 ps_root.visit({}, our_mode_opts); }}}
 
     ContentNode.prototype.handle_visit_success = function (data, when,
@@ -611,24 +611,25 @@ var spideroak = function () {
                                                              mode_opts) {
         /* Embody the root storage node with 'data'.
            'when' is time soon before data was fetched. */
-        var mgr = content_node_manager;
+        var combo_root = content_node_manager.get_combo_root();
         var url, dev, devdata;
 
         this.name = my.username;
-        mgr.stats = data["stats"]; // TODO: We'll cook stats when UI is ready.
+        // TODO: We'll cook stats when UI is ready.
+        content_node_manager.stats = data["stats"];
 
         this.subdirs = [];
         for (var i=0; i < data.devices.length; i++) {
             devdata = data.devices[i];
-            url = my.storage_root_url + devdata["encoded"]
-            dev = mgr.get(url, this)
+            url = my.storage_root_url + devdata["encoded"];
+            // Set our contents' parent to combo root, rather than ourselves:
+            dev = content_node_manager.get(url, combo_root);
             dev.name = devdata["name"];
             dev.lastlogin = devdata["lastlogin"];
             dev.lastcommit = devdata["lastcommit"];
             if (this.subdirs.indexOf(url) === -1) {
-                this.subdirs.push(url);
-            }
-        }
+                this.subdirs.push(url); }}
+
         this.lastfetched = when; }
 
     FolderContentNode.prototype.provision_populate = function (data, when) {
@@ -668,17 +669,35 @@ var spideroak = function () {
                 this.files.push(url); }}
 
         this.lastfetched = when; }
-    RootShareNode.prototype.provision_populate = function (data, when) {
+
+    PersonalRootShareNode.prototype.provision_populate = function (data, when) {
         /* Embody the root share room with 'data'.
            'when' is time soon before data was fetched. */
+        var combo_root = content_node_manager.get_combo_root();
         var url, dev, devdata;
-        this.name = "Share Rooms";
+        this.name = "Personal Share Rooms Container";
 
         data.dirs = []
         for (room_url in my.public_share_rooms_urls) {
-            data.dirs.push([content_node_manager.get(room_url), room_url]); }
+            data.dirs.push([content_node_manager.get(room_url, combo_root),
+                            room_url]); }
 
         FolderContentNode.prototype.provision_populate.call(this, data, when); }
+
+    PublicRootShareNode.prototype.provision_populate = function (data, when) {
+        /* Embody the public root share room with 'data'.
+           'when' is time soon before data was fetched. */
+        var combo_root = content_node_manager.get_combo_root();
+        var url, dev, devdata;
+        this.name = "Public Share Rooms Container";
+
+        data.dirs = []
+        for (room_url in my.public_share_rooms_urls) {
+            data.dirs.push([content_node_manager.get(room_url, combo_root),
+                            room_url]); }
+
+        FolderContentNode.prototype.provision_populate.call(this, data, when); }
+
     DeviceStorageNode.prototype.provision_populate = function (data, when) {
         /* Embody storage folder items with 'data'.
            'when' is time soon before data was fetched. */
