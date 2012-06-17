@@ -307,16 +307,18 @@ var spideroak = function () {
         delete this.files; }
     RootStorageNode.prototype = new StorageNode();
     function RootShareNode(url, parent) {
+        ShareNode.call(this, url, this);
         this.emblem = "Root Share";
-        this.root_url = url;
-        ShareNode.call(this, url, this); }
+        this.root_url = url; }
     RootShareNode.prototype = new ShareNode();
     function PublicRootShareNode(url, parent) {
         RootShareNode.call(this, url, parent);
         this.emblem = "Familiar Public Share Rooms"; }
+    PersonalRootShareNode.prototype = new RootShareNode();
     function PersonalRootShareNode(url, parent) {
         RootShareNode.call(this, url, parent);
         this.emblem = "Personally Published Share Rooms"; }
+    PublicRootShareNode.prototype = new RootShareNode();
 
     function DeviceStorageNode(url, parent) {
         StorageNode.call(this, url, parent);
