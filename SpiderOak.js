@@ -526,10 +526,17 @@ var spideroak = function () {
                                                            mode_opts,
                                                            exception) {
         /* Do failed visit error handling with 'xhr' XMLHttpResponse report. */
-        // Currently, defer to the ComboRootNode visit failure routine:
-        var combo_root = content_node_manager.get_combo_root();
         if (mode_opts.notify_callback) {
-            mode_opts.notify_callback(false, mode_opts.notify_token, xhr); }}
+            mode_opts.notify_callback(false, mode_opts.notify_token, xhr); }
+        else {
+            $.mobile.hidePageLoadingMsg();
+            alert("Visit " + this.name + " failed", xhr.statusText);
+            var combo_root = content_node_manager.get_combo_root();
+            if (! is_combo_root_url(this.url)) {
+                // Recover upwards, eventually to the top:
+                $.mobile.changePage(this.parent_url
+                                    ? this.parent_url
+                                    : combo_root.url); }}}
 
     RootContentNode.prototype.handle_visit_failure = function (xhr,
                                                                chngpg_opts,
