@@ -286,7 +286,8 @@ var spideroak = function () {
         /* Consolidated root of the storage and share content hierarchies. */
         ContentNode.call(this, url, parent);
         this.root_url = url;
-        this.emblem = "Home";
+        this.emblem = "Root";
+        this.name = "Dashboard";
         delete this.subdirs;
         delete this.files; }
     RootContentNode.prototype = new ContentNode();
@@ -313,10 +314,12 @@ var spideroak = function () {
     RootShareNode.prototype = new ShareNode();
     function PublicRootShareNode(url, parent) {
         RootShareNode.call(this, url, parent);
+        this.name = "Public Share Rooms";
         this.emblem = "Familiar Public Share Rooms"; }
     PersonalRootShareNode.prototype = new RootShareNode();
     function PersonalRootShareNode(url, parent) {
         RootShareNode.call(this, url, parent);
+        this.name = "My Share Rooms";
         this.emblem = "Personally Published Share Rooms"; }
     PublicRootShareNode.prototype = new RootShareNode();
 
@@ -847,8 +850,7 @@ var spideroak = function () {
         if (this.parent_url) {
             var container = content_node_manager.get(this.parent_url);
             fields.left_url = '#' + this.parent_url;
-            fields.left_label = (container.is_root()
-                                 ? "Storage Devices" : container.name) };
+            fields.left_label = container.name; }
         this.layout_header_fields(fields); }
     RootStorageNode.prototype.layout_header = function(mode_opts) {
         /* Fill in typical values for header fields of .my_page$(). */
