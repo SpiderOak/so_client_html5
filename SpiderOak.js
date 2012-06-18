@@ -485,7 +485,7 @@ var spideroak = function () {
         else {
             // Inject the duplicated content and show it, or hide the
             // section if empty:
-            $(selector + " + li").remove(); // Remove the leader's li siblings.
+            $(selector + " ~ li").remove(); // Remove the leader's li siblings.
             var $children = content.children();
             if ($children.length) {
                 $(selector).after($children); }
