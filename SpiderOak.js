@@ -624,6 +624,42 @@ var spideroak = function () {
                     this.emblem
                     + " type-specific provisioning implementation"); }
 
+    ContentNode.prototype.provision_items = function (data_items,
+                                                      this_container,
+                                                      url_base, url_element,
+                                                      trailing_slash,
+                                                      fields,
+                                                      contents_parent) {
+        /* Register data item fields into subnodes of this node:
+           'data_items' - the object to iterate over for the data,
+           'this_container' - the container into which to place the subnodes,
+           'url_base' - the base url onto which the url_element is appended,
+           'url_element' - the field name for the url of item within this node,
+           'trailing_slash' - true: url is given a trailing slash if absent,
+           'fields' - an array of field names for properties to be copied (1),
+           'contents_parent' - the node to attribute as the subnodes parent (2).
+
+           (1) Fields are either strings, denoting the same attribute name in
+               the data item and subnode, or two element subarrays, with the
+               first element being the data attribute name and the second being
+               the attribute name for the subnode.
+           (2) The contained item's parent is not always this object, eg for
+               the content roots. */
+        var parent = content_node_manager.get(contents_parent);
+        data_items.map(function (item) {
+            var url = url_base + item[url_element];
+            if (trailing_slash && (url.slice(url.length-1) !== '/')) {
+                url += "/"; }
+            var subnode = content_node_manager.get(url, parent);
+            fields.map(function (field) {
+                if (field instanceof Array) {
+                    subnode[field[1]] = item[field[0]]; }
+                else {
+                    subnode[field] = item[field]; }})
+            // TODO Scaling - make subdirs an object for hashed lookup.
+            if (this_container.indexOf(url) === -1) {
+                this_container.push(url); }})}
+
     RootStorageNode.prototype.provision_populate = function (data, when,
                                                              mode_opts) {
         /* Embody the root storage node with 'data'.
@@ -631,76 +667,55 @@ var spideroak = function () {
         var combo_root = content_node_manager.get_combo_root();
         var url, dev, devdata;
 
+        // XXX ?:
         this.name = my.username;
         // TODO: We'll cook stats when UI is ready.
-        content_node_manager.stats = data["stats"];
+        this.stats = data["stats"];
 
         this.subdirs = [];
-        for (var i=0; i < data.devices.length; i++) {
-            devdata = data.devices[i];
-            url = my.storage_root_url + devdata["encoded"];
-            // Set our contents' parent to combo root, rather than ourselves:
-            dev = content_node_manager.get(url, combo_root);
-            dev.name = devdata["name"];
-            dev.lastlogin = devdata["lastlogin"];
-            dev.lastcommit = devdata["lastcommit"];
-            if (this.subdirs.indexOf(url) === -1) {
-                this.subdirs.push(url); }}
+        this.provision_items(data.devices, this.subdirs,
+                             this.url, 'encoded', true,
+                             ['name', 'lastlogin', 'lastcommit'],
+                             my.combo_root_url);
 
         this.lastfetched = when; }
 
     FolderContentNode.prototype.provision_populate = function (data, when) {
         /* Embody folder content items with 'data'.
            'when' is time soon before data was fetched. */
-        var mgr = content_node_manager;
-        var url, dir, dirdata, file, filedata;
 
         this.subdirs = [];
-        for (var i=0; i < data.dirs.length; i++) {
-            dirdata = data.dirs[i];
-            url = this.url + dirdata[1];
-            // Get a node for the subdir:
-            dir = mgr.get(url, this)
-            dir.name = dirdata[0];
-            // Include, if not already present:
-            if (this.subdirs.indexOf(url) === -1) {
-                this.subdirs.push(url); }}
+        this.provision_items(data.dirs, this.subdirs, this.url, 1, true,
+                             [[0, 'name']], this.url);
 
-        if (data.files) {
+        if (data.hasOwnProperty('files')) {
             this.files = [];
-            for (var i=0; i < data.files.length; i++) {
-                filedata = data.files[i];
-                url = this.url + filedata['url'];
-                // Get a node for the file:
-                file = mgr.get(url, this);
-                var fields = ['name', 'size', 'ctime', 'mtime', 'versions'];
-                for (var nmi=0; nmi < fields.length; nmi++) {
-                    var name = fields[nmi];
-                    if (filedata.hasOwnProperty(name)) {
-                        file[name] = filedata[name]; }}
-                for (var szi=0; szi < defaults.preview_sizes.length; szi++) {
-                    var sz = "preview_" + defaults.preview_sizes[szi];
-                    if (sz in filedata) {
-                        file[sz] = filedata[sz]; }}
-                // Include, if not already present:
-                if (this.files.indexOf(url) === -1) {
-                    this.files.push(url); }}}
+            var fields = ['name', 'size', 'ctime', 'mtime', 'versions'];
+            defaults.preview_sizes.map(function (size) {
+                /* Add previews, if any, to the fields. */
+                if (("preview_" + size) in data.files) {
+                    fields.push("preview_" + size); }})
+            this.provision_items(data.files, this.files, this.url, 'url', false,
+                                 fields, this.url); }
 
         this.lastfetched = when; }
 
-    PersonalRootShareNode.prototype.provision_populate = function (data, when) {
+    OriginalRootShareNode.prototype.provision_populate = function (data, when) {
         /* Embody the root share room with 'data'.
            'when' is time soon before data was fetched. */
-        var combo_root = content_node_manager.get_combo_root();
-        var url, dev, devdata;
-        this.name = "Personal Share Rooms Container";
+        this.subdirs = [];
+        var room_base = my.actual_shares_root_url + data.share_id_b32 + "/";
+        this.provision_items(data.share_rooms, this.subdirs,
+                             room_base, 'room_key', true,
+                             [['room_name', 'name'],
+                              ['room_description', 'description'],
+                              'room_key', 'share_id'],
+                             my.combo_root_url);
+        this.subdirs.map(function (url) {
+            /* Ensure the contained rooms urls are registered as originals. */
+            register_original_share_room_url(url); });
 
-        data.dirs = []
-        for (room_url in my.public_share_rooms_urls) {
-            data.dirs.push([content_node_manager.get(room_url, combo_root),
-                            room_url]); }
-
-        FolderContentNode.prototype.provision_populate.call(this, data, when); }
+        this.lastfetched = when; }
 
     PublicRootShareNode.prototype.provision_populate = function (data, when) {
         /* Embody the public root share room with 'data'.
@@ -709,12 +724,19 @@ var spideroak = function () {
         var url, dev, devdata;
         this.name = "Public Share Rooms Container";
 
-        data.dirs = []
         for (room_url in my.public_share_rooms_urls) {
-            data.dirs.push([content_node_manager.get(room_url, combo_root),
-                            room_url]); }
+            if (my.public_share_rooms_urls.hasOwnProperty(room_url)) {
+                data.dirs.push([content_node_manager.get(room_url, combo_root),
+                                room_url]); }}
 
-        FolderContentNode.prototype.provision_populate.call(this, data, when); }
+        this.provision_items(data.share_rooms, this.subdirs,
+                             room_base, 'room_key', true,
+                             [['room_name', 'name'],
+                              ['room_description', 'description'],
+                              'room_key', 'share_id'],
+                             my.combo_root_url);
+
+        this.lastfetched = when; }
 
     DeviceStorageNode.prototype.provision_populate = function (data, when) {
         /* Embody storage folder items with 'data'.
