@@ -1100,7 +1100,7 @@ var spideroak = function () {
 
         // "remember_me" field not in fields, so only it is retained when
         // remembering is disabled:
-        fields: {username: "", storage_host: "", storage_web_url: ""},
+        fields: ['username', 'storage_host', 'storage_web_url'],
 
         active: function (disposition) {
             /* Report or set "Remember Me" persistent account info retention.
@@ -1115,31 +1115,29 @@ var spideroak = function () {
             else if (typeof disposition === "undefined") {
                 return persistence_manager.get("remember_me") || false; }
             else {
-                for (var key in remember_manager.fields) {
-                    if (remember_manager.fields.hasOwnProperty(key)) {
-                        persistence_manager.remove(key); }}
+                fields.map(function (key) {
+                    persistence_manager.remove(key); });
                 return persistence_manager.set("remember_me", false); }},
 
         fetch: function () {
             /* Return remembered account info . */
             var got = {};
-            for (var key in remember_manager.fields) {
-                got[key] = persistence_manager.get(key); }
+            remember_manager.fields.map(function (key) {
+                got[key] = persistence_manager.get(key); });
             return got; },
 
         store: function (obj) {
             /* Preserve account info, obtaining specific fields from 'obj'.
                Error is thrown if obj lacks any fields. */
-            for (var key in remember_manager.fields) {
-                if (remember_manager.fields.hasOwnProperty(key)) {
-                    if (! obj.hasOwnProperty(key)) {
-                        throw new Error("Missing field: " + key); }
-                    persistence_manager.set(key, obj[key]); }}},
+            remember_manager.fields.map(function (key) {
+                if (! obj.hasOwnProperty(key)) {
+                    throw new Error("Missing field: " + key); }
+                persistence_manager.set(key, obj[key]); })},
 
         remove_storage_host: function () {
-            /* The means to inhibit auto-login, without losing the
-               convenience of a remembered username, in the absence of the
-               means to remove the authentication cookies. */
+            /* How to inhibit auto-login, without losing the convenience of
+               a remembered username, in the absence of a way to remove the
+               authentication cookies. */
             persistence_manager.remove('storage_host'); },
     };
     var remgr = remember_manager;
