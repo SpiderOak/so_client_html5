@@ -885,8 +885,7 @@ var spideroak = function () {
             fields.right_url = '#' + add_query_param(this.url,"refresh","true");
             fields.right_label = "Refresh"
             fields.left_url = '#' + this.parent_url;
-            fields.left_label = (container.is_root()
-                                 ? "Share Rooms" : container.name);
+            fields.left_label = container.name;
             fields.title = this.name; }
         else {
             fields.right_url = '#' + add_query_param(this.url, "mode", "edit");
