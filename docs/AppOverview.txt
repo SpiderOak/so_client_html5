@@ -145,11 +145,11 @@ of those visits are delegated such that:
    success status notification from the `RootStorageNode` visit, since both
    depend on successful authentication (while the `PublicRootShareNode`
    visit does not).
-   * If the visit `RootStorageNode` visit succeeds, the
-     `OriginalRootShareNode` is dispatched.
-   * If the visit `RootStorageNode` visit fails, the `RootContentNode`
-     presents the login form, with the username filled in and Remember Me
-     is activated, if appropriate.
+   * If the `RootStorageNode` visit succeeds, the `OriginalRootShareNode`
+     is dispatched.
+   * If the `RootStorageNode` visit fails, the `RootContentNode` presents
+     the login form, with the username filled in and Remember Me is
+     activated, as appropriate.
 
 See [#ContentNodenavigationmodes below] for details about the navigation
 modes.
