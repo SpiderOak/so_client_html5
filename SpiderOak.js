@@ -950,8 +950,8 @@ var spideroak = function () {
             if (lenfiles) {
                 divider_prefix = "";
                 for (var i=0; i < this.files.length; i++) {
-                    insert_subnode(this.files[i]); }}
-        }
+                    insert_subnode(this.files[i]); }}}
+
         $page.page();
         $list.listview("refresh");
         return $page; }
@@ -1192,7 +1192,6 @@ var spideroak = function () {
                         if (is_storage_url(url)) {
                             got = new DeviceStorageNode(url, parent); }
                         else {
-                            // XXX Distinguish between public and personal??
                             got = new RoomShareNode(url, parent); }}
                     else if (url.charAt(url.length-1) !== "/") {
                         // No trailing slash.
