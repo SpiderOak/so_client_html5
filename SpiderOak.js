@@ -484,19 +484,21 @@ var spideroak = function () {
                 $(selector).after($children); }
             else {
                 // TODO Make pretty:
-                $leader.after($('<li/>').html('<p> <em> Empty </em> </p>')); }
+                $leader.after($('<li title="Empty"/>')
+                              .html('<em>&nbsp;&nbsp;&nbsp;'
+                                    + '&nbsp;&empty; </em>')); }
             if (token === 'storage') {
-                // Ensure we're current page and chain to personal shares root.
+                // Ensure we're current page and chain to original shares root.
 
                 this.show({}, {});
 
                 var our_mode_opts = {passive: true,
                                      notify_callback:
                                        this.notify_subvisit_status.bind(this),
-                                     notify_token: 'personal-share'};
+                                     notify_token: 'original-share'};
                 $('.nav_login_storage').fadeIn();
                 this.authenticated(true, content);
-                var ps_root = cnmgr.get(my.personal_shares_root_url, this);
+                var ps_root = cnmgr.get(my.original_shares_root_url, this);
                 ps_root.visit({}, our_mode_opts); }}}
 
     ContentNode.prototype.handle_visit_success = function (data, when,
@@ -523,7 +525,8 @@ var spideroak = function () {
             mode_opts.notify_callback(false, mode_opts.notify_token, xhr); }
         else {
             $.mobile.hidePageLoadingMsg();
-            alert("Visit " + this.name + " failed", xhr.statusText);
+            alert("Visit '" + this.name + "' failed: "
+                  + xhr.statusText + " (" + xhr.status + ")");
             var combo_root = content_node_manager.get_combo_root();
             if (! is_combo_root_url(this.url)) {
                 // Recover upwards, eventually to the top:
@@ -930,8 +933,9 @@ var spideroak = function () {
 
         if (lensubdirs + lenfiles === 0) {
             // XXX Need to convey that the container is empty more nicely.
-            $content.after('<p class="empty-sign" data-role="empty-sign">'
-                           + 'Empty. </p>'); }
+            $list.append($('<li title="Empty" class="empty-sign"'
+                           + 'class="empty-placeholder"/>')
+                         .html('&nbsp;&nbsp;&nbsp;&nbsp;&empty;')); }
         else {
             var $item;
             var curinitial, divider_prefix, indicator = "";
