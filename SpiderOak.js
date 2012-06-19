@@ -40,14 +40,13 @@ var spideroak = function () {
     var defaults = {
         /* Settings not specific to a particular login session: */
         // API v1.
-        // XXX starting_host_url may vary according to brand package.
-        starting_host_url: "https://spideroak.com",
-        share_host_url: "https://spideroak.com",
+        // XXX base_host_url may vary according to brand package.
+        base_host_url: "https://spideroak.com",
         combo_root_url: "https://home",
         storage_login_path: "/browse/login",
         storage_logout_suffix: "logout",
         storage_path_prefix: "/storage/",
-        personal_shares_path_suffix: "shares",
+        original_shares_path_suffix: "shares",
         public_shares_path_suffix: "/share/",
         content_page_template_id: "content-page-template",
         devices_query_expression: 'device_info=yes',
@@ -60,16 +59,14 @@ var spideroak = function () {
     };
     var my = {
         /* Login session settings: */
-        starting_host_url: null,
         username: null,
         storage_web_url: null,  // Location of storage web UI for user.
-        // content_roots_urls are for discerning URLs of contained items.
-        // They're accumulated on access to storage repo root and share rooms.
         storage_root_url: null,
-        personal_shares_root_url: null,
-        public_shares_root_url: null,
+        original_shares_root_url: null,
+        // All the service's actual shares reside within:
+        actual_shares_root_url: defaults.base_host_url + "/share/",
         public_share_room_urls: {},
-        personal_share_room_urls: {},
+        original_share_room_urls: {},
     };
 
     /* Navigation handlers: */
@@ -112,14 +109,14 @@ var spideroak = function () {
         return my.combo_root_url; }
     function clear_storage_account() {
         /* Obliterate internal settings and all content nodes for a clean slate.
-           All share artifacts, personal and public, are removed, as well
+           All share artifacts, original and public, are removed, as well
            as registered storage.  We do not remove persistent settings. */
 
         // Empty strings instead of null to distinguish from initial settings.
 
-        if (my.personal_shares_root_url) {
-            content_node_manager.clear_hierarchy(my.personal_shares_root_url); }
-        my.personal_shares_root_url = "";
+        if (my.original_shares_root_url) {
+            content_node_manager.clear_hierarchy(my.original_shares_root_url); }
+        my.original_shares_root_url = "";
         if (my.storage_root_url) {
             content_node_manager.clear_hierarchy(my.storage_root_url); }
         my.storage_root_url = "";
@@ -137,11 +134,7 @@ var spideroak = function () {
              'storage_path_prefix': the leading part of the storage path
         */
 
-        if (! my.public_shares_root_url) {
-            // Establish the share rooms root.
-            register_public_shares_root_host(host); }
-
-        var root = content_node_manager.get(my.public_shares_root_url);
+        var root = content_node_manager.get(my.actual_shares_root_url);
         var url = (root.url + b32encode_trim(shareid) + "/" + password + "/");
         register_public_share_room_url(url);
         content_node_manager.get(url, root);
@@ -156,7 +149,9 @@ var spideroak = function () {
     // - the storage root, my.storage_root_url, determined by the user's account
     // - the public share root, which is the same across all accounts
     //
-    // A third category, the personal share root, resides in the storage root.
+    // There is also a collection of the shares originated by the account,
+    // in the OriginalSharesRoot.  Like all shares, the URLs of the items
+    // it contains reside among the public shares.
     //
     // Content urls are recognized by virtue of beginning with one of the
     // registered content roots. The storage root is registered when the user
@@ -175,28 +170,23 @@ var spideroak = function () {
                                + defaults.storage_path_prefix
                                + b32encode_trim(username)
                                + "/");
-        // Public personal root is determined by storage root:
-        register_personal_shares_root();
+        // Original root is determined by storage root:
+        register_original_shares_root();
 
         return my.storage_root_url;
     }
-    function register_public_shares_root(host) {
-        /* Identify the public share rooms root according to 'host'.
-           Return the url. */
-        var psps = defaults.public_shares_path_suffix;
-        return (my.public_shares_root_url = (host + "/" + psps)); }
-    function register_personal_shares_root() {
-        /* Identify personal share rooms root url. Depends on established
+    function register_original_shares_root() {
+        /* Identify original share rooms root url. Depends on established
            storage root.  Return the url. */
-        my.personal_shares_root_url =
-            (my.storage_root_url + defaults.personal_shares_path_suffix); }
+        my.original_shares_root_url =
+            (my.storage_root_url + defaults.original_shares_path_suffix); }
     function register_public_share_room_url(url) {
         /* Include url among the registered public rooms.  Returns the url. */
         my.public_share_room_urls[url] = true;
         return url; }
-    function register_personal_share_room_url(url) {
-        /* Include url among the registered personal rooms.  Returns the url. */
-        my.personal_share_room_urls[url] = true;
+    function register_original_share_room_url(url) {
+        /* Include url among the registered original rooms.  Returns the url. */
+        my.original_share_room_urls[url] = true;
         return url; }
     function is_combo_root_url(url) {
         return (url === my.combo_root_url); }
@@ -205,16 +195,16 @@ var spideroak = function () {
            Doesn't depend on the url having an established node. */
         return ((url === my.combo_root_url)
                 || (url === my.storage_root_url)
-                || (url === my.personal_shares_root_url)
-                || (url === my.public_shares_root_url)); }
+                || (url === my.original_shares_root_url)
+                || (url === my.actual_shares_root_url)); }
     function is_public_share_room_url(url) {
         /* True if the 'url' is for one of the familiar public share rooms.
            Doesn't depend on the url having an established node. */
         return (my.public_share_room_urls.hasOwnProperty(url)); }
-    function is_personal_share_room_url(url) {
-        /* True if the 'url' is for one of the personal share rooms.
+    function is_original_share_room_url(url) {
+        /* True if the 'url' is for one of the original share rooms.
            Doesn't depend on the url having an established node. */
-        return (my.personal_share_room_urls.hasOwnProperty(url)); }
+        return (my.original_share_room_urls.hasOwnProperty(url)); }
     function is_storage_url(url) {
         /* True if the URL is for a content item in the user's storage area.
            Doesn't depend on the url having an established node. */
@@ -224,9 +214,9 @@ var spideroak = function () {
     function is_share_url(url) {
         /* True if the URL is for a content item in the user's storage area.
            Doesn't depend on the url having an established node. */
-        return (my.public_share_rooms_root_url
-                && (url.slice(0, my.share_rooms_root_url.length)
-                    === my.share_rooms_root_url)); }
+        return (my.actual_shares_root_url
+                && (url.slice(0, my.actual_shares_root_url.length)
+                    === my.actual_shares_root_url)); }
     function is_content_url(url) {
         /* True if url within registered content roots. */
         return (is_storage_url(url)
@@ -316,11 +306,11 @@ var spideroak = function () {
         RootShareNode.call(this, url, parent);
         this.name = "Public Share Rooms";
         this.emblem = "Familiar Public Share Rooms"; }
-    PersonalRootShareNode.prototype = new RootShareNode();
-    function PersonalRootShareNode(url, parent) {
+    OriginalRootShareNode.prototype = new RootShareNode();
+    function OriginalRootShareNode(url, parent) {
         RootShareNode.call(this, url, parent);
         this.name = "My Share Rooms";
-        this.emblem = "Personally Published Share Rooms"; }
+        this.emblem = "Originally Published Share Rooms"; }
     PublicRootShareNode.prototype = new RootShareNode();
 
     function DeviceStorageNode(url, parent) {
@@ -1186,9 +1176,9 @@ var spideroak = function () {
                             got = new RootContentNode(url, parent); }
                         else if (url === my.storage_root_url) {
                             got = new RootStorageNode(url, parent); }
-                        else if (url === my.personal_shares_root_url) {
-                            got = new PersonalRootShareNode(url, parent); }
-                        else if (url === my.public_shares_root_url) {
+                        else if (url === my.original_shares_root_url) {
+                            got = new OriginalRootShareNode(url, parent); }
+                        else if (url === my.actual_shares_root_url) {
                             got = new PublicRootShareNode(url, parent); }
                         else {
                             throw new Error("Content model management error");}}
@@ -1265,7 +1255,7 @@ var spideroak = function () {
             login_url = url; }
 
         else {
-            server_host_url = defaults.starting_host_url;
+            server_host_url = defaults.base_host_url;
             login_url = (server_host_url + defaults.storage_login_path); }
 
         $.ajax({
