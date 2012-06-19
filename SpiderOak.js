@@ -573,27 +573,29 @@ var spideroak = function () {
                     // Unauthorized - expunge all privileged info:
                     clear_storage_account(); }}
             else { $status.hide(); }
-            // Hide the storage and personal shares sections
+            // Hide the storage and original shares sections
             $content_section.hide();
             // Show the form
             $login_section.fadeIn('fast'); }}
 
 
     /* ===== Containment ===== */
+    /* For content_node_manager.clear_hierarchy() */
 
     ContentNode.prototype.contained_urls = function () {
-        return this.subdirs.concat(this.files); }
+        return [].concat(this.subdirs, this.files); }
     RootContentNode.prototype.contained_urls = function () {
-        return this.storage_devices.concat(this.personal_shares,
-                                           this.public_shares); }
+        return [].concat(this.storage_devices,
+                         this.original_shares, this.public_shares); }
     RootStorageNode.prototype.contained_urls = function () {
-        return this.subdirs.concat([]); }
+        return [].concat(this.subdirs); }
     FileStorageNode.prototype.contained_urls = function () {
         return []; }
     FileShareNode.prototype.contained_urls = function () {
         return []; }
 
-       /* "Provisioning": Data model assimilation of fetched data */
+
+    /* "Provisioning": Data model assimilation of fetched data */
 
     ContentNode.prototype.provision = function (data, when, mode_opts) {
         /* Populate node with JSON 'data'. 'when' is the data's current-ness.
