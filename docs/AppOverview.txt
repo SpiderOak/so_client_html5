@@ -21,19 +21,19 @@ folders and file "nodes".
     * `DirectoryStorageNode`
     * `FileStorageNode`
   * `ShareNode` - Share Rooms and their contents
-    * `PersonalRootShareNode` - share rooms published by the account
-    * `PublicRootShareNode` - public share rooms registered with the UI
-    * `RoomShareNode` - a public or personal share room
+    * `OriginalRootShareNode` - Share rooms published by the account
+    * `PublicRootShareNode` - Other share rooms visited
+    * `RoomShareNode` - a public or original share room
     * `DirectoryShareNode`
     * `FileShareNode`
 
 ==== Content Access ====
 
-Public and personal share rooms collections are structurally similar, but
-have different behaviors.  The personal share rooms are those share rooms
-published by the account, and privileges to access the collection listing
-and management depends on account login.  The public share rooms are just
-those publicly available share rooms that have been visited using the app.
+Public and original share rooms collections are structurally similar, but
+have different behaviors.  Original share rooms are the ones that are
+published by the account, and require account privileges for access.  The
+public share rooms are just those publicly available share rooms that have
+been visited using the app.
 
 * Public share rooms: Beyond navigating them, the user can only
   add and discard public share rooms to their collection.
@@ -41,6 +41,31 @@ those publicly available share rooms that have been visited using the app.
   storage items constitutes a share room.  (I have yet to get to the
   share room password protection feature, but expect that will be set here,
   as well.)
+
+===== Content Model URLs vs Actual Content URLS =====
+
+The model elements are organized according to the URLs of their
+corresponding content items.  All the URLs are within the storage service's
+domain. (Different accounts can have different storage root hosts within
+the domain.)  They are obtained from the content_node_manager using these
+URL correspondences:
+
+* The actual content items are indexed in the content_node_manager by their
+  JSON access URLs.
+* The `ComboRootContentNode` is indexed under an arbitrary string,
+  sufficiently URL-like to be recognized as such by jQm changePage()
+* The `RootStorageNode` uses a URL with the respective storage host, the
+  storage_path_prefix, and the trimmed b32 encoding of the account name.
+* The `PersonalRootShareNode` URL is that of the `RootStorageNode` with
+  "share/" appended. (This is where the JSON for the account's shares is found.)
+* The `PublicRootShareNode` uses the base url, without any
+  account's share ID.
+
+The content_node_manager is the broker by which everything obtains nodes,
+given their URL handles. It also is how nodes are nodes are minted, when
+first encountered, and so requires identification of the parent node in any
+situations that might be first encounters (or first encounters after a
+logout).
 
 ==== Organization of Content Navigation ====
 
