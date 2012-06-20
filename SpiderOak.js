@@ -1359,7 +1359,7 @@ var spideroak = function () {
 
         var $name = $('input[name=' + name_field + ']', this);
         var $remember_widget = $form.find('#remember-me');
-        var remembering = remgr.active();
+        var remembering = remember_manager.active();
         if (remembering && ($remember_widget.val() !== "on")) {
             $remember_widget.find('option[value="on"]').attr('selected',
                                                              'selected');
@@ -1423,7 +1423,7 @@ var spideroak = function () {
             // Hide everything below the banner, for subsequent unveiling:
             combo_root.veil(false);
 
-            // Collect persistent settings
+            // Try a storage account if available from persistent settings
             if (remember_manager.active()) {
                 var settings = remember_manager.fetch();
                 if (settings.username && settings.storage_host) {
@@ -1431,6 +1431,7 @@ var spideroak = function () {
                                         settings.storage_host,
                                         settings.storage_web_url); }}
 
+            // ... and go:
             $.mobile.changePage(combo_root.url); },
 
     }
