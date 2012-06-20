@@ -1102,6 +1102,9 @@ var spideroak = function () {
         // remembering is disabled:
         fields: ['username', 'storage_host', 'storage_web_url'],
 
+        unset: function (disposition) {
+            /* True if no persistent remember manager settings are found. */
+            return persistence_manager.get("remember_me") === null; },
         active: function (disposition) {
             /* Report or set "Remember Me" persistent account info retention.
                'disposition':
@@ -1363,6 +1366,9 @@ var spideroak = function () {
             $remember_widget.val("on");
             // I believe the reason we need to also .change() is because
             // the presented slider is just tracking the actual select widget.
+            $remember_widget.trigger('change'); }
+        else if (!remember_manager.unset() && !remembering) {
+            $remember_widget.val("off");
             $remember_widget.trigger('change'); }
         var name_field_val = pmgr.get(name_field);
         if (name_field_val
