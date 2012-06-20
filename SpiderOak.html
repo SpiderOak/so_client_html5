@@ -90,7 +90,7 @@
           <ul data-role="listview" class="my-content-section">
             <li data-role="list-divider" id="my-rooms-leader"
                 data-theme="f" data-icon="gear">
-              <a href=""> My Share Rooms </a>
+              <a XXX href="" alt="Configure My Share Rooms"> My Share Rooms </a>
             </li>
             <li align="center">
               <p> <em> Empty / Fetching... </em> </p>
@@ -100,7 +100,7 @@
           <ul data-role="listview" class="public-content-section">
             <li data-role="list-divider" id="public-rooms-leader"
                 data-theme="f" data-icon="plus">
-              <a href="#share-home"> Public Share Rooms </a>
+              <a href="#share-home" alt="Change"> Public Share Rooms </a>
             </li>
             <li align="center">
               <p> <em> ... </em> </p>
@@ -120,12 +120,14 @@
   </div>
 
   <div data-role="page" id="about" data-theme="c">
-    <div data-role="header" data-position="fixed">
-      <img src="brand_images/named_logo.png" alt="Logo">
+    <div data-role="header" data-position="fixed" data-theme="f">
+      <a href="#home" data-icon="arrow-l" data-role="button"
+         alt="Dashboard" data-theme="a">
+        Dashboard</a>
+      <h3> About SpiderOak </h3>
     </div>
     <div data-role="content">
-      <h1> About </h1>
-      <p> SpiderOak All-Weather client 0.1 - Secure File Backup, Sync, and
+      <p> SpiderOak All-Weather client 0.5 - Secure File Backup, Sync, and
         Sharing </p>
       <p> SpiderOak is an advanced automated offsite backup system with a
         "Zero Knowledge" approach to encryption and privacy.  Capabilities
@@ -159,7 +161,8 @@
 
   <div data-role="page" id="share-home" data-theme="a">
     <div data-role="header" data-position="fixed" data-theme="f">
-      <a href="#home" data-icon="arrow-l" data-role="button">
+      <a href="#home" data-icon="arrow-l" data-role="button"
+         alt="Dashboard" data-theme="a">
         Dashboard</a>
       <h3> ShareRooms </h3>
     </div>
