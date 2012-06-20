@@ -33,7 +33,8 @@
           <ul data-role="listview" class="roots"  style="padding-bottom: 10px;">
             <li data-role="list-divider" data-theme="f"
                 id="storage-devices-leader" data-icon="info">
-              <a href="#about"> My Storage and Share Rooms </a>
+              <a alt="Dashboard guide" href="#combo-about">
+                My Storage and Share Rooms </a>
             </li>
           </ul>
           <ul data-role="listview" data-inset="true">
@@ -78,8 +79,8 @@
       <div class="content-section">
           <ul data-role="listview" class="my-content-section">
             <li data-role="list-divider" data-inset="true" data-theme="f"
-                id="my-storage-leader" data-icon="info">
-              <a href="#about" data-icon="info"> My Storage </a>
+                alt="Info" id="my-storage-leader" data-icon="info">
+              <a alt="Dashboard guide" href="#combo-about"> My Storage </a>
             </li>
             <li align="center">
               <p> <em> Empty / Fetching... </em> </p>
@@ -209,6 +210,53 @@
         </small>
       </div>
     </div>
+  </div>
+
+  <div data-role="page" id="combo-about" data-theme="c">
+    <div data-role="header" data-position="fixed" data-theme="f">
+      <a href="#home" data-icon="arrow-l" data-role="button" alt="Dashboard">
+        Dashboard</a>
+      <h3> About the SpiderOak Dashboard page </h3>
+    </div>
+    <div data-role="content">
+      <ul>
+        <li>
+          <p> Shows relevant SpiderOak content, and/or a Login form towards the
+            top if account credentials are needed to see account
+            storage.</p>
+        </li>
+        <li>
+          <p> Account storage and share rooms published by an account require
+            login. The Login form is shown if no credentials are
+            present, followed by the remembered public share
+            rooms. Otherwise, the account's storage devices are listed,
+            followed by the share rooms originated by the account, and then
+            the public share rooms.</p>
+          <p> While logged in, an "X" logout button is available in the
+            upper left-hand corner of the page.</p>
+          <p> When the "Remember Me" slider is active, the account name
+            will be retained across sessions. </p>
+        </li>
+        <li>
+          <p> Public share rooms remembered using the app are available
+            whether or not any account login is active. </p></li>
+        <li>
+          <p> Clicking on a content item navigates to a page showing the
+            contents of that item. Each page has a return button in the
+            upper left to bring you back to that item's container. </p> </li>
+        <li> 
+          <p> Clicking on a section header brings you to the activity page
+            and/or info for that section. </p> </li>
+      </ul>
+    </div>
+    <div data-role="footer" data-position="fixed" data-theme="a">
+      <div data-role="navbar">
+        <ul>
+          <li> <a href="#"> Access </a> </li>
+          <li> <a href="#"> Settings </a> </li>
+        </ul>
+      </div>
+    </div><!-- /footer -->
   </div>
 
   <div data-role="page" id="share_about" data-theme="c">
