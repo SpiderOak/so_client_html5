@@ -511,10 +511,10 @@ var spideroak = function () {
         this.layout(mode_opts);
         this.show(chngpg_opts, mode_opts);
         if (mode_opts.notify_callback) {
-            var cloned_listview = this.my_contents_listview$().clone(true);
+            var cloned_items_list$ = this.my_content_items$().clone(true);
             mode_opts.notify_callback(true,
                                       mode_opts.notify_token,
-                                      cloned_listview); }}
+                                      cloned_items_list$); }}
 
     ContentNode.prototype.handle_visit_failure = function (xhr,
                                                            chngpg_opts,
@@ -907,7 +907,7 @@ var spideroak = function () {
         /* Present this content node by adjusting its DOM data-role="page" */
         var $page = this.my_page$();
 	var $content = $page.find('[data-role="content"]');
-	var $list = this.my_contents_listview$();
+	var $list = this.my_content_items$();
         if ($list.children().length) {
             $list.empty(); }
 
@@ -1056,9 +1056,9 @@ var spideroak = function () {
                 ? this.$page
                 : (this.$page = $("#" + this.my_page_id()))); }
 
-    ContentNode.prototype.my_contents_listview$ = function () {
+    ContentNode.prototype.my_content_items$ = function () {
         /* Return this node's jQuery contents litview object. */
-        return this.my_page$().find('[data-role="listview"]'); }
+        return this.my_page$().find('.content-items'); }
     ContentNode.prototype.get_storage_page_template$ = function() {
         return $("#" + defaults.content_page_template_id); }
 
