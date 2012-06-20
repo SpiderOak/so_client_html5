@@ -1460,7 +1460,6 @@ $(document).ready(function () {
     // Development convenience: Go back to start page on full document reload.
     // All the internal application state is gone, anyway.
     if (window.location.hash) {
-        window.location.hash = "";
         $.mobile.changePage(window.location.href.split('#')[0]); }
 
     spideroak.init();
