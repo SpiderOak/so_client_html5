@@ -21,70 +21,74 @@ folders and file "nodes".
     * `DirectoryStorageNode`
     * `FileStorageNode`
   * `ShareNode` - Share Rooms and their contents
-    * `OriginalRootShareNode` - Share rooms published by the account
+    * `OriginalRootShareNode` - The list of share rooms published by the account
     * `PublicRootShareNode` - Other share rooms visited
     * `RoomShareNode` - a public or original share room
     * `DirectoryShareNode`
     * `FileShareNode`
 
-==== Content Access ====
+=== Content Addressing ===
 
-Public and original share rooms collections are structurally similar, but
-have different behaviors.  Original share rooms are the ones that are
-published by the account, and require account privileges for access.  The
-public share rooms are just those publicly available share rooms that have
-been visited using the app.
+Content model elements are address by the URLs of their JSON content items:
 
-* Public share rooms: Beyond navigating them, the user can only
-  add and discard public share rooms to their collection.
-* Personal share rooms: Among other things, users can change which of their
-  storage items constitutes a share room.  (I have yet to get to the
-  share room password protection feature, but expect that will be set here,
-  as well.)
+* as the '#' fragment identifiers of the app's URL, for jQuery Mobile
+  changePage navigation, and
+* as the key for retrieval (and allocation) within the app's internal node
+  database, mediated by the spideroak.content_node_manager object.
 
-===== Content Model URLs vs Actual Content URLS =====
-
-The model elements are organized according to the URLs of their
-corresponding content items.  All the URLs are within the storage service's
-domain. (Different accounts can have different storage root hosts within
-the domain.)  They are obtained from the content_node_manager using these
-URL correspondences:
+The app introduces a few objects - the root nodes - which contain and
+organize the actual content.  The root nodes have URL addresses, more or
+less situated at the top of their respective content hierarchies.
 
 * The actual content items are indexed in the content_node_manager by their
-  JSON access URLs.
-* The `ComboRootContentNode` is indexed under an arbitrary string,
-  sufficiently URL-like to be recognized as such by jQm changePage()
-* The `RootStorageNode` uses a URL with the respective storage host, the
-  storage_path_prefix, and the trimmed b32 encoding of the account name.
-* The `PersonalRootShareNode` URL is that of the `RootStorageNode` with
-  "share/" appended. (This is where the JSON for the account's shares is found.)
-* The `PublicRootShareNode` uses the base url, without any
-  account's share ID.
+  JSON access URLs, and addressed in app URLs as the fragment identifiers.
+* The `RootStorageNode` contains the backup storage items, with a URL
+  consisting of the storage server host (which can vary) and a trimmed,
+  b32 encoding of the account name.  Access to the contained items depends
+  on login, at which point the storage host server is determined.
+* The account-originated collection of share rooms is collected
+  within the `OriginalRootShareNode`, which has a special JSON address
+  within the storage root.  The original share rooms are situated
+  with all the public share rooms, in...
+* The `PublicRootShareNode` has a URL that is the common stem of all
+  !SpiderOak share rooms.
+* A encompassing root node, the `ComboRootContentNode`, contains all the
+  other roots, and presents their contents in a consolidated view.  The app
+  uses an arbitrary, internal address for it, sufficiently URL-like to be
+  recognized as such by the jQm URL traversal machinery in changePage().
 
-The content_node_manager is the broker by which everything obtains nodes,
-given their URL handles. It also is how nodes are nodes are minted, when
-first encountered, and so requires identification of the parent node in any
-situations that might be first encounters (or first encounters after a
-logout).
+The spideroak.content_node_manager is the broker by which everything
+obtains nodes, given their URL handles. It also is how nodes are nodes are
+allocated, when first encountered, and so requires identification of the
+parent node in any situations that might be first encounters (or first
+encounters after a logout).
 
-==== Organization of Content Navigation ====
+=== Organization of Content Navigation ===
 
 There are a few kinds of structural connections by which users navigate the
-content nodes.
+content hierarchies.
 
-* Navigation into contained items, generally the entries presented for some
-  kind of folder content, including share and storage folders, share rooms,
-  storage devices, and the various root containers.
+* Navigation into contained items: Downwards navigation is by clicking on
+  the items presented as the contents of some kind of folder, including
+  share room and storage devices, their contained folders, and the various
+  root containers.
 
-  The consolidated root node, `RootContentNode`, arranges to present the
-  contents of the respective actual content roots, the `RootStorageNode`,
-  `OriginalRootShareNode`, and `PublicRootShareNode`. Thus the
-  `RootContentNode` effectively shares downward-navigation containment of
-  the actual content roots.
+  The items have URLs consisting of the application's address followed by a
+  fragement identifier consisting of the content's address.  (See
+  [#ContentAddressing Content Adressing], above.)  The app's
+  [#DynamicPageTraversal dynamic page traversal machinery] (below)
+  retrieves the JSON data for each node and populates and presents an
+  application node for it.
+
+  The special consolidated root node, `RootContentNode`, arranges to
+  present the contents of the respective actual content roots, the
+  `RootStorageNode`, `OriginalRootShareNode`, and `PublicRootShareNode`.
+  Thus the `RootContentNode` effectively shares downward-navigation
+  containment of the actual content roots.
 
 * Navigation from more contained nodes to less contained ones depends on
   registration of the parent node URLs in the offspring when the offspring
-  nodes are minted.
+  nodes are allocated.
 
   The respective actual content root's items are produced so that the
   consolidated root is registered as their parent.  Thus, outward
@@ -92,69 +96,17 @@ content nodes.
   rooms) goes to the `RootContentNode` consolidated root, rather than the
   actual content roots.
 
-Thus, for normal navigation the content-specific root nodes are skipped.
-This frees them for use providing management activities for their
-respective collections:
+In this way, the content-specific root nodes are skipped in normal
+navigation.  This frees them for use providing management activities for
+their respective collections:
 
 * `RootStorageNode`: (eventually) adjusting backup coverage
-* `PersonalRootShareNode`: managing the share rooms published by the account
+* `PersonalRootShareNode`: (eventually) managing the share rooms published
+  by the account
 * `PublicRootShareNode`: adding to and omitting from the locally familiar
   collection of public share rooms.
-  collection
 
-=== Dynamic Pages ===
-Content nodes (backup storage folders and files, share rooms, and an
-encompassing root node - see [#ContentNodeDataModel the data model]) are
-presented as jQuery Mobile "pages" (`<div data-role="page>`) generated
-dynamically from cloned copies of static template DOM nodes, upon in-app
-traversal of particular URLs.
-* The spideroak object's `.handle_content_visit()` method is assigned as a
-  handler to the jQuery Mobile `pagebeforechange` event, which tracks
-  changes to the browser's `location.hash` setting.
-* The handler discerns navigation to URLs with hash portions that are
-  within the user's !SpiderOak-managed content, and:
-  * Fetches a suitable `ContentNode`-based object for the node using
-  * `spideroak.content_node_manager.get()`, which returns an already
-    existing node, if any, or else manufactures a new one with suitable
-    initial settings.
-  * The respective `ContentNode` object uses its `.visit()` method to
-    handle the visit.
-* In most cases, `ContentNode.visit()`:
-  * Fetches the node contents from the server if necessary (''intially,
-    always necessary'')
-  * Gets a jQuery object for the node's data-role="page", cloning the
-    !SpiderOak.html id="content-page-template" &lt;div&gt; and adjusts
-    the basic structure, if that's not already been done.
-  * Fills in the page header and footer with node's-specific navigation
-    context.  The container return locations vary, and different types
-    of nodes have different actions associated with them.
-  * Populates the page listview with entries for the node's contents, or
-    special activities associated with the node.
-
-The `RootContentNode` is an exception (as usual) to the last part.  It has
-a special .visit() method which dispatches a visit to the
-`PublicRootShareNode`, `RootStorageNode` and `OriginalRootShareNode`.  All
-of those visits are delegated such that:
-
-1. The delegated presentations do not take browser focus (using the
-   'passive' mode option), leaving focus on the `RootContentNode`, and
-2. the `RootContentNode` is notified of success, along with the produced
-   content, so it can display a consolidated view of the respective
-   content, as it is received.
-3. The  visit is contingent to receiving
-   success status notification from the `RootStorageNode` visit, since both
-   depend on successful authentication (while the `PublicRootShareNode`
-   visit does not).
-   * If the `RootStorageNode` visit succeeds, the `OriginalRootShareNode`
-     is dispatched.
-   * If the `RootStorageNode` visit fails, the `RootContentNode` presents
-     the login form, with the username filled in and Remember Me is
-     activated, as appropriate.
-
-See [#ContentNodenavigationmodes below] for details about the navigation
-modes.
-
-==== Application !Entry/Init Overview ====
+=== Application !Entry/Init Overview ===
 * $(document).ready() function calls spideroak.init()
 * spideroak.init():
   * establishes the traversal handler
@@ -163,14 +115,63 @@ modes.
   * prepares to combo gradual fade-in
   * fetches persistent settings
   * does a traversal to the combo root `RootContentNode`.
-* the `RootContentNode.visit()` method happens as described above.
+* the `RootContentNode.visit()` and other content node `.visit()` methods
+  are described [#DyanamicPageTraversal next].
+
+=== Dynamic Page Traversal ===
+Most content nodes ([#ContentNodeDataModel in the data model, above]) are
+presented as jQuery Mobile "pages" - `<div data-role="page>`. They are
+generated dynamically from cloned copies of static template DOM nodes,
+found in `SpiderOak.html`, upon in-app traversal of content URLs (see
+[#ContentAddressing Content Addressing], above).
+* The spideroak object's `.handle_content_visit()` method is assigned to
+  handle the jQuery Mobile `pagebeforechange` event, which tracks changes
+  to the browser's `location.hash` setting.
+* The handler discerns navigation to URLs with hash portions that are
+  within the user's !SpiderOak-managed content, and:
+  * Fetches a suitable `ContentNode`-based object for the node using
+  * `spideroak.content_node_manager.get()` - returns an already
+    existing node, if any, or else allocates a new one with suitable
+    initial settings.
+  * The respective `ContentNode` object uses its `.visit()` method to
+    handle the visit.
+* In most cases, `ContentNode.visit()`:
+  * Fetches the node contents from the server if necessary (''intially,
+    always necessary'')
+  * Gets a jQuery object for the node's data-role="page", cloning the
+    !SpiderOak.html id="content-page-template" &lt;div&gt; if it hasn't
+    already gotten a copy this way, and adjusting the basic structure.
+  * Fills in the page header and footer according to the node's navigation
+    context.  Different types of nodes have different actions and relative
+    ascending navigation routes associated with them.
+  * Populates the page listview with entries for the node's contents, or
+    special activities associated with the node.
+  * The `RootContentNode`'s `.visit()` method is different.  It dispatches a
+    visit to the `PublicRootShareNode`, `RootStorageNode` and
+    `OriginalRootShareNode`.  All of those visits are delegated such that:
+    1. The delegated presentations do not take browser focus (using the
+       'passive' mode option), leaving focus on the `RootContentNode`, and
+    2. the `RootContentNode` is notified of success, along with the produced
+       content, so it can display a consolidated view of the respective
+       content, as it is received.
+    3. The  visit is contingent to receiving
+       success status notification from the `RootStorageNode` visit, since both
+       depend on successful authentication (while the `PublicRootShareNode`
+       visit does not).
+       * If the `RootStorageNode` visit succeeds, the `OriginalRootShareNode`
+         is dispatched.
+       * If the `RootStorageNode` visit fails, the `RootContentNode` presents
+         the login form, with the username filled in and Remember Me is
+         activated, as appropriate.
+    See [#ContentNodenavigationmodes below] for details about the navigation
+    modes.
 
 === Content Node navigation modes ===
 Special navigation behaviors are supported using query (search) parameters
 on the node hash locations, translated to the node_opts parameter passed
-through the .visit(), .provision*(), and .show()/.layout*() node methods.
-(Some modes are only used internally, via node_opts, and not passed via
-the URL query parameters.)
+through the `.visit()`, `.provision*()`, and `.show()`/`.layout*()` node
+methods.  (Some modes can only be used via the mode_opts method parameters,
+and not passed as URL query parameters.)
 
 Currently implemented modes include:
 * `passive`: when showing a node, just adjust the DOM $page, don't do
