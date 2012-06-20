@@ -5,12 +5,15 @@ functionalities are covered by pure HTML5:
 
 ||= Feature =||= Pure HTML5? =||= Comments =||
 || Filesystem access || no || html5 filesystem very limited - does not provide access to user regular files, system files ||
-|| Secure storage - keychain || no || No reliably secure native html5 local storage||
+|| Secure storage - keychain || no || No reliably secure native html5 local storage. ||
+|| Platform data-encryption APIs || no || For navy. ||
 || Providing all necessary native UI operations || probably || jQm provides long-press (taphold), swipe, lots more. ||
 || Settings and persistent data || yes || html5 local storage. ([#lawnchair Lawnchair]?) - but no secure storage ||
 || Offline operation || yes || html5 cache manifest ||
-|| Circumventing CORS restrictions || no, but || we cannot circumvent CORS with just html5 (really, javascript) access without opening ploys that others can use - see [[HTML5ClientAppSameOriginIssues]] ||
+|| Circumventing CORS restrictions || no, but... || we cannot circumvent CORS with just html5 (really, javascript) access without opening ploys that others can use - see [[HTML5ClientAppSameOriginIssues]] ||
 
-> ([=#lawnchair lawnchair] has a bunch of local storage adapters, for
-> identical persistent key/value operation across available storage modes
-> of most browsers we would need to consider.)
+> ([=#lawnchair lawnchair]: http://brian.io/lawnchair/ lightweight db wrapper around html5
+> local storage. It provides a db abstraction and a bunch of local storage adapters, 
+> auto-selectable for identical persistent key/value operation across available storage
+> modes of most browsers we would need to consider. May not need it, but worth
+> keeping in mind in case something like it is necessary.)
