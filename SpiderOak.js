@@ -137,9 +137,8 @@ var spideroak = function () {
         var root = content_node_manager.get(my.actual_shares_root_url);
         var url = (root.url + b32encode_trim(shareid) + "/" + password + "/");
         register_public_share_room_url(url);
-        content_node_manager.get(url, root);
-        return url;
-    }
+        content_node_manager.get(url, content_node_manager.get_combo_root());
+        return url; }
 
 
     /* ===== Node-independent content URL categorization ===== */
@@ -1414,7 +1413,10 @@ var spideroak = function () {
             establish_traversal_handler();
 
             // Properly furnish login form:
-            prep_login_form('.nav_login_storage', storage_login, 'username');
+            prep_login_form('.nav_login_storage', storage_login,
+                            'username');
+            prep_login_form('.nav_login_share', visit_public_share_room,
+                            'shareid');
 
             my.combo_root_url = defaults.combo_root_url;
             var combo_root = content_node_manager.get_combo_root();
