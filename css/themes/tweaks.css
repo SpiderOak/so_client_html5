@@ -4,9 +4,13 @@
 }
 
 .transplanted-items .ui-content .ui-listview {
-  /* Workaround for spacing problem in transplanted items on home page: */
+  /* Workaround for spacing problem in procedurally transplanted items: */
   margin: -1px -15px -1px -15px !important;
 }
+/* I couldn't get .transplanted-items to work closer to the actual items,
+   so I use this to compensate in the login form. Aiee! */
+.non-transplanted {
+  margin: 10px; }
 
 .empty-sign {
   color: gray !important;
