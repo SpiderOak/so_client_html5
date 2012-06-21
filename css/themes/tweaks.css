@@ -7,3 +7,7 @@
   /* Workaround for spacing problem in transplanted items on home page: */
   margin: -1px -15px -1px -15px !important;
 }
+
+.empty-sign {
+  color: gray !important;
+}

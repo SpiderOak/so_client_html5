@@ -933,10 +933,9 @@ var spideroak = function () {
             insert_item(subnode.layout_item$(mode_opts)); }
 
         if (lensubdirs + lenfiles === 0) {
-            // XXX Need to convey that the container is empty more nicely.
-            $list.append($('<li title="Empty" class="empty-sign"'
-                           + 'class="empty-placeholder"/>')
-                         .html('&nbsp;&nbsp;&nbsp;&nbsp;&empty;')); }
+            $list.append($('<li title="Empty" class="empty-placeholder"/>')
+                         .html('<span class="empty-sign ui-btn-text">'
+                               + '&empty;</span>')); }
         else {
             var $item;
             var curinitial, divider_prefix, indicator = "";
