@@ -6,6 +6,7 @@
   <title>SpiderOak</title>
   <!--[if lt IE 9]><script src="js_aux/html5.js"></script><![endif]-->
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="css/themes/tweaks.css" />
   <link rel="stylesheet" href="css/themes/iphone.css" />
   <link rel="stylesheet" href="jquery.mobile-1.1.0/jquery.mobile.structure-1.1.0.css"/>
   <script src="jquery-1.7.2/jquery-1.7.2.js"></script>
@@ -18,7 +19,7 @@
 
 <body>
 
-  <div data-role="page" id="home" data-theme="a">
+  <div data-role="page" class="transplanted-items" id="home" data-theme="a">
     <div data-role="header">
       <a data-role="button" class="logout-button"
          data-icon="delete" data-iconpos="notext"
@@ -85,7 +86,6 @@
             <li align="center">
               <p> <em> Empty / Fetching... </em> </p>
             </li>
-            <br/>
           </ul>
           <ul data-role="listview" class="my-content-section">
             <li data-role="list-divider" id="my-rooms-leader"
@@ -95,24 +95,22 @@
             <li align="center">
               <p> <em> Empty / Fetching... </em> </p>
             </li>
-            <br/>
           </ul>
           <ul data-role="listview" class="public-content-section">
             <li data-role="list-divider" id="public-rooms-leader"
                 data-theme="f" data-icon="plus">
-              <a href="#share-home" alt="Change"> Public Share Rooms </a>
+              <a href="#share-home" alt="Change"> Other Share Rooms </a>
             </li>
             <li align="center">
               <p> <em> ... </em> </p>
             </li>
-            <br/>
           </ul>
       </div>
     </div>
     <div data-role="footer" data-position="fixed" data-theme="a">
       <div data-role="navbar">
         <ul>
-          <li> <a href="#settings"> Settings </a> </li>
+          <li> <a href="#settings"> Unimplemented </a> </li>
           <li> <a href="#about"> About SpiderOak</a> </li>
         </ul>
       </div>
