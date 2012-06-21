@@ -234,10 +234,10 @@ For more details about CORS restrictions and the project, see
 === Managing the UI Theme ===
 The default set of jQuery Mobile theme swatches get us near enough to
 Mike's designs to be worth building on. The jQm theme roller gets us
-closer, but unfortunately its too low resolution to avoid some custom
-tailoring and contortions to get us the rest of the way. It's necessary to
-know some details about using the tool in order to continue to leverage its
-benefits while preserving our custom tailoring.
+closer, but unfortunately it's resolution is too low to avoid the need for
+custom tailoring and contortions. It's necessary to know some details about
+using the tool in order to continue to leverage its benefits while
+preserving our custom tailoring.
 
 ==== Maintaining our theme through the theme roller ====
 The most essential maintenance routine is feeding our tailored css back
@@ -248,7 +248,7 @@ subsequent jQm versions.
 To do so:
 * Visit the tool at http://jquerymobile.com/themeroller/
 * Open the "Import (or Upgrade)" activity
-* Enter our adjusted css/themes/spideroak.css in the text box and hit Import
+* Enter our adjusted css/themes/iphone.css in the text box and hit Import
 * Make adjustments
 * Use the "Download (theme zip file)" activity to get the zip file
 * Put in place copies of the desired artifacts - .css, .min.css, and incidentals
