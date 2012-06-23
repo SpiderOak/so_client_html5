@@ -489,22 +489,15 @@ var spideroak = function () {
         // - those visited in this session
         // - those remembered across sessions
 
-        var all_shares = [].concat(pmgr.get("other_share_urls") || [],
-                                   Object.keys(my.share_room_urls));
-        var combo_root = content_node_manager.get_combo_root();
-
-        this.subdirs = [];
-        all_shares.map(function (candidate) {
-            if (is_other_share_room_url(candidate)) {
-                // Parent in the combo root, instead of us:
-                this.add_item(candidate);
-                // Add unconditionally - it'll be removed elsewhere if invalid.
-                this.subdirs.push(candidate);}}.bind(this));
-        this.subdirs.sort(content_nodes_by_url_sorter);
-
+        this.subdirs = other_share_room_urls();
+        // .add_item() will also remove invalid ones from this.subdirs:
+        this.subdirs.map(this.add_item.bind(this));
         this.do_presentation(chngpg_opts, mode_opts); }
+
     OtherRootShareNode.prototype.do_presentation = function (chngpg_opts,
                                                              mode_opts) {
+
+        this.subdirs.sort(content_nodes_by_url_sorter);
 
         this.layout_header(chngpg_opts, mode_opts);
         this.layout_content(chngpg_opts, mode_opts);
@@ -580,25 +573,20 @@ var spideroak = function () {
                     [job_id, subnode_URL],
            'content': on success: the jquery $(dom) for the populated content,
                       for failure: the resulting XHR object. */
-
-        // On success notification we do two things:
-        // - Re-.layout() and .show(), in "passive" mode to not take browser
-        //   focus (we don't care about the content they pass back)
-        // - If the job_id is current, and the our_mode_opts passed back
-        //   has a notify_callback and _token, use them.
-        // On failure
+        // We ignore the content.
 
         var $page = this.my_page$();
         var subvisit_job_id = token[0];
         var subvisit_url = token[1];
 
         if (succeeded !== true) {
-            if (content.status === 401) {
+            if (content.status === 404) {
                 this.remove_item(subvisit_url);}}
 
-        if (subvisit_job_id === this.job_id)
+        if (subvisit_job_id === this.job_id) {
             // Do update, whether or not it was successful:
-            this.do_presentation({}, {passive: true}); }
+            this.subdirs = other_share_room_urls();
+            this.do_presentation({}, {passive: true}); }}
 
     ContentNode.prototype.handle_visit_success = function (data, when,
                                                            chngpg_opts,
@@ -714,33 +702,12 @@ var spideroak = function () {
            internal object operation. */
         this.job_id += 1;
         this.remove_item(url); }
+
     OtherRootShareNode.prototype.remove_item = function (room_url) {
         /* Omit a non-original share room from persistent and resident memory.
          */
-        this.subdirs = this.subdirs.filter(function (node) {
-                node.url !== room_url; })
         if (is_other_share_room_url(room_url)) {
-            var i = my.share_room_urls.indexOf(room_url);
-            if (i !== -1) {
-                my.share_room_urls.splice(i, i); }
-            this.unpersist_item(room_url); }}
-
-    OtherRootShareNode.prototype.persist_item = function (room_url) {
-        /* Add one of the non-original share rooms to persistent memory. */
-        var persistents = pmgr.get("other_share_urls") || [];
-        var i = persistents.indexOf(room_url);
-        if (i === -1) {
-            persistents.push(room_url);
-            persistents.sort();
-            pmgr.set("other_share_urls", persistents); }}
-
-    OtherRootShareNode.prototype.unpersist_item = function (room_url) {
-        /* Omit a non-original share room from persistent memory. */
-        var persistents = pmgr.get("other_share_urls") || [];
-        var i = persistents.indexOf(room_url);
-        if (i !== -1) {
-            persistents.splice(i, i);
-            pmgr.set("other_share_urls", persistents); }}
+            unregister_share_room_url(room_url); }}
 
     /* ===== Containment ===== */
     /* For content_node_manager.clear_hierarchy() */
