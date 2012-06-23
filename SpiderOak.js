@@ -1448,18 +1448,24 @@ var spideroak = function () {
            reveal and position the cursor in the username field.
            Optional callback is a function to invoke as part of the un/veiling.
         */
-        function focus_and_callback() {
+        function do_focus() {
             var $username = $('#my_login_username');
             if ($username.val() === "") { $username.focus(); }
-            else { $('#my_login_password').focus(); }
-            if (callback) { callback.call(this); }}
+            else { $('#my_login_password').focus(); }}
+        function do_focus_and_callback() {
+            do_focus();
+            if (callback) { callback(); }}
         var selector = '#home [data-role="content"]';
         if (conceal) {
             $(selector).hide(0, callback);
             this.veiled = true; }
         else {
             this.veiled = false;
-            $(selector).fadeIn(2000, focus_and_callback); }}
+            // Surprisingly, doing focus before dispatching fadeIn doesn't work.
+            // Also, username field focus doesn't *always* work before the
+            // delay is done, hence the redundancy.  Sigh.
+            $(selector).fadeIn(2000, do_focus_and_callback);
+            do_focus(); }}
 
     function prep_login_form(content_selector, submit_handler, name_field,
                              do_fade) {
