@@ -306,16 +306,17 @@ var spideroak = function () {
         this.emblem = "Root Share";
         this.root_url = url; }
     RootShareNode.prototype = new ShareNode();
-    function PublicRootShareNode(url, parent) {
+    function OtherRootShareNode(url, parent) {
         RootShareNode.call(this, url, parent);
-        this.name = "Public Share Rooms";
-        this.emblem = "Familiar Public Share Rooms"; }
+        this.name = "Other Share Rooms";
+        this.emblem = "Other Share Rooms";
+        this.job_id = 0; }
     OriginalRootShareNode.prototype = new RootShareNode();
     function OriginalRootShareNode(url, parent) {
         RootShareNode.call(this, url, parent);
         this.name = "My Share Rooms";
         this.emblem = "Originally Published Share Rooms"; }
-    PublicRootShareNode.prototype = new RootShareNode();
+    OtherRootShareNode.prototype = new RootShareNode();
 
     function DeviceStorageNode(url, parent) {
         StorageNode.call(this, url, parent);
@@ -411,7 +412,7 @@ var spideroak = function () {
                 error: function (xhr, statusText, thrown) {
                     this.handle_visit_failure(xhr, chngpg_opts, mode_opts,
                                               statusText,
-                                              thrown)}.bind(this), })};
+                                              thrown)}.bind(this), })}
 
     RootContentNode.prototype.visit = function (chngpg_opts, mode_opts) {
         /* Do the special visit of the consolidated storage/share root. */
@@ -577,10 +578,10 @@ var spideroak = function () {
         this.layout(mode_opts);
         this.show(chngpg_opts, mode_opts);
         if (mode_opts.notify_callback) {
-            var cloned_items_list$ = this.my_content_items$().clone(true);
+            var cloned_items_list$ = 
             mode_opts.notify_callback(true,
                                       mode_opts.notify_token,
-                                      cloned_items_list$); }}
+                                      this.my_content_items$().clone(true)); }}
 
     ContentNode.prototype.handle_visit_failure = function (xhr,
                                                            chngpg_opts,
@@ -620,7 +621,7 @@ var spideroak = function () {
         var $login_section = $page.find('.login-section');
         if (succeeded) {
             $login_section.hide(0);
-            $content_section.fadeIn('fast');
+            $content_section.fadeIn(4000);
             if (remember_manager.active()) {
                 // remember_manager will store just the relevant fields.
                 remember_manager.store(my);
