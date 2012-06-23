@@ -1342,14 +1342,15 @@ var spideroak = function () {
             $(selector).fadeIn(2000, function () {
                 $('#my_login_username').focus(); }); }}
 
-    function prep_login_form(content_selector, submit_handler, name_field) {
+    function prep_login_form(content_selector, submit_handler, name_field,
+                             do_fade) {
         /* Instrument form within 'content_selector' to submit with
-           'submit_handler'. 'name_field' is the id of the form field
-           with the login name, "password" is assumed to be the
-           password field id.
-
-           The submit action fades the content and clears the password
-           value, so it can't be reused.
+           'submit_handler'. 'name_field' is the id of the form field with
+           the login name, "password" is assumed to be the password field
+           id. If 'do_fade' is true, the content portion of the page will
+           be rigged to fade on form submit, and on pagechange reappear
+           gradually.  In any case, the password value will be cleared, so
+           it can't be reused.
         */
         var $content = $(content_selector);
         var $form = $(content_selector + " form");
@@ -1391,14 +1392,18 @@ var spideroak = function () {
                     remember_manager.active(false); }}
 
             data['password'] = $password.val();
-            $content.fadeOut(1000, function() { $password.val("");});
-            var unhide_form_oneshot = function(event, data) {
-                $content.show('fast');
-                $.mobile.hidePageLoadingMsg();
-                $(document).unbind("pagechange", unhide_form_oneshot);
-                $(document).unbind("error", unhide_form_oneshot); }
-            $(document).bind("pagechange", unhide_form_oneshot)
-            $(document).bind("error", unhide_form_oneshot)
+            if (do_fade) {
+                $content.fadeOut(1000, function() { $password.val("");});
+                var unhide_form_oneshot = function(event, data) {
+                    $content.show('fast');
+                    $.mobile.hidePageLoadingMsg();
+                    $(document).unbind("pagechange", unhide_form_oneshot);
+                    $(document).unbind("error", unhide_form_oneshot); }
+                $(document).bind("pagechange", unhide_form_oneshot)
+                $(document).bind("error", unhide_form_oneshot); }
+            else {
+                $name.val("");
+                $password.val(""); }
             submit_handler(data);
             return false; }); }
 
@@ -1414,14 +1419,16 @@ var spideroak = function () {
             // Setup traversal hook:
             establish_traversal_handler();
 
-            // Properly furnish login form:
-            prep_login_form('.nav_login_storage', storage_login,
-                            'username');
-            prep_login_form('.nav_login_share', visit_public_share_room,
-                            'shareid');
-
             my.combo_root_url = defaults.combo_root_url;
             var combo_root = content_node_manager.get_combo_root();
+            var other_shares = content_node_manager.get(my.shares_root_url);
+
+            // Properly furnish login form:
+            prep_login_form('.nav_login_storage', storage_login,
+                            'username', true);
+            prep_login_form('.nav_login_share',
+                            other_shares.add_item_external.bind(other_shares),
+                            'shareid', false);
 
             // Hide everything below the banner, for subsequent unveiling:
             combo_root.veil(false);
