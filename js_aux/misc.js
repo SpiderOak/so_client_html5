@@ -7,13 +7,7 @@ function translate(text) {
 
 
 $(document).ready(function() {
-    /* Prevent "event.layerX and event.layerY are broken and deprecated ..."
-       WebKit warning message, per:
-      http://stackoverflow.com/questions/7825448/webkit-issues-with-event-layerx-and-event-layery
-      */
-    $.event.props = ($.event.props.join('|')
-                     .replace('layerX|layerY|', '')
-                     .split('|'));
+    /* Nothing so far. */
 })
 
 /* from http://forthescience.org/blog/2010/11/30/base32-encoding-in-javascript/
