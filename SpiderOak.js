@@ -228,6 +228,20 @@ var spideroak = function () {
                 || is_content_root_url(url)
                 || is_content_root_page_id(url)); }
 
+    function other_share_room_urls() {
+        /* Return an array of known share room urls that are not among the
+           ones originated by the current account. Draws from peristence
+           storage if remembering is active.  Doesn't depend on the urls being
+           established as nodes. */
+        var all_shares = Object.keys(my.share_room_urls);
+        if (remember_manager.active()) {
+            var others = Object.keys(pmgr.get('other_share_urls') || {});
+            others.map(function (candidate) {
+                if (! my.share_room_urls.hasOwnProperty(candidate)) {
+                    register_share_room_url(candidate); }});
+            all_shares = all_shares.concat(others); }
+        return all_shares.filter(is_other_share_room_url); }
+
     /* ===== Data model ===== */
 
     /* SpiderOak content includes storage (backups) and share rooms. The
