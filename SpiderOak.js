@@ -43,11 +43,14 @@ var spideroak = function () {
         // XXX base_host_url may vary according to brand package.
         base_host_url: "https://spideroak.com",
         combo_root_url: "https://home",
+        combo_root_page_id: "home",
+        original_shares_root_page_id: "original-home",
+        other_shares_root_page_id: "share-home",
         storage_login_path: "/browse/login",
         storage_logout_suffix: "logout",
         storage_path_prefix: "/storage/",
         original_shares_path_suffix: "shares",
-        public_shares_path_suffix: "/share/",
+        shares_path_suffix: "/share/",
         content_page_template_id: "content-page-template",
         devices_query_expression: 'device_info=yes',
         versions_query_expression: 'format=version_info',
@@ -138,8 +141,9 @@ var spideroak = function () {
     // - the public share root, which is the same across all accounts
     //
     // There is also a collection of the shares originated by the account,
-    // in the OriginalSharesRoot.  Like all shares, the URLs of the items
-    // it contains reside among the public shares.
+    // in the OriginalRootShareNode.  Like all SpiderOak share rooms, the
+    // items are actually public shares, but the collection listing is only
+    // visible from within the account.
     //
     // Content urls are recognized by virtue of beginning with one of the
     // registered content roots. The storage root is registered when the user
@@ -168,13 +172,16 @@ var spideroak = function () {
            storage root.  Return the url. */
         my.original_shares_root_url =
             (my.storage_root_url + defaults.original_shares_path_suffix); }
-    function register_public_share_room_url(url) {
+    function register_share_room_url(url) {
         /* Include url among the registered public rooms.  Returns the url. */
-        my.public_share_room_urls[url] = true;
+        my.share_room_urls[url] = true;
         return url; }
     function register_original_share_room_url(url) {
-        /* Include url among the registered original rooms.  Returns the url. */
+        /* Include url among the registered original rooms.
+           Also registers among the set of all familiar share room urls.
+           Returns the url. */
         my.original_share_room_urls[url] = true;
+        register_share_room_url(url);
         return url; }
     function is_combo_root_url(url) {
         return (url === my.combo_root_url); }
@@ -184,15 +191,23 @@ var spideroak = function () {
         return ((url === my.combo_root_url)
                 || (url === my.storage_root_url)
                 || (url === my.original_shares_root_url)
-                || (url === my.actual_shares_root_url)); }
-    function is_public_share_room_url(url) {
+                || (url === my.shares_root_url)); }
+    function is_content_root_page_id(url) {
+        return ((url === defaults.combo_root_page_id)
+                || (url === defaults.other_shares_root_page_id)
+                || (url === defaults.original_shares_root_page_id)); }
+    function is_share_room_url(url) {
         /* True if the 'url' is for one of the familiar public share rooms.
            Doesn't depend on the url having an established node. */
-        return (my.public_share_room_urls.hasOwnProperty(url)); }
+        return my.share_room_urls.hasOwnProperty(url); }
     function is_original_share_room_url(url) {
         /* True if the 'url' is for one of the original share rooms.
            Doesn't depend on the url having an established node. */
         return (my.original_share_room_urls.hasOwnProperty(url)); }
+    function is_other_share_room_url(url) {
+        /* True if the 'url' is for one of the original share rooms.
+           Doesn't depend on the url having an established node. */
+        return is_share_room_url(url) && (! is_original_share_room_url(url)); }
     function is_storage_url(url) {
         /* True if the URL is for a content item in the user's storage area.
            Doesn't depend on the url having an established node. */
@@ -202,15 +217,16 @@ var spideroak = function () {
     function is_share_url(url) {
         /* True if the URL is for a content item in the user's storage area.
            Doesn't depend on the url having an established node. */
-        return (my.actual_shares_root_url
-                && (url.slice(0, my.actual_shares_root_url.length)
-                    === my.actual_shares_root_url)); }
+        return (my.shares_root_url
+                && (url.slice(0, my.shares_root_url.length)
+                    === my.shares_root_url)); }
     function is_content_url(url) {
         /* True if url within registered content roots. */
         return (is_storage_url(url)
                 || is_share_url(url)
-                || is_combo_root_url(url)); }
-
+                || is_combo_root_url(url)
+                || is_content_root_url(url)
+                || is_content_root_page_id(url)); }
 
     /* ===== Data model ===== */
 
@@ -694,7 +710,7 @@ var spideroak = function () {
         return [].concat(this.subdirs, this.files); }
     RootContentNode.prototype.contained_urls = function () {
         return [].concat(this.storage_devices,
-                         this.original_shares, this.public_shares); }
+                         this.original_shares, this.shares); }
     RootStorageNode.prototype.contained_urls = function () {
         return [].concat(this.subdirs); }
     FileStorageNode.prototype.contained_urls = function () {
@@ -807,7 +823,7 @@ var spideroak = function () {
         /* Embody the root share room with 'data'.
            'when' is time soon before data was fetched. */
         this.subdirs = [];
-        var room_base = my.actual_shares_root_url + data.share_id_b32 + "/";
+        var room_base = my.shares_root_url + data.share_id_b32 + "/";
         this.provision_items(data.share_rooms, this.subdirs,
                              room_base, 'room_key', true,
                              [['room_name', 'name'],
