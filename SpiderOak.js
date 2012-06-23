@@ -425,8 +425,6 @@ var spideroak = function () {
         // See docs/AppOverview.txt "Content Node navigation modes" for
         // details about mode controls.
 
-        this.veil(true);
-
         this.layout_header();
 
         if (! this.loggedin_ish()) {
@@ -533,7 +531,7 @@ var spideroak = function () {
                                      notify_callback:
                                        this.notify_subvisit_status.bind(this),
                                      notify_token: 'original-share'};
-                $('.nav_login_storage').fadeIn(2000);
+                if (this.veiled) { this.veil(false); }
                 this.authenticated(true, content);
                 var ps_root = cnmgr.get(my.original_shares_root_url, this);
                 ps_root.visit({}, our_mode_opts); }}}
@@ -620,8 +618,9 @@ var spideroak = function () {
         var $content_section = $page.find('.my-content-section');
         var $login_section = $page.find('.login-section');
         if (succeeded) {
-            $login_section.hide(0);
-            $content_section.fadeIn(4000);
+            // Show the content instead of the form
+            $login_section.hide();
+            $content_section.show();
             if (remember_manager.active()) {
                 // remember_manager will store just the relevant fields.
                 remember_manager.store(my);
@@ -629,6 +628,8 @@ var spideroak = function () {
         else {
             // Include the xhr.statusText in the form.
             this.veil(false);
+            $content_section.hide();
+            $login_section.show();
             var $status = $page.find('.error-status-message');
             if (content) {
                 var error_message = content.statusText;
@@ -642,8 +643,7 @@ var spideroak = function () {
             else { $status.hide(); }
             // Hide the storage and original shares sections
             $content_section.hide();
-            // Show the form
-            $login_section.fadeIn(2000); }}
+            if (this.veiled) { this.veil(false); }}}
 
     OtherRootShareNode.prototype.add_item_external = function (credentials) {
         /* Visit a specified share room, according to 'credentials' object:
@@ -1435,15 +1435,21 @@ var spideroak = function () {
                                     + " (" + xhr.statusText + ")");
                         finish(); }}); }}
 
-    RootContentNode.prototype.veil = function (conceal) {
+    RootContentNode.prototype.veil = function (conceal, callback) {
         /* If 'conceal' is true, conceal our baudy body.  Otherwise, gradually
-           reveal and position the cursor in the username field. */
+           reveal and position the cursor in the username field.
+           Optional callback is a function to invoke as part of the un/veiling.
+        */
+        function focus_and_callback() {
+            $('#my_login_username').focus();
+            if (callback) { callback.call(this); }};
         var selector = '#home [data-role="content"]';
         if (conceal) {
-            $(selector).hide(0); }
+            $(selector).hide(0, callback);
+            this.veiled = true; }
         else {
-            $(selector).fadeIn(2000, function () {
-                $('#my_login_username').focus(); }); }}
+            this.veiled = false;
+            $(selector).fadeIn(2000, focus_and_callback); }}
 
     function prep_login_form(content_selector, submit_handler, name_field,
                              do_fade) {
@@ -1496,7 +1502,8 @@ var spideroak = function () {
 
             data['password'] = $password.val();
             if (do_fade) {
-                $content.fadeOut(1000, function() { $password.val("");});
+                var combo_root = content_node_manager.get_combo_root();
+                combo_root.veil(true, function() { $password.val("");});
                 var unhide_form_oneshot = function(event, data) {
                     $content.show('fast');
                     $.mobile.hidePageLoadingMsg();
@@ -1534,7 +1541,7 @@ var spideroak = function () {
                             'shareid', false);
 
             // Hide everything below the banner, for subsequent unveiling:
-            combo_root.veil(false);
+            combo_root.veil(true);
 
             // Try a storage account if available from persistent settings
             if (remember_manager.active()) {
