@@ -173,9 +173,28 @@ var spideroak = function () {
         my.original_shares_root_url =
             (my.storage_root_url + defaults.original_shares_path_suffix); }
     function register_share_room_url(url) {
+        /* Include 'url' among registered share rooms.  Persists the change
+           if remembering mode is active.  Returns the url. */
         /* Include url among the registered public rooms.  Returns the url. */
         my.share_room_urls[url] = true;
+        if (remember_manager.active() && is_other_share_room_url(url)) {
+            var others = pmgr.get('other_share_urls') || {};
+            if (! others.hasOwnProperty(url)) {
+                others[url] = true;
+                pmgr.set('other_share_urls', others); }}
         return url; }
+    function unregister_share_room_url(url) {
+        /* Remove 'url' from the registered share rooms.  Persists the change
+           if remembering mode is active.  Returns the url. */
+        if (my.share_room_urls.hasOwnProperty(url)) {
+            if (remember_manager.active() && is_other_share_room_url(url)) {
+                var others = pmgr.get('other_share_urls') || {};
+                if (others.hasOwnProperty(url)) {
+                    delete others[url];
+                    pmgr.set('other_share_urls', others); }}
+            // Below so above use of is_other_share_room_url works:
+            delete my.share_room_urls[url];
+            return url; }}
     function register_original_share_room_url(url) {
         /* Include url among the registered original rooms.
            Also registers among the set of all familiar share room urls.
