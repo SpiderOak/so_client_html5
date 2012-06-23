@@ -631,6 +631,10 @@ var spideroak = function () {
             this.veil(false);
             $content_section.hide();
             $login_section.show();
+            var username;
+            if (remember_manager.active()
+                && (username = remember_manager.fetch().username)) {
+                $('#my_login_username').val(username); }
             var $status = $page.find('.error-status-message');
             if (content) {
                 var error_message = content.statusText;
@@ -1498,6 +1502,7 @@ var spideroak = function () {
             var $password = $('input[name=password]', this);
             var data = {};
             data[name_field] = $name.val();
+            $name.val("");
             if ($remember_widget.length > 0) {
                 // Preserve whether or not we're remembering, so on a
                 // successful visits we'll know whether to preserve data:
@@ -1509,7 +1514,7 @@ var spideroak = function () {
             data['password'] = $password.val();
             if (do_fade) {
                 var combo_root = content_node_manager.get_combo_root();
-                combo_root.veil(true, function() { $password.val("");});
+                combo_root.veil(true, function() { $password.val(""); });
                 var unhide_form_oneshot = function(event, data) {
                     $content.show('fast');
                     $.mobile.hidePageLoadingMsg();
