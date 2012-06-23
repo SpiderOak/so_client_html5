@@ -1445,8 +1445,10 @@ var spideroak = function () {
            Optional callback is a function to invoke as part of the un/veiling.
         */
         function focus_and_callback() {
-            $('#my_login_username').focus();
-            if (callback) { callback.call(this); }};
+            var $username = $('#my_login_username');
+            if ($username.val() === "") { $username.focus(); }
+            else { $('#my_login_password').focus(); }
+            if (callback) { callback.call(this); }}
         var selector = '#home [data-role="content"]';
         if (conceal) {
             $(selector).hide(0, callback);
