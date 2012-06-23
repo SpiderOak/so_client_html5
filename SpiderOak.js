@@ -494,7 +494,6 @@ var spideroak = function () {
 
         this.authenticated(true);
 
-        $.mobile.hidePageLoadingMsg();
         var $page = this.my_page$();
         var selector = ((token === 'storage')
                         ? "#my-storage-leader"
@@ -502,6 +501,7 @@ var spideroak = function () {
         var $leader = $(selector);
 
         if (! succeeded) {
+            $.mobile.hidePageLoadingMsg();
             $(selector + " + li").remove(); // Remove the leader's li siblings.
             // TODO Make pretty:
             $leader.after($('<li/>').html('<p> <em> Error: '
@@ -531,7 +531,8 @@ var spideroak = function () {
                                      notify_callback:
                                        this.notify_subvisit_status.bind(this),
                                      notify_token: 'original-share'};
-                if (this.veiled) { this.veil(false); }
+                if (this.veiled) {
+                    this.veil(false, $.mobile.hidePageLoadingMsg); }
                 this.authenticated(true, content);
                 var ps_root = cnmgr.get(my.original_shares_root_url, this);
                 ps_root.visit({}, our_mode_opts); }}}
@@ -1420,7 +1421,10 @@ var spideroak = function () {
                 remember_manager.remove_storage_host(); }
             go_to_entrance(); }
 
-        if (! content_node_manager.get_combo_root().loggedin_ish()) {
+        var combo_root = content_node_manager.get_combo_root();
+        combo_root.veil(true);
+
+        if (! combo_root.loggedin_ish()) {
             // Can't reach logout location without server - just clear and bail.
             finish(); }
         else {
