@@ -598,7 +598,6 @@ var spideroak = function () {
         this.layout(mode_opts);
         this.show(chngpg_opts, mode_opts);
         if (mode_opts.notify_callback) {
-            var cloned_items_list$ = 
             mode_opts.notify_callback(true,
                                       mode_opts.notify_token,
                                       this.my_content_items$().clone(true)); }}
