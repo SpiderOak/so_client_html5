@@ -64,25 +64,27 @@ var spideroak = function () {
         storage_root_url: null,
         original_shares_root_url: null,
         // All the service's actual shares reside within:
-        actual_shares_root_url: defaults.base_host_url + "/share/",
-        public_share_room_urls: {},
+        shares_root_url: defaults.base_host_url + "/share/",
+        share_room_urls: {},
         original_share_room_urls: {},
     };
 
     /* Navigation handlers: */
 
+
     function handle_content_visit(e, data) {
         /* Intercept URL visits and intervene for repository content. */
-        if ((typeof data.toPage === "string")
-            && is_content_url(data.toPage)) {
+        var page = internalize_url(data.toPage);
+
+        if ((typeof page === "string") && is_content_url(page)) {
             e.preventDefault();
-            var mode_opts = query_params(data.toPage);
-            content_node_manager.get(data.toPage).visit(data.options,
-                                                        mode_opts); }}
+            var mode_opts = query_params(page);
+            content_node_manager.get(page).visit(data.options, mode_opts); }}
+
+
     function establish_traversal_handler() {
         /* Establish page change event handler. */
-        $(document).bind("pagebeforechange.SpiderOak", handle_content_visit);
-    }
+        $(document).bind("pagebeforechange.SpiderOak", handle_content_visit); }
 
 
     /*  ===== Content Root Registration =====  */
@@ -1442,6 +1444,40 @@ var spideroak = function () {
 
     ContentNode.prototype.toString = function () {
         return "<" + this.emblem + ": " + this.url + ">"; }
+
+    function internalize_url(obj) {
+        /* Return the "internal" version of the 'url'.
+
+           - For non-string objects, returns the object
+           - For fragments of the application code's url, returns the fragment
+             (sans the '#'),
+           - Translates page-ids for root content nodes to their urls,
+           - Those last two Combined transforms fragment references to root
+             content pages to the urls of those pages.
+
+           main body is that of the application.  Otherwise, the original
+           object is returned. */
+        if (typeof obj !== "string") { return obj; }
+        if (obj.split('#')[0] === window.location.href.split('#')[0]) {
+            obj = obj.split('#')[1]; }
+        switch (obj) {
+        case (defaults.combo_root_page_id):
+            return defaults.combo_root_url;
+        case (defaults.original_shares_root_page_id):
+            return my.original_shares_root_url;
+        case (defaults.other_shares_root_page_id):
+            return my.shares_root_url;
+        default: return obj; }}
+
+    function content_nodes_by_url_sorter(prev, next) {
+        var prev_str = prev, next_str = next;
+        var prev_name = content_node_manager.get(prev).name;
+        var next_name = content_node_manager.get(prev).name;
+        if (prev_name && next_name) {
+            prev_str = prev_name, next_str = next_name; }
+        if (prev_str < next_str) { return -1; }
+        else if (prev_str > next_str) { return 1; }
+        else { return 0; }}
 
     if (SO_DEBUGGING) {
         // Expose the managers for access while debugging:
