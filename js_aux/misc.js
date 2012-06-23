@@ -11,7 +11,9 @@ $(document).ready(function() {
        WebKit warning message, per:
       http://stackoverflow.com/questions/7825448/webkit-issues-with-event-layerx-and-event-layery
       */
-    $.event.props = $.event.props.join('|').replace('layerX|layerY|', '').split('|');
+    $.event.props = ($.event.props.join('|')
+                     .replace('layerX|layerY|', '')
+                     .split('|'));
 })
 
 /* from http://forthescience.org/blog/2010/11/30/base32-encoding-in-javascript/
