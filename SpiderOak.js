@@ -129,19 +129,6 @@ var spideroak = function () {
         my.storage_host = "";
         my.storage_web_url = ""; }
 
-    function add_public_share_room(shareid, password, host) {
-        /* Register a public share room in the public share root, returning URL.
-             'username': the account name
-             'host': the server for the account
-             'storage_path_prefix': the leading part of the storage path
-        */
-
-        var root = content_node_manager.get(my.actual_shares_root_url);
-        var url = (root.url + b32encode_trim(shareid) + "/" + password + "/");
-        register_public_share_room_url(url);
-        content_node_manager.get(url, content_node_manager.get_combo_root());
-        return url; }
-
 
     /* ===== Node-independent content URL categorization ===== */
 
@@ -448,6 +435,38 @@ var spideroak = function () {
             // XXX Provide public share edit and "+" add controls - somewhere.
             }}
 
+    OtherRootShareNode.prototype.visit = function (chngpg_opts, mode_opts) {
+        /* Obtain the known, non-original share rooms and present them. */
+        // Our content is the set of remembered urls, from:
+        // - those visited in this session
+        // - those remembered across sessions
+
+        var all_shares = [].concat(pmgr.get("other_share_urls") || [],
+                                   Object.keys(my.share_room_urls));
+        var combo_root = content_node_manager.get_combo_root();
+
+        this.subdirs = [];
+        all_shares.map(function (candidate) {
+            if (is_other_share_room_url(candidate)) {
+                // Parent in the combo root, instead of us:
+                this.add_item(candidate);
+                // Add unconditionally - it'll be removed elsewhere if invalid.
+                this.subdirs.push(candidate);}}.bind(this));
+        this.subdirs.sort(content_nodes_by_url_sorter);
+
+        this.do_presentation(chngpg_opts, mode_opts); }
+    OtherRootShareNode.prototype.do_presentation = function (chngpg_opts,
+                                                             mode_opts) {
+
+        this.layout_header(chngpg_opts, mode_opts);
+        this.layout_content(chngpg_opts, mode_opts);
+        this.layout_footer(chngpg_opts, mode_opts);
+
+        this.show(chngpg_opts, mode_opts);
+        if (mode_opts.notify_callback) {
+            mode_opts.notify_callback(true,
+                                      mode_opts.notify_token); }}
+
     RootContentNode.prototype.notify_subvisit_status = function(succeeded,
                                                                 token,
                                                                 content) {
@@ -497,10 +516,40 @@ var spideroak = function () {
                                      notify_callback:
                                        this.notify_subvisit_status.bind(this),
                                      notify_token: 'original-share'};
-                $('.nav_login_storage').fadeIn();
+                $('.nav_login_storage').fadeIn(2000);
                 this.authenticated(true, content);
                 var ps_root = cnmgr.get(my.original_shares_root_url, this);
                 ps_root.visit({}, our_mode_opts); }}}
+
+
+    OtherRootShareNode.prototype.notify_subvisit_status = function(succeeded,
+                                                                   token,
+                                                                   content) {
+        /* Callback for subordinate share nodes to signal their visit result:
+           'succeeded': true for success, false for failure.
+           'token': token we passed in to identify transaction and convey info:
+                    [job_id, subnode_URL],
+           'content': on success: the jquery $(dom) for the populated content,
+                      for failure: the resulting XHR object. */
+
+        // On success notification we do two things:
+        // - Re-.layout() and .show(), in "passive" mode to not take browser
+        //   focus (we don't care about the content they pass back)
+        // - If the job_id is current, and the our_mode_opts passed back
+        //   has a notify_callback and _token, use them.
+        // On failure
+
+        var $page = this.my_page$();
+        var subvisit_job_id = token[0];
+        var subvisit_url = token[1];
+
+        if (succeeded !== true) {
+            if (content.status === 401) {
+                this.remove_item(subvisit_url);}}
+
+        if (subvisit_job_id === this.job_id)
+            // Do update, whether or not it was successful:
+            this.do_presentation({}, {passive: true}); }
 
     ContentNode.prototype.handle_visit_success = function (data, when,
                                                            chngpg_opts,
@@ -577,8 +626,66 @@ var spideroak = function () {
             // Hide the storage and original shares sections
             $content_section.hide();
             // Show the form
-            $login_section.fadeIn('fast'); }}
+            $login_section.fadeIn(2000); }}
 
+    OtherRootShareNode.prototype.add_item_external = function (credentials) {
+        /* Visit a specified share room, according to 'credentials' object:
+           {username, password}.
+           Use this routine only for adding from outside the object - use
+           this.add_item(), instead, for internal operation.
+        */
+
+        this.job_id += 1;       // Entry
+
+        return this.add_item(my.shares_root_url
+                             + b32encode_trim(credentials.shareid)
+                             + "/" + credentials.password
+                             + "/"); }
+
+    OtherRootShareNode.prototype.add_item = function (url) {
+        /* Visit a specified share room, according its' URL address.
+           Return the room object. */
+        register_share_room_url(url);
+        var room = content_node_manager.get(url, cnmgr.get_combo_root());
+        room.visit({},
+                   {passive: true,
+                    notify_callback: this.notify_subvisit_status.bind(this),
+                    notify_token: [this.job_id, url]});
+        return room; }
+
+    OtherRootShareNode.prototype.remove_item_external = function (room_url) {
+        /* Omit a non-original share room from persistent and resident memory.
+           This is for use from outside of the object. Use .remove_item() for
+           internal object operation. */
+        this.job_id += 1;
+        this.remove_item(url); }
+    OtherRootShareNode.prototype.remove_item = function (room_url) {
+        /* Omit a non-original share room from persistent and resident memory.
+         */
+        this.subdirs = this.subdirs.filter(function (node) {
+                node.url !== room_url; })
+        if (is_other_share_room_url(room_url)) {
+            var i = my.share_room_urls.indexOf(room_url);
+            if (i !== -1) {
+                my.share_room_urls.splice(i, i); }
+            this.unpersist_item(room_url); }}
+
+    OtherRootShareNode.prototype.persist_item = function (room_url) {
+        /* Add one of the non-original share rooms to persistent memory. */
+        var persistents = pmgr.get("other_share_urls") || [];
+        var i = persistents.indexOf(room_url);
+        if (i === -1) {
+            persistents.push(room_url);
+            persistents.sort();
+            pmgr.set("other_share_urls", persistents); }}
+
+    OtherRootShareNode.prototype.unpersist_item = function (room_url) {
+        /* Omit a non-original share room from persistent memory. */
+        var persistents = pmgr.get("other_share_urls") || [];
+        var i = persistents.indexOf(room_url);
+        if (i !== -1) {
+            persistents.splice(i, i);
+            pmgr.set("other_share_urls", persistents); }}
 
     /* ===== Containment ===== */
     /* For content_node_manager.clear_hierarchy() */
@@ -713,27 +820,6 @@ var spideroak = function () {
 
         this.lastfetched = when; }
 
-    PublicRootShareNode.prototype.provision_populate = function (data, when) {
-        /* Embody the public root share room with 'data'.
-           'when' is time soon before data was fetched. */
-        var combo_root = content_node_manager.get_combo_root();
-        var url, dev, devdata;
-        this.name = "Public Share Rooms Container";
-
-        for (room_url in my.public_share_rooms_urls) {
-            if (my.public_share_rooms_urls.hasOwnProperty(room_url)) {
-                data.dirs.push([content_node_manager.get(room_url, combo_root),
-                                room_url]); }}
-
-        this.provision_items(data.share_rooms, this.subdirs,
-                             room_base, 'room_key', true,
-                             [['room_name', 'name'],
-                              ['room_description', 'description'],
-                              'room_key', 'share_id'],
-                             my.combo_root_url);
-
-        this.lastfetched = when; }
-
     DeviceStorageNode.prototype.provision_populate = function (data, when) {
         /* Embody storage folder items with 'data'.
            'when' is time soon before data was fetched. */
@@ -779,7 +865,13 @@ var spideroak = function () {
         return this.url; }
     RootContentNode.prototype.my_page_id = function () {
         /* Set the UI page id, escaping special characters as necessary. */
-        return "home"; }
+        return defaults.combo_root_page_id; }
+    OtherRootShareNode.prototype.my_page_id = function () {
+        /* Set the UI page id, escaping special characters as necessary. */
+        return defaults.other_shares_root_page_id; }
+    OriginalRootShareNode.prototype.my_page_id = function () {
+        /* Set the UI page id, escaping special characters as necessary. */
+        return defaults.original_shares_root_page_id; }
     ContentNode.prototype.show = function (chngpg_opts, mode_opts) {
         /* Trigger UI focus on our content layout.
            If mode_opts "passive" === true, don't do a changePage.
@@ -1050,6 +1142,8 @@ var spideroak = function () {
             // Include our page in the DOM, after the storage page template:
             $template.after(this.my_page$()); }
         return this.$page; }
+    OtherRootShareNode.prototype.my_page$ = function () {
+        return RootContentNode.prototype.my_page$.call(this); }
     RootContentNode.prototype.my_page$ = function () {
         /* Return the special case of the root content nodes actual page. */
         return (this.$page
@@ -1184,8 +1278,8 @@ var spideroak = function () {
                             got = new RootStorageNode(url, parent); }
                         else if (url === my.original_shares_root_url) {
                             got = new OriginalRootShareNode(url, parent); }
-                        else if (url === my.actual_shares_root_url) {
-                            got = new PublicRootShareNode(url, parent); }
+                        else if (url === my.shares_root_url) {
+                            got = new OtherRootShareNode(url, parent); }
                         else {
                             throw new Error("Content model management error");}}
 
@@ -1323,14 +1417,6 @@ var spideroak = function () {
                                     + xhr.status
                                     + " (" + xhr.statusText + ")");
                         finish(); }}); }}
-
-    function visit_public_share_room(credentials) {
-        /* Visit a specified share room.
-           'credentials': Object including "shareid" and "password" attrs.
-        */
-        $.mobile.changePage(
-            add_public_share_room(credentials.shareid, credentials.password,
-                                  defaults.share_host_url)); }
 
     RootContentNode.prototype.veil = function (conceal) {
         /* If 'conceal' is true, conceal our baudy body.  Otherwise, gradually
