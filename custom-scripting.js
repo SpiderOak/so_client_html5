@@ -14,6 +14,8 @@ $(document).bind("mobileinit", function(){
 $.ajaxSetup({
     beforeSend:function(){
         $.mobile.showPageLoadingMsg(); },
-    complete:function(){
-        $.mobile.hidePageLoadingMsg(); },
+    // This would hide loading message much too soon on storage login, so we
+    // do the hiding explicitly.
+    //complete:function(){
+    //    $.mobile.hidePageLoadingMsg(); },
 });
