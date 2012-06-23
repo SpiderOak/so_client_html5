@@ -653,7 +653,7 @@ var spideroak = function () {
             $login_section.show();
             var username;
             if (remember_manager.active()
-                && (username = remember_manager.fetch().username)) {
+                && (username = persistence_manager.get('username'))) {
                 $('#my_login_username').val(username); }
             var $status = $page.find('.error-status-message');
             if (content) {
