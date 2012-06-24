@@ -73,18 +73,27 @@ content hierarchies.
   share room and storage devices, their contained folders, and the various
   root containers.
 
-  The items have URLs consisting of the application's address followed by a
-  fragement identifier consisting of the content's address.  (See
-  [#ContentAddressing Content Adressing], above.)  The app's
-  [#DynamicPageTraversal dynamic page traversal machinery] (below)
-  retrieves the JSON data for each node and populates and presents an
-  application node for it.
+  * The items have URLs consisting of the application's address followed by a
+    fragement identifier consisting of the content's address.  (See
+    [#ContentAddressing Content Adressing], above.)  The app's
+    [#DynamicPageTraversal dynamic page traversal machinery] (below)
+    retrieves the JSON data for each node and populates and presents an
+    application node for it.
 
-  The special consolidated root node, `RootContentNode`, arranges to
-  present the contents of the respective actual content roots, the
-  `RootStorageNode`, `OriginalRootShareNode`, and `PublicRootShareNode`.
-  Thus the `RootContentNode` effectively shares downward-navigation
-  containment of the actual content roots.
+  * Special provisions are made for intra-document html links that go to
+    the pages which serve as template for content root nodes, eg, the
+    combined `RootContentNode`, and the `OtherRootShareNode`.  Those
+    addresses are explicitly identified, and translated to their
+    `content_node_manager` addresses using a `handle_content_visit()`
+    helper, `internalize_url()`. The nodes then get control and fetch the
+    actual pages from the HTML document DOM, populating and presenting
+    with them, etc.
+
+  * The special consolidated root node, `RootContentNode`, arranges to
+    present the contents of the respective actual content roots, the
+    `RootStorageNode`, `OriginalRootShareNode`, and `PublicRootShareNode`.
+    Thus the `RootContentNode` effectively shares downward-navigation
+    containment of the actual content roots.
 
 * Navigation from more contained nodes to less contained ones depends on
   registration of the parent node URLs in the offspring when the offspring
