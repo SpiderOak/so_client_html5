@@ -5,6 +5,19 @@ function translate(text) {
     return text
 };
 
+function submit_button_sentinel(inputs, $submit) {
+    /* Enable element if all inputs in 'inputs' array have content, else
+       disable. */
+    function submit_button_sentinel_closure() {
+        var passed = true;
+        inputs.map(function ($input) {
+            if ($input.val() === "") {
+                passed = false;
+                $submit.button('disable'); }}.bind(this));
+        if (passed) {
+            $submit.button('enable'); }
+        return true; }
+    return submit_button_sentinel_closure; }
 
 $(document).ready(function() {
     /* Nothing so far. */

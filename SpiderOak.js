@@ -1518,7 +1518,16 @@ var spideroak = function () {
         var $esm = $form.find(".error-status-message");
         $esm.hide();
 
-        var $name = $('input[name=' + name_field + ']', this);
+        var $password = $form.find('input[name=password]');
+        var $name = $form.find('input[name=' + name_field + ']');
+
+        var $submit = $form.find('[type="submit"]');
+        var sentinel = new submit_button_sentinel([$name, $password], $submit)
+        $name.bind('keyup', sentinel);
+        $password.bind('keyup', sentinel);
+        $submit.button()
+        sentinel();
+
         var $remember_widget = $form.find('#remember-me');
         var remembering = remember_manager.active();
         if (remembering && ($remember_widget.val() !== "on")) {
@@ -1542,6 +1551,9 @@ var spideroak = function () {
             var $name = $('input[name=' + name_field + ']', this);
             var $password = $('input[name=password]', this);
             var data = {};
+            if (($name.val() === "") || ($password.val() === "")) {
+                // Minimal - the submit button sentinel should prevent this.
+                return false; }
             data[name_field] = $name.val();
             $name.val("");
             if ($remember_widget.length > 0) {
