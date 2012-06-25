@@ -494,9 +494,9 @@ var spideroak = function () {
 
         this.subdirs.sort(content_nodes_by_url_sorter);
 
-        this.layout_header(chngpg_opts, mode_opts);
-        this.layout_content(chngpg_opts, mode_opts);
-        this.layout_footer(chngpg_opts, mode_opts);
+        this.layout_header(mode_opts);
+        this.layout_content(mode_opts);
+        this.layout_footer(mode_opts);
 
         this.show(chngpg_opts, mode_opts);
         if (mode_opts.notify_callback) {
