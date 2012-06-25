@@ -4,8 +4,8 @@
  * - jquery.mobile-1.0.1.css
  * - jquery-1.6.4.js
  * - jquery.mobile-1.0.1.js
- * - js_aux/misc.js - b32encode_trim(), blather(), fragment_quote(),
- *                    error_alert()
+ * - js_aux/misc.js - blather(), fragment_quote(), error_alert(), ...
+ * - Nibbler 2010-04-07 - base32 encode, decode, and enhance with encode_trim.
  * - custom-scripting.js - jqm settings and contextual configuration
  */
 
@@ -71,6 +71,13 @@ var spideroak = function () {
         share_room_urls: {},
         original_share_room_urls: {},
     };
+    var base32 = new Nibbler({dataBits: 8,
+                              codeBits: 5,
+                              keyString: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567',
+                              pad: '='});
+    Nibbler.prototype.encode_trim = function (str) {
+        /* Base32 encoding with trailing "=" removed. */
+        return this.encode(str).replace(/=+$/, ''); }
 
     /* Navigation handlers: */
 
@@ -160,7 +167,7 @@ var spideroak = function () {
 
         my.storage_root_url = (host
                                + defaults.storage_path_prefix
-                               + b32encode_trim(username)
+                               + base32.encode_trim(username)
                                + "/");
         // Original root is determined by storage root:
         register_original_shares_root();
@@ -665,7 +672,7 @@ var spideroak = function () {
         this.job_id += 1;       // Entry
 
         return this.add_item(my.shares_root_url
-                             + b32encode_trim(credentials.shareid)
+                             + base32.encode_trim(credentials.shareid)
                              + "/" + credentials.password
                              + "/"); }
 
