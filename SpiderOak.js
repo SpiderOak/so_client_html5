@@ -121,7 +121,7 @@ var spideroak = function () {
         return my.combo_root_url; }
     function clear_storage_account() {
         /* Obliterate internal settings and all content nodes for a clean slate.
-           All share artifacts, original and public, are removed, as well
+           All share artifacts, original and other, are removed, as well
            as registered storage.  We do not remove persistent settings. */
 
         // Empty strings instead of null to distinguish from initial settings.
@@ -210,7 +210,7 @@ var spideroak = function () {
                 || (url === defaults.other_shares_root_page_id)
                 || (url === defaults.original_shares_root_page_id)); }
     function is_share_room_url(url) {
-        /* True if the 'url' is for one of the familiar public share rooms.
+        /* True if the 'url' is for one of the familiar share rooms.
            Doesn't depend on the url having an established node. */
         return my.share_room_urls.hasOwnProperty(url); }
     function is_original_share_room_url(url) {
@@ -474,8 +474,8 @@ var spideroak = function () {
                 this.authenticated(false,
                                    {status: 0, statusText: "System error"},
                                    err); }
-            // XXX Populate the familiar public share rooms.
-            // XXX Provide public share edit and "+" add controls - somewhere.
+            // XXX Populate the familiar other share rooms.
+            // XXX Provide other share edit and "+" add controls - somewhere.
             }}
 
     OtherRootShareNode.prototype.visit = function (chngpg_opts, mode_opts) {
