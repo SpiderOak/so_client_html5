@@ -568,14 +568,21 @@ var spideroak = function () {
         // We ignore the content.
 
         var $page = this.my_page$();
-        var subvisit_job_id = token[0];
-        var subvisit_url = token[1];
+        var sub_job_id = token[0];
+        var url = token[1];
 
         if (succeeded !== true) {
-            if (content.status === 404) {
-                this.remove_item(subvisit_url);}}
+            var splat = url.split('/');
+            var share_id = base32.decode(splat[splat.length-3]);
+            var room_key = splat[splat.length-2];
+            var message = ("'" + share_id + "/" + room_key + "' failed: "
+                           + content.statusText + " (" + content.status +
+                           ") - Omit it?");
+            if (confirm(message)) {
+                this.remove_item(url);
+                this.unpersist_item(url); }}
 
-        if (subvisit_job_id === this.job_id) {
+        if (sub_job_id === this.job_id) {
             // Do update, whether or not it was successful:
             this.subdirs = other_share_room_urls();
             this.do_presentation({}, {passive: true}); }}
