@@ -450,13 +450,11 @@ var spideroak = function () {
         // See docs/AppOverview.txt "Content Node navigation modes" for
         // details about mode controls.
 
-        this.layout_header();
-
-        this.layout_content(mode_opts, other_share_room_urls(), [],
-                            '.other-content-list')
+        this.show(chngpg_opts, {});
 
         if (! this.loggedin_ish()) {
             // Not enough registered info to try authenticating:
+            this.layout(mode_opts); 
             this.authenticated(false);
             this.show(chngpg_opts, {}); }
         else {
@@ -471,6 +469,7 @@ var spideroak = function () {
                 storage_root.visit(chngpg_opts, our_mode_opts); }
             catch (err) {
                 // XXX These failsafes should be in error handlers:
+                this.layout();
                 this.authenticated(false,
                                    {status: 0, statusText: "System error"},
                                    err); }
@@ -530,7 +529,7 @@ var spideroak = function () {
                                           + '</em> </p>'));
             if (token === "storage") {
                 this.authenticated(false, content);
-                this.show({}, {}); }}
+                this.layout(); }}
         else {
             // Inject the duplicated content and show it, or hide the
             // section if empty:
@@ -546,7 +545,8 @@ var spideroak = function () {
             if (token === 'storage') {
                 // Ensure we're current page and chain to original shares root.
 
-                this.show({}, {});
+                this.layout();
+                this.show();
 
                 var our_mode_opts = {passive: true,
                                      notify_callback:
@@ -627,6 +627,7 @@ var spideroak = function () {
                                                                mode_opts,
                                                                exception) {
         /* Do failed visit error handling with 'xhr' XMLHttpResponse report. */
+        this.layout();
         this.authenticated(false, xhr, exception); }
 
     RootContentNode.prototype.authenticated = function (succeeded, content,
@@ -933,6 +934,27 @@ var spideroak = function () {
         this.layout_content(mode_opts);
         this.layout_footer(mode_opts);
     }
+    RootContentNode.prototype.layout = function (chngpg_opts, mode_opts) {
+        /* Do layout arrangements - different than other node types. */
+        var $page = this.my_page$();
+
+        this.layout_header();
+
+        // Other share rooms section:
+        var other_share_urls = other_share_room_urls();
+        var $other_shares_nonempty = $page.find('.other-content');
+        var $other_shares_empty = $page.find('.other-no-content');
+        // Show the section or the button depending on whether there's content:
+        if (other_share_urls.length === 0) {
+            $other_shares_nonempty.hide();
+            $other_shares_empty.show(); }
+        else {
+            $other_shares_empty.hide();
+            $other_shares_nonempty.show();
+            this.layout_content(mode_opts, other_share_urls, [],
+                                '.other-content-list'); }
+
+        this.layout_footer(mode_opts); }
 
     ContentNode.prototype.layout_header_fields = function(fields) {
         /* Populate this content node's page header with these fields settings:
