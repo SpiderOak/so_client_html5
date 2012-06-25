@@ -1036,16 +1036,29 @@ var spideroak = function () {
                       'right_label': "Edit"};
         this.layout_header_fields(fields); }
 
-    ContentNode.prototype.layout_content = function (mode_opts) {
-        /* Present this content node by adjusting its DOM data-role="page" */
+    ContentNode.prototype.layout_content = function (mode_opts,
+                                                     subdirs,
+                                                     files,
+                                                     content_items_selector) {
+        /* Present this content node by adjusting its DOM data-role="page".
+           'mode_opts' adjust various aspects of provisioning and layout.
+           'subdirs' is an optional array of urls for contained directories,
+             otherwise this.subdirs is used;
+           'files' is an optional array of urls for contained files, otherwise
+             this.files is used;
+           'content_items_selector' optionally specifies the selector for
+             the listview to hold the items, via this.my_content_items$().
+         */
         var $page = this.my_page$();
 	var $content = $page.find('[data-role="content"]');
-	var $list = this.my_content_items$();
+	var $list = this.my_content_items$(content_items_selector);
         if ($list.children().length) {
             $list.empty(); }
 
-        var lensubdirs = this.subdirs ? this.subdirs.length : 0;
-        var lenfiles = this.files ? this.files.length : 0;
+        subdirs = subdirs || this.subdirs;
+        var lensubdirs = subdirs ? subdirs.length : 0;
+        files = files || this.files;
+        var lenfiles = files ? files.length : 0;
         var do_dividers = (lensubdirs + lenfiles) > defaults.dividers_threshold;
         var do_filter = (lensubdirs + lenfiles) > defaults.filter_threshold;
 
@@ -1077,12 +1090,12 @@ var spideroak = function () {
             if (do_filter) { $list.attr('data-filter', 'true'); }
             if (lensubdirs) {
                 divider_prefix = "/";
-                for (var i=0; i < this.subdirs.length; i++) {
-                    insert_subnode(this.subdirs[i]); }}
+                for (var i=0; i < subdirs.length; i++) {
+                    insert_subnode(subdirs[i]); }}
             if (lenfiles) {
                 divider_prefix = "";
-                for (var i=0; i < this.files.length; i++) {
-                    insert_subnode(this.files[i]); }}}
+                for (var i=0; i < files.length; i++) {
+                    insert_subnode(files[i]); }}}
 
         $page.page();
         $list.listview("refresh");
@@ -1190,9 +1203,10 @@ var spideroak = function () {
                 ? this.$page
                 : (this.$page = $("#" + this.my_page_id()))); }
 
-    ContentNode.prototype.my_content_items$ = function () {
-        /* Return this node's jQuery contents litview object. */
-        return this.my_page$().find('.content-items'); }
+    ContentNode.prototype.my_content_items$ = function (selector) {
+        /* Return this node's jQuery contents litview object.
+           Optional 'selector' is used, otherwise '.content-items'. */
+        return this.my_page$().find(selector || '.content-items'); }
     ContentNode.prototype.get_storage_page_template$ = function() {
         return $("#" + defaults.content_page_template_id); }
 
