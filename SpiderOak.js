@@ -452,6 +452,9 @@ var spideroak = function () {
 
         this.layout_header();
 
+        this.layout_content(mode_opts, other_share_room_urls(), [],
+                            '.other-content-list')
+
         if (! this.loggedin_ish()) {
             // Not enough registered info to try authenticating:
             this.authenticated(false);
