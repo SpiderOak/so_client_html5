@@ -696,10 +696,12 @@ var spideroak = function () {
 
     OtherRootShareNode.prototype.remove_item = function (room_url) {
         /* Omit a non-original share room from the persistent and resident
-           collections. */
+           collections. Returns true if the item was present, else false. */
         if (is_other_share_room_url(room_url)) {
             unregister_share_room_url(room_url);
-            this.unpersist_item(room_url); }}
+            this.unpersist_item(room_url);
+            return true; }
+        else { return false; }}
 
     OtherRootShareNode.prototype.persist_item = function (room_url) {
         /* Add a share rooms to the collection persistent non-originals. */
@@ -709,11 +711,14 @@ var spideroak = function () {
             pmgr.set("other_share_urls", persistents); }}
 
     OtherRootShareNode.prototype.unpersist_item = function (room_url) {
-        /* Omit a non-original share room from persistent memory. */
+        /* Omit a non-original share room from the persistent
+           collection.  Returns true if the item was present, else false. */
         var persistents = pmgr.get("other_share_urls") || {};
         if (persistents.hasOwnProperty(room_url)) {
             delete persistents[room_url];
-            pmgr.set("other_share_urls", persistents); }}
+            pmgr.set("other_share_urls", persistents);
+            return true; }
+        else { return false; }}
 
     /* ===== Containment ===== */
     /* For content_node_manager.clear_hierarchy() */
