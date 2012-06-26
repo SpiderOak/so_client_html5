@@ -153,3 +153,11 @@ function elide(text, limit) {
     if (text.length <= limit) { return text; }
     else { return text.slice(0, limit) + "..."; }}
 
+function deploy_focus_oneshot(selector, event) {
+    /* Deploy a reliable 'selector' input-field focus function on 'event'.
+       Use to avoid page-loading timing complications, eg using jQm pageshow.
+       The function removes itself after firing. */
+    var focus_oneshot = function(e, data) {
+        $(selector).focus();
+        $(document).unbind(event, focus_oneshot); }
+    $(document).bind(event, focus_oneshot); }
