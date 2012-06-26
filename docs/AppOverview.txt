@@ -189,10 +189,10 @@ Currently implemented modes include:
   updates.
 * `notify_callback`: report visit success or failure to this callback.
   The callback requires: the visit success (true or false), the
-  accompanying value of `notify_token`, and on success, the jQuery DOM of
-  the presented data or, on failure, the xhr result object.
-* `notify_token`: token to be passed via `notify_callback`, by which the
-  initiator can identify the transaction and convey useful state.
+  accompanying value of `notify_token`, and on failure, the XMLHttpResponse
+  (xhr) object.
+* `notify_token`: object to be passed back to `notify_callback`. To be used
+  by the initiator to identify the transaction and convey useful state.
 * `refresh`: refetch the data for the node.
 
 === Storage and Share Rooms ===
