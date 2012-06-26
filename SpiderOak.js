@@ -566,12 +566,13 @@ var spideroak = function () {
             var splat = url.split('/');
             var share_id = base32.decode(splat[splat.length-3]);
             var room_key = splat[splat.length-2];
-            var message = ("'" + share_id + "/" + room_key + "' failed: "
-                           + content.statusText + " (" + content.status +
-                           ")");
+            var message = (content.statusText + " (" + content.status + ")"
+                           + ": " + share_id + " / " + room_key);
             var remove = true;
             if (content.status === 404) {
-                alert(message); }
+                // TODO: Instead, use an error notice on the page.
+                toastish(message, 2000);
+            }
             else {
                 message = [].concat(message, " - omit it?");
                 remove = confirm(message); }

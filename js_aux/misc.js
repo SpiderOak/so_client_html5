@@ -153,6 +153,14 @@ function elide(text, limit) {
     if (text.length <= limit) { return text; }
     else { return text.slice(0, limit) + "..."; }}
 
+function toastish(message, duration, theme) {
+    /* Show android-ish toast 'message', timed-out after 'duration' millesecs.
+       Optional 'theme' specifies a theme swatch to use, default "b". */
+    $.mobile.hidePageLoadingMsg();
+    setTimeout(function () {
+        $.mobile.showPageLoadingMsg(theme || "b", message, true); }, 0);
+    setTimeout(function () { $.mobile.hidePageLoadingMsg(); }, duration); }
+
 function deploy_focus_oneshot(selector, event) {
     /* Deploy a reliable 'selector' input-field focus function on 'event'.
        Use to avoid page-loading timing complications, eg using jQm pageshow.
