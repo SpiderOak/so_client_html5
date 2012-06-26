@@ -1624,6 +1624,7 @@ var spideroak = function () {
             else {
                 $name.val("");
                 $password.val(""); }
+            $name.focus();
             submit_handler(data);
             return false; }); }
 
