@@ -1473,6 +1473,10 @@ var spideroak = function () {
 
             error: function (xhr) {
                 $.mobile.hidePageLoadingMsg();
+                var username;
+                if (remember_manager.active()
+                    && (username = persistence_manager.get('username'))) {
+                    $('#my_login_username').val(username); }
                 error_alert("Storage login", xhr.status); },
 
         }); }
