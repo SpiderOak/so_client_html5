@@ -568,8 +568,14 @@ var spideroak = function () {
             var room_key = splat[splat.length-2];
             var message = ("'" + share_id + "/" + room_key + "' failed: "
                            + content.statusText + " (" + content.status +
-                           ") - Omit it?");
-            if (confirm(message)) {
+                           ")");
+            var remove = true;
+            if (content.status === 404) {
+                alert(message); }
+            else {
+                message = [].concat(message, " - omit it?");
+                remove = confirm(message); }
+            if (remove) {
                 this.remove_item(url);
                 this.unpersist_item(url); }}
 
