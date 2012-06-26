@@ -80,34 +80,40 @@
         </form>
       </div>
       <div class="content-section">
-          <ul data-role="listview" class="my-content-section">
-            <li data-role="list-divider" data-inset="true" data-theme="f"
+          <ul data-role="listview" class="my-content-section my-content">
+            <li data-role="list-divider" data-theme="f"
                 alt="Info" id="my-storage-leader" data-icon="false">
               <a alt="Dashboard guide" href="#combo-about"> My Storage </a>
             </li>
+          </ul>
+          <ul data-role="listview" class="storage-list my-content"
+              data-theme="c">
             <li align="center">
-              <p> <em> Empty / Fetching... </em> </p>
+              <p> <em> &empty; / Fetching... </em> </p>
             </li>
           </ul>
-          <ul data-role="listview" class="my-content-section">
+          <ul data-role="listview" class="my-content-section my-content">
             <li data-role="list-divider" id="my-rooms-leader"
                 data-theme="f" data-icon="false">
               <a> My Share Rooms </a>
             </li>
+          </ul>
+          <ul data-role="listview" class="my-shares-list my-content"
+              data-theme="c">
             <li align="center">
-              <p> <em> Empty / Fetching... </em> </p>
+              <p> <em> &empty; / Fetching... </em> </p>
             </li>
           </ul>
           <ul data-role="listview" class="other-content">
             <li data-role="list-divider" id="other-rooms-leader"
-                data-theme="f" data-icon="plus">
+                data-theme="f" data-icon="plus"> <!-- XXX Edit, not "+". -->
               <a href="#share-home" alt="Change"> Other Share Rooms </a>
             </li>
           </ul>
-          <ul data-role="listview" class="other-content-list other-content"
+          <ul data-role="listview" class="other-shares-list other-content"
               data-theme="c">
             <li align="center">
-              <p> <em> Empty / Fetching... </em> </p>
+              <p> <em> &empty; / Fetching... </em> </p>
             </li>
           </ul>
       </div>
