@@ -21,24 +21,17 @@
 <body>
 
   <div data-role="page" class="multiple-listviews" id="home" data-theme="a">
-    <div data-role="header">
-      <a data-role="button" class="logout-button"
-         data-icon="back" data-iconpos="notext"
-         data-theme="c" href="#logout">Logout</a>
-      <div align="center">
-        <br/>
-      </div>
+    <div data-role="header" data-position="fixed" data-theme="f">
+      <a href="#logout" data-role="button" class="logout-button"
+         data-icon="back" data-iconpos="notext"></a>
+      <h3 class="header-title"> SpiderOak </h3>
+      <a alt="About the SpiderOak Dashboard" data-role="button"
+         href="#about" data-icon="info" data-iconpos="notext"></a>
     </div>
+
     <div class="nav_login_storage" data-role="content">
       <div class="login-section">
         <form method="POST" id="root-login-form" class="login-form">
-          <ul data-role="listview" class="roots"  style="padding-bottom: 10px;">
-            <li data-role="list-divider" data-theme="f"
-                id="storage-devices-leader" data-icon="info">
-              <a alt="Dashboard guide" href="#combo-about">
-                My Storage and Share Rooms </a>
-            </li>
-          </ul>
           <ul data-role="listview" data-inset="true">
             <li class="error-status-message">
             </li>
