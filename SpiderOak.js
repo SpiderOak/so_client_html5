@@ -492,12 +492,9 @@ var spideroak = function () {
                                                              mode_opts) {
 
         this.subdirs.sort(content_nodes_by_url_sorter);
-
-        this.layout_header(mode_opts);
-        this.layout_content(mode_opts);
-        this.layout_footer(mode_opts);
-
+        this.layout(mode_opts);
         this.show(chngpg_opts, mode_opts);
+
         if (mode_opts.notify_callback) {
             mode_opts.notify_callback(true,
                                       mode_opts.notify_token); }}
@@ -924,6 +921,20 @@ var spideroak = function () {
         this.layout_header(mode_opts);
         this.layout_content(mode_opts);
         this.layout_footer(mode_opts); }
+
+    OtherRootShareNode.prototype.layout = function (mode_opts) {
+        /* Deploy content as markup on our page. */
+        ContentNode.prototype.layout.call(this, mode_opts);
+        var $content_items = this.my_page$().find('.page-content')
+        if (this.subdirs.length === 0) {
+            $content_items.hide(); }
+        else {
+            $content_items.show(); }}
+
+    OtherRootShareNode.prototype.show = function (chngpg_opts, mode_opts) {
+        /* Deploy content as markup on our page. */
+        ContentNode.prototype.show.call(this, chngpg_opts, mode_opts);
+        deploy_focus_oneshot('#my_share_id', "pageshow"); }
 
     RootContentNode.prototype.layout = function (chngpg_opts, mode_opts) {
         /* Do layout arrangements - different than other node types. */
