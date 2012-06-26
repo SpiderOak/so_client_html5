@@ -504,15 +504,15 @@ var spideroak = function () {
 
     RootContentNode.prototype.notify_subvisit_status = function(succeeded,
                                                                 token,
-                                                                content) {
+                                                                response) {
         /* Callback passed to subordinate root content nodes to signal their
            update disposition:
            'succeeded': true for success, false for failure.
            'token': token they were passed to identify the transaction,
-           'content': on success: the jquery $(dom) for the populated content,
-                      for failure: the resulting XHR object. */
+           'response': on failure: the resulting XHR object. */
 
-        this.authenticated(true);
+        if (token !== 'other-shares') {
+            this.authenticated(true); }
 
         var $page = this.my_page$();
         var selector = ((token === 'storage')
@@ -525,23 +525,14 @@ var spideroak = function () {
             $(selector + " + li").remove(); // Remove the leader's li siblings.
             // TODO Make pretty:
             $leader.after($('<li/>').html('<p> <em> Error: '
-                                          + content.statusText
+                                          + response.statusText
                                           + '</em> </p>'));
             if (token === "storage") {
-                this.authenticated(false, content);
+                this.authenticated(false, response);
                 this.layout(); }}
         else {
-            // Inject the duplicated content and show it, or hide the
-            // section if empty:
-            $(selector + " ~ li").remove(); // Remove the leader's li siblings.
-            var $children = content.children();
-            if ($children.length) {
-                $(selector).after($children); }
-            else {
-                // TODO Make pretty:
-                $leader.after($('<li title="Empty"/>')
-                              .html('<em>&nbsp;&nbsp;&nbsp;'
-                                    + '&nbsp;&empty; </em>')); }
+            this.layout();
+
             if (token === 'storage') {
                 // Ensure we're current page and chain to original shares root.
 
@@ -554,7 +545,7 @@ var spideroak = function () {
                                      notify_token: 'original-share'};
                 if (this.veiled) {
                     this.veil(false, $.mobile.hidePageLoadingMsg); }
-                this.authenticated(true, content);
+                this.authenticated(true, response);
                 var ps_root = cnmgr.get(my.original_shares_root_url, this);
                 ps_root.visit({}, our_mode_opts); }}}
 
@@ -601,8 +592,7 @@ var spideroak = function () {
         this.show(chngpg_opts, mode_opts);
         if (mode_opts.notify_callback) {
             mode_opts.notify_callback(true,
-                                      mode_opts.notify_token,
-                                      this.my_content_items$().clone(true)); }}
+                                      mode_opts.notify_token); }}
 
     ContentNode.prototype.handle_visit_failure = function (xhr,
                                                            chngpg_opts,
@@ -932,13 +922,31 @@ var spideroak = function () {
         /* Deploy content as markup on our page. */
         this.layout_header(mode_opts);
         this.layout_content(mode_opts);
-        this.layout_footer(mode_opts);
-    }
+        this.layout_footer(mode_opts); }
+
     RootContentNode.prototype.layout = function (chngpg_opts, mode_opts) {
         /* Do layout arrangements - different than other node types. */
         var $page = this.my_page$();
 
         this.layout_header();
+
+        // Storage content section:
+        // We avoid doing layout of these when not authenticated so the
+        // re-presentation of the hidden sections doesn't show through.
+        var storage_subdirs = (my.storage_root_url
+                               && cnmgr.get(my.storage_root_url,
+                                            this).subdirs
+                               || [])
+        this.layout_content(mode_opts, storage_subdirs, false,
+                            '.storage-list');
+
+        // My share rooms section:
+        var myshares_subdirs = (my.original_shares_root_url
+                                && cnmgr.get(my.original_shares_root_url,
+                                             this).subdirs
+                                || [])
+        this.layout_content(mode_opts, myshares_subdirs, false,
+                            '.my-shares-list');
 
         // Other share rooms section:
         var other_share_urls = other_share_room_urls();
