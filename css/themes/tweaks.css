@@ -4,7 +4,8 @@
 }
 
 .multiple-listviews .ui-content .ui-listview {
-  /* Workaround for spacing problem in pages with multiple listviews: */
+  /* Independently derived workaround for multiple-listviews spacing problem:
+     https://github.com/jquery/jquery-mobile/issues/1204 */
   margin: -1px -15px -1px -15px !important;
 }
 /* I couldn't get .multiple-listviews right on the items, so I use this to
