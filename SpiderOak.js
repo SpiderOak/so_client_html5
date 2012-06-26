@@ -450,6 +450,8 @@ var spideroak = function () {
         // See docs/AppOverview.txt "Content Node navigation modes" for
         // details about mode controls.
 
+        this.remove_error_message();
+
         this.show(chngpg_opts, {});
 
         if (! this.loggedin_ish()) {
@@ -520,7 +522,6 @@ var spideroak = function () {
         if (! succeeded) {
             $.mobile.hidePageLoadingMsg();
             $(selector + " + li").remove(); // Remove the leader's li siblings.
-            // TODO Make pretty:
             $leader.after($('<li/>').html('<p> <em> Error: '
                                           + response.statusText
                                           + '</em> </p>'));
@@ -570,15 +571,15 @@ var spideroak = function () {
                            + ": " + share_id + " / " + room_key);
             var remove = true;
             if (content.status === 404) {
-                // TODO: Instead, use an error notice on the page.
-                toastish(message, 2000);
-            }
+                this.show_error_message(message); }
             else {
                 message = [].concat(message, " - omit it?");
                 remove = confirm(message); }
             if (remove) {
                 this.remove_item(url);
                 this.unpersist_item(url); }}
+        else {
+            this.remove_error_message(); }
 
         if (sub_job_id === this.job_id) {
             // Do update, whether or not it was successful:
@@ -639,6 +640,7 @@ var spideroak = function () {
         if (succeeded) {
             // Show the content instead of the form
             $login_section.hide();
+            this.remove_error_message();
             $content_section.show();
             if (remember_manager.active()) {
                 // remember_manager will store just the relevant fields.
@@ -653,17 +655,14 @@ var spideroak = function () {
             if (remember_manager.active()
                 && (username = persistence_manager.get('username'))) {
                 $('#my_login_username').val(username); }
-            var $status = $page.find('.error-status-message');
             if (response) {
                 var error_message = response.statusText;
                 if (exception) {
                     error_message += " - " + exception.message; }
-                $status.text(error_message);
-                $status.show();
+                this.show_error_message(error_message);
                 if (response.status === 401) {
                     // Unauthorized - expunge all privileged info:
                     clear_storage_account(); }}
-            else { $status.hide(); }
             // Hide the storage and original shares sections
             $content_section.hide();
             if (this.veiled) { this.veil(false); }}}
@@ -1568,9 +1567,6 @@ var spideroak = function () {
         var $content = $(content_selector);
         var $form = $(content_selector + " form");
 
-        var $esm = $form.find(".error-status-message");
-        $esm.hide();
-
         var $password = $form.find('input[name=password]');
         var $name = $form.find('input[name=' + name_field + ']');
 
@@ -1675,10 +1671,48 @@ var spideroak = function () {
     }
 
 
-    /* ===== Convenience ===== */
+    /* ===== Boilerplate ===== */
+
+    ContentNode.prototype.show_error_message = function (html) {
+        /* Inject an 'html' error message after the node header.
+           Returns the produced $esm object. */
+        this.remove_error_message(); // Ditch prior.
+
+        var $page = this.my_page$();
+        var $esm = $page.find('.error-status-message');
+
+        $esm = $('<ul data-role="listview" data-inset="true"/>')
+            .append($('<li class="error-status-message" data-inset="true">')
+                    .html(html));
+
+        var $header = $page.find('[data-role="header"]');
+        $header.after($('<br/>').after($esm));
+        $esm.listview();
+        $esm.show();
+        return $esm; }
+
+    ContentNode.prototype.remove_error_message = function () {
+        /* Remove existing error status message, if present.
+           Returns the prior message, if any was present, else null. */
+        var $page = this.my_page$();
+        var $esm = $page.find('.error-status-message');
+        var was = null;
+
+        if ($esm.length !== 0) {
+            was = $esm.find('li').html;
+            $esm.remove(); }
+
+        return was; }
 
     ContentNode.prototype.toString = function () {
         return "<" + this.emblem + ": " + this.url + ">"; }
+
+
+    var document_addresses = {
+        /* Map specific document fragment addresses from the application
+           document to internal functions/methods. */
+        logout: storage_logout,
+    }
 
     function internalize_url(obj) {
         /* Return the "internal" version of the 'url'.
