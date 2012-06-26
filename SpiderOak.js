@@ -960,8 +960,8 @@ var spideroak = function () {
         else {
             $other_shares_empty.hide();
             $other_shares_nonempty.show();
-            this.layout_content(mode_opts, other_share_urls, [],
-                                '.other-content-list'); }
+            this.layout_content(mode_opts, other_share_urls, false,
+                                '.other-shares-list'); }
 
         this.layout_footer(mode_opts); }
 
