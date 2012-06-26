@@ -454,8 +454,8 @@ var spideroak = function () {
 
         if (! this.loggedin_ish()) {
             // Not enough registered info to try authenticating:
-            this.layout(mode_opts); 
             this.authenticated(false);
+            this.layout(mode_opts);
             this.show(chngpg_opts, {}); }
         else {
             var storage_root = content_node_manager.get(my.storage_root_url);
@@ -469,10 +469,10 @@ var spideroak = function () {
                 storage_root.visit(chngpg_opts, our_mode_opts); }
             catch (err) {
                 // XXX These failsafes should be in error handlers:
-                this.layout();
                 this.authenticated(false,
                                    {status: 0, statusText: "System error"},
-                                   err); }
+                                   err);
+                this.layout(); }
             // XXX Populate the familiar other share rooms.
             // XXX Provide other share edit and "+" add controls - somewhere.
             }}
@@ -578,7 +578,8 @@ var spideroak = function () {
 
         if (sub_job_id === this.job_id) {
             // Do update, whether or not it was successful:
-            this.subdirs = other_share_room_urls();
+            this.subdirs = other_share_room_urls()
+            this.subdirs.sort(content_nodes_by_url_sorter)
             this.do_presentation({}, {passive: true}); }}
 
     ContentNode.prototype.handle_visit_success = function (data, when,
@@ -1683,7 +1684,7 @@ var spideroak = function () {
     function content_nodes_by_url_sorter(prev, next) {
         var prev_str = prev, next_str = next;
         var prev_name = content_node_manager.get(prev).name;
-        var next_name = content_node_manager.get(prev).name;
+        var next_name = content_node_manager.get(next).name;
         if (prev_name && next_name) {
             prev_str = prev_name, next_str = next_name; }
         if (prev_str < next_str) { return -1; }
