@@ -560,8 +560,8 @@ var spideroak = function () {
             var splat = url.split('/');
             var share_id = base32.decode(splat[splat.length-3]);
             var room_key = splat[splat.length-2];
-            var message = (content.statusText + " (" + content.status + ")"
-                           + ": " + share_id + " / " + room_key);
+            var message = ("Sorry - " + share_id + " / " + room_key + " was "
+                           + content.statusText + " (" + content.status + ")");
             var remove = true;
             if (content.status === 404) {
                 this.show_error_message(message); }
