@@ -74,11 +74,18 @@ content hierarchies.
   root containers.
 
   * The items have URLs consisting of the application's address followed by a
-    fragement identifier consisting of the content's address.  (See
-    [#ContentAddressing Content Adressing], above.)  The app's
+    fragement identifier consisting of the content's address.  The app's
     [#DynamicPageTraversal dynamic page traversal machinery] (below)
     retrieves the JSON data for each node and populates and presents an
     application node for it.
+
+  * Some fragment addresses are simple locations of jQuery mobile page divs
+    ([data-role="page"]), conveyed to the regular jQm pageChange.
+
+  * Some addresses are of application-managed, non-content-specific
+    facilities, like 'logout'. These are listed in the `document_addrs`
+    object, which is used by `internalize_url()` and
+    `handle_content_visit()` to dispatch the listed functions.
 
   * Special provisions are made for intra-document html links that go to
     the pages which serve as template for content root nodes, eg, the
@@ -133,11 +140,14 @@ presented as jQuery Mobile "pages" - `<div data-role="page>`. They are
 generated dynamically from cloned copies of static template DOM nodes,
 found in `SpiderOak.html`, upon in-app traversal of content URLs (see
 [#ContentAddressing Content Addressing], above).
-* The spideroak object's `.handle_content_visit()` method is assigned to
+* The spideroak object's `handle_content_visit()` method is assigned to
   handle the jQuery Mobile `pagebeforechange` event, which tracks changes
-  to the browser's `location.hash` setting.
-* The handler discerns navigation to URLs with hash portions that are
-  within the user's !SpiderOak-managed content, and:
+  to the browser's `location.hash` setting
+* A few different classes of addresses are used in the application, as
+  described in [#OrganizationofContentNavigation Content
+  Navigation], above.
+* For navigation URLs that go to application content, including the user's
+  !SpiderOak-managed content, then:
   * Fetches a suitable `ContentNode`-based object for the node using
   * `spideroak.content_node_manager.get()` - returns an already
     existing node, if any, or else allocates a new one with suitable

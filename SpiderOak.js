@@ -86,10 +86,17 @@ var spideroak = function () {
         /* Intercept URL visits and intervene for repository content. */
         var page = internalize_url(data.toPage);
 
-        if ((typeof page === "string") && is_content_url(page)) {
+        if ((typeof page === "string")
+            && (is_content_url(page)
+                || document_addrs.hasOwnProperty(page))) {
             e.preventDefault();
             var mode_opts = query_params(page);
-            content_node_manager.get(page).visit(data.options, mode_opts); }}
+            if (document_addrs.hasOwnProperty(page)) {
+                var current_internal = internalize_url(document.location.href);
+                return document_addrs[page].call(this, current_internal); }
+            else {
+                content_node_manager.get(page).visit(data.options,
+                                                     mode_opts); }}}
 
 
     function establish_traversal_handler() {
@@ -1025,14 +1032,7 @@ var spideroak = function () {
         if (! this.loggedin_ish()) {
             $logout_button.hide(); }
         else {
-            // Only add the click handler if not already present!
-            var events = $logout_button.data("events");
-            if (! (events && events.hasOwnProperty("click"))) {
-                $logout_button.bind("click",
-                                    function (eventObj) {
-                                        storage_logout(); })};
-            $logout_button.show();
-        }}
+            $logout_button.show(); }}
 
     StorageNode.prototype.layout_header = function(mode_opts) {
         /* Fill in typical values for header fields of .my_page$().
@@ -1704,7 +1704,7 @@ var spideroak = function () {
         return "<" + this.emblem + ": " + this.url + ">"; }
 
 
-    var document_addresses = {
+    var document_addrs = {
         /* Map specific document fragment addresses from the application
            document to internal functions/methods. */
         logout: storage_logout,
@@ -1725,6 +1725,8 @@ var spideroak = function () {
         if (typeof obj !== "string") { return obj; }
         if (obj.split('#')[0] === window.location.href.split('#')[0]) {
             obj = obj.split('#')[1]; }
+        if (document_addrs.hasOwnProperty(obj)) {
+            return obj; }
         switch (obj) {
         case (defaults.combo_root_page_id):
             return defaults.combo_root_url;
