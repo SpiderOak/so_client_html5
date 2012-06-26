@@ -620,17 +620,17 @@ var spideroak = function () {
         this.layout();
         this.authenticated(false, xhr, exception); }
 
-    RootContentNode.prototype.authenticated = function (succeeded, content,
+    RootContentNode.prototype.authenticated = function (succeeded, response,
                                                         exception) {
         /* Present login challenge versus content, depending on access success.
            'succeeded': true for success, false for failure.
-           'content': on success: the jquery $(dom) for the populated content,
-                      for failure: the resulting XHR object, if any.
+           'response': on failure: the resulting XHR object, if any.
            'exception': on failure, exception caught by ajax machinery, if any.
          */
         var $page = this.my_page$();
-        var $content_section = $page.find('.my-content-section');
+        var $content_section = $page.find('.my-content');
         var $login_section = $page.find('.login-section');
+
         if (succeeded) {
             // Show the content instead of the form
             $login_section.hide();
@@ -649,13 +649,13 @@ var spideroak = function () {
                 && (username = persistence_manager.get('username'))) {
                 $('#my_login_username').val(username); }
             var $status = $page.find('.error-status-message');
-            if (content) {
-                var error_message = content.statusText;
+            if (response) {
+                var error_message = response.statusText;
                 if (exception) {
                     error_message += " - " + exception.message; }
                 $status.text(error_message);
                 $status.show();
-                if (content.status === 401) {
+                if (response.status === 401) {
                     // Unauthorized - expunge all privileged info:
                     clear_storage_account(); }}
             else { $status.hide(); }
