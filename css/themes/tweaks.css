@@ -3,13 +3,13 @@
   padding-bottom: 0px !important;
 }
 
-.transplanted-items .ui-content .ui-listview {
-  /* Workaround for spacing problem in procedurally transplanted items: */
+.multiple-listviews .ui-content .ui-listview {
+  /* Workaround for spacing problem in pages with multiple listviews: */
   margin: -1px -15px -1px -15px !important;
 }
-/* I couldn't get .transplanted-items to work closer to the actual items,
-   so I use this to compensate in the login form. Aiee! */
-.non-transplanted {
+/* I couldn't get .multiple-listviews right on the items, so I use this to
+   compensate in the login form.  Argh. */
+.compact-paragraph {
   margin: 10px; }
 
 .empty-sign {
