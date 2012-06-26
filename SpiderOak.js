@@ -521,10 +521,6 @@ var spideroak = function () {
 
         if (! succeeded) {
             $.mobile.hidePageLoadingMsg();
-            $(selector + " + li").remove(); // Remove the leader's li siblings.
-            $leader.after($('<li/>').html('<p> <em> Error: '
-                                          + response.statusText
-                                          + '</em> </p>'));
             if (token === "storage") {
                 this.authenticated(false, response);
                 this.layout(); }}
