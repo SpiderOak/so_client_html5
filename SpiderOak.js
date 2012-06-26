@@ -71,6 +71,7 @@ var spideroak = function () {
         share_room_urls: {},
         original_share_room_urls: {},
     };
+
     var base32 = new Nibbler({dataBits: 8,
                               codeBits: 5,
                               keyString: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567',
@@ -1626,7 +1627,6 @@ var spideroak = function () {
             $name.focus();
             submit_handler(data);
             return false; }); }
-
 
 
     /* ===== Public interface ===== */
