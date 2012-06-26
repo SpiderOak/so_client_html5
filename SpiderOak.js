@@ -414,39 +414,6 @@ var spideroak = function () {
         else {
             this.show(chngpg_opts, mode_opts); }}
 
-    ContentNode.prototype.fetch_and_dispatch = function (chngpg_opts,
-                                                         mode_opts) {
-        /* Retrieve this node's data and deploy it.
-           'chngpg_opts' - Options for the framework's changePage function
-           'mode_opts': node provisioning and layout modal settings.
-
-           - On success, call this.handle_visit_success() with the retrieved
-             JSON data, new Date() just prior to the retrieval, chngpg_opts,
-             mode_opts, a text status categorization, and the XMLHttpRequest
-             object.
-           - Otherwise, this.handle_visit_failure() is called with the
-             XMLHttpResponse object, chngpg_opts, mode_opts, the text status
-             categorization, and an exception object, present if an exception
-             was caught.
-
-           See the jQuery.ajax() documentation for XMLHttpResponse details.
-        */
-
-        var when = new Date();
-        var url = this.url + this.query_qualifier;
-        $.ajax({url: url,
-                type: 'GET',
-                dataType: 'json',
-                cache: false,
-                success: function (data, status, xhr) {
-                    this.handle_visit_success(data, when,
-                                              chngpg_opts, mode_opts,
-                                              status, xhr); }.bind(this),
-                error: function (xhr, statusText, thrown) {
-                    this.handle_visit_failure(xhr, chngpg_opts, mode_opts,
-                                              statusText,
-                                              thrown)}.bind(this), })}
-
     RootContentNode.prototype.visit = function (chngpg_opts, mode_opts) {
         /* Do the special visit of the consolidated storage/share root. */
 
@@ -498,16 +465,39 @@ var spideroak = function () {
         this.subdirs.map(this.add_item.bind(this));
         this.do_presentation(chngpg_opts, mode_opts); }
 
-    OtherRootShareNode.prototype.do_presentation = function (chngpg_opts,
-                                                             mode_opts) {
 
-        this.subdirs.sort(content_nodes_by_url_sorter);
-        this.layout(mode_opts);
-        this.show(chngpg_opts, mode_opts);
+    ContentNode.prototype.fetch_and_dispatch = function (chngpg_opts,
+                                                         mode_opts) {
+        /* Retrieve this node's data and deploy it.
+           'chngpg_opts' - Options for the framework's changePage function
+           'mode_opts': node provisioning and layout modal settings.
 
-        if (mode_opts.notify_callback) {
-            mode_opts.notify_callback(true,
-                                      mode_opts.notify_token); }}
+           - On success, call this.handle_visit_success() with the retrieved
+             JSON data, new Date() just prior to the retrieval, chngpg_opts,
+             mode_opts, a text status categorization, and the XMLHttpRequest
+             object.
+           - Otherwise, this.handle_visit_failure() is called with the
+             XMLHttpResponse object, chngpg_opts, mode_opts, the text status
+             categorization, and an exception object, present if an exception
+             was caught.
+
+           See the jQuery.ajax() documentation for XMLHttpResponse details.
+        */
+
+        var when = new Date();
+        var url = this.url + this.query_qualifier;
+        $.ajax({url: url,
+                type: 'GET',
+                dataType: 'json',
+                cache: false,
+                success: function (data, status, xhr) {
+                    this.handle_visit_success(data, when,
+                                              chngpg_opts, mode_opts,
+                                              status, xhr); }.bind(this),
+                error: function (xhr, statusText, thrown) {
+                    this.handle_visit_failure(xhr, chngpg_opts, mode_opts,
+                                              statusText,
+                                              thrown)}.bind(this), })}
 
     RootContentNode.prototype.notify_subvisit_status = function(succeeded,
                                                                 token,
@@ -550,7 +540,6 @@ var spideroak = function () {
                 this.authenticated(true, response);
                 var ps_root = cnmgr.get(my.original_shares_root_url, this);
                 ps_root.visit({}, our_mode_opts); }}}
-
 
     OtherRootShareNode.prototype.notify_subvisit_status = function(succeeded,
                                                                    token,
@@ -925,6 +914,18 @@ var spideroak = function () {
             $.mobile.changePage($page, chngpg_opts); }
         // Just in case, eg of refresh:
         $.mobile.hidePageLoadingMsg(); }
+
+    OtherRootShareNode.prototype.do_presentation = function (chngpg_opts,
+                                                             mode_opts) {
+        /* An exceptional, consolidated presentation routine. */
+        // For use by this.visit() and this.notify_subvisit_status().
+        this.subdirs.sort(content_nodes_by_url_sorter);
+        this.layout(mode_opts);
+        this.show(chngpg_opts, mode_opts);
+
+        if (mode_opts.notify_callback) {
+            mode_opts.notify_callback(true,
+                                      mode_opts.notify_token); }}
 
     ContentNode.prototype.layout = function (mode_opts) {
         /* Deploy content as markup on our page. */
