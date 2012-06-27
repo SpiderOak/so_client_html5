@@ -318,7 +318,7 @@ var spideroak = function () {
         /* Consolidated root of the storage and share content hierarchies. */
         ContentNode.call(this, url, parent);
         this.root_url = url;
-        this.emblem = "Root";
+        this.emblem = "SpiderOak";
         this.name = "Dashboard";
         delete this.subdirs;
         delete this.files; }
@@ -346,8 +346,8 @@ var spideroak = function () {
     RootShareNode.prototype = new ShareNode();
     function OtherRootShareNode(url, parent) {
         RootShareNode.call(this, url, parent);
-        this.name = "Other Share Rooms";
-        this.emblem = "Other Share Rooms";
+        this.name = "Public Share Rooms";
+        this.emblem = "Public Share Rooms";
         this.job_id = 0;
         // Whitelist of methods eligible for invocation via mode_opts.action:
         this.action_methods = {'collection_menu': true,
@@ -1014,7 +1014,7 @@ var spideroak = function () {
         this.layout_content(mode_opts, myshares_subdirs, false,
                             '.my-shares-list');
 
-        // Other share rooms section:
+        // Public share rooms section:
         var other_share_urls = other_share_room_urls();
         var $other_shares_nonempty = $page.find('.other-content');
         var $other_shares_empty = $page.find('.other-no-content');
@@ -1074,6 +1074,8 @@ var spideroak = function () {
         /* Do special RootContentNode header layout. */
         var $header = this.my_page$().find('[data-role="header"]');
         var $logout_button = $header.find('.logout-button');
+        var $title = $header.find('.header-title');
+        $title.text(this.title());
         if (! this.loggedin_ish()) {
             $logout_button.hide(); }
         else {
@@ -1316,6 +1318,13 @@ var spideroak = function () {
     ContentNode.prototype.get_storage_page_template$ = function() {
         return $("#" + generic.content_page_template_id); }
 
+    ContentNode.prototype.title = function () {
+        return this.name; }
+
+    RootContentNode.prototype.title = function () {
+        return (my.username
+                ? this.emblem + ': ' + my.username
+                : this.emblem); }
 
     /* ===== Resource managers ===== */
 
