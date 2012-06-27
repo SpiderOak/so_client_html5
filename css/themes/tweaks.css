@@ -1,6 +1,12 @@
+.status-message {
+  margin-top: 1em !important;
+  text-align: center !important;
+}
 .error-status-message {
   color: firebrick !important;
-  text-align: center !important;
+}
+.result-status-message {
+  color: darkgreen !important;
 }
 
 .compact-vertical {

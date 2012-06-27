@@ -1710,36 +1710,41 @@ var spideroak = function () {
 
     /* ===== Boilerplate ===== */
 
-    ContentNode.prototype.show_error_message = function (html) {
-        /* Inject an 'html' error message after the node header.
-           Returns the produced $esm object. */
-        this.remove_error_message(); // Ditch prior.
+    ContentNode.prototype.show_status_message = function (html, kind) {
+        /* Inject 'html' into the page DOM as a status message. Optional
+           'kind' is the status message kind - currently, 'result' and
+           'error' have distinct color styles, the default is 'error'.
+           Returns a produced $status_message object. */
+        kind = kind || 'error';
+        var selector = '.' + kind + '-status-message';
 
         var $page = this.my_page$();
-        var $esm = $page.find('.error-status-message');
+        var $sm = $page.find(selector)
+        if ($sm.length > 0) {
+            $sm.html(html);
+            $sm.listview(); }
+        else {
+            var $li = $('<li class="status-message '
+                        + kind + '-status-message">');
+            $li.html(html);
+            $sm = $('<ul data-role="listview"/>');
+            $sm.append($li);
+            $page.find('[data-role="header"]').after($sm);
+            $sm.listview();
+            $sm.show(); }
+        return $sm; }
 
-        $esm = $('<ul data-role="listview" data-inset="true"/>')
-            .append($('<li class="error-status-message" data-inset="true">')
-                    .html(html));
-
-        var $header = $page.find('[data-role="header"]');
-        $header.after($('<br/>').after($esm));
-        $esm.listview();
-        $esm.show();
-        return $esm; }
-
-    ContentNode.prototype.remove_error_message = function () {
-        /* Remove existing error status message, if present.
-           Returns the prior message, if any was present, else null. */
+    ContentNode.prototype.remove_status_message = function (kind) {
+        /* Remove existing status message of specified 'kind' (default,
+           all), if present. */
+        var selector = (kind
+                        ? '.' + kind + '-status-message'
+                        : '.status-message');
         var $page = this.my_page$();
-        var $esm = $page.find('.error-status-message');
-        var was = null;
+        var $sm = $page.find(selector);
 
-        if ($esm.length !== 0) {
-            was = $esm.find('li').html;
-            $esm.remove(); }
-
-        return was; }
+        if ($sm.length !== 0) {
+            $sm.remove(); }}
 
     ContentNode.prototype.toString = function () {
         return "<" + this.emblem + ": " + this.url + ">"; }
