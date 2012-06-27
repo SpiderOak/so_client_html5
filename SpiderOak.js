@@ -37,7 +37,7 @@ var spideroak = function () {
 
     /* ==== Object-wide settings ===== */
 
-    var defaults = {
+    var generic = {
         /* Settings not specific to a particular login session: */
         // API v1.
         // XXX base_host_url may vary according to brand package.
@@ -68,7 +68,7 @@ var spideroak = function () {
         storage_root_url: null,
         original_shares_root_url: null,
         // All the service's actual shares reside within:
-        shares_root_url: defaults.base_host_url + "/share/",
+        shares_root_url: generic.base_host_url + "/share/",
         share_room_urls: {},
         original_share_room_urls: {},
     };
@@ -179,7 +179,7 @@ var spideroak = function () {
         my.storage_web_url = storage_web_url;
 
         my.storage_root_url = (host
-                               + defaults.storage_path_prefix
+                               + generic.storage_path_prefix
                                + base32.encode_trim(username)
                                + "/");
         // Original root is determined by storage root:
@@ -191,7 +191,7 @@ var spideroak = function () {
         /* Identify original share rooms root url. Depends on established
            storage root.  Return the url. */
         my.original_shares_root_url =
-            (my.storage_root_url + defaults.original_shares_path_suffix); }
+            (my.storage_root_url + generic.original_shares_path_suffix); }
     function register_share_room_url(url) {
         /* Include url among the registered share rooms.  Returns the url. */
         my.share_room_urls[url] = true;
@@ -219,9 +219,9 @@ var spideroak = function () {
                 || (url === my.original_shares_root_url)
                 || (url === my.shares_root_url)); }
     function is_content_root_page_id(url) {
-        return ((url === defaults.combo_root_page_id)
-                || (url === defaults.other_shares_root_page_id)
-                || (url === defaults.original_shares_root_page_id)); }
+        return ((url === generic.combo_root_page_id)
+                || (url === generic.other_shares_root_page_id)
+                || (url === generic.original_shares_root_page_id)); }
     function is_share_room_url(url) {
         /* True if the 'url' is for one of the familiar share rooms.
            Doesn't depend on the url having an established node. */
@@ -334,7 +334,7 @@ var spideroak = function () {
 
     function RootStorageNode(url, parent) {
         StorageNode.call(this, url, parent);
-        this.query_qualifier = "?" + defaults.devices_query_expression;
+        this.query_qualifier = "?" + generic.devices_query_expression;
         this.emblem = "Root Storage";
         this.stats = null;
         delete this.files; }
@@ -683,7 +683,7 @@ var spideroak = function () {
 
     OtherRootShareNode.prototype.collection_menu = function (target_url) {
         /* Present a menu of collection membership actions for 'target_url'. */
-        // >>>
+        alert("OtherRootShareNode.collection_menu");
         }
 
     OtherRootShareNode.prototype.add_item_external = function (credentials) {
@@ -863,7 +863,7 @@ var spideroak = function () {
         if (data.hasOwnProperty('files')) {
             this.files = [];
             var fields = ['name', 'size', 'ctime', 'mtime', 'versions'];
-            defaults.preview_sizes.map(function (size) {
+            generic.preview_sizes.map(function (size) {
                 /* Add previews, if any, to the fields. */
                 if (("preview_" + size) in data.files) {
                     fields.push("preview_" + size); }})
@@ -934,13 +934,13 @@ var spideroak = function () {
         return this.url; }
     RootContentNode.prototype.my_page_id = function () {
         /* Set the UI page id, escaping special characters as necessary. */
-        return defaults.combo_root_page_id; }
+        return generic.combo_root_page_id; }
     OtherRootShareNode.prototype.my_page_id = function () {
         /* Set the UI page id, escaping special characters as necessary. */
-        return defaults.other_shares_root_page_id; }
+        return generic.other_shares_root_page_id; }
     OriginalRootShareNode.prototype.my_page_id = function () {
         /* Set the UI page id, escaping special characters as necessary. */
-        return defaults.original_shares_root_page_id; }
+        return generic.original_shares_root_page_id; }
     ContentNode.prototype.show = function (chngpg_opts, mode_opts) {
         /* Trigger UI focus on our content layout.
            If mode_opts "passive" === true, don't do a changePage.
@@ -1150,8 +1150,8 @@ var spideroak = function () {
         var lensubdirs = subdirs ? subdirs.length : 0;
         files = files || this.files;
         var lenfiles = files ? files.length : 0;
-        var do_dividers = (lensubdirs + lenfiles) > defaults.dividers_threshold;
-        var do_filter = (lensubdirs + lenfiles) > defaults.filter_threshold;
+        var do_dividers = (lensubdirs + lenfiles) > generic.dividers_threshold;
+        var do_filter = (lensubdirs + lenfiles) > generic.filter_threshold;
 
         function insert_item($item) {
             if ($cursor === $list) { $cursor.append($item); }
@@ -1293,7 +1293,7 @@ var spideroak = function () {
             if (! $template) {
                 error_alert("Missing markup",
                             "Expected page #"
-                            + defaults.content_page_template_id
+                            + generic.content_page_template_id
                             + " not present."); }
             this.$page = $template.clone();
             this.$page.attr('id', this.my_page_id());
@@ -1314,7 +1314,7 @@ var spideroak = function () {
            Optional 'selector' is used, otherwise '.content-items'. */
         return this.my_page$().find(selector || '.content-items'); }
     ContentNode.prototype.get_storage_page_template$ = function() {
-        return $("#" + defaults.content_page_template_id); }
+        return $("#" + generic.content_page_template_id); }
 
 
     /* ===== Resource managers ===== */
@@ -1498,7 +1498,7 @@ var spideroak = function () {
     function storage_login(login_info, url) {
         /* Login to storage account and commence browsing at devices.
            'login_info': An object with "username" and "password" attrs.
-           'url': An optional url, else defaults.storage_login_path is used.
+           'url': An optional url, else generic.storage_login_path is used.
            We provide for redirection to specific alternative servers
            by recursive calls. See:
            https://spideroak.com/apis/partners/web_storage_api#Loggingin
@@ -1514,8 +1514,8 @@ var spideroak = function () {
             login_url = url; }
 
         else {
-            server_host_url = defaults.base_host_url;
-            login_url = (server_host_url + defaults.storage_login_path); }
+            server_host_url = generic.base_host_url;
+            login_url = (server_host_url + generic.storage_login_path); }
 
         $.ajax({
             url: login_url,
@@ -1575,7 +1575,7 @@ var spideroak = function () {
             finish(); }
         else {
             // SpiderOak's logout url doesn't (as of 2012-06-15) remove cookies!
-            $.ajax({url: my.storage_root_url + defaults.storage_logout_suffix,
+            $.ajax({url: my.storage_root_url + generic.storage_logout_suffix,
                     type: 'GET',
                     success: function (data) {
                         finish(); },
@@ -1697,7 +1697,7 @@ var spideroak = function () {
             // Setup traversal hook:
             establish_traversal_handler();
 
-            my.combo_root_url = defaults.combo_root_url;
+            my.combo_root_url = generic.combo_root_url;
             var combo_root = content_node_manager.get_combo_root();
             var other_shares = content_node_manager.get(my.shares_root_url);
 
@@ -1791,11 +1791,11 @@ var spideroak = function () {
         if (document_addrs.hasOwnProperty(obj)) {
             return obj; }
         switch (obj) {
-        case (defaults.combo_root_page_id):
-            return defaults.combo_root_url;
-        case (defaults.original_shares_root_page_id):
+        case (generic.combo_root_page_id):
+            return generic.combo_root_url;
+        case (generic.original_shares_root_page_id):
             return my.original_shares_root_url;
-        case (defaults.other_shares_root_page_id):
+        case (generic.other_shares_root_page_id):
             return my.shares_root_url;
         default: return obj; }}
 
