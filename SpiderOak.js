@@ -133,13 +133,12 @@ var spideroak = function () {
            All share artifacts, original and other, are removed, as well
            as registered storage.  We do not remove persistent settings. */
 
-        Object.keys(my.original_share_room_urls).map(function (room_url) {
-            if (! is_other_share_room_url(room_url)) {
-                delete my.share_room_urls[room_url]; }})
-        my.original_share_room_urls = {};
-
         if (my.original_shares_root_url) {
-            content_node_manager.clear_hierarchy(my.original_shares_root_url); }
+            var original_shares_root = cnmgr.get(my.original_shares_root_url);
+            original_share_room_urls_list().map(
+                original_shares_root.remove_item)
+            // remove_item, above, frees the rooms and contents.
+            cnmgr.free(original_shares_root); }
         my.original_shares_root_url = "";
 
         if (my.storage_root_url) {
@@ -728,36 +727,50 @@ var spideroak = function () {
                     notify_token: [this.job_id, url]});
         return room; }
 
-    OtherRootShareNode.prototype.remove_item_external = function (room_url) {
+    PublicRootShareNode.prototype.remove_item_external = function (room_url) {
         /* Omit a non-original share room from persistent and resident memory.
            This is for use from outside of the object. Use .remove_item() for
            internal object operation. */
         this.job_id += 1;
         this.remove_item(url); }
 
-    OtherRootShareNode.prototype.remove_item = function (room_url) {
+    PublicRootShareNode.prototype.remove_item = function (room_url) {
         /* Omit a non-original share room from the persistent and resident
            collections. Returns true if the item was present, else false. */
-        if (is_other_share_room_url(room_url)) {
-            unregister_share_room_url(room_url);
+        if (is_public_share_room_url(room_url)) {
+            if (! is_original_share_room_url(room_url)) {
+                // Free the nodes.
+                content_node_manager.clear_hierarchy(room_url); }
+            unregister_public_share_room_url(room_url);
             this.unpersist_item(room_url);
             return true; }
         else { return false; }}
 
-    OtherRootShareNode.prototype.persist_item = function (room_url) {
+    OriginalRootShareNode.prototype.remove_item = function (room_url) {
+        /* Omit an original share room from the resident collection.
+           Returns true if the item was present, else false. */
+        if (is_original_share_room_url(room_url)) {
+            if (! is_public_share_room_url(room_url)) {
+                // Free the nodes.
+                content_node_manager.clear_hierarchy(room_url); }
+            unregister_original_share_room_url(room_url);
+            return true; }
+        else { return false; }}
+
+    PublicRootShareNode.prototype.persist_item = function (room_url) {
         /* Add a share rooms to the collection persistent non-originals. */
-        var persistents = pmgr.get("other_share_urls") || {};
+        var persistents = pmgr.get("public_share_urls") || {};
         if (! persistents.hasOwnProperty(room_url)) {
             persistents[room_url] = true;
-            pmgr.set("other_share_urls", persistents); }}
+            pmgr.set("public_share_urls", persistents); }}
 
-    OtherRootShareNode.prototype.unpersist_item = function (room_url) {
+    PublicRootShareNode.prototype.unpersist_item = function (room_url) {
         /* Omit a non-original share room from the persistent
            collection.  Returns true if the item was present, else false. */
-        var persistents = pmgr.get("other_share_urls") || {};
+        var persistents = pmgr.get("public_share_urls") || {};
         if (persistents.hasOwnProperty(room_url)) {
             delete persistents[room_url];
-            pmgr.set("other_share_urls", persistents);
+            pmgr.set("public_share_urls", persistents);
             return true; }
         else { return false; }}
 
