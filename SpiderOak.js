@@ -1806,11 +1806,10 @@ var spideroak = function () {
            - For fragments of the application code's url, returns the fragment
              (sans the '#'),
            - Translates page-ids for root content nodes to their urls,
-           - Those last two Combined transforms fragment references to root
+           - Those last two, combined, transforms fragment references to root
              content pages to the urls of those pages.
 
-           main body is that of the application.  Otherwise, the original
-           object is returned. */
+           If none of the conditions holds, the original object is returned. */
         if (typeof obj !== "string") { return obj; }
         if (obj.split('#')[0] === window.location.href.split('#')[0]) {
             obj = obj.split('#')[1]; }
