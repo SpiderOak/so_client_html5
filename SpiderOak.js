@@ -248,29 +248,25 @@ var spideroak = function () {
                     === my.storage_root_url)); }
     function is_share_url(url) {
         /* True if the URL is for a content item in the user's storage area.
+           Does not include the original shares root.
            Doesn't depend on the url having an established node. */
         return (my.shares_root_url
                 && (url.slice(0, my.shares_root_url.length)
                     === my.shares_root_url)); }
     function is_content_url(url) {
         /* True if url within registered content roots. */
+        url = internalize_url(url); // ... for content root page ids.
         return (is_storage_url(url)
                 || is_share_url(url)
                 || is_combo_root_url(url)
-                || is_content_root_url(url)
-                || is_content_root_page_id(url)); }
+                || is_content_root_url(url)); }
 
-    function other_share_room_urls() {
-        /* Return an array of known share room urls that are not among the
-           ones originated by the current account, *including* ones from
-           peristence storage.  Doesn't depend on the urls being
-           established as nodes. */
-        var others = Object.keys(pmgr.get('other_share_urls') || {});
-        others.map(function (candidate) {
-            if (! my.share_room_urls.hasOwnProperty(candidate)) {
-                register_share_room_url(candidate); }})
-        var all = Object.keys(my.share_room_urls);
-        return all.filter(is_other_share_room_url); }
+    function public_share_room_urls_list() {
+        /* Return an array of public share room urls being visited. */
+        return Object.keys(generic.public_share_room_urls); }
+    function original_share_room_urls_list() {
+        /* Return an array of original share room urls being visited. */
+        return Object.keys(my.original_share_room_urls); }
 
     /* ===== Data model ===== */
 
@@ -488,7 +484,7 @@ var spideroak = function () {
             if (this.action_methods.hasOwnProperty(action)) {
                 return this[action](mode_opts); }}
 
-        this.subdirs = other_share_room_urls();
+        this.subdirs = public_share_room_urls_list();
         // .add_item() will also remove invalid ones from this.subdirs:
         this.subdirs.map(this.add_item.bind(this));
         this.do_presentation(chngpg_opts, mode_opts); }
@@ -606,7 +602,7 @@ var spideroak = function () {
 
         if (sub_job_id === this.job_id) {
             // Do update, whether or not it was successful:
-            this.subdirs = other_share_room_urls()
+            this.subdirs = public_share_room_urls_list()
             this.subdirs.sort(content_nodes_by_url_sorter)
             this.do_presentation({}, {passive: true}); }}
 
@@ -1024,17 +1020,17 @@ var spideroak = function () {
                             '.my-shares-list');
 
         // Public share rooms section:
-        var other_share_urls = other_share_room_urls();
-        var $other_shares_nonempty = $page.find('.other-content');
-        var $other_shares_empty = $page.find('.other-no-content');
+        var public_share_urls = public_share_room_urls_list();
+        var $public_shares_nonempty = $page.find('.other-content');
+        var $public_shares_empty = $page.find('.other-no-content');
         // Show the section or the button depending on whether there's content:
-        if (other_share_urls.length === 0) {
-            $other_shares_nonempty.hide();
-            $other_shares_empty.show(); }
+        if (public_share_urls.length === 0) {
+            $public_shares_nonempty.hide();
+            $public_shares_empty.show(); }
         else {
-            $other_shares_empty.hide();
-            $other_shares_nonempty.show();
-            this.layout_content(mode_opts, other_share_urls, false,
+            $public_shares_empty.hide();
+            $public_shares_nonempty.show();
+            this.layout_content(mode_opts, public_share_urls, false,
                                 '.other-shares-list'); }
 
         this.layout_footer(mode_opts); }
