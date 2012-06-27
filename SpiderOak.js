@@ -660,6 +660,11 @@ var spideroak = function () {
             $content_section.hide();
             if (this.veiled) { this.veil(false); }}}
 
+    OtherRootShareNode.prototype.collection_menu = function (target_url) {
+        /* Present a menu of collection membership actions for 'target_url'. */
+        // >>>
+        }
+
     OtherRootShareNode.prototype.add_item_external = function (credentials) {
         /* Visit a specified share room, according to 'credentials' object:
            {username, password}.
@@ -935,6 +940,11 @@ var spideroak = function () {
 
     OtherRootShareNode.prototype.layout = function (mode_opts) {
         /* Deploy content as markup on our page. */
+        // Get a split button on each item to provoke an action menu:
+        var split_params = {url: this.url + '?action=collection_menu&target=',
+                            icon: 'gear',
+                            title: "Collection membership"};
+        mode_opts.split_button_url_append = split_params;
         ContentNode.prototype.layout.call(this, mode_opts);
         var $content_items = this.my_page$().find('.page-content')
         if (this.subdirs.length === 0) {
@@ -1151,12 +1161,27 @@ var spideroak = function () {
         return $page; }
 
     FolderContentNode.prototype.layout_item$ = function(mode_opts) {
-        /* Return a folder-like content item's description as jQuery item. */
-        var $href = $('<a/>').attr('class', "compact-vertical");
-        $href.attr('href', "#" + this.url);
-        $href.html($('<h4/>').html(this.name));
-        var $it = $('<li/>').append($href);
+        /* Return a folder-like content item's description as jQuery item.
+           Optional:
+           mode_opts['split_button_url_append']: {icon:, title:, url:}
+            - construct a split button, appending node's url onto passed url.
+         */
+        var $a = $('<a/>').attr('class', "compact-vertical");
+        $a.attr('href', "#" + this.url);
+        $a.html($('<h4/>').html(this.name));
+
+        var $it = $('<li/>').append($a);
+
+        if (mode_opts && mode_opts.hasOwnProperty('split_button_url_append')) {
+            var split_params = mode_opts.split_button_url_append;
+            $a = $('<a/>');
+            $a.attr('href', '#' + split_params.url + this.url);
+            $a.attr('data-icon', split_params.icon);
+            $a.attr('title', split_params.title);
+            $it.find('a').after($a); }
+
         $it.attr('data-filtertext', this.name);
+
         return $it; }
     DeviceStorageNode.prototype.layout_item$ = function(mode_opts) {
         /* Return a storage device's description as a jQuery item. */
