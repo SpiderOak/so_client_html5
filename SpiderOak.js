@@ -45,7 +45,7 @@ var spideroak = function () {
         combo_root_url: "https://home",
         combo_root_page_id: "home",
         original_shares_root_page_id: "original-home",
-        other_shares_root_page_id: "share-home",
+        public_shares_root_page_id: "share-home",
         storage_login_path: "/browse/login",
         storage_logout_suffix: "logout",
         storage_path_prefix: "/storage/",
@@ -59,7 +59,7 @@ var spideroak = function () {
         preview_sizes: [25, 48, 228, 800],
         dividers_threshold: 10,
         filter_threshold: 20,
-        other_share_room_urls: {},
+        public_share_room_urls: {},
     };
     var my = {
         /* Login session settings: */
@@ -345,7 +345,7 @@ var spideroak = function () {
         this.emblem = "Root Share";
         this.root_url = url; }
     RootShareNode.prototype = new ShareNode();
-    function OtherRootShareNode(url, parent) {
+    function PublicRootShareNode(url, parent) {
         RootShareNode.call(this, url, parent);
         this.name = "Public Share Rooms";
         this.emblem = "Public Share Rooms";
@@ -362,7 +362,7 @@ var spideroak = function () {
         RootShareNode.call(this, url, parent);
         this.name = "My Share Rooms";
         this.emblem = "Originally Published Share Rooms"; }
-    OtherRootShareNode.prototype = new RootShareNode();
+    PublicRootShareNode.prototype = new RootShareNode();
 
     function DeviceStorageNode(url, parent) {
         StorageNode.call(this, url, parent);
@@ -470,7 +470,7 @@ var spideroak = function () {
             // XXX Provide other share edit and "+" add controls - somewhere.
             }}
 
-    OtherRootShareNode.prototype.visit = function (chngpg_opts, mode_opts) {
+    PublicRootShareNode.prototype.visit = function (chngpg_opts, mode_opts) {
         /* Obtain the known, non-original share rooms and present them. */
         // Our content is the set of remembered urls, from:
         // - those visited in this session
@@ -564,7 +564,7 @@ var spideroak = function () {
                 var ps_root = cnmgr.get(my.original_shares_root_url, this);
                 ps_root.visit({}, our_mode_opts); }}}
 
-    OtherRootShareNode.prototype.notify_subvisit_status = function(succeeded,
+    PublicRootShareNode.prototype.notify_subvisit_status = function(succeeded,
                                                                    token,
                                                                    content) {
         /* Callback for subordinate share nodes to signal their visit result:
@@ -685,12 +685,12 @@ var spideroak = function () {
             $content_section.hide();
             if (this.veiled) { this.veil(false); }}}
 
-    OtherRootShareNode.prototype.collection_menu = function (target_url) {
+    PublicRootShareNode.prototype.collection_menu = function (target_url) {
         /* Present a menu of collection membership actions for 'target_url'. */
-        alert("OtherRootShareNode.collection_menu");
+        alert("PublicRootShareNode.collection_menu");
         }
 
-    OtherRootShareNode.prototype.add_item_external = function (credentials) {
+    PublicRootShareNode.prototype.add_item_external = function (credentials) {
         /* Visit a specified share room, according to 'credentials' object:
            {username, password}.
            Use this routine only for adding from outside the object - use
@@ -706,7 +706,7 @@ var spideroak = function () {
                              + base32.encode_trim(share_id)
                              + "/" + room_key
                              + "/");
-        if (is_other_share_room_url(new_share_url)) {
+        if (is_public_share_room_url(new_share_url)) {
             this.show_status_message(message + " already added"); }
         else if (is_share_room_url(new_share_url)) {
             this.show_status_message(message + ' already among "my" shares'); }
@@ -716,10 +716,10 @@ var spideroak = function () {
             $sm.delay(1000).fadeIn(1000); // Give time for error to appear.
             return this.add_item(new_share_url); }}
 
-    OtherRootShareNode.prototype.add_item = function (url) {
+    PublicRootShareNode.prototype.add_item = function (url) {
         /* Visit a specified share room, according its' URL address.
            Return the room object. */
-        register_share_room_url(url);
+        register_public_share_room_url(url);
         var room = content_node_manager.get(url, cnmgr.get_combo_root());
         room.visit({},
                    {passive: true,
@@ -953,9 +953,9 @@ var spideroak = function () {
     RootContentNode.prototype.my_page_id = function () {
         /* Set the UI page id, escaping special characters as necessary. */
         return generic.combo_root_page_id; }
-    OtherRootShareNode.prototype.my_page_id = function () {
+    PublicRootShareNode.prototype.my_page_id = function () {
         /* Set the UI page id, escaping special characters as necessary. */
-        return generic.other_shares_root_page_id; }
+        return generic.public_shares_root_page_id; }
     OriginalRootShareNode.prototype.my_page_id = function () {
         /* Set the UI page id, escaping special characters as necessary. */
         return generic.original_shares_root_page_id; }
@@ -971,7 +971,7 @@ var spideroak = function () {
         // Just in case, eg of refresh:
         $.mobile.hidePageLoadingMsg(); }
 
-    OtherRootShareNode.prototype.do_presentation = function (chngpg_opts,
+    PublicRootShareNode.prototype.do_presentation = function (chngpg_opts,
                                                              mode_opts) {
         /* An exceptional, consolidated presentation routine. */
         // For use by this.visit() and this.notify_subvisit_status().
@@ -989,7 +989,7 @@ var spideroak = function () {
         this.layout_content(mode_opts);
         this.layout_footer(mode_opts); }
 
-    OtherRootShareNode.prototype.layout = function (mode_opts) {
+    PublicRootShareNode.prototype.layout = function (mode_opts) {
         /* Deploy content as markup on our page. */
         // Get a split button on each item to provoke an action menu:
         var split_params = {url: this.url + '?action=collection_menu&target=',
@@ -1003,7 +1003,7 @@ var spideroak = function () {
         else {
             $content_items.show(); }}
 
-    OtherRootShareNode.prototype.show = function (chngpg_opts, mode_opts) {
+    PublicRootShareNode.prototype.show = function (chngpg_opts, mode_opts) {
         /* Deploy content as markup on our page. */
         ContentNode.prototype.show.call(this, chngpg_opts, mode_opts);
         deploy_focus_oneshot('#my_share_id', "pageshow"); }
@@ -1321,7 +1321,7 @@ var spideroak = function () {
             // Include our page in the DOM, after the storage page template:
             $template.after(this.my_page$()); }
         return this.$page; }
-    OtherRootShareNode.prototype.my_page$ = function () {
+    PublicRootShareNode.prototype.my_page$ = function () {
         return RootContentNode.prototype.my_page$.call(this); }
     RootContentNode.prototype.my_page$ = function () {
         /* Return the special case of the root content nodes actual page. */
@@ -1466,7 +1466,7 @@ var spideroak = function () {
                         else if (url === my.original_shares_root_url) {
                             got = new OriginalRootShareNode(url, parent); }
                         else if (url === my.shares_root_url) {
-                            got = new OtherRootShareNode(url, parent); }
+                            got = new PublicRootShareNode(url, parent); }
                         else {
                             throw new Error("Content model management error");}}
 
@@ -1726,13 +1726,13 @@ var spideroak = function () {
 
             my.combo_root_url = generic.combo_root_url;
             var combo_root = content_node_manager.get_combo_root();
-            var other_shares = content_node_manager.get(my.shares_root_url);
+            var public_shares = content_node_manager.get(my.shares_root_url);
 
             // Properly furnish login form:
             prep_login_form('.nav_login_storage', storage_login,
                             'username', true);
             prep_login_form('.nav_login_share',
-                            other_shares.add_item_external.bind(other_shares),
+                            public_shares.add_item_external.bind(public_shares),
                             'shareid', false);
 
             // Hide everything below the banner, for subsequent unveiling:
@@ -1822,7 +1822,7 @@ var spideroak = function () {
             return generic.combo_root_url;
         case (generic.original_shares_root_page_id):
             return my.original_shares_root_url;
-        case (generic.other_shares_root_page_id):
+        case (generic.public_shares_root_page_id):
             return my.shares_root_url;
         default: return obj; }}
 
