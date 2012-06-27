@@ -69,7 +69,6 @@ var spideroak = function () {
         original_shares_root_url: null,
         // All the service's actual shares reside within:
         shares_root_url: generic.base_host_url + "/share/",
-        share_room_urls: {},
         original_share_room_urls: {},
     };
 
