@@ -437,6 +437,9 @@ var spideroak = function () {
         // See docs/AppOverview.txt "Content Node navigation modes" for
         // details about mode controls.
 
+        this.veil(true);
+        this.veil(false);
+
         this.remove_status_message();
 
         this.show(chngpg_opts, {});
