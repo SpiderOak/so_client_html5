@@ -1090,7 +1090,7 @@ var spideroak = function () {
         fields.right_url = ('#' + add_query_param(this.url,
                                                   "refresh", "true", true));
         fields.right_label = "Refresh";
-        fields.title = this.name;
+        fields.title = this.title();
         if (this.parent_url) {
             var container = content_node_manager.get(this.parent_url);
             fields.left_url = '#' + this.parent_url;
@@ -1112,7 +1112,7 @@ var spideroak = function () {
             fields.right_label = "Refresh"
             fields.left_url = '#' + this.parent_url;
             fields.left_label = container.name;
-            fields.title = this.name; }
+            fields.title = this.title(); }
         else {
             fields.right_url = '#' + add_query_param(this.url, "mode", "edit");
             fields.right_label = "Edit";
