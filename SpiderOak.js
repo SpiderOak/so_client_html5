@@ -59,6 +59,7 @@ var spideroak = function () {
         preview_sizes: [25, 48, 228, 800],
         dividers_threshold: 10,
         filter_threshold: 20,
+        other_share_room_urls: {},
     };
     var my = {
         /* Login session settings: */
