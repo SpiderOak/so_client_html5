@@ -343,7 +343,14 @@ var spideroak = function () {
         RootShareNode.call(this, url, parent);
         this.name = "Other Share Rooms";
         this.emblem = "Other Share Rooms";
-        this.job_id = 0; }
+        this.job_id = 0;
+        // Whitelist of methods eligible for invocation via mode_opts.action:
+        this.action_methods = {'collection_menu': true,
+                               'remove_item': true,
+                               'persist_item': true,
+                               'unpersist_item': true}
+
+    }
     OriginalRootShareNode.prototype = new RootShareNode();
     function OriginalRootShareNode(url, parent) {
         RootShareNode.call(this, url, parent);
@@ -459,6 +466,11 @@ var spideroak = function () {
         // Our content is the set of remembered urls, from:
         // - those visited in this session
         // - those remembered across sessions
+
+        if (mode_opts.hasOwnProperty('action')) {
+            var action = mode_opts.action;
+            if (this.action_methods.hasOwnProperty(action)) {
+                return this[action](mode_opts); }}
 
         this.subdirs = other_share_room_urls();
         // .add_item() will also remove invalid ones from this.subdirs:
