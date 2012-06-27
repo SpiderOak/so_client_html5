@@ -436,7 +436,7 @@ var spideroak = function () {
         // See docs/AppOverview.txt "Content Node navigation modes" for
         // details about mode controls.
 
-        this.remove_error_message();
+        this.remove_status_message();
 
         this.show(chngpg_opts, {});
 
@@ -470,6 +470,8 @@ var spideroak = function () {
         // Our content is the set of remembered urls, from:
         // - those visited in this session
         // - those remembered across sessions
+
+        this.remove_status_message();
 
         if (mode_opts.hasOwnProperty('action')) {
             var action = mode_opts.action;
@@ -571,16 +573,18 @@ var spideroak = function () {
         var $page = this.my_page$();
         var sub_job_id = token[0];
         var url = token[1];
+        var splat = url.split('/');
+        var share_id = base32.decode(splat[splat.length-3]);
+        var room_key = splat[splat.length-2];
 
         if (succeeded !== true) {
-            var splat = url.split('/');
-            var share_id = base32.decode(splat[splat.length-3]);
-            var room_key = splat[splat.length-2];
-            var message = ("Sorry - " + share_id + " / " + room_key + " was "
+            this.remove_status_message('result');
+            var message = ("Sorry - <tt>"
+                           + share_id + "</tt> / <tt>" + room_key + "</tt> "
                            + content.statusText + " (" + content.status + ")");
             var remove = true;
             if (content.status === 404) {
-                this.show_error_message(message); }
+                this.show_status_message(message); }
             else {
                 message = [].concat(message, " - omit it?");
                 remove = confirm(message); }
@@ -588,7 +592,7 @@ var spideroak = function () {
                 this.remove_item(url);
                 this.unpersist_item(url); }}
         else {
-            this.remove_error_message(); }
+            this.remove_status_message('error'); }
 
         if (sub_job_id === this.job_id) {
             // Do update, whether or not it was successful:
@@ -649,7 +653,7 @@ var spideroak = function () {
         if (succeeded) {
             // Show the content instead of the form
             $login_section.hide();
-            this.remove_error_message();
+            this.remove_status_message();
             $content_section.show();
             if (remember_manager.active()) {
                 // remember_manager will store just the relevant fields.
@@ -668,7 +672,7 @@ var spideroak = function () {
                 var error_message = response.statusText;
                 if (exception) {
                     error_message += " - " + exception.message; }
-                this.show_error_message(error_message);
+                this.show_status_message(error_message);
                 if (response.status === 401) {
                     // Unauthorized - expunge all privileged info:
                     clear_storage_account(); }}
@@ -690,10 +694,22 @@ var spideroak = function () {
 
         this.job_id += 1;       // Entry
 
-        return this.add_item(my.shares_root_url
-                             + base32.encode_trim(credentials.shareid)
-                             + "/" + credentials.password
-                             + "/"); }
+        var share_id = credentials.shareid;
+        var room_key = credentials.password;
+        var message = (share_id + "</tt> / <tt>" + room_key + "</tt> ");
+        var new_share_url = (my.shares_root_url
+                             + base32.encode_trim(share_id)
+                             + "/" + room_key
+                             + "/");
+        if (is_other_share_room_url(new_share_url)) {
+            this.show_status_message(message + " already added"); }
+        else if (is_share_room_url(new_share_url)) {
+            this.show_status_message(message + ' already among "my" shares'); }
+        else {
+            var $sm = this.show_status_message("Added: " + message, 'result');
+            $sm.hide();
+            $sm.delay(1000).fadeIn(1000); // Give time for error to appear.
+            return this.add_item(new_share_url); }}
 
     OtherRootShareNode.prototype.add_item = function (url) {
         /* Visit a specified share room, according its' URL address.
