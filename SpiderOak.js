@@ -132,11 +132,15 @@ var spideroak = function () {
            All share artifacts, original and other, are removed, as well
            as registered storage.  We do not remove persistent settings. */
 
-        // Empty strings instead of null to distinguish from initial settings.
+        Object.keys(my.original_share_room_urls).map(function (room_url) {
+            if (! is_other_share_room_url(room_url)) {
+                delete my.share_room_urls[room_url]; }})
+        my.original_share_room_urls = {};
 
         if (my.original_shares_root_url) {
             content_node_manager.clear_hierarchy(my.original_shares_root_url); }
         my.original_shares_root_url = "";
+
         if (my.storage_root_url) {
             content_node_manager.clear_hierarchy(my.storage_root_url); }
         my.storage_root_url = "";
