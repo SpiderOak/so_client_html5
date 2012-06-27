@@ -1066,7 +1066,6 @@ var spideroak = function () {
         StorageNode.prototype.layout_header.call(this, mode_opts);
         this.layout_header_fields({'title': "Storage Devices",
                                    'left_label': "Home",
-                                   // XXX use from the combo-root, instead:
                                    'left_url': "#" + this.parent_url}); }
 
     ShareNode.prototype.layout_header = function(mode_opts) {
@@ -1195,7 +1194,7 @@ var spideroak = function () {
     RoomShareNode.prototype.layout_item$ = function(mode_opts) {
         /* Return a share room's description as a jQuery item. */
         return FolderShareNode.prototype.layout_item$.call(this,
-                                                               mode_opts); }
+                                                           mode_opts); }
     FileContentNode.prototype.layout_item$ = function(mode_opts) {
         /* Return a file-like content node's description as a jQuery item. */
         var $it = $('<li data-mini="true"/>');
@@ -1294,9 +1293,9 @@ var spideroak = function () {
            - .keys() returns an array of all stored keys.
            - .length returns the number of keys.
          */
-        // XXX Compat: versions of android < 2.1 do not support localStorage.
-        //             They do support gears sqlite. lawnchair would make it
-        //             easy to switch between them.
+        // NOTE Compat: versions of android < 2.1 do not support localStorage.
+        //              They do support gears sqlite. lawnchair would make it
+        //              easy to switch between them.
         get: function (name) {
             /* Retrieve the value for 'name' from persistent storage. */
             return JSON.parse(localStorage.getItem(name)); },
