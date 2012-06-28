@@ -22,7 +22,7 @@ folders and file "nodes".
     * `FileStorageNode`
   * `ShareNode` - Share Rooms and their contents
     * `OriginalRootShareNode` - The list of share rooms published by the account
-    * `PublicRootShareNode` - Other share rooms visited
+    * `PublicRootShareNode` - Any share rooms visited
     * `RoomShareNode` - a public or original share room
     * `DirectoryShareNode`
     * `FileShareNode`
@@ -46,11 +46,11 @@ less situated at the top of their respective content hierarchies.
   consisting of the storage server host (which can vary) and a trimmed,
   b32 encoding of the account name.  Access to the contained items depends
   on login, at which point the storage host server is determined.
-* The account-originated collection of share rooms is collected
-  within the `OriginalRootShareNode`, which has a special JSON address
-  within the storage root.  The original share rooms are situated
-  with all the public share rooms, in...
-* The `PublicRootShareNode` has a URL that is the common stem of all
+* The list of account-originated share rooms is collected
+  within the `OriginalRootShareNode`. It has a special JSON address on the
+  server within each account's storage root.  The original share rooms are
+  situated with all the public share rooms, in...
+* The `PublicRootShareNode` has a URL that is the common stem of all visited
   !SpiderOak share rooms.
 * A encompassing root node, the `ComboRootContentNode`, contains all the
   other roots, and presents their contents in a consolidated view.  The app
@@ -89,7 +89,7 @@ content hierarchies.
 
   * Special provisions are made for intra-document html links that go to
     the pages which serve as template for content root nodes, eg, the
-    combined `RootContentNode`, and the `OtherRootShareNode`.  Those
+    combined `RootContentNode`, and the `PublicRootShareNode`.  Those
     addresses are explicitly identified, and translated to their
     `content_node_manager` addresses using a `handle_content_visit()`
     helper, `internalize_url()`. The nodes then get control and fetch the
@@ -117,10 +117,10 @@ navigation.  This frees them for use providing management activities for
 their respective collections:
 
 * `RootStorageNode`: (eventually) adjusting backup coverage
-* `PersonalRootShareNode`: (eventually) managing the share rooms published
+* `OriginalRootShareNode`: (eventually) managing the share rooms published
   by the account
-* `PublicRootShareNode`: adding to and omitting from the locally familiar
-  collection of public share rooms.
+* `PublicRootShareNode`: adding to and omitting from the collection of
+  share rooms being visited.
 
 === Application !Entry/Init Overview ===
 * $(document).ready() function calls spideroak.init()
@@ -170,15 +170,15 @@ found in `SpiderOak.html`, upon in-app traversal of content URLs (see
     `OriginalRootShareNode`.  All of those visits are delegated such that:
     1. The delegated presentations do not take browser focus (using the
        'passive' mode option), leaving focus on the `RootContentNode`, and
-    2. the `RootContentNode` is notified of success, along with the produced
-       content, so it can display a consolidated view of the respective
-       content, as it is received.
-    3. The  visit is contingent to receiving
-       success status notification from the `RootStorageNode` visit, since both
-       depend on successful authentication (while the `PublicRootShareNode`
-       visit does not).
+    2. the `RootContentNode` is notified of success, along with an
+       indicator of the transaction that succeeded, so it can redisplay its
+       consolidated content view, as it notifications are received.
+    3. The visit is contingent to receiving success status notification
+       from the `RootStorageNode` visit, since both depend on successful
+       authentication, while access to contents of the
+       `PublicRootShareNode` does not.
        * If the `RootStorageNode` visit succeeds, the `OriginalRootShareNode`
-         is dispatched.
+         visit is dispatched.
        * If the `RootStorageNode` visit fails, the `RootContentNode` presents
          the login form, with the username filled in and Remember Me is
          activated, as appropriate.
@@ -204,6 +204,21 @@ Currently implemented modes include:
 * `notify_token`: object to be passed back to `notify_callback`. To be used
   by the initiator to identify the transaction and convey useful state.
 * `refresh`: refetch the data for the node.
+* `action`: arrange for menu of actions available for this item.
+  Eg, so `ContentNode.layout_item$()` can provide the proper links to elicit
+  the menu, and `RoomShareNode.visit()` can present the menu and implement
+  the actions.
+
+=== Content and Operational Menus ===
+Elaborate actions on content, like adding and removing share nodes, is
+implemented with a combination of specific [#ContentNodenavigationmodes
+content navigation modes].
+
+* The state is conveyed in the address domain using the URL query string.
+
+* In the procedural domain, it is conveyed using the mode_opts parameter.
+  `handle_content_visit()` translates from URL to mode_opts using
+  `query_params()`.
 
 === Storage and Share Rooms ===
 Content urls are recognized by virtue of beginning with one of the
