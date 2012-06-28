@@ -776,7 +776,7 @@ var spideroak = function () {
            This is for use from outside of the object. Use .remove_item() for
            internal object operation. */
         this.job_id += 1;
-        this.remove_item(url); }
+        this.remove_item(room_url); }
 
     PublicRootShareNode.prototype.remove_item = function (room_url) {
         /* Omit a non-original share room from the persistent and resident
