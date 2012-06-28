@@ -478,11 +478,19 @@ var spideroak = function () {
                 this.do_presentation(chngpg_opts, {});
                 return got; }}
 
-        this.subdirs = public_share_room_urls_list();
-        // .add_item() will also remove invalid ones from this.subdirs:
-        this.subdirs.map(this.add_item.bind(this));
+        // this.add_item() only adds what's missing, and sets this.subdirs.
+        this.get_subdir_prospects().map(this.add_item.bind(this));
         this.do_presentation(chngpg_opts, mode_opts); }
 
+    PublicRootShareNode.prototype.get_subdir_prospects = function () {
+        /* Load the subdirs list from active list and persistence. */
+        var subdirs = public_share_room_urls_list();
+        var persisted = persistence_manager.get('public_share_urls') || {};
+        var additions = [];
+        Object.keys(persisted).map(function (item) {
+            if (subdirs.indexOf(item) === -1) {
+                additions.push(item); }});
+        return subdirs.concat(additions); }
 
     ContentNode.prototype.fetch_and_dispatch = function (chngpg_opts,
                                                          mode_opts) {
