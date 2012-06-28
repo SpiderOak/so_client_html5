@@ -605,7 +605,6 @@ var spideroak = function () {
         this.subdirs = public_share_room_urls_list()
         this.subdirs.sort(content_nodes_by_url_sorter)
         this.do_presentation({}, {passive: true});
-        if (token and token.hasOwnProperty('notify_callback')) {
         // XXX Feeble: we always update the combo root.
         cnmgr.get_combo_root().layout(); }
 
