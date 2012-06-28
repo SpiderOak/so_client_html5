@@ -699,8 +699,6 @@ var spideroak = function () {
                     + 'data-mini="true" data-iconpos="right">'
                     + item_text + '</a>')}.bind(this);
 
-        console.log("PublicRootShareNode.enlisted_room_menu("
-                    + subject + ")");
         var subject_room = content_node_manager.get(subject);
         var room_url = subject_room.url;
 
@@ -1858,10 +1856,13 @@ var spideroak = function () {
         return "<" + this.emblem + ": " + this.url + ">"; }
 
 
+    function no_op () { console.log("no-op"); }
+
     var document_addrs = {
         /* Map specific document fragment addresses from the application
            document to internal functions/methods. */
         logout: storage_logout,
+        noop: no_op,
     }
 
     function internalize_url(obj) {
