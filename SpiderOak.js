@@ -601,13 +601,13 @@ var spideroak = function () {
         else {
             this.remove_status_message('error'); }
 
-        if (sub_job_id === this.job_id) {
-            // Do update, whether or not it was successful:
-            this.subdirs = public_share_room_urls_list()
-            this.subdirs.sort(content_nodes_by_url_sorter)
-            this.do_presentation({}, {passive: true});
-            // XXX Feeble: we always update the combo root.
-            cnmgr.get_combo_root().layout(); }}
+        // Do update, whether or not it was successful:
+        this.subdirs = public_share_room_urls_list()
+        this.subdirs.sort(content_nodes_by_url_sorter)
+        this.do_presentation({}, {passive: true});
+        if (token and token.hasOwnProperty('notify_callback')) {
+        // XXX Feeble: we always update the combo root.
+        cnmgr.get_combo_root().layout(); }
 
     ContentNode.prototype.handle_visit_success = function (data, when,
                                                            chngpg_opts,
