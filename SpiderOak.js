@@ -1697,7 +1697,7 @@ var spideroak = function () {
             // Surprisingly, doing focus before dispatching fadeIn doesn't work.
             // Also, username field focus doesn't *always* work before the
             // delay is done, hence the redundancy.  Sigh.
-            $(selector).fadeIn(2000, do_focus_and_callback);
+            $(selector).delay(1000).fadeIn(2500, do_focus_and_callback);
             do_focus(); }}
 
     function prep_login_form(content_selector, submit_handler, name_field,
