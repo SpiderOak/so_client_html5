@@ -36,9 +36,10 @@ Content model elements are address by the URLs of their JSON content items:
 * as the key for retrieval (and allocation) within the app's internal node
   database, mediated by the spideroak.content_node_manager object.
 
-The app introduces a few objects - the root nodes - which contain and
-organize the actual content.  The root nodes have URL addresses, more or
-less situated at the top of their respective content hierarchies.
+The app introduces a few encompassing objects - the root nodes - which
+contain and organize the actual content.  The root nodes have URL
+addresses, more or less situated at the top of their respective content
+hierarchies.
 
 * The actual content items are indexed in the content_node_manager by their
   JSON access URLs, and addressed in app URLs as the fragment identifiers.
