@@ -1487,6 +1487,54 @@ var spideroak = function () {
     var remgr = remember_manager;
 
 
+    var transit_manager = function () {
+        /* Facilities to detect repeated traversals of the same URL.
+           Specifically useful for distinguishing popups handling, where the
+           special traversal provisions has conflicted with ours.
+
+           To use:
+
+           - When creating a url for traversal, 'url = tm.distinguish(url)'
+
+           handle_content_visit() will recognize repeats within recents_span
+           traversals, and discard them.
+        */
+        var tm_param_name = "so_transit";
+        var recent_transits = [];
+        var recents_span = 10;
+
+        function new_distinction() {
+            /* */
+            return ''.concat(new Date().getTime()
+                             + Math.floor(Math.random() * 1e5)); }
+        function is_repeat(distinction) {
+            /* Check 'distinction', and register that we've seen it if not
+               already registered. */
+            if (! distinction) {
+                return false; }
+            else if (recent_transits.indexOf(distinction) != -1) {
+                return true; }
+            else {
+                recent_transits.unshift(distinction);
+                recent_transits.splice(recents_span);
+                return false; }}
+
+        var expose = {
+            distinguish_url: function(url) {
+                /* Add a query parameter to a url to distinguish it, so it
+                   can be recognized on redundant changePage. */
+                var distinct = new_distinction();
+                var delim = ((url.search('\\?') === -1) ? "?" : "&");
+                return url.concat(delim + tm_param_name + "=" + distinct); },
+
+            is_repeat_url: function(url) {
+                return is_repeat(query_params(url)[tm_param_name]); },
+        }
+        if (SO_DEBUGGING) {
+            expose.recent_transits = recent_transits; }
+        return expose;}();
+    var tmgr = transit_manager;
+
     var content_node_manager = function () {
         /* A singleton utility for getting and removing content node objects.
            "Getting" means finding existing ones or else allocating new ones.
@@ -1902,7 +1950,8 @@ var spideroak = function () {
     if (SO_DEBUGGING) {
         // Expose the managers for access while debugging:
         public_interface.cnmgr = cnmgr;
-        public_interface.pmgr = pmgr; }
+        public_interface.pmgr = pmgr;
+        public_interface.tmgr = tmgr; }
 
 
     /* ===== Here we go: ===== */
