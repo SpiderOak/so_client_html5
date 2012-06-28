@@ -1,6 +1,6 @@
 [[PageOutline]]
 = HTML5 Client Technical Details =
-Noteworthy technical details of the !SpiderOak HTML5 application. See
+Noteworthy technical !SpiderOak HTML5 client project technical details. See
 [[HTML5ClientProject]] for project status, etc.
 
 == Architectural Elements ==
