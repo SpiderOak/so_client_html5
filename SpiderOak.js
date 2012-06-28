@@ -65,6 +65,7 @@ var spideroak = function () {
     var my = {
         /* Login session settings: */
         username: null,
+        storage_host: null,
         storage_web_url: null,  // Location of storage web UI for user.
         storage_root_url: null,
         original_shares_root_url: null,
@@ -792,6 +793,18 @@ var spideroak = function () {
         else { return false; }}
     // Whitelist this method for use as a mode_opts 'action':
     PublicRootShareNode.prototype.remove_item.is_action = true;
+
+    OriginalRootShareNode.prototype.clear_item = function (room_url) {
+        /* Omit an original share room from the resident collection.
+           (The share room is not actually removed on the server.)
+           Returns true if the item was present, else false. */
+        if (is_original_share_room_url(room_url)) {
+            if (! is_public_share_room_url(room_url)) {
+                // Free the nodes.
+                content_node_manager.clear_hierarchy(room_url); }
+            unregister_original_share_room_url(room_url);
+            return true; }
+        else { return false; }}
 
     PublicRootShareNode.prototype.persist_item = function (room_url) {
         /* Add a share rooms to the collection persistent non-originals. */
