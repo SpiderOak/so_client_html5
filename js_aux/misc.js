@@ -23,8 +23,8 @@ $(document).ready(function() {
     /* Nothing so far. */
 })
 
-function error_alert(purpose, status_code) {
-    /* Post and alert and throw an error for 'purpose' with 'status_code'.
+function error_alert_message(purpose, status_code) {
+    /* Return a error message for 'purpose' with 'status_code'.
        'purpose' should name the problem, and 'status_code' can be one
        of a few SpiderOak web status codes, or text elaborating the problem. */
     var msg;
@@ -41,6 +41,13 @@ function error_alert(purpose, status_code) {
     msg = translate(purpose) + ": " + translate(msg);
     if (typeof status_code !== "string") {
         msg += " (" + status_code + ")"; }
+    return msg; }
+
+function error_alert(purpose, status_code) {
+    /* Post an alert and throw an error for 'purpose' with 'status_code'.
+       'purpose' should name the problem, and 'status_code' can be one
+       of a few SpiderOak web status codes, or text elaborating the problem. */
+    var msg = error_alert_message(purpose, status_code);
     $(document).trigger("error");
     alert(msg);
     throw new Error(msg);

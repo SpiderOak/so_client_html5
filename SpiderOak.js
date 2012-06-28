@@ -1551,8 +1551,10 @@ var spideroak = function () {
             success: function (data) {
                 var match = data.match(/^(login|location):(.+)$/m);
                 if (!match) {
-                    error_alert('Temporary server failure',
-                                'Please try again later.');
+                    var combo_root = content_node_manager.get_combo_root();
+                    combo_root.show_status_message(
+                        error_alert_message('Temporary server failure',
+                                            'Please try again later.'));
                 } else if (match[1] === 'login') {
                     if (match[2].charAt(0) === "/") {
                         login_url = server_host_url + match[2];
@@ -1575,8 +1577,10 @@ var spideroak = function () {
                 if (remember_manager.active()
                     && (username = persistence_manager.get('username'))) {
                     $('#my_login_username').val(username); }
-                error_alert("Storage login", xhr.status); },
-
+                    var combo_root = content_node_manager.get_combo_root();
+                combo_root.show_status_message(
+                    error_alert_message('Storage login', xhr.status));
+                $(document).trigger("error"); }
         }); }
 
     function storage_logout() {
