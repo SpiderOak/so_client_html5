@@ -93,13 +93,16 @@ var spideroak = function () {
             && (is_content_url(page)
                 || document_addrs.hasOwnProperty(page))) {
             e.preventDefault();
-            var mode_opts = query_params(page);
-            if (document_addrs.hasOwnProperty(page)) {
-                var current_internal = internalize_url(document.location.href);
-                return document_addrs[page].call(this, current_internal); }
+            if (transit_manager.is_repeat_url(page)) {
+                return false; }
             else {
-                content_node_manager.get(page).visit(data.options,
-                                                     mode_opts); }}}
+                var mode_opts = query_params(page);
+                if (document_addrs.hasOwnProperty(page)) {
+                    var internal = internalize_url(document.location.href);
+                    return document_addrs[page].call(this, internal); }
+                else {
+                    content_node_manager.get(page).visit(data.options,
+                                                         mode_opts); }}}}
 
 
     function establish_traversal_handler() {
@@ -472,9 +475,10 @@ var spideroak = function () {
 
         if (mode_opts.hasOwnProperty('action')) {
             var action = mode_opts.action;
+            var subject = mode_opts.subject;
             if (this[action] && this[action].is_action) {
-                var got = this[action](mode_opts.subject);
-                this.do_presentation(chngpg_opts, {});
+                var got = this[action](subject);
+                this.layout(chngpg_opts, {});
                 return got; }}
 
         // this.add_item() only adds what's missing, and sets this.subdirs.
@@ -1048,8 +1052,9 @@ var spideroak = function () {
     PublicRootShareNode.prototype.layout = function (mode_opts) {
         /* Deploy content as markup on our page. */
         // Get a split button on each item to provoke an action menu:
-        var split_params = {url: (this.url
-                                  + '?action=enlisted_room_menu&subject='),
+        var url = (transit_manager.distinguish_url(this.url)
+                   + '&action=enlisted_room_menu&subject=');
+        var split_params = {url: url,
                             icon: 'gear',
                             type: 'popup',
                             title: "Collection membership"};
