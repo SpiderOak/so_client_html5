@@ -309,17 +309,20 @@
     </div><!-- /footer -->
   </div>
 
-  <div data-role="page" id="simple-menu-holder">
-    <div data-role="popup" id="simple-menu"
-         data-theme="none" data-overlay-theme="a" data-theme="c">
-      <div data-role="header">
-        <h4 class="header-title"> Subject operations </h4>
+  <div data-role="page" id="menu-holder">
+    <div data-role="popup" id="simple-menu" style="max-width: 300px;"
+         data-theme="a" data-overlay-theme="a">
+      <div data-role="header" data-theme="c">
         <a href="#" data-icon="delete" data-rel="back" alt="Close"
            class="header-right-slot ui-btn-right" data-role="button"
            data-iconpos="notext" data-mini="true">Close</a>
+        <div class="popup-title"> Subject operations </div>
       </div>
-      <div data-role="content" data-theme="c">
-        <ul class="content-items" data-role="listview"></ul>
+      <div data-role="content" data-theme="d"
+           class="ui-corner-bottom ui-content">
+        <h4 class="ui-title actions-summary actions-leader"></h4>
+        <div class="actions-holder">
+        </div>
       </div>
     </div>
   </div>
