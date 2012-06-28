@@ -136,7 +136,7 @@ var spideroak = function () {
         if (my.original_shares_root_url) {
             var original_shares_root = cnmgr.get(my.original_shares_root_url);
             original_share_room_urls_list().map(
-                original_shares_root.remove_item)
+                original_shares_root.clear_item)
             // remove_item, above, frees the rooms and contents.
             cnmgr.free(original_shares_root); }
         my.original_shares_root_url = "";
@@ -438,30 +438,28 @@ var spideroak = function () {
 
         this.show(chngpg_opts, {});
 
+        // We always dispatch the public shares visit:
+        var public_mode_opts = {passive: true,
+                                notify_callback:
+                                    this.notify_subvisit_status.bind(this),
+                                notify_token: 'public-shares'};
+        $.extend(public_mode_opts, mode_opts);
+        var public_root = cnmgr.get(my.public_shares_root_url);
+        public_root.visit(chngpg_opts, public_mode_opts);
+
         if (! this.loggedin_ish()) {
             // Not enough registered info to try authenticating:
             this.authenticated(false);
             this.layout(mode_opts);
             this.show(chngpg_opts, {}); }
+
         else {
             var storage_root = content_node_manager.get(my.storage_root_url);
-            var our_mode_opts = {passive: true,
-                                 notify_callback:
-                                     this.notify_subvisit_status.bind(this),
-                                 notify_token: 'storage'};
-            $.extend(our_mode_opts, mode_opts);
-            try {
-                // Will chain via notify_callback:
-                storage_root.visit(chngpg_opts, our_mode_opts); }
-            catch (err) {
-                // XXX These failsafes should be in error handlers:
-                this.authenticated(false,
-                                   {status: 0, statusText: "System error"},
-                                   err);
-                this.layout(); }
-            // XXX Populate the familiar other share rooms.
-            // XXX Provide other share edit and "+" add controls - somewhere.
-            }}
+            // Make a distinct copy:
+            var storage_mode_opts = $.extend({}, public_mode_opts);
+            storage_mode_opts.notify_token = 'storage';
+            // Will chain to original shares via notify_callback.
+            storage_root.visit(chngpg_opts, storage_mode_opts); }}
 
     PublicRootShareNode.prototype.visit = function (chngpg_opts, mode_opts) {
         /* Obtain the known, non-original share rooms and present them. */
@@ -606,7 +604,9 @@ var spideroak = function () {
             // Do update, whether or not it was successful:
             this.subdirs = public_share_room_urls_list()
             this.subdirs.sort(content_nodes_by_url_sorter)
-            this.do_presentation({}, {passive: true}); }}
+            this.do_presentation({}, {passive: true});
+            // XXX Feeble: we always update the combo root.
+            cnmgr.get_combo_root().layout(); }}
 
     ContentNode.prototype.handle_visit_success = function (data, when,
                                                            chngpg_opts,
