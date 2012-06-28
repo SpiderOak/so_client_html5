@@ -69,7 +69,7 @@ var spideroak = function () {
         storage_root_url: null,
         original_shares_root_url: null,
         // All the service's actual shares reside within:
-        shares_root_url: generic.base_host_url + "/share/",
+        public_shares_root_url: generic.base_host_url + "/share/",
         original_share_room_urls: {},
     };
 
@@ -221,7 +221,7 @@ var spideroak = function () {
         return ((url === my.combo_root_url)
                 || (url === my.storage_root_url)
                 || (url === my.original_shares_root_url)
-                || (url === my.shares_root_url)); }
+                || (url === my.public_shares_root_url)); }
     function is_content_root_page_id(url) {
         return ((url === generic.combo_root_page_id)
                 || (url === generic.public_shares_root_page_id)
@@ -249,9 +249,9 @@ var spideroak = function () {
         /* True if the URL is for a content item in the user's storage area.
            Does not include the original shares root.
            Doesn't depend on the url having an established node. */
-        return (my.shares_root_url
-                && (url.slice(0, my.shares_root_url.length)
-                    === my.shares_root_url)); }
+        return (my.public_shares_root_url
+                && (url.slice(0, my.public_shares_root_url.length)
+                    === my.public_shares_root_url)); }
     function is_content_url(url) {
         /* True if url within registered content roots. */
         url = internalize_url(url); // ... for content root page ids.
@@ -747,7 +747,7 @@ var spideroak = function () {
         var share_id = credentials.shareid;
         var room_key = credentials.password;
         var message = (share_id + " / " + room_key);
-        var new_share_url = (my.shares_root_url
+        var new_share_url = (my.public_shares_root_url
                              + base32.encode_trim(share_id)
                              + "/" + room_key
                              + "/");
@@ -938,7 +938,7 @@ var spideroak = function () {
         /* Embody the root share room with 'data'.
            'when' is time soon before data was fetched. */
         this.subdirs = [];
-        var room_base = my.shares_root_url + data.share_id_b32 + "/";
+        var room_base = my.public_shares_root_url + data.share_id_b32 + "/";
         this.provision_items(data.share_rooms, this.subdirs,
                              room_base, 'room_key', true,
                              [['room_name', 'name'],
@@ -1513,7 +1513,7 @@ var spideroak = function () {
                             got = new RootStorageNode(url, parent); }
                         else if (url === my.original_shares_root_url) {
                             got = new OriginalRootShareNode(url, parent); }
-                        else if (url === my.shares_root_url) {
+                        else if (url === my.public_shares_root_url) {
                             got = new PublicRootShareNode(url, parent); }
                         else {
                             throw new Error("Content model management error");}}
@@ -1778,7 +1778,7 @@ var spideroak = function () {
 
             my.combo_root_url = generic.combo_root_url;
             var combo_root = content_node_manager.get_combo_root();
-            var public_shares = content_node_manager.get(my.shares_root_url);
+            var public_shares = cnmgr.get(my.public_shares_root_url);
 
             // Properly furnish login form:
             prep_login_form('.nav_login_storage', storage_login,
@@ -1874,7 +1874,7 @@ var spideroak = function () {
         case (generic.original_shares_root_page_id):
             return my.original_shares_root_url;
         case (generic.public_shares_root_page_id):
-            return my.shares_root_url;
+            return my.public_shares_root_url;
         default: return obj; }}
 
     function content_nodes_by_url_sorter(prev, next) {
