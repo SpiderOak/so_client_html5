@@ -1,6 +1,7 @@
 .status-message {
-  margin-bottom: -2em !important;
-  text-align: center !important;
+  margin-bottom: -1em !important;
+  font-weight: lighter !important;
+/*  text-align: center !important; */
 }
 .error-status-message {
   color: firebrick !important;
@@ -9,9 +10,13 @@
   color: darkgreen !important;
 }
 
+.crushed-vertical {
+  padding-top: 3px !important;
+  padding-bottom: 3px !important;
+}
 .compact-vertical {
-  padding-top: 0px !important;
-  padding-bottom: 0px !important;
+  padding-top: 6px !important;
+  padding-bottom: 6px !important;
 }
 
 .multiple-listviews .ui-content .ui-listview {

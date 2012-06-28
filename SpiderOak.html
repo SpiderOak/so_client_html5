@@ -70,9 +70,11 @@
       </div>
       <div class="content-section">
           <ul data-role="listview" class="my-content-section my-content">
-            <li data-role="list-divider" data-theme="f"
+            <li data-theme="f"
                 alt="Info" id="my-storage-leader" data-icon="false">
-              <a alt="Dashboard guide" href="#combo-about"> My Storage: </a>
+              <a alt="Dashboard guide" href="#combo-about"
+                 class="compact-vertical">
+                My Storage: </a>
             </li>
           </ul>
           <ul data-role="listview" class="storage-list my-content"
@@ -82,9 +84,9 @@
             </li>
           </ul>
           <ul data-role="listview" class="my-content-section my-content">
-            <li data-role="list-divider" id="my-rooms-leader"
+            <li id="my-rooms-leader"
                 data-theme="f" data-icon="false">
-              <a> My Share Rooms: </a>
+              <a class="compact-vertical"> My Share Rooms: </a>
             </li>
           </ul>
           <ul data-role="listview" class="my-shares-list my-content"
@@ -94,9 +96,11 @@
             </li>
           </ul>
           <ul data-role="listview" class="other-content">
-            <li data-role="list-divider" id="other-rooms-leader"
+            <li id="other-rooms-leader"
                 data-theme="f" data-icon="plus"> <!-- XXX Edit, not "+". -->
-              <a href="#share-home" alt="Edit"> Public Share Room Visits: </a>
+              <a href="#share-home" class="compact-vertical" alt="Edit">
+                Public Share Room Visits:
+              </a>
             </li>
           </ul>
           <ul data-role="listview" class="other-shares-list other-content"
@@ -106,8 +110,7 @@
             </li>
           </ul>
       </div>
-      <div data-role="list-divider"
-           id="other-rooms-button" class="other-no-content"
+      <div id="other-rooms-button" class="other-no-content"
            data-theme="f" data-icon="plus">
         <a data-role="button" href="#share-home" alt="Edit" data-theme="f"
            data-icon="plus" data-iconpos="right">

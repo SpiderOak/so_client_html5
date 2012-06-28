@@ -1214,10 +1214,10 @@ var spideroak = function () {
     FolderContentNode.prototype.layout_item$ = function(mode_opts) {
         /* Return a folder-like content item's description as jQuery item.
            Optional:
-           mode_opts['split_button_url_append']: {icon:, title:, url:}
+           mode_opts['split_button_url_append']: {icon:, title:, url:, options:}
             - construct a split button, appending node's url onto passed url.
          */
-        var $a = $('<a/>').attr('class', "compact-vertical");
+        var $a = $('<a/>').attr('class', "crushed-vertical");
         $a.attr('href', "#" + this.url);
         $a.html($('<h4/>').html(this.name));
 
@@ -1271,7 +1271,7 @@ var spideroak = function () {
         $table.append($tr);
         var $href = $('<a/>');
         $href.attr('href', this.url);
-        $href.attr('class', "compact-vertical");
+        $href.attr('class', "crushed-vertical");
         $href.append($table);
         $it.append($href);
 
@@ -1767,10 +1767,10 @@ var spideroak = function () {
             $sm.html(html);
             $sm.listview(); }
         else {
-            var $li = $('<li class="status-message '
+            var $li = $('<li class="status-message crushed-vertical '
                         + kind + '-status-message">');
             $li.html(html);
-            $sm = $('<ul data-role="listview"/>');
+            $sm = $('<ul data-role="listview" data-theme="c"/>');
             $sm.append($li);
             $page.find('[data-role="header"]').after($sm);
             $sm.listview();
