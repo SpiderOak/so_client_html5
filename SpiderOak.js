@@ -533,7 +533,7 @@ var spideroak = function () {
            'token': token they were passed to identify the transaction,
            'response': on failure: the resulting XHR object. */
 
-        if (token !== 'other-shares') {
+        if (token !== 'public-shares') {
             this.authenticated(true); }
 
         var $page = this.my_page$();
@@ -1698,7 +1698,7 @@ var spideroak = function () {
             // Surprisingly, doing focus before dispatching fadeIn doesn't work.
             // Also, username field focus doesn't *always* work before the
             // delay is done, hence the redundancy.  Sigh.
-            $(selector).fadeIn(4000, do_focus_and_callback);
+            $(selector).fadeIn(2000, do_focus_and_callback);
             do_focus(); }}
 
     function prep_login_form(content_selector, submit_handler, name_field,
