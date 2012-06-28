@@ -60,6 +60,7 @@ var spideroak = function () {
         dividers_threshold: 10,
         filter_threshold: 20,
         public_share_room_urls: {},
+        simple_menu_id: 'simple-menu',
     };
     var my = {
         /* Login session settings: */
@@ -348,14 +349,7 @@ var spideroak = function () {
         RootShareNode.call(this, url, parent);
         this.name = "Public Share Rooms";
         this.emblem = "Public Share Rooms";
-        this.job_id = 0;
-        // Whitelist of methods eligible for invocation via mode_opts.action:
-        this.action_methods = {'collection_menu': true,
-                               'remove_item': true,
-                               'persist_item': true,
-                               'unpersist_item': true}
-
-    }
+        this.job_id = 0; }
     OriginalRootShareNode.prototype = new RootShareNode();
     function OriginalRootShareNode(url, parent) {
         RootShareNode.call(this, url, parent);
@@ -479,8 +473,10 @@ var spideroak = function () {
 
         if (mode_opts.hasOwnProperty('action')) {
             var action = mode_opts.action;
-            if (this.action_methods.hasOwnProperty(action)) {
-                return this[action](mode_opts); }}
+            if (this[action] && this[action].is_action) {
+                var got = this[action](mode_opts.subject);
+                this.do_presentation(chngpg_opts, {});
+                return got; }}
 
         this.subdirs = public_share_room_urls_list();
         // .add_item() will also remove invalid ones from this.subdirs:
@@ -583,8 +579,8 @@ var spideroak = function () {
 
         if (succeeded !== true) {
             this.remove_status_message('result');
-            var message = ("Sorry - <tt>"
-                           + share_id + "</tt> / <tt>" + room_key + "</tt> "
+            var message = ("Sorry - "
+                           + share_id + " / " + room_key + " "
                            + content.statusText + " (" + content.status + ")");
             var remove = true;
             if (content.status === 404) {
@@ -684,10 +680,52 @@ var spideroak = function () {
             $content_section.hide();
             if (this.veiled) { this.veil(false); }}}
 
-    PublicRootShareNode.prototype.collection_menu = function (target_url) {
-        /* Present a menu of collection membership actions for 'target_url'. */
-        alert("PublicRootShareNode.collection_menu");
-        }
+    PublicRootShareNode.prototype.enlisted_room_menu = function (subject) {
+        /* Present a menu of actions for enlisted RoomShareNode specified
+           by 'subject' url. */
+        var mint_anchor = function (action, subject_url, icon_name, item_text) {
+            var href = (window.location.href.split('#')[0] + '#'
+                        + this.url + '?action=' + action
+                        + '&subject=' + subject_url);
+            return ('<a href="' + href + '" data-icon="' + icon_name + '"'
+                    + 'data-mini="true" data-iconpos="right">'
+                    + item_text + '</a>')}.bind(this);
+
+        console.log("PublicRootShareNode.enlisted_room_menu("
+                    + subject + ")");
+        var subject_room = content_node_manager.get(subject);
+        var room_url = subject_room.url;
+
+        var $popup = $('#' + generic.simple_menu_id);
+        $popup.popup();
+        var $listview = $popup.find('.content-items');
+        $listview.empty();
+
+        $popup.find('.header-title').html(subject_room.title());
+
+        var $remove_li = $('<li/>').append(mint_anchor('remove_item',
+                                                       room_url,
+                                                       'delete',
+                                                       "Remove from list"));
+
+        var $persistence_li = $('<li/>');
+        if (this.is_persisted(room_url)) {
+            $persistence_li.append(mint_anchor('unpersist_item',
+                                               room_url,
+                                               'minus',
+                                               "Stop retaining"
+                                               + " across sessions")); }
+        else {
+            $persistence_li.append(mint_anchor('persist_item',
+                                               room_url,
+                                               'minus',
+                                               "Retain across sessions")); }
+        $listview.append($remove_li);
+        $listview.children().after($persistence_li);
+
+        $popup.popup('open'); }
+    // Whitelist this method for use as a mode_opts 'action':
+    PublicRootShareNode.prototype.enlisted_room_menu.is_action = true;
 
     PublicRootShareNode.prototype.add_item_external = function (credentials) {
         /* Visit a specified share room, according to 'credentials' object:
@@ -700,15 +738,13 @@ var spideroak = function () {
 
         var share_id = credentials.shareid;
         var room_key = credentials.password;
-        var message = (share_id + "</tt> / <tt>" + room_key + "</tt> ");
+        var message = (share_id + " / " + room_key);
         var new_share_url = (my.shares_root_url
                              + base32.encode_trim(share_id)
                              + "/" + room_key
                              + "/");
         if (is_public_share_room_url(new_share_url)) {
             this.show_status_message(message + " already added"); }
-        else if (is_share_room_url(new_share_url)) {
-            this.show_status_message(message + ' already among "my" shares'); }
         else {
             var $sm = this.show_status_message("Added: " + message, 'result');
             $sm.hide();
@@ -724,6 +760,7 @@ var spideroak = function () {
                    {passive: true,
                     notify_callback: this.notify_subvisit_status.bind(this),
                     notify_token: [this.job_id, url]});
+        this.subdirs = public_share_room_urls_list();
         return room; }
 
     PublicRootShareNode.prototype.remove_item_external = function (room_url) {
@@ -742,26 +779,20 @@ var spideroak = function () {
                 content_node_manager.clear_hierarchy(room_url); }
             unregister_public_share_room_url(room_url);
             this.unpersist_item(room_url);
+            this.subdirs = public_share_room_urls_list();
             return true; }
         else { return false; }}
-
-    OriginalRootShareNode.prototype.remove_item = function (room_url) {
-        /* Omit an original share room from the resident collection.
-           Returns true if the item was present, else false. */
-        if (is_original_share_room_url(room_url)) {
-            if (! is_public_share_room_url(room_url)) {
-                // Free the nodes.
-                content_node_manager.clear_hierarchy(room_url); }
-            unregister_original_share_room_url(room_url);
-            return true; }
-        else { return false; }}
+    // Whitelist this method for use as a mode_opts 'action':
+    PublicRootShareNode.prototype.remove_item.is_action = true;
 
     PublicRootShareNode.prototype.persist_item = function (room_url) {
         /* Add a share rooms to the collection persistent non-originals. */
-        var persistents = pmgr.get("public_share_urls") || {};
+        var persistents = pmgr.get('public_share_urls') || {};
         if (! persistents.hasOwnProperty(room_url)) {
             persistents[room_url] = true;
             pmgr.set("public_share_urls", persistents); }}
+    // Whitelist this method for use as a mode_opts 'action':
+    PublicRootShareNode.prototype.persist_item.is_action = true;
 
     PublicRootShareNode.prototype.unpersist_item = function (room_url) {
         /* Omit a non-original share room from the persistent
@@ -769,9 +800,15 @@ var spideroak = function () {
         var persistents = pmgr.get("public_share_urls") || {};
         if (persistents.hasOwnProperty(room_url)) {
             delete persistents[room_url];
-            pmgr.set("public_share_urls", persistents);
+            pmgr.set('public_share_urls', persistents);
             return true; }
         else { return false; }}
+    // Whitelist this method for use as a mode_opts 'action':
+    PublicRootShareNode.prototype.unpersist_item.is_action = true;
+
+    PublicRootShareNode.prototype.is_persisted = function (room_url) {
+        var persisteds = persistence_manager.get('public_share_urls') || {};
+        return persisteds.hasOwnProperty(room_url); }
 
     /* ===== Containment ===== */
     /* For content_node_manager.clear_hierarchy() */
@@ -991,8 +1028,10 @@ var spideroak = function () {
     PublicRootShareNode.prototype.layout = function (mode_opts) {
         /* Deploy content as markup on our page. */
         // Get a split button on each item to provoke an action menu:
-        var split_params = {url: this.url + '?action=collection_menu&target=',
+        var split_params = {url: (this.url
+                                  + '?action=enlisted_room_menu&subject='),
                             icon: 'gear',
+                            type: 'popup',
                             title: "Collection membership"};
         mode_opts.split_button_url_append = split_params;
         ContentNode.prototype.layout.call(this, mode_opts);
@@ -1229,6 +1268,8 @@ var spideroak = function () {
             $a.attr('href', '#' + split_params.url + this.url);
             $a.attr('data-icon', split_params.icon);
             $a.attr('title', split_params.title);
+            if (mode_opts.type === 'popup') {
+                $a.attr('data-rel', "popup"); }
             $it.find('a').after($a); }
 
         $it.attr('data-filtertext', this.name);
@@ -1636,7 +1677,7 @@ var spideroak = function () {
             // Surprisingly, doing focus before dispatching fadeIn doesn't work.
             // Also, username field focus doesn't *always* work before the
             // delay is done, hence the redundancy.  Sigh.
-            $(selector).fadeIn(3000, do_focus_and_callback);
+            $(selector).fadeIn(4000, do_focus_and_callback);
             do_focus(); }}
 
     function prep_login_form(content_selector, submit_handler, name_field,
@@ -1850,7 +1891,7 @@ var spideroak = function () {
 
 
 
-$(document).ready(function () {
+    $(document).ready(function () {
     "use strict";               // ECMAScript 5
 
     // Development convenience: Go back to start page on full document reload.
