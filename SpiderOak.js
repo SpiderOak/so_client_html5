@@ -696,44 +696,50 @@ var spideroak = function () {
         /* Present a menu of actions for enlisted RoomShareNode specified
            by 'subject' url. */
         var mint_anchor = function (action, subject_url, icon_name, item_text) {
-            var href = (window.location.href.split('#')[0] + '#'
-                        + this.url + '?action=' + action
-                        + '&subject=' + subject_url);
-            return ('<a href="' + href + '" data-icon="' + icon_name + '"'
-                    + 'data-mini="true" data-iconpos="right">'
+            var url = (window.location.href.split('#')[0] + '#'
+                       + this.url + '?action=' + action
+                       + '&subject=' + subject_url);
+            url = transit_manager.distinguish_url(url);
+            return ('<a href="#" data-icon="' + icon_name + '"'
+                    + ' data-inline="true" data-rel="back"'
+                    + ' onclick="spideroak.cnmgr.get(\''
+                    + this.url +'\').' + action + '(\''
+                    + subject_url +'\'); console.log(\'yo: '
+                    + action + '\'); return true;"'
+                    + ' data-iconpos="right">'
                     + item_text + '</a>')}.bind(this);
 
-        console.log("PublicRootShareNode.enlisted_room_menu("
-                    + subject + ")");
         var subject_room = content_node_manager.get(subject);
         var room_url = subject_room.url;
 
+        var $page = $('#menu-holder');
         var $popup = $('#' + generic.simple_menu_id);
         $popup.popup();
-        var $listview = $popup.find('.content-items');
-        $listview.empty();
+        var $actions = $popup.find('.actions-holder');
+        $actions.empty();
 
-        $popup.find('.header-title').html(subject_room.title());
+        $popup.find('.popup-title').html(subject_room.title());
 
-        var $remove_li = $('<li/>').append(mint_anchor('remove_item',
-                                                       room_url,
-                                                       'delete',
-                                                       "Remove from list"));
+        var $remove_button = ($('<div/>')
+                              .append(mint_anchor('remove_item',
+                                                  room_url,
+                                                  'delete',
+                                                  "Remove from list")));
 
-        var $persistence_li = $('<li/>');
+        var $persistence_button = $('<div/>');
         if (this.is_persisted(room_url)) {
-            $persistence_li.append(mint_anchor('unpersist_item',
-                                               room_url,
-                                               'minus',
-                                               "Stop retaining"
-                                               + " across sessions")); }
+            $persistence_button.append(mint_anchor('unpersist_item',
+                                                   room_url,
+                                                   'minus',
+                                                   "Stop retaining"
+                                                   + " across sessions")); }
         else {
-            $persistence_li.append(mint_anchor('persist_item',
-                                               room_url,
-                                               'minus',
-                                               "Retain across sessions")); }
-        $listview.append($remove_li);
-        $listview.children().after($persistence_li);
+            $persistence_button.append(mint_anchor('persist_item',
+                                              room_url,
+                                              'plus',
+                                              "Retain across sessions")); }
+        $actions.append($remove_button);
+        $actions.children().after($persistence_button);
 
         $popup.popup('open'); }
     // Whitelist this method for use as a mode_opts 'action':
