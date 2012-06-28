@@ -756,7 +756,7 @@ var spideroak = function () {
         else {
             var $sm = this.show_status_message("Added: " + message, 'result');
             $sm.hide();
-            $sm.delay(1000).fadeIn(1000); // Give time for error to appear.
+            $sm.delay(1000).fadeIn(2000); // Give time for error to appear.
             return this.add_item(new_share_url); }}
 
     PublicRootShareNode.prototype.add_item = function (url) {
