@@ -312,20 +312,17 @@
   <div data-role="page" id="menu-templates">
     <div data-role="popup" id="simple-popup"
          data-theme="none" data-overlay-theme="a">
-      <ul data-role="listview" data-inset="true" style="min-width:300px;">
+      <a href="#" data-icon="delete" data-rel="back"
+         data-role="button" alt="Close" class="ui-btn-left"
+         data-iconpos="notext" data-mini="true"> </a>
+      <div data-role="navbar" data-theme="d" width="100%" align="center">
+        <h4 class="title"> here </h4>
+      </div>
+      <ul data-role="listview" data-inset="true">
         <li data-role="divider" class="title list-leader">
-          <a href="#" data-icon="delete" data-rel="back"
-             data-role="button" alt="Close" class="ui-btn-right"
-             data-iconpos="notext" data-mini="true">
-            Subject operations
-          </a>
         </li>
       </ul>
     </div>
-  </div>
-  <div data-role="page" id="transient-space">
-    <!-- A place for transient items, like popup menus.  It's cleared just
-         before dispatching content node page transitions. -->
   </div>
 </body>
 
