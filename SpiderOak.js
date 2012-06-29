@@ -64,7 +64,7 @@ var spideroak = function () {
     };
     var my = {
         /* Login session settings: */
-        username: null,
+        username: "",
         storage_host: null,
         storage_web_url: null,  // Location of storage web UI for user.
         storage_root_url: null,
@@ -95,19 +95,19 @@ var spideroak = function () {
             e.preventDefault();
             var mode_opts = query_params(page);
             if (document_addrs.hasOwnProperty(page)) {
-                var current_internal = internalize_url(document.location.href);
-                return document_addrs[page].call(this, current_internal); }
+                var internal = internalize_url(document.location.href);
+                return document_addrs[page].call(this, internal); }
             else {
-                content_node_manager.get(page).visit(data.options,
-                                                     mode_opts); }}}
-
+                var node = content_node_manager.get(page);
+                //XXX node.flush_transient_dom();
+                node.visit(data.options, mode_opts); }}}
 
     function establish_traversal_handler() {
         /* Establish page change event handler. */
         $(document).bind("pagebeforechange.SpiderOak", handle_content_visit); }
 
 
-    /*  ===== Content Root Registration =====  */
+    /* ==== Content Root Registration ====  */
 
     function set_storage_account(username, storage_host, storage_web_url) {
         /* Register confirmed user-specific storage details.  Return the
