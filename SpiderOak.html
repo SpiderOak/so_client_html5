@@ -309,19 +309,23 @@
     </div><!-- /footer -->
   </div>
 
-  <div data-role="page" id="simple-menu-holder">
-    <div data-role="popup" id="simple-menu"
-         data-theme="none" data-overlay-theme="a" data-theme="c">
-      <div data-role="header">
-        <h4 class="header-title"> Subject operations </h4>
-        <a href="#noop" data-icon="delete" alt="Close"
-           class="header-right-slot ui-btn-right" data-role="button"
-           data-iconpos="notext" data-mini="true">Close</a>
-      </div>
-      <div data-role="content" data-theme="c">
-        <ul class="content-items" data-role="listview"></ul>
-      </div>
+  <div data-role="page" id="menu-templates">
+    <div data-role="popup" id="simple-popup"
+         data-theme="none" data-overlay-theme="a">
+      <ul data-role="listview" data-inset="true" style="min-width:300px;">
+        <li data-role="divider" class="title list-leader">
+          <a href="#" data-icon="delete" data-rel="back"
+             data-role="button" alt="Close" class="ui-btn-right"
+             data-iconpos="notext" data-mini="true">
+            Subject operations
+          </a>
+        </li>
+      </ul>
     </div>
+  </div>
+  <div data-role="page" id="transient-space">
+    <!-- A place for transient items, like popup menus.  It's cleared just
+         before dispatching content node page transitions. -->
   </div>
 </body>
 
