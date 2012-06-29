@@ -99,7 +99,6 @@ var spideroak = function () {
                 return document_addrs[page].call(this, internal); }
             else {
                 var node = content_node_manager.get(page);
-                //XXX node.flush_transient_dom();
                 node.visit(data.options, mode_opts); }}}
 
     function establish_traversal_handler() {
