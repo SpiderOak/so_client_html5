@@ -204,6 +204,11 @@ Currently implemented modes include:
   (xhr) object.
 * `notify_token`: object to be passed back to `notify_callback`. To be used
   by the initiator to identify the transaction and convey useful state.
+* `actions_menu_fabricator`: Function to be used by item layout routine. The
+  callback is given the URL of the subject item, and returns an actions menu
+  to be used as the item's popup-menu
+  [http://jquerymobile.com/test/docs/lists/lists-split.html split-button]
+  for the item.
 * `refresh`: refetch the data for the node.
 * `action`: arrange for menu of actions available for this item.
   Eg, so `ContentNode.layout_item$()` can provide the proper links to elicit
