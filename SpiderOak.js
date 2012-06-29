@@ -690,51 +690,6 @@ var spideroak = function () {
             $content_section.hide();
             if (this.veiled) { this.veil(false); }}}
 
-    PublicRootShareNode.prototype.enlisted_room_menu = function (subject) {
-        /* Present a menu of actions for enlisted RoomShareNode specified
-           by 'subject' url. */
-        var mint_anchor = function (action, subject_url, icon_name, item_text) {
-            var href = (window.location.href.split('#')[0] + '#'
-                        + this.url + '?action=' + action
-                        + '&subject=' + subject_url);
-            return ('<a href="' + href + '" data-icon="' + icon_name + '"'
-                    + 'data-mini="true" data-iconpos="right">'
-                    + item_text + '</a>')}.bind(this);
-
-        var subject_room = content_node_manager.get(subject);
-        var room_url = subject_room.url;
-
-        var $popup = $('#' + generic.simple_menu_id);
-        $popup.popup();
-        var $listview = $popup.find('.content-items');
-        $listview.empty();
-
-        $popup.find('.header-title').html(subject_room.title());
-
-        var $remove_li = $('<li/>').append(mint_anchor('remove_item',
-                                                       room_url,
-                                                       'delete',
-                                                       "Remove from list"));
-
-        var $persistence_li = $('<li/>');
-        if (this.is_persisted(room_url)) {
-            $persistence_li.append(mint_anchor('unpersist_item',
-                                               room_url,
-                                               'minus',
-                                               "Stop retaining"
-                                               + " across sessions")); }
-        else {
-            $persistence_li.append(mint_anchor('persist_item',
-                                               room_url,
-                                               'minus',
-                                               "Retain across sessions")); }
-        $listview.append($remove_li);
-        $listview.children().after($persistence_li);
-
-        $popup.popup('open'); }
-    // Whitelist this method for use as a mode_opts 'action':
-    PublicRootShareNode.prototype.enlisted_room_menu.is_action = true;
-
     PublicRootShareNode.prototype.add_item_external = function (credentials) {
         /* Visit a specified share room, according to 'credentials' object:
            {username, password}.
@@ -770,13 +725,6 @@ var spideroak = function () {
                     notify_token: [this.job_id, url]});
         this.subdirs = public_share_room_urls_list();
         return room; }
-
-    PublicRootShareNode.prototype.remove_item_external = function (room_url) {
-        /* Omit a non-original share room from persistent and resident memory.
-           This is for use from outside of the object. Use .remove_item() for
-           internal object operation. */
-        this.job_id += 1;
-        this.remove_item(room_url); }
 
     PublicRootShareNode.prototype.remove_item = function (room_url) {
         /* Omit a non-original share room from the persistent and resident
@@ -1047,19 +995,80 @@ var spideroak = function () {
 
     PublicRootShareNode.prototype.layout = function (mode_opts) {
         /* Deploy content as markup on our page. */
-        // Get a split button on each item to provoke an action menu:
-        var split_params = {url: (this.url
-                                  + '?action=enlisted_room_menu&subject='),
-                            icon: 'gear',
-                            type: 'popup',
-                            title: "Collection membership"};
-        mode_opts.split_button_url_append = split_params;
+        var callback = this.situate_room_popup.bind(this);
+        mode_opts.actions_menu_fabricator = callback;
         ContentNode.prototype.layout.call(this, mode_opts);
         var $content_items = this.my_page$().find('.page-content')
         if (this.subdirs.length === 0) {
             $content_items.hide(); }
         else {
             $content_items.show(); }}
+
+    PublicRootShareNode.prototype.situate_room_popup = function (subject_url) {
+        /* Create a menu for 'subject_url' using 'template_id'.  Return an
+           anchor object that will popup the menu when clicked. */
+
+        // Create the popup menu in transient DOM space, furnish it,
+        // and return an anchor that will launch the menu as a popup.
+
+        // Fabricate and situate the popup:
+        var $popup = this.fabricate_transient_element('simple-popup',
+                                                      'actions-popup');
+        var popup_id = $popup.attr('id');
+        this.furnish_room_actions_popup(subject_url, $popup);
+
+        // Fabricate the anchor:
+        var $anchor = $('<a/>');
+        $anchor.attr('data-rel', "popup");
+        $anchor.attr('href', popup_id);        // $x.attr('id') prepends "#" :-(
+        $anchor.attr('data-icon', 'gear');
+        $anchor.attr('title', "Collection membership");
+
+        // And return it for deployment:
+        return $anchor; }
+
+    PublicRootShareNode.prototype.furnish_room_actions_popup = function(subject,
+                                                                        $popup){
+        /* For an enlisted RoomShareNode 'subject_url', furnish a '$menu'
+           of context-specific actions. */
+        var fab_anchor = function (action, subject_url, icon_name, item_text) {
+            var href = (window.location.href.split('#')[0] + '#'
+                        + this.url + '?action=' + action
+                        + '&subject=' + subject_url);
+            return ('<a href="' + href + '" data-icon="' + icon_name + '"'
+                    + 'data-mini="true" data-iconpos="right">'
+                    + item_text + '</a>')}.bind(this);
+
+        var subject_room = content_node_manager.get(subject);
+        var subject_url = subject_room.url;
+
+        var $listview = $popup.find('[data-role="listview"]');
+
+        $popup.find('.title').html(elide(subject_room.title(), 70));
+
+        var $remove_li = $('<li/>');
+        $remove_li.append(fab_anchor('remove_item',
+                                     subject_url,
+                                     'delete',
+                                     "Stop visiting this room"));
+
+        var $persistence_li = $('<li/>');
+        if (this.is_persisted(subject_url)) {
+            $persistence_li.append(fab_anchor('unpersist_item',
+                                              subject_url,
+                                              'minus',
+                                              "Stop retaining"
+                                              + " across sessions")); }
+        else {
+            $persistence_li.append(fab_anchor('persist_item',
+                                              subject_url,
+                                              'plus',
+                                              "Retain across sessions")); }
+        $listview.children().after($remove_li, $persistence_li);
+        $popup.popup();
+        $popup.page();
+        $listview.listview();
+    }
 
     PublicRootShareNode.prototype.show = function (chngpg_opts, mode_opts) {
         /* Deploy content as markup on our page. */
@@ -1276,21 +1285,16 @@ var spideroak = function () {
            mode_opts['split_button_url_append']: {icon:, title:, url:, options:}
             - construct a split button, appending node's url onto passed url.
          */
-        var $a = $('<a/>').attr('class', "crushed-vertical");
-        $a.attr('href', "#" + this.url);
-        $a.html($('<h4/>').html(this.name));
+        var $anchor = $('<a/>').attr('class', "crushed-vertical");
+        $anchor.attr('href', "#" + this.url);
+        $anchor.html($('<h4/>').html(this.name));
 
-        var $it = $('<li/>').append($a);
+        var $it = $('<li/>').append($anchor);
 
-        if (mode_opts && mode_opts.hasOwnProperty('split_button_url_append')) {
-            var split_params = mode_opts.split_button_url_append;
-            $a = $('<a/>');
-            $a.attr('href', '#' + split_params.url + this.url);
-            $a.attr('data-icon', split_params.icon);
-            $a.attr('title', split_params.title);
-            if (mode_opts.type === 'popup') {
-                $a.attr('data-rel', "popup"); }
-            $it.find('a').after($a); }
+        if (mode_opts
+            && mode_opts.hasOwnProperty('actions_menu_fabricator')) {
+            $anchor = mode_opts.actions_menu_fabricator(this.url);
+            $it.find('a').after($anchor); }
 
         $it.attr('data-filtertext', this.name);
 
@@ -1891,7 +1895,7 @@ var spideroak = function () {
     function no_op () { console.log("no-op"); }
 
     var document_addrs = {
-        /* Map specific document fragment addresses from the application
+        /* Map certain document fragment addresses from the application
            document to internal functions/methods. */
         logout: storage_logout,
         noop: no_op,
