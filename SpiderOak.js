@@ -60,7 +60,7 @@ var spideroak = function () {
         dividers_threshold: 10,
         filter_threshold: 20,
         public_share_room_urls: {},
-        simple_menu_id: 'simple-menu',
+        simple_popup_id: 'simple-popup',
     };
     var my = {
         /* Login session settings: */
@@ -689,10 +689,11 @@ var spideroak = function () {
             $content_section.hide();
             if (this.veiled) { this.veil(false); }}}
 
-    PublicRootShareNode.prototype.enlisted_room_menu = function (subject) {
-        /* Present a menu of actions for enlisted RoomShareNode specified
-           by 'subject' url. */
-        var mint_anchor = function (action, subject_url, icon_name, item_text) {
+    PublicRootShareNode.prototype.enlisted_room_menu = function (subject_url) {
+        /* For an enlisted RoomShareNode 'subject_url', furnish the simple
+         * popup menu with context-specific actions. */
+
+        var fab_anchor = function (action, subject_url, icon_name, item_text) {
             var href = (window.location.href.split('#')[0] + '#'
                         + this.url + '?action=' + action
                         + '&subject=' + subject_url);
@@ -700,37 +701,46 @@ var spideroak = function () {
                     + 'data-mini="true" data-iconpos="right">'
                     + item_text + '</a>')}.bind(this);
 
-        var subject_room = content_node_manager.get(subject);
-        var room_url = subject_room.url;
+        var $popup = $('#' + generic.simple_popup_id);
+        var subject_room = content_node_manager.get(subject_url);
 
-        var $popup = $('#' + generic.simple_menu_id);
-        $popup.popup();
-        var $listview = $popup.find('.content-items');
-        $listview.empty();
+        var $listview = $popup.find('[data-role="listview"]');
+        $listview.empty()
 
-        $popup.find('.header-title').html(subject_room.title());
+        var popup_id = '#' + generic.simple_popup_id;
+        var $popup = $(popup_id);
+        $popup.find('.title').html('<span style="color: gray">Room: </span>'
+                                   + elide(subject_room.title(), 50));
+        // Clear out any prior additions:
 
-        var $remove_li = $('<li/>').append(mint_anchor('remove_item',
-                                                       room_url,
-                                                       'delete',
-                                                       "Remove from list"));
+        var $remove_li = $('<li/>');
+        $remove_li.append(fab_anchor('remove_item',
+                                     subject_url,
+                                     'delete',
+                                     "Drop this room from the list"));
 
         var $persistence_li = $('<li/>');
-        if (this.is_persisted(room_url)) {
-            $persistence_li.append(mint_anchor('unpersist_item',
-                                               room_url,
-                                               'minus',
-                                               "Stop retaining"
-                                               + " across sessions")); }
+        if (this.is_persisted(subject_url)) {
+            $persistence_li.append(fab_anchor('unpersist_item',
+                                              subject_url,
+                                              'minus',
+                                              "Stop retaining"
+                                              + " across sessions")); }
         else {
-            $persistence_li.append(mint_anchor('persist_item',
-                                               room_url,
-                                               'minus',
-                                               "Retain across sessions")); }
-        $listview.append($remove_li);
-        $listview.children().after($persistence_li);
+            $persistence_li.append(fab_anchor('persist_item',
+                                              subject_url,
+                                              'plus',
+                                              "Retain across sessions")); }
+        $listview.append($remove_li, $persistence_li);
 
-        $popup.popup('open'); }
+        $popup = $(popup_id);
+        $popup.popup();
+        $popup.parent().page();
+        $listview.listview('refresh');
+        $popup.popup('open');
+        // Haven't gotten .changePage(..., {role: 'popup', ...}) to work.
+        //$.mobile.changePage(popup_id, {role: 'popup', transition: 'pop'});
+    }
     // Whitelist this method for use as a mode_opts 'action':
     PublicRootShareNode.prototype.enlisted_room_menu.is_action = true;
 
@@ -1284,11 +1294,11 @@ var spideroak = function () {
         if (mode_opts && mode_opts.hasOwnProperty('split_button_url_append')) {
             var split_params = mode_opts.split_button_url_append;
             $a = $('<a/>');
+            // We specifically don't use 'data-rel="popup"' because that
+            // bypasses the normal changePage transition.
             $a.attr('href', '#' + split_params.url + this.url);
             $a.attr('data-icon', split_params.icon);
             $a.attr('title', split_params.title);
-            if (mode_opts.type === 'popup') {
-                $a.attr('data-rel', "popup"); }
             $it.find('a').after($a); }
 
         $it.attr('data-filtertext', this.name);
