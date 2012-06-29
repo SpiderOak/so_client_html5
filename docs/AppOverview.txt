@@ -74,28 +74,28 @@ content hierarchies.
   share room and storage devices, their contained folders, and the various
   root containers.
 
-  * The items have URLs consisting of the application's address followed by a
-    fragement identifier consisting of the content's address.  The app's
+  * The items have URLs consisting of the application's address followed by
+    a fragment identifier consisting of the content's address.  The app's
     [#DynamicPageTraversal dynamic page traversal machinery] (below)
-    retrieves the JSON data for each node and populates and presents an
+    retrieves the JSON data for content nodes and populates and presents an
     application node for it.
 
-  * Some fragment addresses are simple locations of jQuery mobile page divs
-    ([data-role="page"]), conveyed to the regular jQm pageChange.
+  * Besides content items and the special provisions listed below, fragment
+    addresses are simple locations of jQuery mobile page divs
+    ([data-role="page"]), conveyed to the regular jQm pageChange if none of
+    the specific conditions obtain.
 
   * Some addresses are of application-managed, non-content-specific
-    facilities, like 'logout'. These are listed in the `document_addrs`
-    object, which is used by `internalize_url()` and
-    `handle_content_visit()` to dispatch the listed functions.
+    facilities, like 'logout'.  These are listed in the `document_addrs`
+    object, which is used by `handle_content_visit()` to dispatch the
+    listed functions.
 
-  * Special provisions are made for intra-document html links that go to
-    the pages which serve as template for content root nodes, eg, the
-    combined `RootContentNode`, and the `PublicRootShareNode`.  Those
-    addresses are explicitly identified, and translated to their
-    `content_node_manager` addresses using a `handle_content_visit()`
-    helper, `internalize_url()`. The nodes then get control and fetch the
-    actual pages from the HTML document DOM, populating and presenting
-    with them, etc.
+  * Some of the encompassing root nodes, like the `RootContentNode` and
+    `PublicRootShareNode`, use static DOM templates, with corresponding
+    static document addresses.  Intra-document (fragment) links to those
+    static template addresses are mapped to the addresses of corresponding
+    root content nodes using a `handle_content_visit()` helper,
+    `internalize_url()`.
 
   * The special consolidated root node, `RootContentNode`, arranges to
     present the contents of the respective actual content roots, the
