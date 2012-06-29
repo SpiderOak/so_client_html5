@@ -1879,8 +1879,6 @@ var spideroak = function () {
         if (typeof obj !== "string") { return obj; }
         if (obj.split('#')[0] === window.location.href.split('#')[0]) {
             obj = obj.split('#')[1]; }
-        if (document_addrs.hasOwnProperty(obj)) {
-            return obj; }
         switch (obj) {
         case (generic.combo_root_page_id):
             return generic.combo_root_url;
