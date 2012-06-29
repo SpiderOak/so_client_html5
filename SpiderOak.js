@@ -52,6 +52,7 @@ var spideroak = function () {
         original_shares_path_suffix: "shares",
         shares_path_suffix: "/share/",
         content_page_template_id: "content-page-template",
+        transient_space_id: "transient-space",
         devices_query_expression: 'device_info=yes',
         versions_query_expression: 'format=version_info',
         home_page_id: 'home',
@@ -99,7 +100,7 @@ var spideroak = function () {
                 return document_addrs[page].call(this, internal); }
             else {
                 var node = content_node_manager.get(page);
-                //XXX node.flush_transient_dom();
+                node.flush_transient_dom();
                 node.visit(data.options, mode_opts); }}}
 
     function establish_traversal_handler() {
@@ -1403,7 +1404,37 @@ var spideroak = function () {
                 ? this.emblem + ': ' + my.username
                 : this.emblem); }
 
-    /* ===== Resource managers ===== */
+
+    /* ==== Transient DOM space management and resources ==== */
+
+    ContentNode.prototype.flush_transient_dom = function () {
+        /* Clear elements accumulated in transient DOM space.  Invoked
+           automatically just before dispatching content node transitions.
+         */
+        var $transient = $('#' + generic.transient_space_id);
+        $transient.empty(); }
+
+    ContentNode.prototype.fabricate_transient_element = function (template_id,
+                                                                  id_prefix) {
+        /* Clone 'template_id' and situate the copy in transient space,
+           giving it an id prefixed by 'id_prefix'.  Return the jQuery
+           object. */
+        var $menu = $('#' + template_id).clone();
+
+        var menu_id_base = id_prefix + "-" + (new Date().getTime());
+        var menu_id;
+        // Find a free node name. (Avoid collisions with random offset.)
+        var count = Math.floor(Math.random() * 1e2);
+        while ($(menu_id = '#' + menu_id_base + '_' + count).length !== 0) {
+            count += 1; }
+        $menu.attr('id', menu_id);
+
+        var $transient_space = $('#' + generic.transient_space_id);
+        $transient_space.prepend($menu);
+        return $menu; }
+
+
+    /* ==== Resource managers ==== */
 
     var persistence_manager = {
         /* Maintain domain-specific persistent settings, using localStorage.
