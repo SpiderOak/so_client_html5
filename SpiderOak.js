@@ -33,9 +33,9 @@ var spideroak = function () {
     "use strict";               // ECMAScript 5
 
 
-    /* Private elements: */
+    /* == Private elements == */
 
-    /* ==== Object-wide settings ===== */
+    /* ==== Object-wide settings ==== */
 
     var generic = {
         /* Settings not specific to a particular login session: */
@@ -82,8 +82,8 @@ var spideroak = function () {
         /* Base32 encoding with trailing "=" removed. */
         return this.encode(str).replace(/=+$/, ''); }
 
-    /* Navigation handlers: */
 
+    /* ==== Navigation handlers ==== */
 
     function handle_content_visit(e, data) {
         /* Intercept URL visits and intervene for repository content. */
@@ -153,7 +153,7 @@ var spideroak = function () {
         my.storage_web_url = ""; }
 
 
-    /* ===== Node-independent content URL categorization ===== */
+    /* ===== Node-independent content URL categorization ==== */
 
     // Managed content is organized within two content roots:
     //
@@ -268,7 +268,7 @@ var spideroak = function () {
         /* Return an array of original share room urls being visited. */
         return Object.keys(my.original_share_room_urls); }
 
-    /* ===== Data model ===== */
+    /* ===== Data model ==== */
 
     /* SpiderOak content includes storage (backups) and share rooms. The
        data model distinguishes different kinds of those things - the
@@ -286,6 +286,7 @@ var spideroak = function () {
         }
         if (url) {             // Skip if we're in prototype assignment.
             this.url = url;
+            this.name = "";
             this.root_url = parent ? parent.root_url : url;
             this.query_qualifier = "";
             this.parent_url = parent ? parent.url : null;
@@ -398,7 +399,7 @@ var spideroak = function () {
         delete this.files; }
     FileShareNode.prototype = new ShareNode();
 
-    /* ===== Content type and role predicates ===== */
+    /* ===== Content type and role predicates ==== */
 
     ContentNode.prototype.is_root = function () {
         /* True if the node is a collections top-level item. */
@@ -409,7 +410,7 @@ var spideroak = function () {
     DeviceStorageNode.prototype.is_device = function() {
         return true; }
 
-    /* ===== Remote data access ===== */
+    /* ===== Remote data access ==== */
 
     ContentNode.prototype.visit = function (chngpg_opts, mode_opts) {
         /* Fetch current data from server, provision, layout, and present.
@@ -605,7 +606,7 @@ var spideroak = function () {
         this.subdirs = public_share_room_urls_list()
         this.subdirs.sort(content_nodes_by_url_sorter)
         this.do_presentation({}, {passive: true});
-        // XXX Feeble: we always update the combo root.
+        // XXX Feeble: always updating the combo root is too intertwined.
         cnmgr.get_combo_root().layout(); }
 
     ContentNode.prototype.handle_visit_success = function (data, when,
@@ -828,7 +829,7 @@ var spideroak = function () {
         var persisteds = persistence_manager.get('public_share_urls') || {};
         return persisteds.hasOwnProperty(room_url); }
 
-    /* ===== Containment ===== */
+    /* ===== Containment ==== */
     /* For content_node_manager.clear_hierarchy() */
 
     ContentNode.prototype.contained_urls = function () {
@@ -844,7 +845,7 @@ var spideroak = function () {
         return []; }
 
 
-    /* "Provisioning": Data model assimilation of fetched data */
+    /* ==== Provisioning - Data model assimilation of fetched data ==== */
 
     ContentNode.prototype.provision = function (data, when, mode_opts) {
         /* Populate node with JSON 'data'. 'when' is the data's current-ness.
@@ -999,7 +1000,7 @@ var spideroak = function () {
         return false; }
 
 
-    /* ===== Content node page presentation ===== */
+    /* ==== Content node page presentation ==== */
 
     ContentNode.prototype.my_page_id = function () {
         /* Set the UI page id, escaping special characters as necessary. */
@@ -1572,7 +1573,7 @@ var spideroak = function () {
     var cnmgr = content_node_manager; // Compact name, for convenience.
 
 
-    /* ===== Login ===== */
+    /* ==== Login ==== */
 
     function go_to_entrance() {
         /* Visit the entrance page. Depending on session state, it might
@@ -1776,7 +1777,7 @@ var spideroak = function () {
             return false; }); }
 
 
-    /* ===== Public interface ===== */
+    /* ==== Public interface ==== */
 
     // ("public_interface" because "public" is reserved in strict mode.)
     var public_interface = {
@@ -1814,7 +1815,7 @@ var spideroak = function () {
     }
 
 
-    /* ===== Boilerplate ===== */
+    /* ==== Boilerplate ==== */
 
     ContentNode.prototype.show_status_message = function (html, kind) {
         /* Inject 'html' into the page DOM as a status message. Optional
@@ -1904,7 +1905,7 @@ var spideroak = function () {
         public_interface.pmgr = pmgr; }
 
 
-    /* ===== Here we go: ===== */
+    /* ==== Here we go: ==== */
     return public_interface;
 }();
 
