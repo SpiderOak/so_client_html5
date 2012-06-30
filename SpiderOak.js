@@ -89,7 +89,6 @@ var spideroak = function () {
         /* Intercept URL visits and intervene for repository content. */
         var page = internalize_url(data.toPage);
 
-        if (page === "simple-dialog") { return true; } // XXX DELETEME
         if ((typeof page === "string")
             && (is_content_url(page)
                 || document_addrs.hasOwnProperty(page))) {
