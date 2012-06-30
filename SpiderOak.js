@@ -1305,7 +1305,7 @@ var spideroak = function () {
          */
         var $anchor = $('<a/>').attr('class', "crushed-vertical");
         $anchor.attr('href', "#" + this.url);
-        $anchor.html($('<h4/>').html(this.name));
+        $anchor.html($('<h4 class="item-title"/>').html(this.name));
 
         var $it = $('<li/>').append($anchor);
 
@@ -1330,12 +1330,12 @@ var spideroak = function () {
         /* Return a share room's description as a jQuery item. */
         var $it = FolderShareNode.prototype.layout_item$.call(this,
                                                               mode_opts);
-        var $name = $it.find('.item-name');
-        $name.html($name.html()
-                   + '<small> <span class="subdued">Share ID:</span> '
-                   + this.share_id
-                   + ', <span class="subdued">Room Key:</span> '
-                   + this.room_key + ' </small>');
+        var $title = $it.find('.item-title');
+        $title.html($title.html()
+                    + '<div> <small> <span class="subdued">Share ID:</span> '
+                    + this.share_id
+                    + ', <span class="subdued">Room Key:</span> '
+                    + this.room_key + ' </small> </div>');
         return $it; }
     FileContentNode.prototype.layout_item$ = function(mode_opts) {
         /* Return a file-like content node's description as a jQuery item. */
