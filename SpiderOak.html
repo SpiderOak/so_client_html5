@@ -26,7 +26,7 @@
          data-theme="f" data-icon="back" data-iconpos="notext"></a>
       <h3 class="header-title"> SpiderOak </h3>
       <a alt="About the SpiderOak Dashboard" data-role="button"
-         href="#about" data-icon="info" data-iconpos="notext"></a>
+         href="#combo-about" data-icon="info" data-iconpos="notext"></a>
     </div>
 
     <div class="nav_login_storage" data-role="content">
@@ -131,10 +131,13 @@
 
   <div data-role="page" id="about" data-theme="c">
     <div data-role="header" data-position="fixed" data-theme="f">
-      <a href="#home" data-icon="arrow-l" data-role="button"
-         alt="Dashboard">
-        Dashboard</a>
+      <a alt="About the SpiderOak Dashboard" data-role="button"
+         href="#combo-about" data-icon="arrow-l" data-iconpos="left">
+        About the Dashboard</a>
       <h3> About SpiderOak </h3>
+      <a href="#home" data-role="button"
+         data-icon="arrow-r" data-iconpos="right"
+         alt="Dashboard"> Dashboard </a>
     </div>
     <div data-role="content">
       <p> SpiderOak All-Weather client 0.5 - Secure File Backup, Sync, and
@@ -324,8 +327,8 @@
   <div data-role="page" id="menu-templates">
     <div data-role="popup" id="simple-popup"
          data-theme="none" data-overlay-theme="a">
-      <a class="ui-btn-left" data-role="button" alt="Close"
-         href="#" data-icon="delete" data-rel="back"
+      <a class="ui-btn-left close-button" data-role="button" alt="Close"
+         href="#" data-icon="delete"
          data-iconpos="notext" data-mini="true"> </a>
       <div data-role="navbar" data-theme="d" width="100%" align="center">
         <h4 class="title"> here </h4>
