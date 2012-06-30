@@ -915,7 +915,8 @@ var spideroak = function () {
                 if (field instanceof Array) {
                     subnode[field[1]] = item[field[0]]; }
                 else {
-                    subnode[field] = item[field]; }})
+                    if (typeof item[field] !== "undefined") {
+                        subnode[field] = item[field]; }}})
             // TODO Scaling - make subdirs an object for hashed lookup.
             if (this_container.indexOf(url) === -1) {
                 this_container.push(url); }})}
