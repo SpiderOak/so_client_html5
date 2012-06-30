@@ -366,7 +366,11 @@ var spideroak = function () {
     function RoomShareNode(url, parent) {
         ShareNode.call(this, url, parent);
         this.emblem = "Share Room";
-        this.room_url = url; }
+        this.room_url = url;
+        var splat = url.split('/');
+        this.share_id = base32.decode(splat[splat.length-3]);
+        this.room_key = splat[splat.length-2];
+        console.log(this.share_id + '/' + this.room_key); }
     RoomShareNode.prototype = new ShareNode();
 
     function FolderContentNode(url, parent) {
@@ -755,7 +759,6 @@ var spideroak = function () {
         */
 
         this.job_id += 1;       // Entry
-
         var share_id = credentials.shareid;
         var room_key = credentials.password;
         var message = (share_id + " / " + room_key);
@@ -1288,7 +1291,8 @@ var spideroak = function () {
            mode_opts['split_button_url_append']: {icon:, title:, url:, options:}
             - construct a split button, appending node's url onto passed url.
          */
-        var $a = $('<a/>').attr('class', "crushed-vertical");
+        var $a = $('<a/>')
+        $a.attr('class', "crushed-vertical item-name");
         $a.attr('href', "#" + this.url);
         $a.html($('<h4/>').html(this.name));
 
@@ -1318,8 +1322,13 @@ var spideroak = function () {
         return FolderContentNode.prototype.layout_item$.call(this, mode_opts); }
     RoomShareNode.prototype.layout_item$ = function(mode_opts) {
         /* Return a share room's description as a jQuery item. */
-        return FolderShareNode.prototype.layout_item$.call(this,
-                                                           mode_opts); }
+        var $it = FolderShareNode.prototype.layout_item$.call(this,
+                                                              mode_opts);
+        var $name = $it.find('.item-name');
+        $name.html($name.html()
+                   + '<small> Share ID: ' + this.share_id
+                   + ', Room Key: ' + this.room_key + ' </small>');
+        return $it; }
     FileContentNode.prototype.layout_item$ = function(mode_opts) {
         /* Return a file-like content node's description as a jQuery item. */
         var $it = $('<li data-mini="true"/>');
