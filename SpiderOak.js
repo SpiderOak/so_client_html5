@@ -691,6 +691,21 @@ var spideroak = function () {
             $content_section.hide();
             if (this.veiled) { this.veil(false); }}}
 
+    PublicRootShareNode.prototype.actions_menu_link = function (subject_url) {
+        /* Create a menu for 'subject_url' using 'template_id'.  Return an
+           anchor object that will popup the menu when clicked. */
+
+        var href = ('#' + this.url
+                    + '?action=enlisted_room_menu&subject='
+                    + subject_url)
+
+        var $anchor = $('<a/>');
+        $anchor.attr('href', href);
+        $anchor.attr('data-icon', 'gear');
+        $anchor.attr('title', "Actions menu");
+        // Return it for deployment:
+        return $anchor; }
+
     PublicRootShareNode.prototype.enlisted_room_menu = function (subject_url) {
         /* For an enlisted RoomShareNode 'subject_url', furnish the simple
          * popup menu with context-specific actions. */
@@ -1062,14 +1077,10 @@ var spideroak = function () {
 
     PublicRootShareNode.prototype.layout = function (mode_opts) {
         /* Deploy content as markup on our page. */
-        // Get a split button on each item to provoke an action menu:
-        var split_params = {url: (this.url
-                                  + '?action=enlisted_room_menu&subject='),
-                            icon: 'gear',
-                            type: 'popup',
-                            title: "Collection membership"};
-        mode_opts.split_button_url_append = split_params;
+
+        mode_opts.actions_menu_link_creator = this.actions_menu_link.bind(this);
         ContentNode.prototype.layout.call(this, mode_opts);
+
         var $content_items = this.my_page$().find('.page-content')
         if (this.subdirs.length === 0) {
             $content_items.hide(); }
@@ -1286,27 +1297,22 @@ var spideroak = function () {
         return $page; }
 
     FolderContentNode.prototype.layout_item$ = function(mode_opts) {
-        /* Return a folder-like content item's description as jQuery item.
-           Optional:
-           mode_opts['split_button_url_append']: {icon:, title:, url:, options:}
-            - construct a split button, appending node's url onto passed url.
+        /* Return a jQuery object representing a folder-like content item.
+
+           If mode_opts has 'actions_menu_link_creator', apply it to our
+           URL to get back a anchor to a context-specific actions menu for
+           this item.
          */
-        var $a = $('<a/>')
-        $a.attr('class', "crushed-vertical item-name");
-        $a.attr('href', "#" + this.url);
-        $a.html($('<h4/>').html(this.name));
+        var $anchor = $('<a/>').attr('class', "crushed-vertical");
+        $anchor.attr('href', "#" + this.url);
+        $anchor.html($('<h4/>').html(this.name));
 
-        var $it = $('<li/>').append($a);
+        var $it = $('<li/>').append($anchor);
 
-        if (mode_opts && mode_opts.hasOwnProperty('split_button_url_append')) {
-            var split_params = mode_opts.split_button_url_append;
-            $a = $('<a/>');
-            // We specifically don't use 'data-rel="popup"' because that
-            // bypasses the normal changePage transition.
-            $a.attr('href', '#' + split_params.url + this.url);
-            $a.attr('data-icon', split_params.icon);
-            $a.attr('title', split_params.title);
-            $it.find('a').after($a); }
+        if (mode_opts
+            && mode_opts.hasOwnProperty('actions_menu_link_creator')) {
+            $anchor = mode_opts.actions_menu_link_creator(this.url);
+            $it.find('a').after($anchor); }
 
         $it.attr('data-filtertext', this.name);
 
