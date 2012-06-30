@@ -25,9 +25,14 @@
   padding-bottom: 6px !important;
 }
 
+.my-popup-title {
+  margin: 8px 1em 8px 1em !important;
+}
+
 .ui-popup-container {
   /* So popups aren't unnecessarily big */
-  min-height: 10px !important;
+  width: auto !important;
+  min-height: 1em !important;
 }
 
 .subdued {
