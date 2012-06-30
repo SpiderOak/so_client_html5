@@ -25,6 +25,11 @@
   padding-bottom: 6px !important;
 }
 
+.ui-popup-container {
+  /* So popups aren't unnecessarily big */
+  min-height: 10px !important;
+}
+
 .subdued {
   color: gray;
 }
