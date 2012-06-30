@@ -704,13 +704,15 @@ var spideroak = function () {
         var subject_room = content_node_manager.get(subject_url);
 
         var $listview = $popup.find('[data-role="listview"]');
+        // Ditch prior contents:
         $listview.empty()
 
         var popup_id = '#' + generic.simple_popup_id;
         var $popup = $(popup_id);
         $popup.find('.title').html('<span style="color: gray">Room: </span>'
                                    + elide(subject_room.title(), 50));
-        // Clear out any prior additions:
+        $popup.find('.close-button').attr('href',
+                                          this.here() + '?refresh=true');
 
         var $remove_li = $('<li/>');
         $remove_li.append(fab_anchor('remove_item',
@@ -732,8 +734,11 @@ var spideroak = function () {
                                               "Retain across sessions")); }
         $listview.append($remove_li, $persistence_li);
 
-        $popup = $(popup_id);
-        $popup.popup();
+        var handlers = {opened: function (event, ui) { console.log('opened'); },
+                        closed: function (event, ui) {
+                            console.log("popup closed"); }}
+        // $.mobile.changePage(this.here() + '?refresh=true'); }});
+        $popup.popup(handlers);
         $popup.parent().page();
         $listview.listview('refresh');
         $popup.popup('open');
