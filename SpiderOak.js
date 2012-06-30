@@ -711,7 +711,7 @@ var spideroak = function () {
 
         var popup_id = '#' + generic.simple_popup_id;
         var $popup = $(popup_id);
-        $popup.find('.title').html('<span style="color: gray">Room: </span>'
+        $popup.find('.title').html('<span class="subdued">Room: </span>'
                                    + elide(subject_room.title(), 50));
         $popup.find('.close-button').attr('href',
                                           this.here() + '?refresh=true');
@@ -1326,8 +1326,10 @@ var spideroak = function () {
                                                               mode_opts);
         var $name = $it.find('.item-name');
         $name.html($name.html()
-                   + '<small> Share ID: ' + this.share_id
-                   + ', Room Key: ' + this.room_key + ' </small>');
+                   + '<small> <span class="subdued">Share ID:</span> '
+                   + this.share_id
+                   + ', <span class="subdued">Room Key:</span> '
+                   + this.room_key + ' </small>');
         return $it; }
     FileContentNode.prototype.layout_item$ = function(mode_opts) {
         /* Return a file-like content node's description as a jQuery item. */

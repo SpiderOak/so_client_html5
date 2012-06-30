@@ -19,6 +19,10 @@
   padding-bottom: 6px !important;
 }
 
+.subdued {
+  color: gray;
+}
+
 .multiple-listviews .ui-content .ui-listview {
   /* Independently derived workaround for multiple-listviews spacing problem:
      https://github.com/jquery/jquery-mobile/issues/1204 */
