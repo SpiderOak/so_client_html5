@@ -1,3 +1,9 @@
+[data-role=header] {
+/*  cursor: context-menu; */
+}
+[data-role=header] .header-title {
+}
+
 .status-message {
   margin-bottom: -1em !important;
   font-weight: lighter !important;
