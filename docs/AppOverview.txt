@@ -143,18 +143,25 @@ found in `SpiderOak.html`, upon in-app traversal of content URLs (see
 [#ContentAddressing Content Addressing], above).
 * The spideroak object's `handle_content_visit()` method is assigned to
   handle the jQuery Mobile `pagebeforechange` event, which tracks changes
-  to the browser's `location.hash` setting
+  to the browser's `location.hash` setting.
+
+  Our handle_content_visit() routine discontinues default jQm traversal
+  machinery only for handling of string addresses.  That way, we can (and
+  do) use the standard jQm traversal facilities for the jQm objects that
+  our machinery fabricates, by passing them to $.mobile.changePage() as
+  jQm objects.
 * A few different classes of addresses are used in the application, as
-  described in [#OrganizationofContentNavigation Content
-  Navigation], above.
+  described in the [#OrganizationofContentTraversal Content Traversal]
+  section, above.
 * For navigation URLs that go to application content, including the user's
-  !SpiderOak-managed content, then:
-  * Fetches a suitable `ContentNode`-based object for the node using
-  * `spideroak.content_node_manager.get()` - returns an already
+  !SpiderOak-managed content, we:
+  * Fetch a suitable `ContentNode`-based object for the node using
+  * `spideroak.content_node_manager.get()`, which returns an already
     existing node, if any, or else allocates a new one with suitable
     initial settings.
-  * The respective `ContentNode` object uses its `.visit()` method to
-    handle the visit.
+  * The obtained `ContentNode` object uses its `.visit()` method to
+    handle the visit - fabricating a (jQm <div data-role="page"/>) page
+    object and using the traversal machinery to visit it.
 * In most cases, `ContentNode.visit()`:
   * Fetches the node contents from the server if necessary (''intially,
     always necessary'')
@@ -166,25 +173,26 @@ found in `SpiderOak.html`, upon in-app traversal of content URLs (see
     ascending navigation routes associated with them.
   * Populates the page listview with entries for the node's contents, or
     special activities associated with the node.
-  * The `RootContentNode`'s `.visit()` method is different.  It dispatches a
-    visit to the `PublicRootShareNode`, `RootStorageNode` and
-    `OriginalRootShareNode`.  All of those visits are delegated such that:
-    1. The delegated presentations do not take browser focus (using the
-       'passive' mode option), leaving focus on the `RootContentNode`, and
-    2. the `RootContentNode` is notified of success, along with an
-       indicator of the transaction that succeeded, so it can redisplay its
-       consolidated content view, as it notifications are received.
-    3. The visit is contingent to receiving success status notification
-       from the `RootStorageNode` visit, since both depend on successful
-       authentication, while access to contents of the
-       `PublicRootShareNode` does not.
-       * If the `RootStorageNode` visit succeeds, the `OriginalRootShareNode`
-         visit is dispatched.
-       * If the `RootStorageNode` visit fails, the `RootContentNode` presents
-         the login form, with the username filled in and Remember Me is
-         activated, as appropriate.
-    See [#ContentNodenavigationmodes below] for details about the navigation
-    modes.
+
+* The `RootContentNode`'s `.visit()` method is different.  It dispatches a
+  visit to the `PublicRootShareNode`, `RootStorageNode` and
+  `OriginalRootShareNode`.  All of those visits are delegated such that:
+  1. The delegated presentations do not take browser focus (using the
+     'passive' mode option), leaving focus on the `RootContentNode`, and
+  2. the `RootContentNode` is notified of success, along with an
+     indicator of the transaction that succeeded, so it can redisplay its
+     consolidated content view, as it notifications are received.
+  3. The visit is contingent to receiving success status notification
+     from the `RootStorageNode` visit, since both depend on successful
+     authentication, while access to contents of the
+     `PublicRootShareNode` does not.
+     * If the `RootStorageNode` visit succeeds, the `OriginalRootShareNode`
+       visit is dispatched.
+     * If the `RootStorageNode` visit fails, the `RootContentNode` presents
+       the login form, with the username filled in and Remember Me is
+       activated, as appropriate.
+See [#ContentNodenavigationmodes below] for details about the navigation
+modes.
 
 === Content Node navigation modes ===
 Special navigation behaviors are supported using query (search) parameters
@@ -217,8 +225,8 @@ Currently implemented modes include:
 
 === Content and Operational Menus ===
 Elaborate actions on content, like adding and removing share nodes, is
-implemented with a combination of specific [#ContentNodenavigationmodes
-content navigation modes].
+implemented with a combination of specific
+[#ContentNodenavigationmodes content navigation modes].
 
 * The state is conveyed in the address domain using the URL query string.
 
@@ -248,7 +256,7 @@ function, which recurses to the indicated server when required.
 === Special Browser Requirements ===
 While developing the html5 client app I did not have the luxury of
 situating the code to reside within the same domain as the storage
-servers.  To get around [HTML5ClientAppSameOriginIssues CORS restrictions]
+servers.  To get around [#HTML5ClientAppSameOriginIssues CORS restrictions]
 (without JSONP, which the SpiderOak storage repo does not accept), I needed
 to run my browser with drastically reduced security.  I used Chip Black's
 suggestions for doing so with Google Chrome (and haven't figured
