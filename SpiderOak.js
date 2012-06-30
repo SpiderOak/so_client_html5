@@ -369,8 +369,7 @@ var spideroak = function () {
         this.room_url = url;
         var splat = url.split('/');
         this.share_id = base32.decode(splat[splat.length-3]);
-        this.room_key = splat[splat.length-2];
-        console.log(this.share_id + '/' + this.room_key); }
+        this.room_key = splat[splat.length-2]; }
     RoomShareNode.prototype = new ShareNode();
 
     function FolderContentNode(url, parent) {
