@@ -693,8 +693,7 @@ var spideroak = function () {
          * popup menu with context-specific actions. */
 
         var fab_anchor = function (action, subject_url, icon_name, item_text) {
-            var href = (window.location.href.split('#')[0] + '#'
-                        + this.url + '?action=' + action
+            var href = (this.here() + '?action=' + action
                         + '&subject=' + subject_url);
             return ('<a href="' + href + '" data-icon="' + icon_name + '"'
                     + 'data-mini="true" data-iconpos="right">'
@@ -1408,6 +1407,11 @@ var spideroak = function () {
         return this.my_page$().find(selector || '.content-items'); }
     ContentNode.prototype.get_storage_page_template$ = function() {
         return $("#" + generic.content_page_template_id); }
+
+    ContentNode.prototype.here = function () {
+        /* Return the complete address of this content node, as part of the
+           application code, not just its JSON url.  */
+        return window.location.href.split('#')[0] + '#' + this.url; }
 
     ContentNode.prototype.title = function () {
         return this.name; }
