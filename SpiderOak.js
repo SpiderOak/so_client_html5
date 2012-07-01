@@ -44,14 +44,15 @@ var spideroak = function () {
         base_host_url: "https://spideroak.com",
         combo_root_url: "https://home",
         combo_root_page_id: "home",
+        storage_root_page_id: "storage-home",
         original_shares_root_page_id: "original-home",
         public_shares_root_page_id: "share-home",
+        content_page_template_id: "content-page-template",
         storage_login_path: "/browse/login",
         storage_logout_suffix: "logout",
         storage_path_prefix: "/storage/",
         original_shares_path_suffix: "shares",
         shares_path_suffix: "/share/",
-        content_page_template_id: "content-page-template",
         devices_query_expression: 'device_info=yes',
         versions_query_expression: 'format=version_info',
         home_page_id: 'home',
@@ -227,6 +228,7 @@ var spideroak = function () {
                 || (url === my.public_shares_root_url)); }
     function is_content_root_page_id(url) {
         return ((url === generic.combo_root_page_id)
+                || (url === generic.storage_root_page_id)
                 || (url === generic.public_shares_root_page_id)
                 || (url === generic.original_shares_root_page_id)); }
     function is_share_room_url(url) {
@@ -1038,14 +1040,13 @@ var spideroak = function () {
         /* Set the UI page id, escaping special characters as necessary. */
         return this.url; }
     RootContentNode.prototype.my_page_id = function () {
-        /* Set the UI page id, escaping special characters as necessary. */
         return generic.combo_root_page_id; }
-    PublicRootShareNode.prototype.my_page_id = function () {
-        /* Set the UI page id, escaping special characters as necessary. */
-        return generic.public_shares_root_page_id; }
+    RootStorageNode.prototype.my_page_id = function () {
+        return generic.storage_root_page_id; }
     OriginalRootShareNode.prototype.my_page_id = function () {
-        /* Set the UI page id, escaping special characters as necessary. */
         return generic.original_shares_root_page_id; }
+    PublicRootShareNode.prototype.my_page_id = function () {
+        return generic.public_shares_root_page_id; }
     ContentNode.prototype.show = function (chngpg_opts, mode_opts) {
         /* Trigger UI focus on our content layout.
            If mode_opts "passive" === true, don't do a changePage.
@@ -1201,67 +1202,32 @@ var spideroak = function () {
         this.layout_header_fields(fields); }
     RootStorageNode.prototype.layout_header = function(mode_opts) {
         StorageNode.prototype.layout_header.call(this, mode_opts);
-        // Inject a brief description of the storage hierarchy.
-        var $content = this.my_page$().find('[data-role="content"]');
-        if ($content.find('.spiel').length === 0) {
-            var $spiel_container = $('<div class="spiel"/>')
-            var $spiel = $('<p/>')
-            $spiel_container.append($spiel)
-            $content.children().before($spiel_container);
-
-            $spiel.html("The storage section is the set of storage devices"
-                        + " your account has configured for online backup"
-                        + " by SpiderOak.  You can add to and remove folders"
-                        + " using the SpiderOak desktop application."
-                        + " You can view the storage folders that your account"
-                        + " is making accessible to others in your"
-                        + ' <a href="#' + my.original_shares_root_url + '">'
-                        + ' "My Share Rooms" </a> section.')
-            if (this.subdirs.length === 0) {
-                var $spiel2 = $('<p/>');
-                $spiel2.html("Your account currently does not have any"
-                             + " configured storage devices - indicated"
-                             + ' by the "&empty" empty sign:')
-                $spiel_container.append($spiel2); }}}
+        $('#original_shares_root_url').attr('href',
+                                            '#' + my.original_shares_root_url);
+        var $emptiness_message = this.my_page$().find('.emptiness-message');
+        (this.subdirs.length === 0
+         ? $emptiness_message.hide()
+         : $emptiness_message.show()); }
 
 
     PublicRootShareNode.prototype.layout_header = function(mode_opts) {
         ShareNode.prototype.layout_header.call(this, mode_opts);
         // Inject a brief description.
+        $('#storage_root_url') .attr('href', '#' + my.storage_root_url);
+        $('#public_shares_root_url').attr('href',
+                                          '#' + my.public_share_roots_url);
         var $adjust_spiel = this.my_page$().find('#adjust-spiel');
-        if (this.subdirs.length === 0) {
-            $adjust_spiel.hide(); }
-        else {
-            $adjust_spiel.show(); }}
+        (this.subdirs.length === 0
+         ? $adjust_spiel.hide()
+         : $adjust_spiel.show()); }
 
     OriginalRootShareNode.prototype.layout_header = function(mode_opts) {
         ShareNode.prototype.layout_header.call(this, mode_opts);
-        // Inject a brief description.
-        var $content = this.my_page$().find('[data-role="content"]');
-        if ($content.find('.spiel').length === 0) {
-            var $spiel_container = $('<div/>');
-            $spiel_container.attr('class',  "spiel");
-            var $spiel = $('<p/>');
-            $spiel_container.append($spiel);
-            $content.children().before($spiel_container);
-
-            $spiel.html("This is the set of SpiderOak Share Rooms that your"
-                        + " account is publishing. Each share room is "
-                        + " comprised of a collection of folders that you've"
-                        + " selected from your account's "
-                        + '<a href="#' + my.storage_root_url + '">'
-                        + 'storage folders</a> to be available'
-                        + " for remote access by those that know"
-                        + " their Share ID and Room Key.  You can see the"
-                        + " collection of any publicly accessible Share Rooms"
-                        + " that you are visiting in the"
-                        + ' <a href="#' + my.public_shares_root_url + '">'
-                        + 'Public Share Rooms</a> section.');
-            if (this.subdirs.length === 0) {
-                var $spiel2 = $('<p/>');
-                $spiel2.html('The "&empty;" sign indicates that your account'
-                             + " currently does not publish any Share Rooms");
-                $spiel_container.append($spiel2); }}}
+        // Adjust the description.
+        var $emptiness_message = this.my_page$().find('.emptiness-message');
+        (this.subdirs.length === 0
+         ? $emptiness_message.hide()
+         : $emptiness_message.show()); }
 
     ShareNode.prototype.layout_header = function(mode_opts) {
         /* Fill in header fields of .my_page$(). */
@@ -1481,13 +1447,17 @@ var spideroak = function () {
             // Include our page in the DOM, after the storage page template:
             $template.after(this.my_page$()); }
         return this.$page; }
-    PublicRootShareNode.prototype.my_page$ = function () {
-        return RootContentNode.prototype.my_page$.call(this); }
     RootContentNode.prototype.my_page$ = function () {
         /* Return the special case of the root content nodes actual page. */
         return (this.$page
                 ? this.$page
                 : (this.$page = $("#" + this.my_page_id()))); }
+    PublicRootShareNode.prototype.my_page$ = function () {
+        return RootContentNode.prototype.my_page$.call(this); }
+    OriginalRootShareNode.prototype.my_page$ = function () {
+        return RootContentNode.prototype.my_page$.call(this); }
+    RootStorageNode.prototype.my_page$ = function () {
+        return RootContentNode.prototype.my_page$.call(this); }
 
     ContentNode.prototype.my_content_items$ = function (selector) {
         /* Return this node's jQuery contents litview object.
@@ -2026,6 +1996,8 @@ var spideroak = function () {
         switch (obj) {
         case (generic.combo_root_page_id):
             return generic.combo_root_url;
+        case (generic.storage_root_page_id):
+            return my.storage_root_url;
         case (generic.original_shares_root_page_id):
             return my.original_shares_root_url;
         case (generic.public_shares_root_page_id):
