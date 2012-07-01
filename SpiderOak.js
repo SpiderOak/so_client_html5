@@ -1207,6 +1207,8 @@ var spideroak = function () {
         StorageNode.prototype.layout_header.call(this, mode_opts);
         $('#original_shares_root_url').attr('href',
                                             '#' + my.original_shares_root_url);
+        $('#public_shares_root_url').attr('href',
+                                          '#' + my.public_shares_root_url);
         var $emptiness_message = this.my_page$().find('.emptiness-message');
         (this.subdirs.length === 0
          ? $emptiness_message.show()
@@ -1218,7 +1220,7 @@ var spideroak = function () {
         // Inject a brief description.
         $('#storage_root_url') .attr('href', '#' + my.storage_root_url);
         $('#public_shares_root_url').attr('href',
-                                          '#' + my.public_share_roots_url);
+                                          '#' + my.public_shares_root_url);
         var $adjust_spiel = this.my_page$().find('#adjust-spiel');
         (this.subdirs.length === 0
          ? $adjust_spiel.hide()
