@@ -1209,8 +1209,8 @@ var spideroak = function () {
                                             '#' + my.original_shares_root_url);
         var $emptiness_message = this.my_page$().find('.emptiness-message');
         (this.subdirs.length === 0
-         ? $emptiness_message.hide()
-         : $emptiness_message.show()); }
+         ? $emptiness_message.show()
+         : $emptiness_message.hide()); }
 
 
     PublicRootShareNode.prototype.layout_header = function(mode_opts) {
@@ -1229,8 +1229,8 @@ var spideroak = function () {
         // Adjust the description.
         var $emptiness_message = this.my_page$().find('.emptiness-message');
         (this.subdirs.length === 0
-         ? $emptiness_message.hide()
-         : $emptiness_message.show()); }
+         ? $emptiness_message.show()
+         : $emptiness_message.hide()); }
 
     ShareNode.prototype.layout_header = function(mode_opts) {
         /* Fill in header fields of .my_page$(). */
