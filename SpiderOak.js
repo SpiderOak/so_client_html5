@@ -763,8 +763,6 @@ var spideroak = function () {
         $popup.parent().page();
         $listview.listview('refresh');
         $popup.popup('open');
-        // Haven't gotten .changePage(..., {role: 'popup', ...}) to work.
-        //$.mobile.changePage(popup_id, {role: 'popup', transition: 'pop'});
     }
     // Whitelist this method for use as a mode_opts 'action':
     PublicRootShareNode.prototype.enlisted_room_menu.is_action = true;
@@ -947,7 +945,6 @@ var spideroak = function () {
         var combo_root = content_node_manager.get_combo_root();
         var url, dev, devdata;
 
-        // XXX ?:
         this.name = my.username;
         // TODO: We'll cook stats when UI is ready.
         this.stats = data["stats"];
