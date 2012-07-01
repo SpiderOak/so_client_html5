@@ -561,8 +561,8 @@ var spideroak = function () {
             if (token === 'storage') {
                 // Ensure we're current page and chain to original shares root.
 
-                this.layout();
-                this.show();
+                this.layout({}, {});
+                this.show({}, {});
 
                 var our_mode_opts = {passive: true,
                                      notify_callback:
@@ -1056,6 +1056,7 @@ var spideroak = function () {
         var $page = this.my_page$();
         if ($.mobile.activePage
             && ($.mobile.activePage[0].id !== this.my_page_id())
+            && mode_opts
             && (!mode_opts.passive)) {
             // Use $page object so our handler defers to regular jQm traversal:
             $.mobile.changePage($page, chngpg_opts); }
