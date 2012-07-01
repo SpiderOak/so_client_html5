@@ -1200,11 +1200,68 @@ var spideroak = function () {
             fields.left_label = container.name; }
         this.layout_header_fields(fields); }
     RootStorageNode.prototype.layout_header = function(mode_opts) {
-        /* Fill in typical values for header fields of .my_page$(). */
         StorageNode.prototype.layout_header.call(this, mode_opts);
-        this.layout_header_fields({'title': "Storage Devices",
-                                   'left_label': "Home",
-                                   'left_url': "#" + this.parent_url}); }
+        // Inject a brief description of the storage hierarchy.
+        var $content = this.my_page$().find('[data-role="content"]');
+        if ($content.find('.spiel').length === 0) {
+            var $spiel_container = $('<div class="spiel"/>')
+            var $spiel = $('<p/>')
+            $spiel_container.append($spiel)
+            $content.children().before($spiel_container);
+
+            $spiel.html("The storage section is the set of storage devices"
+                        + " your account has configured for online backup"
+                        + " by SpiderOak.  You can add to and remove folders"
+                        + " using the SpiderOak desktop application."
+                        + " You can view the storage folders that your account"
+                        + " is making accessible to others in your"
+                        + ' <a href="#' + my.original_shares_root_url + '">'
+                        + ' "My Share Rooms" </a> section.')
+            if (this.subdirs.length === 0) {
+                var $spiel2 = $('<p/>');
+                $spiel2.html("Your account currently does not have any"
+                             + " configured storage devices - indicated"
+                             + ' by the "&empty" empty sign:')
+                $spiel_container.append($spiel2); }}}
+
+
+    PublicRootShareNode.prototype.layout_header = function(mode_opts) {
+        ShareNode.prototype.layout_header.call(this, mode_opts);
+        // Inject a brief description.
+        var $adjust_spiel = this.my_page$().find('#adjust-spiel');
+        if (this.subdirs.length === 0) {
+            $adjust_spiel.hide(); }
+        else {
+            $adjust_spiel.show(); }}
+
+    OriginalRootShareNode.prototype.layout_header = function(mode_opts) {
+        ShareNode.prototype.layout_header.call(this, mode_opts);
+        // Inject a brief description.
+        var $content = this.my_page$().find('[data-role="content"]');
+        if ($content.find('.spiel').length === 0) {
+            var $spiel_container = $('<div/>');
+            $spiel_container.attr('class',  "spiel");
+            var $spiel = $('<p/>');
+            $spiel_container.append($spiel);
+            $content.children().before($spiel_container);
+
+            $spiel.html("This is the set of SpiderOak Share Rooms that your"
+                        + " account is publishing. Each share room is "
+                        + " comprised of a collection of folders that you've"
+                        + " selected from your account's "
+                        + '<a href="#' + my.storage_root_url + '">'
+                        + 'storage folders</a> to be available'
+                        + " for remote access by those that know"
+                        + " their Share ID and Room Key.  You can see the"
+                        + " collection of any publicly accessible Share Rooms"
+                        + " that you are visiting in the"
+                        + ' <a href="#' + my.public_shares_root_url + '">'
+                        + 'Public Share Rooms</a> section.');
+            if (this.subdirs.length === 0) {
+                var $spiel2 = $('<p/>');
+                $spiel2.html('The "&empty;" sign indicates that your account'
+                             + " currently does not publish any Share Rooms");
+                $spiel_container.append($spiel2); }}}
 
     ShareNode.prototype.layout_header = function(mode_opts) {
         /* Fill in header fields of .my_page$(). */
