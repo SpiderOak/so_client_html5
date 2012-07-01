@@ -93,13 +93,16 @@ var spideroak = function () {
             && (is_content_url(page)
                 || document_addrs.hasOwnProperty(page))) {
             e.preventDefault();
+            if (transit_manager.is_repeat_url(page)) {
+                // For darn popup stutters.
+                return true; }
             var mode_opts = query_params(page);
             if (document_addrs.hasOwnProperty(page)) {
                 var internal = internalize_url(document.location.href);
                 return document_addrs[page].call(this, internal); }
             else {
                 var node = content_node_manager.get(page);
-                node.visit(data.options, mode_opts); }}}
+                return node.visit(data.options, mode_opts); }}}
 
     function establish_traversal_handler() {
         /* Establish page change event handler. */
@@ -698,6 +701,7 @@ var spideroak = function () {
         var href = ('#' + this.url
                     + '?action=enlisted_room_menu&subject='
                     + subject_url)
+        href = transit_manager.distinguish_url(href);
 
         var $anchor = $('<a/>');
         $anchor.attr('href', href);
@@ -1519,6 +1523,43 @@ var spideroak = function () {
             persistence_manager.remove('storage_host'); },
     };
     var remgr = remember_manager;
+
+    var transit_manager = function () {
+        /* Facilities to detect repeated traversals of the same URL.  To
+           use, (1) when creating a url for traversal,
+               url = tm.distinguish(url)
+           handle_content_visit() will recognize repeats within recents_span
+           traversals, and let them pass.
+        */
+        var tm_param_name = "so_transit";
+        var recent_transits = [];
+        var recents_span = 3;
+
+        function new_distinction() {
+            return ''.concat(new Date().getTime()
+                             + Math.floor(Math.random() * 1e5)); }
+        function is_repeat(distinction) {
+            /* Check 'distinction', and register that we've seen it if not
+               already registered. */
+            if (! distinction) { return false; }
+            else if (recent_transits.indexOf(distinction) != -1) {
+                return true; }
+            else {
+                recent_transits.unshift(distinction);
+                recent_transits.splice(recents_span);
+                return false; }}
+
+        return {
+            distinguish_url: function(url) {
+                /* Add a query parameter to a url to distinguish it, so it
+                   can be recognized on redundant changePage. */
+                var distinct = new_distinction();
+                var delim = ((url.search('\\?') === -1) ? "?" : "&");
+                return url.concat(delim + tm_param_name + "=" + distinct); },
+            is_repeat_url: function(url) {
+                return is_repeat(query_params(url)[tm_param_name]); },
+        }}()
+    var tmgr = transit_manager;
 
 
     var content_node_manager = function () {

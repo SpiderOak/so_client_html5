@@ -343,3 +343,19 @@ cache on explicit refreshes, but not on return by traversal to already
 visited nodes. This seems like a good tradeoff, reducing server load by
 requiring that the user explicitly ask for an update, but we should warn
 the user about it.
+
+==== Complicated popup menu provisions ====
+The (new in jQuery Mobile 1.2) popup machinery requires special provisions
+to live with our `handle_content_visit()` `pagebeforechange` handler.  It
+appears that the first dismissing of a popup since the last page change
+triggers a second traversal, required by the current popup machinery to
+clear the popup context. In order to recognize and properly dismiss the
+second traversal, we treat URLs that are going to be used to trigger popups
+with `transit_manager.distinguish_url()`.  That will add a query paramter for
+`transit_manager.is_repeat_url()` to recognize a repeat, so
+`handle_content_visit()` can dismiss it.
+
+Hopefully this will become unnecessary sometime soon, as the popup
+machinery shakes out, but I haven't been able to quickly construct a simple
+demo in order to report the bug, so am not sure it will be recognized and
+rectified.  In the meanwhile, the transit_manager provides a workaround.
