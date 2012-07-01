@@ -95,7 +95,8 @@ var spideroak = function () {
                 || document_addrs.hasOwnProperty(page))) {
             e.preventDefault();
             if (transit_manager.is_repeat_url(page)) {
-                // For darn popup stutters.
+                // Popup dismissal sends the URL back through, and the
+                // default machinery needs to see it.
                 return true; }
             var mode_opts = query_params(page);
             if (document_addrs.hasOwnProperty(page)) {
