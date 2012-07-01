@@ -757,11 +757,13 @@ var spideroak = function () {
                                               "Retain across sessions")); }
         $listview.append($remove_li, $persistence_li);
 
-        var handlers = {opened: function (event, ui) { console.log('opened'); },
-                        closed: function (event, ui) {
-                            console.log("popup closed"); }}
-        // $.mobile.changePage(this.here() + '?refresh=true'); }});
-        $popup.popup(handlers);
+        // popup handlers apparently not actually implemented as of 2012-07-01.
+        //var handlers = {opened: function (event, ui) {
+        //                    console.log('opened'); },
+        //                closed: function (event, ui) {
+        //                    console.log("popup closed"); }}
+        //$popup.popup(handlers);
+        $popup.popup();
         $popup.parent().page();
         $listview.listview('refresh');
         $popup.popup('open');
@@ -1055,6 +1057,7 @@ var spideroak = function () {
         if ($.mobile.activePage
             && ($.mobile.activePage[0].id !== this.my_page_id())
             && (!mode_opts.passive)) {
+            // Use $page object so our handler defers to regular jQm traversal:
             $.mobile.changePage($page, chngpg_opts); }
         // Just in case, eg of refresh:
         $.mobile.loading('hide'); }
