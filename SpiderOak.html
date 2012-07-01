@@ -29,7 +29,7 @@
          href="#combo-about" data-icon="info" data-iconpos="notext"></a>
     </div>
 
-    <div class="nav_login_storage" data-role="content">
+    <div class="nav-login-storage" data-role="content">
       <div class="login-section">
         <form method="POST" id="root-login-form" class="login-form">
           <ul data-role="listview" data-inset="true">
@@ -181,31 +181,41 @@
       <a alt="About Public Share Rooms" data-role="button" href="#public-about"
          data-icon="info" data-iconpos="notext"></a>
     </div>
-    <div class="share_form nav_login_share" data-role="content" data-theme="c">
-      <form method="POST" class="login-form">
-        <ul data-role="listview" data-inset="true" data-mini="true"
-            data-theme="c">
+    <div data-role="content">
+      <div class="nav-visit-share">
+        <form method="POST" class="login-form">
+          <legend> Add Share Rooms: </legend>
+          <ul data-role="listview" data-inset="true" data-mini="true"
+              data-theme="c">
             <li data-role="fieldcontain" class="ui-hide-label"
-                 data-inset="true" data-mini="true">
+                data-inset="true" data-mini="true">
               <label for="my_share_id">Share ID:</label>
               <input type="text" name="shareid" id="my_share_id"
                      placeholder="Share ID"
                      value>
             </li>
             <li data-role="fieldcontain" class="ui-hide-label"
-                 data-inset="true" data-mini="true">
+                data-inset="true" data-mini="true">
               <label for="my_login_password">Password:</label>
               <input type="text" name="password" id="my_login_password"
                      placeholder="Share Key">
             </li>
-        </ul>
-        <div class="ui-grid-a" data-theme="a">
-          <div class="ui-block-b" align="right">
-            <input type="submit" data-inline="true" value="Visit"
-                   name="Login" data-mini="true" data-theme="b">
+          </ul>
+          <div class="ui-grid-a" data-theme="a">
+            <div class="ui-block-b" align="right">
+              <input type="submit" data-inline="true" value="Visit"
+                     name="Login" data-mini="true" data-theme="b">
+            </div>
           </div>
-        </div>
-      </form>
+        </form>
+      </div>
+      <div data-role="collapsible" data-mini="true" id="adjust-spiel"
+           data-collapsed-icon="arrow-r" data-expanded-icon="arrow-d">
+        <legend> Adjust the visited Share Rooms list: </legend>
+        <p> Use the Share Room's gear menu to remove it from the visited
+          list, or change whether it will retained - continue to be visited
+          across local sessions. </p>
+      </div>
       <hr class="page-content"/>
       <ul class="content-items page-content" data-role="listview">
       </ul>

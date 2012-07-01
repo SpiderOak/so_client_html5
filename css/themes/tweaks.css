@@ -16,6 +16,16 @@
   color: darkgreen !important;
 }
 
+[data-role="content"] > .spiel {
+  margin-top: -1em !important;
+}
+[data-role="collapsible"].spiel {
+  margin-top: -1em !important;
+  margin-bottom: 1em !important;
+  margin-right: -1em !important;
+  margin-left: -1em !important;
+}
+
 .crushed-vertical {
   padding-top: 3px !important;
   padding-bottom: 3px !important;
@@ -37,6 +47,7 @@
 
 .subdued {
   color: gray;
+  font-size: small;
 }
 
 .multiple-listviews .ui-content .ui-listview {

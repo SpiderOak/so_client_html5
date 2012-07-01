@@ -1097,8 +1097,8 @@ var spideroak = function () {
         /* Do layout arrangements - different than other node types. */
         var $page = this.my_page$();
 
-        this.layout_header();
-
+        this.layout_header(chngpg_opts, mode_opts);
+        this.link_to_roots(chngpg_opts, mode_opts);
         // Storage content section:
         // We avoid doing layout of these when not authenticated so the
         // re-presentation of the hidden sections doesn't show through.
@@ -1231,6 +1231,19 @@ var spideroak = function () {
                                                          "mode", "edit"),
                       'right_label': "Edit"};
         this.layout_header_fields(fields); }
+
+    RootContentNode.prototype.link_to_roots = function (chngpg_opts, mode_opts){
+        /* Link section headers to the variable root nodes, if the storage
+           root is known. (The public root address is static, so hard-coded
+           in the HTML.) */
+
+        if (my.storage_root_url) {
+            var $storage = $('#my-storage-leader');
+            $storage.find('a').attr('href',
+                                    '#' + my.storage_root_url);
+            var $originals = $('#my-rooms-leader');
+            $originals.find('a').attr('href',
+                                      '#' + my.original_shares_root_url); }}
 
     ContentNode.prototype.layout_content = function (mode_opts,
                                                      subdirs,
@@ -1865,9 +1878,9 @@ var spideroak = function () {
             var public_shares = cnmgr.get(my.public_shares_root_url);
 
             // Properly furnish login form:
-            prep_login_form('.nav_login_storage', storage_login,
+            prep_login_form('.nav-login-storage', storage_login,
                             'username', true);
-            prep_login_form('.nav_login_share',
+            prep_login_form('.nav-visit-share',
                             public_shares.add_item_external.bind(public_shares),
                             'shareid', false);
 
