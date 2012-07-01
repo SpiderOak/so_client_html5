@@ -345,7 +345,7 @@ var spideroak = function () {
         delete this.files; }
     RootStorageNode.prototype = new StorageNode();
     function RootShareNode(url, parent) {
-        ShareNode.call(this, url, this);
+        ShareNode.call(this, url, parent);
         this.emblem = "Root Share";
         this.root_url = url; }
     RootShareNode.prototype = new ShareNode();
@@ -462,7 +462,7 @@ var spideroak = function () {
 
         else {
             var storage_root = content_node_manager.get(my.storage_root_url);
-            // Make a distinct copy:
+            // Use a distinct copy of mode_opts:
             var storage_mode_opts = $.extend({}, public_mode_opts);
             storage_mode_opts.notify_token = 'storage';
             // Will chain to original shares via notify_callback.
