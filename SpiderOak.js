@@ -549,7 +549,7 @@ var spideroak = function () {
         var $leader = $(selector);
 
         if (! succeeded) {
-            $.mobile.hidePageLoadingMsg();
+            $.mobile.loading('hide');
             if (token === "storage") {
                 this.authenticated(false, response);
                 this.layout(); }}
@@ -567,7 +567,7 @@ var spideroak = function () {
                                        this.notify_subvisit_status.bind(this),
                                      notify_token: 'original-share'};
                 if (this.veiled) {
-                    this.veil(false, $.mobile.hidePageLoadingMsg); }
+                    this.veil(false, function() { $.mobile.loading('hide'); });}
                 this.authenticated(true, response);
                 var ps_root = cnmgr.get(my.original_shares_root_url, this);
                 ps_root.visit({}, our_mode_opts); }}}
@@ -635,7 +635,7 @@ var spideroak = function () {
         if (mode_opts.notify_callback) {
             mode_opts.notify_callback(false, mode_opts.notify_token, xhr); }
         else {
-            $.mobile.hidePageLoadingMsg();
+            $.mobile.loading('hide');
             alert("Visit '" + this.name + "' failed: "
                   + xhr.statusText + " (" + xhr.status + ")");
             var combo_root = content_node_manager.get_combo_root();
@@ -1056,7 +1056,7 @@ var spideroak = function () {
             && (!mode_opts.passive)) {
             $.mobile.changePage($page, chngpg_opts); }
         // Just in case, eg of refresh:
-        $.mobile.hidePageLoadingMsg(); }
+        $.mobile.loading('hide'); }
 
     PublicRootShareNode.prototype.do_presentation = function (chngpg_opts,
                                                              mode_opts) {
@@ -1705,7 +1705,7 @@ var spideroak = function () {
                 }},
 
             error: function (xhr) {
-                $.mobile.hidePageLoadingMsg();
+                $.mobile.loading('hide');
                 var username;
                 if (remember_manager.active()
                     && (username = persistence_manager.get('username'))) {
@@ -1837,7 +1837,7 @@ var spideroak = function () {
                 combo_root.veil(true, function() { $password.val(""); });
                 var unhide_form_oneshot = function(event, data) {
                     $content.show('fast');
-                    $.mobile.hidePageLoadingMsg();
+                    $.mobile.loading('hide');
                     $(document).unbind("pagechange", unhide_form_oneshot);
                     $(document).unbind("error", unhide_form_oneshot); }
                 $(document).bind("pagechange", unhide_form_oneshot)
