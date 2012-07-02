@@ -1858,8 +1858,7 @@ var spideroak = function () {
             else if (!remember_manager.unset() && !remembering) {
                 $remember_widget.val("off");
                 $remember_widget.trigger('change'); }}
-        else if ($remember_widget.attr('id') === "retain-visits") {
-            // widget id = 'retain-visits'
+        else if ($remember_widget.attr('id') === "retain-visit") {
             var retaining = persistence_manager.get('retaining_visits');
             if (retaining && ($remember_widget.val() !== "on")) {
                 $remember_widget.find('option[value="on"]').attr('selected',
@@ -1892,9 +1891,12 @@ var spideroak = function () {
             var remember_widget_on = $remember_widget.val() === "on"
             if ($remember_widget.attr('id') === "remember-me") {
                 remember_manager.active(remember_widget_on); }
-            else {
+            else if ($remember_widget.attr('id') === "retain-visit") {
                 persistence_manager.set('retaining_visits',
                                         remember_widget_on); }
+            else {
+                console.error("spideroak:prep_login_form()"
+                              " - Unanticipated form"); }
 
             data['password'] = $password.val();
             if (do_fade) {
