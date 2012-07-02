@@ -5,7 +5,11 @@
 # This is where we'll be accumulating the recipe as we develop facilities
 # and how the actual release is actually organized.
 
+tools_dir="$(dirname $0)"
+app_dir="$tools_dir/.."
+cd $app_dir
+
 echo "Making blue-themed SpiderOak_blue.html..."
-sed -e 's/"f"/"i"/' ../SpiderOak.html > ../SpiderOak_blue.html
+sed -e 's/"f"/"i"/' SpiderOak.html > SpiderOak_blue.html
 
 echo "Done."
