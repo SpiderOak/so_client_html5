@@ -477,7 +477,8 @@ var spideroak = function () {
         // - those visited in this session
         // - those remembered across sessions
 
-        this.remove_status_message();
+        this.remove_status_message('result');
+        this.remove_status_message('error');
 
         if (mode_opts.hasOwnProperty('action')) {
             var action = mode_opts.action;
@@ -610,8 +611,12 @@ var spideroak = function () {
                 this.unpersist_item(url); }}
         else {
             this.remove_status_message('error');
-            var $sm = this.show_status_message(_t("Added")
-                                               + ": " + which_msg, 'result');
+            if (this.adding_external) {
+                var $sm = this.show_status_message(_t("Added") + ": "
+                                                   + which_msg, 'result');
+                this.adding_external = false; }
+            else {
+                this.remove_status_message('result'); }
             if (persistence_manager.get('retaining_visits')) {
                 this.persist_item(url); }}
 
@@ -780,11 +785,12 @@ var spideroak = function () {
     PublicRootShareNode.prototype.add_item_external = function (credentials) {
         /* Visit a specified share room, according to 'credentials' object:
            {username, password}.
-           Use this routine only for adding from outside the object - use
-           this.add_item(), instead, for internal operation.
+           Use this routine only for the form add.  Use this.add_item(),
+           instead, for internal operation.
         */
 
         this.job_id += 1;       // Entry
+
         var share_id = credentials.shareid;
         var room_key = credentials.password;
         var message = (share_id + " / " + room_key);
@@ -795,8 +801,10 @@ var spideroak = function () {
         if (is_public_share_room_url(new_share_url)) {
             this.show_status_message(message + " " + _t("already added")); }
         else {
+            this.remove_status_message('error');
             var $sm = this.show_status_message(_t("Working..."),
                                                'result');
+            this.adding_external = true;
             $sm.hide();
             $sm.delay(1000).fadeIn(2000); // Give time for error to appear.
             return this.add_item(new_share_url); }}
@@ -1896,7 +1904,7 @@ var spideroak = function () {
                                         remember_widget_on); }
             else {
                 console.error("spideroak:prep_login_form()"
-                              " - Unanticipated form"); }
+                              + " - Unanticipated form"); }
 
             data['password'] = $password.val();
             if (do_fade) {
