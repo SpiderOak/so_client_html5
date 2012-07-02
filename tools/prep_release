@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# Do processing to produce the releasable application.
+
+# This is where we'll be accumulating the recipe as we develop facilities
+# and how the actual release is actually organized.
+
+echo "Making blue-themed SpiderOak_blue.html..."
+sed -e 's/"f"/"i"/' ../SpiderOak.html > ../SpiderOak_blue.html
+
+echo "Done."
