@@ -793,7 +793,7 @@ var spideroak = function () {
                              + "/" + room_key
                              + "/");
         if (is_public_share_room_url(new_share_url)) {
-            this.show_status_message(message + " " + _t("already added"); }
+            this.show_status_message(message + " " + _t("already added")); }
         else {
             var $sm = this.show_status_message(_t("Working..."),
                                                'result');
@@ -1740,22 +1740,21 @@ var spideroak = function () {
                     var combo_root = content_node_manager.get_combo_root();
                     combo_root.show_status_message(
                         error_alert_message(_t('Temporary server failure'),
-                                            _t('Please try again later.'));
-                } else if (match[1] === 'login') {
+                                            _t('Please try again later.'))); }
+                else if (match[1] === 'login') {
                     if (match[2].charAt(0) === "/") {
-                        login_url = server_host_url + match[2];
-                    } else {
-                        login_url = match[2];
-                    }
-                    storage_login(login_info, login_url);
-                } else {
+                        login_url = server_host_url + match[2]; }
+                    else {
+                        login_url = match[2]; }
+                    storage_login(login_info, login_url); }
+                else {
                     // Browser haz auth cookies, we haz relative location.
                     // Go there, and machinery will intervene to handle it.
                     $.mobile.changePage(
                         set_storage_account(login_info['username'],
                                             server_host_url,
-                                            match[2]));
-                }},
+                                            match[2])); }
+            },
 
             error: function (xhr) {
                 $.mobile.loading('hide');
