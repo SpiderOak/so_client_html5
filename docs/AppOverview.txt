@@ -60,7 +60,7 @@ for some an accounting of the principle issues addressed.)
   situated with all the public share rooms, in...
 * The `PublicRootShareNode` has a URL that is the common stem of all visited
   !SpiderOak share rooms.
-* A encompassing root node, the `ComboRootContentNode`, contains all the
+* A encompassing root node, the `RootContentNode`, contains all the
   other roots, and presents their contents in a consolidated view.  The app
   uses an arbitrary, internal address for it, sufficiently URL-like to be
   recognized as such by the jQm URL traversal machinery in changePage().
