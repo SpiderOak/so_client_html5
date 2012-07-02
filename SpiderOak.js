@@ -1824,6 +1824,8 @@ var spideroak = function () {
             do_focus();
             if (callback) { callback(); }}
         var selector = '#home [data-role="content"]';
+        selector = selector.concat(', .error-status-message',
+                                   ', .result-status-message');
         if (conceal) {
             $(selector).hide(0, callback);
             this.veiled = true; }
@@ -1837,6 +1839,10 @@ var spideroak = function () {
 
     function prep_login_form(content_selector, submit_handler, name_field,
                              do_fade) {
+        // XXX This needs to be significantly refactored, to be
+        //     content-node (RootContentNode versus PublicRootShareNode)
+        //     specific, with some share faculties.
+
         /* Instrument form within 'content_selector' to submit with
            'submit_handler'. 'name_field' is the id of the form field with
            the login name, "password" is assumed to be the password field
@@ -1914,7 +1920,7 @@ var spideroak = function () {
                 var combo_root = content_node_manager.get_combo_root();
                 combo_root.veil(true, function() { $password.val(""); });
                 var unhide_form_oneshot = function(event, data) {
-                    $content.show('fast');
+                    combo_root.veil(false);
                     $.mobile.loading('hide');
                     $(document).unbind("pagechange", unhide_form_oneshot);
                     $(document).unbind("error", unhide_form_oneshot); }
