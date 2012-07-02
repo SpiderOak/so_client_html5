@@ -9,6 +9,7 @@ tools_dir="$(dirname $0)"
 app_dir="$tools_dir/.."
 cd $app_dir
 
+# USE A MAKEFILE.
 echo "Making blue-themed SpiderOak_blue.html..."
 sed -e 's/"f"/"i"/' SpiderOak.html > SpiderOak_blue.html
 
