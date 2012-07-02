@@ -1221,31 +1221,34 @@ var spideroak = function () {
         this.layout_header_fields(fields); }
     RootStorageNode.prototype.layout_header = function(mode_opts) {
         StorageNode.prototype.layout_header.call(this, mode_opts);
-        $('#original_shares_root_url').attr('href',
-                                            '#' + my.original_shares_root_url);
-        $('#public_shares_root_url').attr('href',
-                                          '#' + my.public_shares_root_url);
+        var $page = this.my_page$();
+        $page.find('.original_shares_root_url')
+            .attr('href', '#' + my.original_shares_root_url);
+        $page.find('.public_shares_root_url')
+            .attr('href', '#' + my.public_shares_root_url);
         var $emptiness_message = this.my_page$().find('.emptiness-message');
         (this.subdirs.length === 0
          ? $emptiness_message.show()
          : $emptiness_message.hide()); }
-
-
     PublicRootShareNode.prototype.layout_header = function(mode_opts) {
         ShareNode.prototype.layout_header.call(this, mode_opts);
         // Inject a brief description.
-        $('#storage_root_url') .attr('href', '#' + my.storage_root_url);
-        $('#public_shares_root_url').attr('href',
-                                          '#' + my.public_shares_root_url);
+        var $page = this.my_page$();
+        $page.find('.storage_root_url').attr('href', '#' + my.storage_root_url);
+        $page.find('.public_shares_root_url')
+            .attr('href', '#' + my.public_shares_root_url);
         var $adjust_spiel = this.my_page$().find('.adjust-spiel');
         (this.subdirs.length === 0
          ? $adjust_spiel.hide()
          : $adjust_spiel.show()); }
-
     OriginalRootShareNode.prototype.layout_header = function(mode_opts) {
         ShareNode.prototype.layout_header.call(this, mode_opts);
         // Adjust the description.
-        var $emptiness_message = this.my_page$().find('.emptiness-message');
+        var $page = this.my_page$();
+        var $emptiness_message = $page.find('.emptiness-message');
+        $page.find('.storage_root_url').attr('href', '#' + my.storage_root_url);
+        $page.find('.public_shares_root_url')
+            .attr('href', '#' + my.public_shares_root_url);
         (this.subdirs.length === 0
          ? $emptiness_message.show()
          : $emptiness_message.hide()); }
