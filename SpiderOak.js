@@ -593,10 +593,11 @@ var spideroak = function () {
         var share_id = base32.decode(splat[splat.length-3]);
         var room_key = splat[splat.length-2];
 
+        var which_msg = share_id + " / " + room_key;
+
         if (succeeded !== true) {
             this.remove_status_message('result');
-            var message = ("Sorry - "
-                           + share_id + " / " + room_key + " "
+            var message = (_t("Sorry") + " - " + which_msg + " "
                            + content.statusText + " (" + content.status + ")");
             var remove = true;
             if (content.status === 404) {
@@ -609,6 +610,8 @@ var spideroak = function () {
                 this.unpersist_item(url); }}
         else {
             this.remove_status_message('error');
+            var $sm = this.show_status_message(_t("Added")
+                                               + ": " + which_msg, 'result');
             if (persistence_manager.get('retaining_visits')) {
                 this.persist_item(url); }}
 
