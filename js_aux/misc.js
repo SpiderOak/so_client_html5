@@ -4,6 +4,7 @@ function translate(text) {
     /* Stub translate function for eventual i8n. */
     return text
 };
+_t = translate;
 
 function submit_button_sentinel(inputs, $submit) {
     /* Enable element if all inputs in 'inputs' array have content, else

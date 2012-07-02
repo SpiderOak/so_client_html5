@@ -747,15 +747,15 @@ var spideroak = function () {
         $remove_li.append(fab_anchor('remove_item',
                                      subject_url,
                                      'delete',
-                                     "Drop this room from the list"));
+                                     _t("Drop this room from the list")));
 
         var $persistence_li = $('<li/>');
         if (this.is_persisted(subject_url)) {
             $persistence_li.append(fab_anchor('unpersist_item',
                                               subject_url,
                                               'minus',
-                                              "Stop retaining"
-                                              + " across sessions")); }
+                                              _t("Stop retaining across"
+                                                 + " sessions"))); }
         else {
             $persistence_li.append(fab_anchor('persist_item',
                                               subject_url,
@@ -793,9 +793,10 @@ var spideroak = function () {
                              + "/" + room_key
                              + "/");
         if (is_public_share_room_url(new_share_url)) {
-            this.show_status_message(message + " already added"); }
+            this.show_status_message(message + " " + _t("already added"); }
         else {
-            var $sm = this.show_status_message("Working...", 'result');
+            var $sm = this.show_status_message(_t("Working..."),
+                                               'result');
             $sm.hide();
             $sm.delay(1000).fadeIn(2000); // Give time for error to appear.
             return this.add_item(new_share_url); }}
@@ -1738,8 +1739,8 @@ var spideroak = function () {
                 if (!match) {
                     var combo_root = content_node_manager.get_combo_root();
                     combo_root.show_status_message(
-                        error_alert_message('Temporary server failure',
-                                            'Please try again later.'));
+                        error_alert_message(_t('Temporary server failure'),
+                                            _t('Please try again later.'));
                 } else if (match[1] === 'login') {
                     if (match[2].charAt(0) === "/") {
                         login_url = server_host_url + match[2];
