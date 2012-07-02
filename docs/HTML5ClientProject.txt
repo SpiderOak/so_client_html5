@@ -46,7 +46,7 @@ Landmarks:
 || - |||| Plan v1 release ||
 || - |||| Release v1 ||
 
-Stuff below here is for post-release
+Stuff below is for post-v1-release
 
 || - |||| On authentication time-out reauthoriziation, return to where you were interrupted ||
 || - || Implement persistently stored recently-visited list || ||
@@ -57,6 +57,8 @@ Stuff below here is for post-release
 || - |||| Evaluate plans for client-based write functionality, what if anything might be done for initial release ||
 || - |||| Fill in missing html5 app technical details documentation ||
 || - |||| Implement code tests - unit tests, functional tests ||
+
+= Pre-historic Records =
 
 == Status ==
 
