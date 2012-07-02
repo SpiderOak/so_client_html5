@@ -608,7 +608,9 @@ var spideroak = function () {
                 this.remove_item(url);
                 this.unpersist_item(url); }}
         else {
-            this.remove_status_message('error'); }
+            this.remove_status_message('error');
+            if (persistence_manager.get('retaining_visits')) {
+                this.persist_item(url); }}
 
         // Do update, whether or not it was successful:
         this.subdirs = public_share_room_urls_list()
@@ -790,7 +792,7 @@ var spideroak = function () {
         if (is_public_share_room_url(new_share_url)) {
             this.show_status_message(message + " already added"); }
         else {
-            var $sm = this.show_status_message("Added: " + message, 'result');
+            var $sm = this.show_status_message("Working...", 'result');
             $sm.hide();
             $sm.delay(1000).fadeIn(2000); // Give time for error to appear.
             return this.add_item(new_share_url); }}
@@ -1223,7 +1225,7 @@ var spideroak = function () {
         $('#storage_root_url') .attr('href', '#' + my.storage_root_url);
         $('#public_shares_root_url').attr('href',
                                           '#' + my.public_shares_root_url);
-        var $adjust_spiel = this.my_page$().find('#adjust-spiel');
+        var $adjust_spiel = this.my_page$().find('.adjust-spiel');
         (this.subdirs.length === 0
          ? $adjust_spiel.hide()
          : $adjust_spiel.show()); }
@@ -1521,8 +1523,8 @@ var spideroak = function () {
     var remember_manager = {
         /* Maintain user account info in persistent storage. */
 
-        // "remember_me" field not in fields, so only it is retained when
-        // remembering is disabled:
+        // "remember_me" field not in fields, so its setting is retained
+        // when remembering is disabled:
         fields: ['username', 'storage_host', 'storage_web_url'],
 
         unset: function (disposition) {
@@ -1842,26 +1844,40 @@ var spideroak = function () {
         $submit.button()
         sentinel();
 
-        var $remember_widget = $form.find('#remember-me');
+        var $remember_widget = $form.find('.remember');
         var remembering = remember_manager.active();
-        if (remembering && ($remember_widget.val() !== "on")) {
-            $remember_widget.find('option[value="on"]').attr('selected',
-                                                             'selected');
-            $remember_widget.val("on");
-            // I believe the reason we need to also .change() is because
-            // the presented slider is just tracking the actual select widget.
-            $remember_widget.trigger('change'); }
-        else if (!remember_manager.unset() && !remembering) {
-            $remember_widget.val("off");
-            $remember_widget.trigger('change'); }
+        if ($remember_widget.attr('id') === "remember-me") {
+            if (remembering && ($remember_widget.val() !== "on")) {
+                $remember_widget.val("on");
+                // I believe why we need to also .change() is because the
+                // presented slider is just tracking the actual select widget.
+                $remember_widget.trigger('change'); }
+            else if (!remember_manager.unset() && !remembering) {
+                $remember_widget.val("off");
+                $remember_widget.trigger('change'); }}
+        else if ($remember_widget.attr('id') === "retain-visits") {
+            // widget id = 'retain-visits'
+            var retaining = persistence_manager.get('retaining_visits');
+            if (retaining && ($remember_widget.val() !== "on")) {
+                $remember_widget.find('option[value="on"]').attr('selected',
+                                                                 'selected');
+                $remember_widget.val("on");
+                $remember_widget.trigger('change'); }
+            else if (!retaining && ($remember_widget.val() !== "off")) {
+                $remember_widget.val("off");
+                $remember_widget.trigger('change'); }}
+        else {
+            console.error("spideroak:prep_login_form() - Unanticipated form"); }
+
         var name_field_val = pmgr.get(name_field);
         if (name_field_val
-            && ($remember_widget.length > 0)
+            && ($remember_widget.attr('id') === "remember-me")
             && ($remember_widget.val() === "on")) {
             $name.attr('value',name_field_val); }
 
         $form.submit(function () {
-            var $remember_widget = $form.find('#remember-me');
+            $submit.button('disable');
+            var $remember_widget = $form.find('.remember');
             var $name = $('input[name=' + name_field + ']', this);
             var $password = $('input[name=password]', this);
             var data = {};
@@ -1870,13 +1886,12 @@ var spideroak = function () {
                 return false; }
             data[name_field] = $name.val();
             $name.val("");
-            if ($remember_widget.length > 0) {
-                // Preserve whether or not we're remembering, so on a
-                // successful visits we'll know whether to preserve data:
-                if ($remember_widget.val() === "on") {
-                    remember_manager.active(true); }
-                else {
-                    remember_manager.active(false); }}
+            var remember_widget_on = $remember_widget.val() === "on"
+            if ($remember_widget.attr('id') === "remember-me") {
+                remember_manager.active(remember_widget_on); }
+            else {
+                persistence_manager.set('retaining_visits',
+                                        remember_widget_on); }
 
             data['password'] = $password.val();
             if (do_fade) {

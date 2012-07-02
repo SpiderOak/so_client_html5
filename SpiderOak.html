@@ -44,11 +44,15 @@
             </li>
           </ul>
           <p class="compact-paragraph"/><!-- XXX -->
-          <fieldset data-role="controlgroup">
             <div class="ui-grid-a">
-              <div class="ui-block-a" align="left">
+              <div class="ui-block-a" align="center">
+                <input type="submit" data-inline="true" data-theme="b"
+                       value="Login" name="Login">
+              </div>
+              <div class="ui-block-b" align="left">
                 <div data-role="controlgroup">
-                  <select name="slider" id="remember-me" data-role="slider"
+                  <select name="slider" class="remember"
+                          id="remember-me" data-role="slider"
                           data-mini="true">
 	            <option value="off">Off</option default="true">
 	            <option selected value="on">On</option>
@@ -60,12 +64,7 @@
                   </label>
                 </div>
               </div>
-              <div class="ui-block-b" align="right">
-                <input type="submit" data-inline="true" data-theme="b"
-                       value="Login" name="Login">
-              </div>
             </div>
-          </fieldset>
         </form>
       </div>
       <div class="content-section">
@@ -203,14 +202,29 @@
             </li>
           </ul>
           <div class="ui-grid-a" data-theme="a">
-            <div class="ui-block-b" align="right">
+            <div class="ui-block-b" align="center">
               <input type="submit" data-inline="true" value="Visit"
-                     name="Login" data-mini="true" data-theme="b">
+                     name="Login" data-theme="b"/>
+            </div>
+            <div class="ui-block-b" align="left">
+                <div data-role="controlgroup">
+                  <select name="slider" id="retain-visit" class="remember"
+                          data-role="slider"
+                          data-mini="true">
+	            <option value="off">Off</option default="true">
+	            <option selected value="on">On</option>
+                  </select><br/>
+                  <label for="retain-visit">
+                    <small>
+                      Persist visit across sessions
+                    </small>
+                  </label>
+                </div>
             </div>
           </div>
         </form>
       </div>
-      <div data-role="collapsible" data-mini="true" id="adjust-spiel"
+      <div data-role="collapsible" data-mini="true" class="adjust-spiel"
            data-collapsed-icon="arrow-r" data-expanded-icon="arrow-d">
         <legend> Adjust the visited Share Rooms list: </legend>
         <p> Use the gear menu in this list of visited Share Rooms to remove
