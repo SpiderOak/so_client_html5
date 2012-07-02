@@ -6,13 +6,15 @@ drafting ideas that have been or are going to be executed.  See
 
 === 2012-05-22 ===
 ==== Try it out ====
-You can visit a working copy of the mobile app in Ken's web sandbox, '''if'''  you can establish a security-inhibited browsing session - see [#SpecialBrowserRequirements Special Browser Requirements], below. Currently, it demonstrates navigation of a user's devices and storage hierarchy, with a start on the look and feel in place, but much further to go. 
+You can visit a working copy of the mobile app in Ken's web sandbox, '''if'''  you can establish a security-inhibited browsing session - see [../HTML5ClientTechnicalDetails#SpecialBrowserRequirements Special Browser Requirements]. Currently, it demonstrates navigation of a user's devices and storage hierarchy, with a start on the look and feel in place, but much further to go. 
 
-To try it, use a [#SpecialBrowserRequirements security-inhibited browsing session] to visit:
+To try it, use a [../HTML5ClientTechnicalDetails#SpecialBrowserRequirements security-inhibited browsing session] to visit:
 
 * https://ken.dev.spideroak.com:888/so_html5/SpiderOak.html
 
-''If you get ''`Temporary Server Failure`'' when you attempt to login, you're probably using a regular browser session without the [#SpecialBrowserRequirements necessary security inhibition].)''
+''If you get ''`Temporary Server Failure`'' when you attempt to login,
+you're probably using a regular browser session without the
+[../HTML5ClientTechnicalDetails#SpecialBrowserRequirements necessary security inhibition].)''
 
 ==== What's currently in the works ====
 * Basic Look and feel - implementing [/../pandora/raw-attachment/wiki/UX/Mobile/SpiderOak%20Mobile%20for%20iOS.pdf Mike's iOS spec], including crafting our own [http://jquerymobile.com/test/docs/api/themes.html jQm theme] to give us full control.
@@ -50,7 +52,7 @@ I've started to try to document the technical details as they emerge. The new do
 === 2012-05-11 ===
 You can use Chrome to visit a local copy of the client code to do storage login and completely bare-bones storage devices and directory navigation.
 
-To use it, checkout the client code from the [#ApplicationGitRepository: Git repo], visit the !SpiderOak.html page using a [#SpecialBrowserRequirements lax-security Chrome session], login and and traverse. The list element links and browser back and refresh buttons should all work. 
+To use it, checkout the client code from the [#ApplicationGitRepository: Git repo], visit the !SpiderOak.html page using a [../HTML5ClientTechnicalDetails#SpecialBrowserRequirements lax-security Chrome session], login and and traverse. The list element links and browser back and refresh buttons should all work. 
 
 ==== Application Git Repository: ====
 * [https://spideroak.com/git/so_html5/tree/SpiderOak.js Git Web browser]
@@ -68,7 +70,7 @@ attention to pretty, yet.
  * inhibit status bar
  * manifest, app cache for offline operation - icon, javascript, css, etc
  * local datastore useful yet?
- * does JQuery Mobile take care of this for varoius platforms (see below)?
+ * does JQuery Mobile take care of this for various platforms (see below)?
 * login - see [https://spideroak.com/apis/partners/web_storage_api web storage API documentation], [https://spideroak.com/git/pandora/tree/webpy/spideroak.com/static/scripts/sidebar.js sidebar] js code
 * see Mike Crane's [/../pandora/raw-attachment/wiki/UX/Mobile/SpiderOak%20Mobile%20for%20iOS.pdf iOS spec"] for progressions, layout logistics
 * Browse storage hierarchy.
