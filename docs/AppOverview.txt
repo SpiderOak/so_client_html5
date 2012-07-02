@@ -41,6 +41,13 @@ organize the actual content hierarchies.  The root nodes have URL
 addresses, more or less situated at the top of their respective content
 hierarchies.
 
+The respective content-specific roots are encompassed by a consolidated
+root, the `RootContentNode`, which provides a central pivot for
+navigation. Incorporation of this consolidated root provides the basis for
+what I think is the most coherent and clear navigation model possible,
+given the various constituents.  (See [[HTML5ClientProjectConsolidatedRoot]]
+for some an accounting of the principle issues addressed.)
+
 * The actual content items are indexed in the content_node_manager by their
   JSON access URLs, and addressed in app URLs as the fragment identifiers.
 * The `RootStorageNode` contains the backup storage items, with a URL

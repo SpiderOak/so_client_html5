@@ -1,0 +1,82 @@
+This is an explanation of the [[HTML5ClientProject]] consolidated root's
+purpose.
+
+I came up with a specific means to address a challenge I saw in making
+clear and obvious the navigation of the different bodies of
+!SpiderOak-hosted content - backups storage versus "my" shares versus
+public shares.  For instance, I think people are often confused by "my"
+shares versus public shares, and that you need to log in to see "my" shares
+not the public shares.  I wanted to make navigation of these different
+bodies as clear and simple as possible, and towards that end I implemented
+a consolidated organization of all three.
+
+The pivot is a consolidated root node, the `RootContentNode`, that sits
+above the respective content-specific roots.
+
+What exactly you see in the `RootContentNode` depends on whether or not
+you're logged in and whether or not you have any public share visits
+present.
+
+* If you're not logged in to a !SpiderOak backups account, you see the login
+  form followed by the section for the public shares.
+* If you are logged in to a backups account, you see the backups
+  ("Storage") section and the "My Share Rooms" section.
+
+  (I think confusion stems from the fact that My Share Rooms actually
+  contains public share rooms.  It is not the contained rooms that are
+  private, but rather the collection listing that is private to the
+  account.)
+
+Meanwhile:
+
+* If the app is not currently have any public share rooms on its "visiting"
+  list, it shows a big button with a "+" to get to the Public Share
+  Rooms-specific root, where the user can visit share rooms and dismiss
+  rooms from the list.
+* If the app does currently have some Public Share Rooms on its "visiting"
+  list, then it shows a section with that list, and the section header is a
+  link to the same place as the button.
+
+Any section headers present in the consolidated view at any moment are
+links to the dedicated views of the roots of the different content bodies.
+The roots list the same contents as the consolidated view, but just for
+that particular body of content.  The content-specific roots also includes
+some guidance describing the purpose of the specific content body and what
+you can do with it. The public visits view also provides controls for
+adding more visits and removing visited items.  (We'll be able to use the
+other content root views when we implement adding and removing "my" shares
+and changing backup storage arrangements.)
+
+Since the content-specific contents are available in the consolidated view,
+you only need to visit the particular views if you want info about what
+they are, how to use them, and to adjust them (currently, only the public
+visits list is adjustable).  They never get in the way.  The top level
+contents - devices and share rooms - have the dashboard as their parent, so
+navigating up from them doesn't go to the content-specific root.
+
+This is an ideal solution for what was a subtle quandary.
+
+Given that some people will have good reason to switch between different
+!SpiderOak accounts, we have to allow visiting a public share room that is
+published by their accounts.  It doesn't make sense to prohibit that:
+Public Share Rooms specifically could be useful for keeping track of things
+in one or another of your accounts.  Thus, some share rooms could be listed
+at the same time among their "My Share Rooms" and "Public Share Rooms".
+Which is the right one to end up at if navigating upwards from such a
+multiply listed room?
+
+Whatever choice you make, it's going to be different than what some people
+expect some of the time, confusing them.
+
+By having navigation upwards always go to the consolidated root, there's no
+confusion.  If people navigated downwards from one of the content-specific
+roots, they will know they were doing a special activity, and can see the
+link back to the activity at the top of the section.
+
+Generally, using the consolidated root as the dashboard and the
+content-specific roots for guidance and organization of content-specific
+(as available) has made it easy to organize the navigation, and will make
+it easy to organize more management of the content-specific roots as that
+management is implemented. There may be technical things to smooth in the
+consolidated screen, but I think that it organizes the content for simple
+clear navigation.
