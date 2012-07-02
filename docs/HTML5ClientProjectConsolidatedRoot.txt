@@ -1,5 +1,5 @@
 This is an explanation of the [[HTML5ClientProject]] consolidated root's
-purpose.
+purpose, elaborating details mentioned in [[HTML5ClientTechnicalDetails]].
 
 I came up with a specific means to address a challenge I saw in making
 clear and obvious the navigation of the different bodies of
@@ -10,8 +10,8 @@ not the public shares.  I wanted to make navigation of these different
 bodies as clear and simple as possible, and towards that end I implemented
 a consolidated organization of all three.
 
-The pivot is a consolidated root node, the `RootContentNode`, that sits
-above the respective content-specific roots.
+This pivot is the `RootContentNode`, that directly contains both the
+respective content-specific roots and their top-level contents.
 
 What exactly you see in the `RootContentNode` depends on whether or not
 you're logged in and whether or not you have any public share visits
