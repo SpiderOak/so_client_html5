@@ -36,14 +36,17 @@ Landmarks:
 || Done || Implement dynamically fabricated popup menus || For public shares item edits, depth path navigation, eventually other stuff ||
 || Done |||| Implement !Edit/Change mode for original and public share collections ||
 || Done || Reconcile entry and navigation between different major activities (storage, personal shares, public shares) || Personal and public share room collections require distinct roots ||
-|| => |||| Flesh out headers, implement depth path navigation ||
-|| => |||| Implement footers ||
+|| => |||| Flesh out headers, add depth path navigation menu ||
+|| => |||| Flesh out footers ||
 || - |||| Show item-type icons on content listings ||
 || - || Hybridization - Package for mobile device, including settling what exact provisions will be needed for [https://spideroak.com/pandora/wiki/HTML5ClientAppSameOriginIssues CORS], stashed user and share credentials, etc. || See [[HTML5ClientProjectHybrid]] ||
 || - |||| Scope out and implement file-type-specific handling, beyond what the browser does ||
 || - |||| Implement Send-to menu ||
 || - |||| Implement session PIN security ||
 || - |||| Identify and resolve crucial UI and functional issues ||
+|| Mostly Done || Provide an easy way to create app versions with different color schemes || Based on jQm themes, the main (provisional) orange one is converted to a (provisional) blue. I've checked in a script to produce the blue copy. Using the jQm theme roller (see [../HTML5ClientTechnicalDetails#ManagingtheUITheme managing the UI theme] we can tailor the colors, etc. ||
+|| - || Automate creating different versions of the app for orange vs blue, specific enterprise branding and different storage servers, etc || The app 'generic' object has the technical parameters for server location, etc, should be easy to make distinct copies for different packages. ||
+|| - || Internationalize || A few stubs are in place, many more will need to be done then cataloging and translating, I guess ||
 || - || Polish. || Reconcile look and feel, different kinds of user feedback and activity timing issues, etc. ||
 || - |||| Plan v1 release ||
 || - |||| Release v1 ||
