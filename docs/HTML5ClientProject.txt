@@ -1,0 +1,226 @@
+= HTML5 SpiderOak Client App Project =
+[[PageOutline]]
+
+Contact:'' ''ken@spideroak.com
+
+Landmarks:
+* [#a2012-05-22 2012-05-22] Demo of emerging app available via Ken's sandbox; technical details doc started
+* [#a2012-05-11 2012-05-11] Rudimentary storage browsing, plus instructions for trying it
+* 2012-04-06 Document created.
+
+== Resources ==
+* [[HTML5ClientProjectRisksAndUncertainties]] - Keep track of prevalent challenges to the project
+* [[HTML5ClientTechnicalDetails]], [[HTML5ClientProjectHybridVsPureHTML5]], [[HTML5ClientAppSameOriginIssues]] - Key aspects and issues of the html5 app, updated as the app develops - including [https://spideroak.com/pandora/wiki/HTML5ClientTechnicalDetails#SpecialBrowserRequirements instructions for trying it out]
+* Mike Crane's mobile UI docs are in [/../pandora/wiki/UX/Mobile/ mobile section] of his [/../pandora/wiki/UX UX specifications collection], more recently his ClientGraphicAssets page
+* !SpiderOak public [https://spideroak.com/apis/partners/web_storage_api Web Storage API documentation]
+* [https://spideroak.com/git/so_html5/tree/SpiderOak.js html5 app] in the git repository web browser
+* html5 application artifacts (HTML, javascript, css, images, etc), via git ssh checkout:[[BR]]
+  `git clone <user>@rhi.spideroak.com:/var/lib/git-repos/so_html5.git`
+* [https://spideroak.com/browse/share/klm/coalmine Google Chrome Canary installer] for
+  version proven to work in security inhibited mode necessary for
+  [https://spideroak.com/pandora/wiki/HTML5ClientTechnicalDetails#SpecialBrowserRequirements  special browser requirements] operation 
+
+== Pending ==
+|| Done |||| Arrange code infrastructure - git repo, HTML, javascript, css artifacts, etc ||
+|| Done |||| Arrange basic jQuery Mobile infrastructure ||
+|| Done |||| Implement storage login ||
+|| Done |||| Implement storage navigation ||
+|| Ongoing || Implement look-and-feel [/../pandora/raw-attachment/wiki/UX/Mobile Mike's mobile UX specs] || jQuery Mobile default theme seems closely modeled on iPhone UI ||
+|| Ongoing |||| Document the app designs: [[HTML5ClientTechnicalDetails]] ||
+|| Done || Include file metadata (type, size, date) in list entries || Subdirectory details will be deferred to [#Backgroundfetching background fetching] ||
+|| Done || Implement share rooms || JSON retrieval and content hierarchy navigation working, headers, footers, files, and edit mode of rooms pending ||
+|| Done |||| Get all content navigation properly connecting, including traversing between shares and storage ||
+|| Done |||| Implement persistent local settings, "remember me" ||
+|| Done |||| Implement public shares ||
+|| Done || Implement dynamically fabricated popup menus || For public shares item edits, depth path navigation, eventually other stuff ||
+|| Done |||| Implement !Edit/Change mode for original and public share collections ||
+|| Done || Reconcile entry and navigation between different major activities (storage, personal shares, public shares) || Personal and public share room collections require distinct roots ||
+|| => |||| Flesh out headers, implement depth path navigation ||
+|| => |||| Implement footers ||
+|| - |||| Show item-type icons on content listings ||
+|| - || Hybridization - Package for mobile device, including settling what exact provisions will be needed for [https://spideroak.com/pandora/wiki/HTML5ClientAppSameOriginIssues CORS], stashed user and share credentials, etc. || See [[HTML5ClientProjectHybrid]] ||
+|| - |||| Scope out and implement file-type-specific handling, beyond what the browser does ||
+|| - |||| Implement Send-to menu ||
+|| - |||| Implement session PIN security ||
+|| - |||| Resolve crucial UI and functional issues ||
+|| - |||| Plan v1 release ||
+|| - |||| Release v1 ||
+
+Stuff below here is for post-release
+
+|| - |||| On authentication time-out reauthoriziation, return to where you were interrupted ||
+|| - || Implement persistently stored recently-visited list || ||
+|| - || Implement favorites || What are the APIs for this? ||
+|| - || Implement special UI features, eg storage bar || jQuery UI [http://jqueryui.com/demos/progressbar/ progress bar] ||
+|| - || Implement distinct Android theme, autoselect between themes || ... using css media selector, or will something like lesscss be needed? ||
+|| - |||| Implement background fetching of current storage-node contents (details [#Backgroundfetching below]) ||
+|| - |||| Evaluate plans for client-based write functionality, what if anything might be done for initial release ||
+|| - |||| Fill in missing html5 app technical details documentation ||
+|| - |||| Implement code tests - unit tests, functional tests ||
+
+== Status ==
+
+=== 2012-05-22 ===
+==== Try it out ====
+You can visit a working copy of the mobile app in Ken's web sandbox, '''if'''  you can establish a security-inhibited browsing session - see [#SpecialBrowserRequirements Special Browser Requirements], below. Currently, it demonstrates navigation of a user's devices and storage hierarchy, with a start on the look and feel in place, but much further to go. 
+
+To try it, use a [#SpecialBrowserRequirements security-inhibited browsing session] to visit:
+
+* https://ken.dev.spideroak.com:888/so_html5/SpiderOak.html
+
+''If you get ''`Temporary Server Failure`'' when you attempt to login, you're probably using a regular browser session without the [#SpecialBrowserRequirements necessary security inhibition].)''
+
+==== What's currently in the works ====
+* Basic Look and feel - implementing [/../pandora/raw-attachment/wiki/UX/Mobile/SpiderOak%20Mobile%20for%20iOS.pdf Mike's iOS spec], including crafting our own [http://jquerymobile.com/test/docs/api/themes.html jQm theme] to give us full control.
+* Begin to document the app technical details: [[HTML5ClientTechnicalDetails]]
+* Flesh out the storage items, including file metadata (metadata for contained directory entries will be deferred to [#Backgroundfetching background fetching])
+* Implement share rooms
+* Handle authentication time-out more gracefully, by returning to where you left off after re-authentication
+* Implement special UI features, eg jQuery UI [http://jqueryui.com/demos/progressbar/ progress bar] for storage bar
+* Implement background fetching of current storage-node contents (details [#Backgroundfetching below])
+* Implement persistent local settings
+* Scope out and implement file-type-specific handling, beyond what the browser does
+* Implement Send-to menu
+* Implement session PIN security
+* Resolve crucial UI and functional issues
+* Package for mobile device, including settling what exact provisions will be needed for 
+  [https://spideroak.com/pandora/wiki/HTML5ClientAppSameOriginIssues CORS], stashed
+  user and share credentials, etc.
+* Evaluate plans for client-based write functionality, what if anything might be done for initial release
+* Plan release
+* Release
+* Fill in missing html5 app technical details documentation
+* Implement code tests - unit tests, functional tests
+
+==== Background fetching ====
+In Mike's [/../pandora/raw-attachment/wiki/UX/Mobile/SpiderOak%20Mobile%20for%20iOS.pdf iOS] spec, the subfolder items in folder listings currently includes number of items (folders and files) contained by the subfolders. This info isn't currently provided in the JSON info for the containing folder - it requires fetching of the subfolder data. This provides a good starting point for some strategic prefetching, where the data for folders and file contained by the current folder are fetched in the background, and the subfolder info appears as the info is obtained. 
+
+Browser navigation to already-fetched folders will be very quick, and won't interere with navigation 
+to items that haven't yet been prefetched. And it should add to the appeal of using the app, seeing the subdirectory info incrementally appear. (Don't underestimate the value of incidental dynamic effects, particularly useful ones, even in pragmatic applications.)
+
+The jQuery deferred/promise queues will serve well for implementing this, and make it easy to dynamically adjust things to abandon prefetches of contents that are irrelevant once navigation has left their container. And maybe we can next tweak things so that contents currently visible in the browser window are upped to highest priority, as the user scrolls.
+
+==== Get acquainted with the technical details ====
+I've started to try to document the technical details as they emerge. The new document is included in the application code repository 'docs' subdirectory, and linked into this wiki as HTML5ClientTechnicalDetails.
+
+=== 2012-05-11 ===
+You can use Chrome to visit a local copy of the client code to do storage login and completely bare-bones storage devices and directory navigation.
+
+To use it, checkout the client code from the [#ApplicationGitRepository: Git repo], visit the !SpiderOak.html page using a [#SpecialBrowserRequirements lax-security Chrome session], login and and traverse. The list element links and browser back and refresh buttons should all work. 
+
+==== Application Git Repository: ====
+* [https://spideroak.com/git/so_html5/tree/SpiderOak.js Git Web browser]
+* `git clone <user>@rhi.spideroak.com:/var/lib/git-repos/so_html5.git`
+
+==== Special Browser Requirements ====
+See [[HTML5ClientTechnicalDetails#SpecialBrowserRequirements]].
+
+== Start With Minimal HTML5 Application ==
+Minimal features, depends on web storage/web_storage_API for content. No
+attention to pretty, yet.
+
+==== Features ====
+* Do the [http://sixrevisions.com/web-development/html5-iphone-app/ little things to make an html5 app look like a native app]
+ * inhibit status bar
+ * manifest, app cache for offline operation - icon, javascript, css, etc
+ * local datastore useful yet?
+ * does JQuery Mobile take care of this for varoius platforms (see below)?
+* login - see [https://spideroak.com/apis/partners/web_storage_api web storage API documentation], [https://spideroak.com/git/pandora/tree/webpy/spideroak.com/static/scripts/sidebar.js sidebar] js code
+* see Mike Crane's [/../pandora/raw-attachment/wiki/UX/Mobile/SpiderOak%20Mobile%20for%20iOS.pdf iOS spec"] for progressions, layout logistics
+* Browse storage hierarchy.
+ * Don't handle shares yet, minimal settings
+ * all in memory, deferring transient storage 'til later
+ * Base32 IDs - User, Share
+  * decode with javascript equivalent of base64.b32decode()
+  * decoding API tokens requires padding with trailing "=" to multiples of
+    8-char length strings
+ * "JSON API" means visiting URLs to get JSON-expressed data
+  * JSON.parse - see [http://www.json.org/js.html JSON in Javascript]
+ * Tree querying/rendering: existing [https://spideroak.com/git/pandora/tree/webpy/spideroak.com/static/browse/scripts/tree.js tree Javascript]
+ * Then get to feature parity with Frank's maemo M900 python app
+   (`git clone rhi.spideroak.com:/var/lib/git-repos/so_maemo.git`)
+* Use [http://jquerymobile.com/ JQuery Mobile]
+ * supports all mobile device platforms, mobile devices, desktop browsers
+ * [http://palladion.com/static/ploneconf2011_presentation.html Tres Seaver's Plone conf 2011 slides] describing JQuery Mobile usefulness. Tres tends to make smart, effective choices...
+  * (Resource: [http://westcoastlogic.com/lawnchair/ lawnchair] simple HTML5 JSON storage)
+
+==== Questions ====
+* Basic platform compat - what is not covered by Jquery Mobile, or alternative?
+ * It should account for iOS vs Android vs ...
+ * What about legacy platform versions - issues beyond what Modernizr provides?
+* security - best practices, html5 susceptibility of content to other apps?
+ * even while content is just in-memory?
+ * how about rooted apps, subordinated OS?
+
+== Organize UI, Use Local Temporary Storage, Do Content Dispatch ==
+See [/../pandora/raw-attachment/wiki/UX/Mobile/SpiderOak%20Mobile%20for%20iOS.pdf Mike's iOS spec]
+
+* Consider local temporary storage or secure db access for caching
+  directory hierarchies
+* Evaluate necessity of implementing lazy content fetching, so app can
+  scale to large collections.
+ * Try to identify whether or not this would be premature optimization
+ * What's the experience been with the various native apps (desktop, mobile)?
+ * Will it ever be necessary? can we determine that up front?
+ * If possibly necessary, will it be hard to implement later, if we defer
+   designing it now?
+* What else?
+* How does desktop native app handle that?
+
+Maybe add ability to deal with phone-resident stuff
+* at least stubs for connecting shares with mounted (sd card) storage,
+  backup of mounted ?and? internal phone storage
+
+Rearrange any existing functionality that isn't organized per MC-ias
+
+Note things that don't yet fit.
+
+----
+
+== Reassess ==
+The project will probably be somewhat clearer at this point. Take a moment
+to get a sandwich, look around, reassess the subsequent phases.
+
+----
+
+== More  iPhone Access & Settings functionality ==
+Before big steps::
+  Do we want to aim for a release of the html5 app before (prospectively
+  subsequent) desktop reconciliation, client-local operation?
+
+If so, we need to polish - make it look nice, implement more of iPhone
+Access & Settings ([/../pandora/raw-attachment/wiki/UX/Mobile/SpiderOak%20Mobile%20for%20iOS.pdf Mike's iPhone spec])
+
+== Extend HTML5 App to Desktop Browser ==
+Does JQuery Mobile make this very easy? What more is needed for desktop compat?
+
+== Implement Full Client Smarts / Zero Knowledge ==
+Ie, do translation of encrypted block stream in client.
+
+In javascript:
+ * '''javascript implementation of rsync algorithm''' to transfer the
+   encrypted blocks
+
+   Is it feasible to do this using javascript? Are there universal js
+   crypto/checksum/hashing libraries, extensions?
+ * '''javascript implementation of decryption'''
+ * JSON.parse(), JSON.stringify() to '''parse/encode the decrypted JSON
+   metadata and content'''
+  * per JSON web_storage_API
+  * ? lazy provisions for scaling!
+  * identify existing python stuff to model on in
+    [https://spideroak.com/git/pandora/tree/webpy/spideroak.com/browse?h=www-production-trunk browse]
+    sources
+ * '''transient ''secure'' (session-encrypted?) local storage''' for retrieved stuff
+  * ... respecting above lazy provisions, so large hierarchies are fetched
+    on-demand
+ * ability to '''access, add, remove, alter hierarchy contents'''
+
+Likely will need to use hybrid approach, eg using something like [http://phonegap.com/ PhoneGap] to bridge HTML5/JS with native platform features and extensions...
+* !PhoneGap is good prospect - prominent, open source, well esteemed
+* !InfoWorld article describes !PhoneGap/hybrid-related html5 problems introduced by iPad5, including local storage problems: [https://www.infoworld.com/d/mobile-technology/new-ipad-complicates-life-html5-developers-190266 New iPad complicates life for HTML5 developers]
+* Informative apache.org discussion, with allegedly complicated workaround: [https://issues.apache.org/jira/browse/CB-330 localStorage / SQLDatabase no longer persistent after iOS 5.01 Update]:: 
+  >
+  > !WebKit data (localstorage or local !SQLite) are now stored in Library/ Caches folder (instead of !Library/WebKit folder). This is a big problem for all apps using UIWebView and storing user data, because they will no longer be backed up and may be deleted. There are a lot of apps using localstorage or SQLite as a critical feature.
+  >
+  > The SQLite database gets deleted because the database is saved in a location on the filesystem which Apple does not consider to contain persistent data.
