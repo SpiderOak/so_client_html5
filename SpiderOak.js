@@ -1157,8 +1157,8 @@ var spideroak = function () {
     ContentNode.prototype.layout_header = function(mode_opts) {
         /* Do the essential, common header layout. */
         // Every node gets the depth path menu.
-        var $header = $('[data-role="header"]');
-        $header.bind('click', this.depth_path_menu.bind(this)); }
+        var $title = this.my_page$().find('[data-role="header"] .header-title');
+        $title.bind('click', this.depth_path_menu.bind(this)); }
 
     ContentNode.prototype.layout_header_fields = function(fields) {
         /* Populate this content node's page header with these fields settings:
@@ -1564,7 +1564,9 @@ var spideroak = function () {
         $popup.popup();
         $popup.parent().page();
         $listview.listview('refresh');
-        $popup.popup('open'); }
+        $popup.popup('open');
+        // Stop percolation:
+        return false; }
 
     /* ===== Resource managers ===== */
 
