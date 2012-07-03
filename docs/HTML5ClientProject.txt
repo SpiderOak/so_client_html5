@@ -36,9 +36,10 @@ Landmarks:
 || Done || Implement dynamically fabricated popup menus || For public shares item edits, depth path navigation, eventually other stuff ||
 || Done |||| Implement !Edit/Change mode for original and public share collections ||
 || Done || Reconcile entry and navigation between different major activities (storage, personal shares, public shares) || Personal and public share room collections require distinct roots ||
-|| => |||| Flesh out headers, add depth path navigation menu ||
+|| Done |||| Add header depth path navigation menu, with logout ||
+|| => |||| Finish headers ||
 || => |||| Flesh out footers ||
-|| - |||| Show item-type icons on content listings ||
+|| => |||| Show item-type icons on content listings ||
 || - || Hybridization - Package for mobile device, including settling what exact provisions will be needed for [https://spideroak.com/pandora/wiki/HTML5ClientAppSameOriginIssues CORS], stashed user and share credentials, etc. || See [[HTML5ClientProjectHybrid]] ||
 || - |||| Scope out and implement file-type-specific handling, beyond what the browser does ||
 || - |||| Implement Send-to menu ||
