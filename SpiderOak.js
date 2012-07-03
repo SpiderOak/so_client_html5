@@ -756,7 +756,7 @@ var spideroak = function () {
                                           this.here() + '?refresh=true');
 
         var $remove_li = $('<li/>');
-        $remove_li.append(fab_anchor('remove_item',
+        $remove_li.append(fab_anchor('remove_item_external',
                                      subject_url,
                                      'delete',
                                      _t("Drop this room from the list")));
@@ -828,12 +828,27 @@ var spideroak = function () {
         this.subdirs = public_share_room_urls_list();
         return room; }
 
+
     PublicRootShareNode.prototype.remove_item_external = function (room_url) {
         /* Omit a non-original share room from persistent and resident memory.
            This is for use from outside of the object. Use .remove_item() for
            internal object operation. */
         this.job_id += 1;
-        this.remove_item(room_url); }
+        var splat = room_url.split('/');
+        var share_id = base32.decode(splat[splat.length-3]);
+        var room_key = splat[splat.length-2];
+        var message = "Public share room " + (share_id + " / " + room_key);
+
+        if (! is_public_share_room_url(room_url)) {
+            this.show_status_message(message + " " + _t("not found.")); }
+        else {
+            this.remove_status_message('error');
+            this.adding_external = true;
+            this.remove_item(room_url);
+            this.show_status_message(message + " " + _t("removed."),
+                                     'result'); }}
+    // Whitelist this method for use as a mode_opts 'action':
+    PublicRootShareNode.prototype.remove_item_external.is_action = true;
 
     PublicRootShareNode.prototype.remove_item = function (room_url) {
         /* Omit a non-original share room from the persistent and resident
@@ -847,8 +862,6 @@ var spideroak = function () {
             this.subdirs = public_share_room_urls_list();
             return true; }
         else { return false; }}
-    // Whitelist this method for use as a mode_opts 'action':
-    PublicRootShareNode.prototype.remove_item.is_action = true;
 
     OriginalRootShareNode.prototype.clear_item = function (room_url) {
         /* Omit an original share room from the resident collection.
@@ -2031,7 +2044,8 @@ var spideroak = function () {
 
             my.combo_root_url = generic.combo_root_url;
             var combo_root = content_node_manager.get_combo_root();
-            var public_shares = cnmgr.get(my.public_shares_root_url);
+            var public_shares = cnmgr.get(my.public_shares_root_url,
+                                          combo_root);
 
             // Properly furnish login form:
             prep_login_form('.nav-login-storage', storage_login,
