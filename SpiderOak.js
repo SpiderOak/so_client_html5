@@ -1466,13 +1466,15 @@ var spideroak = function () {
            Include a logout split-button link. */
 
         function logout_link_button(url) {
-            return $('<a href="#logout" data-icon="delete"'
+            return $('<a href="#logout" data-icon="back"'
                      + ' data-role="button" class="logout-button"'
                      + ' data-mini="true" data-inline="true"'
-                     + ' data-iconpos="top"> Logout </a>'); }
+                     + ' data-iconpos="notext"> Logout </a>'); }
 
-        mode_opts = mode_opts || {};
-        if (! mode_opts.hasOwnProperty('actions_menu_link_creator')) {
+        // Give a hoot: duplicate, don't pollute...
+        mode_opts = $.extend({}, mode_opts || {});
+        if (this.loggedin_ish()
+            && (! mode_opts.hasOwnProperty('actions_menu_link_creator'))) {
             mode_opts.actions_menu_link_creator = logout_link_button; }
         return FolderContentNode.prototype.layout_item$.call(this, mode_opts);
     }
