@@ -222,8 +222,10 @@ var spideroak = function () {
     function is_combo_root_url(url) {
         return (url === my.combo_root_url); }
     function is_content_root_url(url) {
-        /* True if the 'url' is for one of the root content items.
-           Doesn't depend on the url having an established node. */
+        /* True if the 'url' is for one of the root content items.  We
+           split off any search fragment.  Doesn't depend on the url having
+           an established node. */
+        url = url.split('?')[0];
         return ((url === my.combo_root_url)
                 || (url === my.storage_root_url)
                 || (url === my.original_shares_root_url)
@@ -448,6 +450,10 @@ var spideroak = function () {
         this.remove_status_message();
 
         this.show(chngpg_opts, {});
+
+        if (mode_opts && mode_opts.logout) {
+            this.logout();
+            return true; }
 
         // We always dispatch the public shares visit:
         var public_mode_opts = {passive: true,
@@ -1464,7 +1470,9 @@ var spideroak = function () {
            Include a logout split-button link. */
 
         function logout_link_button(url) {
-            return $('<a href="#logout" data-icon="delete"'
+            var logout_link = '#' + add_query_param(this.url,
+                                                    'logout', "true");
+            return $('<a href="' + logout_link + '" data-icon="delete"'
                      + ' data-role="button" class="logout-button"'
                      + ' data-iconpos="notext"> Logout </a>'); }
 
@@ -1472,7 +1480,8 @@ var spideroak = function () {
         mode_opts = $.extend({}, mode_opts || {});
         if (this.loggedin_ish()
             && (! mode_opts.hasOwnProperty('actions_menu_link_creator'))) {
-            mode_opts.actions_menu_link_creator = logout_link_button; }
+            mode_opts.actions_menu_link_creator
+                = logout_link_button.bind(this); }
         return FolderContentNode.prototype.layout_item$.call(this, mode_opts);
     }
 
@@ -1777,7 +1786,7 @@ var spideroak = function () {
     var cnmgr = content_node_manager; // Compact name, for convenience.
 
 
-    /* ==== Login ==== */
+    /* ==== Login / Logout ==== */
 
     function go_to_entrance() {
         /* Visit the entrance page. Depending on session state, it might
@@ -1848,8 +1857,18 @@ var spideroak = function () {
 
     function storage_logout() {
         /* Conclude storage login, clearing credentials and stored data.
-           Wind up back on the main entry page.
-         */
+           Wind up back on the main entry page. */
+
+        // NOTE: For now we logout only via the combo root.  We're hitting
+        // an incompabibility with the default jQm traversal machinery if
+        // we try to logout directly from a content page or root, with the
+        // machinery apparently expecting some data registered for the
+        // fromPage that's not present.
+
+        var combo_root = content_node_manager.get_combo_root();
+        combo_root.logout(); }
+
+    RootContentNode.prototype.logout = function () {
         function finish() {
             clear_storage_account();
             if (remember_manager.active()) {
@@ -1858,12 +1877,11 @@ var spideroak = function () {
                 // storage host. This leaves the username intact as a
                 // "remember" convenience for the user.
                 remember_manager.remove_storage_host(); }
-            go_to_entrance(); }
+            content_node_manager.get_combo_root().visit(); }
 
-        var combo_root = content_node_manager.get_combo_root();
-        combo_root.veil(true);
+        this.veil(true);
 
-        if (! combo_root.loggedin_ish()) {
+        if (! this.loggedin_ish()) {
             // Can't reach logout location without server - just clear and bail.
             finish(); }
         else {
