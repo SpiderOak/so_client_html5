@@ -26,7 +26,7 @@
          data-theme="f" data-icon="delete" data-iconpos="notext"></a>
       <h3 class="header-title"> SpiderOak </h3>
       <a alt="About the SpiderOak Dashboard" data-role="button"
-         href="#combo-about" data-icon="info" data-iconpos="notext"></a>
+         href="#about-dashboard" data-icon="info" data-iconpos="notext"></a>
     </div>
 
     <div class="nav-login-storage" data-role="content">
@@ -123,18 +123,18 @@
       <div data-role="navbar">
         <ul>
           <li> <a href="#settings"> Unimplemented </a> </li>
-          <li> <a href="#about"> About SpiderOak</a> </li>
+          <li> <a href="#about-spideroak"> About SpiderOak</a> </li>
         </ul>
       </div>
     </div>
   </div>
 
-  <div data-role="page" id="about" data-theme="c">
+  <div data-role="page" id="about-spideroak" data-theme="c">
     <div data-role="header" data-position="fixed" data-theme="f">
       <a alt="About the SpiderOak Dashboard" data-role="button"
-         href="#combo-about" data-icon="arrow-l" data-iconpos="left">
+         href="#about-dashboard" data-icon="arrow-l" data-iconpos="left">
         About the Dashboard</a>
-      <h3> About SpiderOak </h3>
+      <h3 class="header-title"> About SpiderOak </h3>
       <a href="#home" data-role="button"
          data-icon="arrow-r" data-iconpos="right"
          alt="Dashboard"> Dashboard </a>
@@ -256,61 +256,59 @@
     </div>
   </div>
 
-  <div data-role="page" id="combo-about" data-theme="c">
+  <div data-role="page" id="about-dashboard" data-theme="c">
     <div data-role="header" data-position="fixed" data-theme="f">
       <a alt="About the SpiderOak Dashboard" data-role="button"
          href="#home" data-icon="arrow-l" data-iconpos="left">
         Dashboard </a>
       <h3 class="header-title"> About the SpiderOak Dashboard </h3>
-      <a href="#about" data-role="button"
+      <a href="#about-spideroak" data-role="button"
          data-icon="arrow-r" data-iconpos="right"
          alt="Dashboard">About SpiderOak </a>
     </div>
     <div data-role="content">
-      <ul>
-        <li>
-          <p> You can reach any stuff that SpiderOak stores for you via the
-            mobile client dashboard, including your online backups, the
-            particular collections of backed-up directories that you make
-            available publicly through your own share rooms, and the public
-            share rooms of others that you visit.
-          </p>
-        </li>
-        <li>
-          <p> You have to log in to your SpiderOak account in order to see
-            your own storage and the list of share rooms that you make
-            publicly available. You can visit public share rooms without
-            logging in - the dashboard shows you the list of ones you've
-            visited whether or not you're logged in.  Once you have logged
-            in, all three sections will be visible in the dashboard.</p>
-          <p> If either of the Storage or personally originated Share Rooms
-            sections are empty, it will be marked with an &empty; empty
-            symbol.
-          <p> When logged in, you can logout by clicking the curved back
-            arrow <span class="ui-icon ui-icon-back ui-icon-shadow"></span> in
-            the upper left hand corner of the page.</p>
-          <p> When the "Remembering" slider is active, the account name you
-            most recently use to log in will be retained for subsequent
-            logins, until you change it or turn off remembering.</p>
-        </li>
-        <li>
-          <p> Clicking on the Public Share Rooms Visits section header will
-            take you to a page where you can add more public share rooms,
-            omit ones you're already visiting, and select ones that you
-            want to be remembered across sessions.
-        <li>
-          <p> Clicking on the body of any content item visits that item.
-            For folder like items, it brings you to a page with the
-            contents of that folder.  For file-like items, it offers to
-            download a copy of the file for you. </p>
-          <p> The header bar at the top of each content page has the
-            content item's title and, on the left, a link back to the
-            containing folder. Clicking on the title shows a list of the
-            successive containing folders, up to the dashboard, so you can
-            see where you are, and click on any of the entries to return to
-            that container. </p>
-        </li>
-      </ul>
+      <h2> The Dashboard </h2>
+      <div>
+        <p> The SpiderOak mobile dashboard provides a consolidated,
+          top-level view of the content that your are backing up with and
+          sharing via SpiderOak. </p>
+        <p> The dashboard always shows the list of publicly available Share
+          Rooms that you are visiting.  Above that it shows a login form,
+          until you use it to log in to a SpiderOak account. Then, instead
+          of the form, you will see the account's backup storage devices
+          and the list of Share Rooms published from the account.
+        </p>
+        <p> Whatever content is present, you can tap on the items to
+          visit those items, delving into folders or downloading
+          files. Empty sections are signified by a single, inert item
+          with an &empty; empty symbol.
+        </p>
+        <p> You can also tap on the headers of the respective content
+          sections to enter that section's content root.  There you will
+          find info about the section contents and the same list of
+          contents that appears in the dashboard. </p>
+        <p> The Public Share Room content root provides the means too add
+          public Share Room visits, using a form at the top that requires
+          the room's Share ID and Room Key. Below the visit form is the
+          list of currently visited Share Rooms.  The Share Rooms in that
+          list have gear links that each pops up a menu by which you can
+          drop the room from the visited list or change the room's
+          persistence on the list across local sessions. </p>
+      </div>
+      <h2> The Screens </h2>
+      <div>
+          <p> Tapping the title in any page's header will pop up a list of
+            the successive containing folders, with the outermost dashboard
+            at the bottom.  Tapping on any item returns you to that
+            item.  When logged in, the dashboard item includes
+            an <span class="ui-icon ui-icon-back ui-icon-shadow"></span>
+            logout button on the right - tap on it to return to the
+            dashboard and log out. </p>
+          <p> Regarding the dashboard login - when the "Remembering" slider
+            is active, the account name you most recently use to log in
+            will be retained for subsequent logins, until you change it or
+            turn off remembering.</p>
+      </div>
     </div>
     <div data-role="footer" data-position="fixed" data-theme="a">
       <div data-role="navbar">
