@@ -1195,6 +1195,8 @@ var spideroak = function () {
 
     RootContentNode.prototype.layout_header = function (mode_opts) {
         /* Do special RootContentNode header layout. */
+        ContentNode.prototype.layout_header.call(this, mode_opts);
+
         var $header = this.my_page$().find('[data-role="header"]');
         var $logout_button = $header.find('.logout-button');
         var $title = $header.find('.header-title');
@@ -1209,6 +1211,8 @@ var spideroak = function () {
            Many storage node types will use these values as is, some will
            replace them.
          */
+        ContentNode.prototype.layout_header.call(this, mode_opts);
+
         var fields = {};
         fields.right_url = ('#' + add_query_param(this.url,
                                                   "refresh", "true", true));
@@ -1255,6 +1259,8 @@ var spideroak = function () {
 
     ShareNode.prototype.layout_header = function(mode_opts) {
         /* Fill in header fields of .my_page$(). */
+        ContentNode.prototype.layout_header.call(this, mode_opts);
+
         var fields = {};
         if (this.parent_url) {
             var container = content_node_manager.get(this.parent_url);
@@ -1357,6 +1363,10 @@ var spideroak = function () {
         $list.listview("refresh");
         return $page; }
 
+    ContentNode.prototype.layout_item$ = function(mode_opts) {
+        /* Return a jQuery object representing a generic content item.
+           We defer to FolderContentNode item layout for the general case. */
+        return FolderContentNode.prototype.layout_item$.call(this, mode_opts); }
     FolderContentNode.prototype.layout_item$ = function(mode_opts) {
         /* Return a jQuery object representing a folder-like content item.
 
@@ -1425,6 +1435,11 @@ var spideroak = function () {
         $href.attr('class', "crushed-vertical");
         $href.append($table);
         $it.append($href);
+
+        if (mode_opts
+            && mode_opts.hasOwnProperty('actions_menu_link_creator')) {
+            $anchor = mode_opts.actions_menu_link_creator(this.url);
+            $it.find('a').after($anchor); }
 
         // XXX use classification to select an icon:
         $it.attr('data-icon', "false");
