@@ -1373,18 +1373,16 @@ var spideroak = function () {
         return $page; }
 
     ContentNode.prototype.layout_item$ = function(mode_opts) {
-        /* Return a jQuery object representing a generic content item.
-           We defer to FolderContentNode item layout for the general case. */
-        return FolderContentNode.prototype.layout_item$.call(this, mode_opts); }
-    FolderContentNode.prototype.layout_item$ = function(mode_opts) {
-        /* Return a jQuery object representing a folder-like content item.
-
-           If mode_opts has 'actions_menu_link_creator', apply it to our
-           URL to get back a anchor to a context-specific actions menu for
-           this item.
-         */
-        var $anchor = $('<a/>').attr('class', "crushed-vertical");
-        $anchor.attr('href', "#" + this.url);
+        /* Return a jQuery object with the basic content item layout. */
+        var $anchor = $('<a/>').attr('class', "crushed-vertical item-url");
+        var href;
+        if (mode_opts
+            && mode_opts.hasOwnProperty('refresh')) {
+            href = "#" + (add_query_param(this.url,
+                                          'refresh', "true", true)); }
+        else {
+            href = "#" + this.url; }
+        $anchor.attr('href', href);
         $anchor.html($('<h4 class="item-title"/>').html(this.name));
 
         var $it = $('<li/>').append($anchor);
@@ -1397,9 +1395,17 @@ var spideroak = function () {
         $it.attr('data-filtertext', this.name);
 
         return $it; }
+    FolderContentNode.prototype.layout_item$ = function(mode_opts) {
+        /* Return a jQuery object representing a folder-like content item.
+
+           If mode_opts has 'actions_menu_link_creator', apply it to our
+           URL to get back a anchor to a context-specific actions menu for
+           this item.
+         */
+        return ContentNode.prototype.layout_item$.call(this, mode_opts); }
     DeviceStorageNode.prototype.layout_item$ = function(mode_opts) {
         /* Return a storage device's description as a jQuery item. */
-        return FolderStorageNode.prototype.layout_item$.call(this); }
+        return FolderStorageNode.prototype.layout_item$.call(this, mode_opts); }
     FolderStorageNode.prototype.layout_item$ = function(mode_opts) {
         /* Return a storage folder's description as a jQuery item. */
         return FolderContentNode.prototype.layout_item$.call(this, mode_opts); }
@@ -1408,8 +1414,7 @@ var spideroak = function () {
         return FolderContentNode.prototype.layout_item$.call(this, mode_opts); }
     RoomShareNode.prototype.layout_item$ = function(mode_opts) {
         /* Return a share room's description as a jQuery item. */
-        var $it = FolderShareNode.prototype.layout_item$.call(this,
-                                                              mode_opts);
+        var $it = FolderShareNode.prototype.layout_item$.call(this, mode_opts);
         var $title = $it.find('.item-title');
         $title.html($title.html()
                     + '<div> <small> <span class="subdued">Share ID:</span> '
@@ -1419,8 +1424,7 @@ var spideroak = function () {
         return $it; }
     FileContentNode.prototype.layout_item$ = function(mode_opts) {
         /* Return a file-like content node's description as a jQuery item. */
-        var $it = $('<li data-mini="true"/>');
-        $it.attr('data-filtertext', this.name);
+        var $it = ContentNode.prototype.layout_item$.call(this, mode_opts);
 
         var type = classify_file_by_name(this.name);
         var pretty_type = type ? (type + ", ") : "";
@@ -1439,16 +1443,10 @@ var spideroak = function () {
         $tr.append($('<td/>').append($details).attr('wrap', "none"));
         $tr.append($('<td/>').append($date).attr('align', "right"));
         $table.append($tr);
-        var $href = $('<a/>');
-        $href.attr('href', this.url);
-        $href.attr('class', "crushed-vertical");
-        $href.append($table);
-        $it.append($href);
 
-        if (mode_opts
-            && mode_opts.hasOwnProperty('actions_menu_link_creator')) {
-            $anchor = mode_opts.actions_menu_link_creator(this.url);
-            $it.find('a').after($anchor); }
+        var $anchor = $it.find('a.item-url');
+        $anchor.empty();
+        $anchor.append($table);
 
         // XXX use classification to select an icon:
         $it.attr('data-icon', "false");
@@ -1557,7 +1555,9 @@ var spideroak = function () {
         var $listview = $popup.find('[data-role="listview"]');
         $listview.empty()
 
-        $listview.append(this.layout_item$(mode_opts));
+        // refresh necessary so jQuery traversal stuff doesn't pass over:
+        $listview.append(this.layout_item$($.extend({refresh: true},
+                                                    mode_opts)));
         var ancestor_url = this.parent_url;
         while (ancestor_url) {
             var ancestor = content_node_manager.get(ancestor_url);
