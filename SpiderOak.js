@@ -447,7 +447,6 @@ var spideroak = function () {
         // details about mode controls.
 
         this.veil(true);
-        this.veil(false);
 
         this.remove_status_message();
 
