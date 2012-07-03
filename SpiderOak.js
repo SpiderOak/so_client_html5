@@ -1158,7 +1158,7 @@ var spideroak = function () {
         /* Do the essential, common header layout. */
         // Every node gets the depth path menu.
         var $title = this.my_page$().find('[data-role="header"] .header-title');
-        $title.bind('click', this.depth_path_menu.bind(this)); }
+        $title.click(this.depth_path_menu.bind(this)); }
 
     ContentNode.prototype.layout_header_fields = function(fields) {
         /* Populate this content node's page header with these fields settings:
