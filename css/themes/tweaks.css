@@ -1,5 +1,5 @@
 [data-role=header] {
-/*  cursor: context-menu; */
+  cursor: context-menu;
 }
 [data-role=header] .header-title {
 }

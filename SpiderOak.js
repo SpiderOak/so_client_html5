@@ -62,6 +62,7 @@ var spideroak = function () {
         filter_threshold: 20,
         public_share_room_urls: {},
         simple_popup_id: 'simple-popup',
+        depth_path_popup_id: 'depth-path-popup',
     };
     var my = {
         /* Login session settings: */
@@ -1153,6 +1154,12 @@ var spideroak = function () {
 
         this.layout_footer(mode_opts); }
 
+    ContentNode.prototype.layout_header = function(mode_opts) {
+        /* Do the essential, common header layout. */
+        // Every node gets the depth path menu.
+        var $header = $('[data-role="header"]');
+        $header.bind('click', this.depth_path_menu.bind(this)); }
+
     ContentNode.prototype.layout_header_fields = function(fields) {
         /* Populate this content node's page header with these fields settings:
            field.title: html (or just text) with the page label;
@@ -1452,6 +1459,21 @@ var spideroak = function () {
     FileShareNode.prototype.layout_item$ = function(mode_opts) {
         /* Return a storage file's description as a jQuery item. */
         return FileContentNode.prototype.layout_item$.call(this, mode_opts); }
+    RootContentNode.prototype.layout_item$ = function(mode_opts) {
+        /* Present the combo root as a jQm listview item.
+           Include a logout split-button link. */
+
+        function logout_link_button(url) {
+            return $('<a href="#logout" data-icon="delete"'
+                     + ' data-role="button" class="logout-button"'
+                     + ' data-mini="true" data-inline="true"'
+                     + ' data-iconpos="top"> Logout </a>'); }
+
+        mode_opts = mode_opts || {};
+        if (! mode_opts.hasOwnProperty('actions_menu_link_creator')) {
+            mode_opts.actions_menu_link_creator = logout_link_button; }
+        return FolderContentNode.prototype.layout_item$.call(this, mode_opts);
+    }
 
     ContentNode.prototype.layout_footer = function(mode_opts) {
         /* Return markup with general and specific legend fields and urls. */
@@ -1517,6 +1539,30 @@ var spideroak = function () {
         return (my.username
                 ? this.emblem + ': ' + my.username
                 : this.emblem); }
+
+
+    /* ===== Popup Menus ===== */
+
+    ContentNode.prototype.depth_path_menu = function(mode_opts) {
+        /* Popup a menu showing from the containment navigation with more
+           distant further down. Include a link to logout. */
+
+        var $popup = $('#' + generic.depth_path_popup_id);
+
+        var $listview = $popup.find('[data-role="listview"]');
+        $listview.empty()
+
+        $listview.append(this.layout_item$(mode_opts));
+        var ancestor_url = this.parent_url;
+        while (ancestor_url) {
+            var ancestor = content_node_manager.get(ancestor_url);
+            $listview.append(ancestor.layout_item$(mode_opts));
+            ancestor_url = ancestor.parent_url; }
+
+        $popup.popup();
+        $popup.parent().page();
+        $listview.listview('refresh');
+        $popup.popup('open'); }
 
     /* ===== Resource managers ===== */
 
