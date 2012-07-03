@@ -209,6 +209,8 @@ methods.  (Some modes can only be used via the mode_opts method parameters,
 and not passed as URL query parameters.)
 
 Currently implemented modes include:
+* `refresh`: refetch the data for the node.
+* `logout`: return to the dashboard/combo root and logout from storage
 * `passive`: when showing a node, just adjust the DOM $page, don't do
   $.mobile.changePage(). Useful for page updates in the background, or for
   the `RootContentNode` composite page, which is informed by combined subnode
@@ -223,7 +225,9 @@ Currently implemented modes include:
   `.layout_item$()` to get a link to a context-specific
   actions-menu, for inclusion on the item's list entry as, eg, a
   [http://jquerymobile.com/test/docs/lists/lists-split.html split-button].
-* `refresh`: refetch the data for the node.
+* `alt_page_selector`: selector to be used by
+  ContentNode.layout_header() to work on an alternate page than the node's
+  default one.
 
 === Content and Operational Menus ===
 Elaborate actions on content, like adding and removing share nodes, is
