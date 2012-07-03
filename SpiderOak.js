@@ -1783,7 +1783,7 @@ var spideroak = function () {
         /* Visit the entrance page. Depending on session state, it might
            present a login challenge or it might present the top-level
            contents associated with the logged-in account. */
-        $.mobile.changePage(content_node_manager.get_combo_root().url); }
+        $.mobile.changePage(content_node_manager.get_combo_root().my_page$()); }
 
     function storage_login(login_info, url) {
         /* Login to storage account and commence browsing at devices.
