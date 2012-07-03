@@ -1261,7 +1261,7 @@ var spideroak = function () {
             .attr('href', '#' + my.original_shares_root_url);
         $page.find('.public_shares_root_url')
             .attr('href', '#' + my.public_shares_root_url);
-        var $emptiness_message = this.my_page$().find('.emptiness-message');
+        var $emptiness_message = $page.find('.emptiness-message');
         (this.subdirs.length === 0
          ? $emptiness_message.show()
          : $emptiness_message.hide()); }
@@ -1270,10 +1270,11 @@ var spideroak = function () {
 
         // Inject a brief description.
         var $page = this.my_page$();
-        $page.find('.storage_root_url').attr('href', '#' + my.storage_root_url);
+        $page.find('.storage_root_url')
+            .attr('href', '#' + my.storage_root_url);
         $page.find('.public_shares_root_url')
             .attr('href', '#' + my.public_shares_root_url);
-        var $adjust_spiel = this.my_page$().find('.adjust-spiel');
+        var $adjust_spiel = $page.find('.adjust-spiel');
         (this.subdirs.length === 0
          ? $adjust_spiel.hide()
          : $adjust_spiel.show()); }
