@@ -1191,7 +1191,10 @@ var spideroak = function () {
         $title.click(this.depth_path_menu.bind(this)); }
 
     ContentNode.prototype.layout_header_fields = function(fields) {
-        /* Populate this content node's page header with these fields settings:
+        /* Generalized header layout facility.
+
+           Populate this node's page header with fields settings:
+
            field.title: html (or just text) with the page label;
            left_url: left-hand button URL; if absent left button not changed;
            left_label: text for left-hand button, or empty to hide the button;
@@ -1505,7 +1508,7 @@ var spideroak = function () {
                      + ' data-role="button" class="logout-button"'
                      + ' data-iconpos="notext"> Logout </a>'); }
 
-        // Give a hoot: duplicate, don't pollute...
+        // Duplicate, rather than pollute the circulating mode_opts:
         mode_opts = $.extend({}, mode_opts || {});
         if (this.loggedin_ish()
             && (! mode_opts.hasOwnProperty('actions_menu_link_creator'))) {
@@ -1898,7 +1901,7 @@ var spideroak = function () {
         combo_root.logout(); }
 
     RootContentNode.prototype.logout = function () {
-        function finish() {
+        function finish () {
             clear_storage_account();
             if (remember_manager.active()) {
                 // The storage server doesn't remove cookies, so we inhibit
