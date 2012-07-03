@@ -63,6 +63,7 @@ var spideroak = function () {
         public_share_room_urls: {},
         simple_popup_id: 'simple-popup',
         depth_path_popup_id: 'depth-path-popup',
+        top_level_info_ids: ['about-dashboard', 'about-spideroak'],
     };
     var my = {
         /* Login session settings: */
@@ -1178,9 +1179,15 @@ var spideroak = function () {
         this.layout_footer(mode_opts); }
 
     ContentNode.prototype.layout_header = function(mode_opts) {
-        /* Do the essential, common header layout. */
+        /* Do the essential, common header layout.  If mode_opts
+           'alt_page_selector' is passed in, alter that one instead of the
+           node's default page. */
+
         // Every node gets the depth path menu.
-        var $title = this.my_page$().find('[data-role="header"] .header-title');
+        var $page = ((mode_opts && mode_opts.alt_page_selector)
+                     ? $(mode_opts.alt_page_selector)
+                     : this.my_page$());
+        var $title = $page.find('[data-role="header"] .header-title');
         $title.click(this.depth_path_menu.bind(this)); }
 
     ContentNode.prototype.layout_header_fields = function(fields) {
@@ -1226,6 +1233,11 @@ var spideroak = function () {
     RootContentNode.prototype.layout_header = function (mode_opts) {
         /* Do special RootContentNode header layout. */
         ContentNode.prototype.layout_header.call(this, mode_opts);
+        // Give the info pages the combo root's depth path menu:
+        generic.top_level_info_ids.map(function (id) {
+            var alt_mode_opts = {alt_page_selector: '#' + id};
+            ContentNode.prototype.layout_header.call(
+                this, alt_mode_opts); }.bind(this));
 
         var $header = this.my_page$().find('[data-role="header"]');
         var $logout_button = $header.find('.logout-button');
