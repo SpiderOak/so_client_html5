@@ -104,9 +104,10 @@ var spideroak = function () {
             if (document_addrs.hasOwnProperty(page)) {
                 var internal = internalize_url(document.location.href);
                 return document_addrs[page].call(this, internal); }
-            else {
-                var node = content_node_manager.get(page);
-                return node.visit(data.options, mode_opts); }}}
+            else if (data.toPage !== $.mobile.activePage.attr('id')) {
+                // Skip exact duplicates, for eg non-select popup dismissals.
+                return content_node_manager.get(page).visit(data.options,
+                                                            mode_opts); }}}
 
     function establish_traversal_handler() {
         /* Establish page change event handler. */
