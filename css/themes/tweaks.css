@@ -1,7 +1,8 @@
-[data-role=header] {
-  cursor: context-menu;
+#depth-path-popup {
+ min-width: 300px;
 }
 [data-role=header] .header-title {
+  cursor: context-menu;
 }
 
 .status-message {
