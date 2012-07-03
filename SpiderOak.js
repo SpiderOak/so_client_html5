@@ -1205,8 +1205,8 @@ var spideroak = function () {
         if (fields.hasOwnProperty('title')) {
             $header.find('.header-title').html(elide(fields.title, 25)); }
 
+        var $right_slot = $header.find('.header-right-slot');
         if (fields.hasOwnProperty('right_url')) {
-            var $right_slot = $header.find('.header-right-slot');
             $right_slot.attr('href', fields.right_url);
             if (fields.hasOwnProperty('right_label')) {
                 if (! fields.right_label) {
@@ -1215,9 +1215,11 @@ var spideroak = function () {
                     replace_button_text($right_slot, elide(fields.right_label,
                                                            15));
                     $right_slot.show(); }}}
+        else {
+            $right_slot.hide(); }
 
+        var $left_slot = $header.find('.header-left-slot');
         if (fields.hasOwnProperty('left_url')) {
-            var $left_slot = $header.find('.header-left-slot');
             if (fields.left_url === "-") {
                 var parsed = $.mobile.path.parseUrl(window.location.href);
                 fields.left_url = parsed.hrefNoHash; }
@@ -1228,7 +1230,9 @@ var spideroak = function () {
                 else {
                     replace_button_text($left_slot, elide(fields.left_label,
                                                           15));
-                    $left_slot.show(); }}}}
+                    $left_slot.show(); }}}
+        else {
+            $left_slot.hide(); }}
 
     RootContentNode.prototype.layout_header = function (mode_opts) {
         /* Do special RootContentNode header layout. */
@@ -1256,9 +1260,6 @@ var spideroak = function () {
         ContentNode.prototype.layout_header.call(this, mode_opts);
 
         var fields = {};
-        fields.right_url = ('#' + add_query_param(this.url,
-                                                  "refresh", "true", true));
-        fields.right_label = "Refresh";
         fields.title = this.title();
         if (this.parent_url) {
             var container = content_node_manager.get(this.parent_url);
@@ -1309,8 +1310,6 @@ var spideroak = function () {
         var fields = {};
         if (this.parent_url) {
             var container = content_node_manager.get(this.parent_url);
-            fields.right_url = '#' + add_query_param(this.url,"refresh","true");
-            fields.right_label = "Refresh"
             fields.left_url = '#' + this.parent_url;
             fields.left_label = container.name;
             fields.title = this.title(); }
