@@ -1547,11 +1547,12 @@ var spideroak = function () {
 
     /* ===== Popup Menus ===== */
 
-    ContentNode.prototype.depth_path_menu = function(mode_opts) {
+    ContentNode.prototype.depth_path_menu = function(event) {
         /* Popup a menu showing from the containment navigation with more
            distant further down. Include a link to logout. */
 
         var $popup = $('#' + generic.depth_path_popup_id);
+        var mode_opts = {};
 
         var $listview = $popup.find('[data-role="listview"]');
         $listview.empty()
@@ -1566,7 +1567,7 @@ var spideroak = function () {
         $popup.popup();
         $popup.parent().page();
         $listview.listview('refresh');
-        $popup.popup('open');
+        $popup.popup('open', event.clientX, event.clientY);
         // Stop percolation:
         return false; }
 
