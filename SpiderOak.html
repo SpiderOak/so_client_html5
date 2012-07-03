@@ -187,13 +187,14 @@
           <div data-role="collapsible" data-mini="true" data-theme="f"
                data-collapsed-icon="arrow-r" data-expanded-icon="arrow-d">
             <legend> Visit a Public Share Room: </legend>
-            <p> Visit Public Share Rooms - SpiderOak backup contents that
-              someone has made publicly available from their account -
-              using the assigned Share ID and Room Key. </p>
-            <p> The list of share rooms currently being visited is shown
-              below the form.  Share rooms visited with the Persist setting
-              "On" will remain on the list on subsequent local
-              sessions. </p>
+            <p> Public Share Rooms are folders that people have made
+              publicly available from the SpiderOak backup accounts. Anyone
+              can visit a Share Room if they know its Share ID and Room
+              Key. </p>
+            <p> The list of public share rooms being visited in this
+              session are show below the form.  Share rooms visited with
+              the Persist setting "On" will remain on enlisted across
+              subsequent local sessions, until dropped or un-persisted. </p>
           </div>
           <ul data-role="listview" data-inset="true" data-mini="true"
               data-theme="g">
@@ -379,13 +380,13 @@
           for SpiderOak online backup.  Currently, you have to use
           the SpiderOak desktop application to add and remove folders for
           backup.
-        <p>You can view the storage folders that your account is making
-          accessible to others in the
-          <a href="#" class="original_shares_root_url"> My Share Rooms </a>
-          section.  There is a separate collection of publicly accessible Share
-          Rooms that you are currently visiting in the
-          <a href="#" class="public_shares_root_url"> Public Share Rooms </a>
-          section, where you can add and remove items.</p>
+        <p>You can view the backup storage folders that your account is making
+          accessible to others in
+          <a href="#" class="original_shares_root_url"> My Share Rooms</a>.
+          There is a separate collection of publicly accessible Share Rooms
+          that you are currently visiting in
+          <a href="#" class="public_shares_root_url"> Public Share
+          Rooms</a>, where you can add and remove items.</p>
         <p class="emptiness-message">The "&empty;" sign indicates that your
           account currently doesn't publish any Share Rooms.</p>
       </div>
@@ -415,15 +416,15 @@
         <p> These are the SpiderOak Share Rooms that your account is
           publishing. Each share room is comprised of a collection of folders
           that you've selected from your account's
-          <a href="#" class="storage_root_url"> storage folders </a>.  They're
-          available for remote access by anyone that knows their Share
-          ID and Room Key. </p>
+          <a href="#" class="storage_root_url"> backup storage
+          folders </a>.  They're available for remote access by anyone that
+          knows their Share ID and Room Key. </p>
         <p> You can adjust your set of published Share
           Room using the desktop application. </p>
         <p> There is a separate collection of publicly accessible Share
-          Rooms that you are currently visiting in the
-          <a href="#" class="public_shares_root_url"> Public Share Rooms </a>
-          section, where you can add and remove items.</p>
+          Rooms that you are currently visiting in
+          <a href="#" class="public_shares_root_url"> Public Share
+          Rooms</a>, where you can add and remove items.</p>
         <p class="emptiness-message">The "&empty;" sign indicates that your
           account currently doesn't publish any Share Rooms.</p>
       </div>
@@ -443,6 +444,7 @@
     <div data-role="popup" class="ui-popup" id="simple-popup"
          data-corners="true" data-theme="d" data-overlay-theme="b">
       <a class="ui-btn-left close-button" data-role="button" alt="Close"
+         data-theme="f"
          href="#" data-icon="back" title="Close" data-rel="back"
          data-iconpos="notext" data-mini="true"> </a>
       <div data-role="navbar" data-theme="d" width="100%">
