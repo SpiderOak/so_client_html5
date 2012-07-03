@@ -1464,9 +1464,8 @@ var spideroak = function () {
            Include a logout split-button link. */
 
         function logout_link_button(url) {
-            return $('<a href="#logout" data-icon="back"'
+            return $('<a href="#logout" data-icon="delete"'
                      + ' data-role="button" class="logout-button"'
-                     + ' data-mini="true" data-inline="true"'
                      + ' data-iconpos="notext"> Logout </a>'); }
 
         // Give a hoot: duplicate, don't pollute...
