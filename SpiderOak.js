@@ -1232,6 +1232,7 @@ var spideroak = function () {
         this.layout_header_fields(fields); }
     RootStorageNode.prototype.layout_header = function(mode_opts) {
         StorageNode.prototype.layout_header.call(this, mode_opts);
+
         var $page = this.my_page$();
         $page.find('.original_shares_root_url')
             .attr('href', '#' + my.original_shares_root_url);
@@ -1243,6 +1244,7 @@ var spideroak = function () {
          : $emptiness_message.hide()); }
     PublicRootShareNode.prototype.layout_header = function(mode_opts) {
         ShareNode.prototype.layout_header.call(this, mode_opts);
+
         // Inject a brief description.
         var $page = this.my_page$();
         $page.find('.storage_root_url').attr('href', '#' + my.storage_root_url);
