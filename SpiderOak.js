@@ -476,6 +476,7 @@ var spideroak = function () {
             var storage_mode_opts = $.extend({}, public_mode_opts);
             storage_mode_opts.notify_token = 'storage';
             // Will chain to original shares via notify_callback.
+            $.mobile.loading('show');
             storage_root.visit(chngpg_opts, storage_mode_opts); }}
 
     PublicRootShareNode.prototype.visit = function (chngpg_opts, mode_opts) {
@@ -577,11 +578,14 @@ var spideroak = function () {
                                      notify_callback:
                                        this.notify_subvisit_status.bind(this),
                                      notify_token: 'original-share'};
-                if (this.veiled) {
-                    this.veil(false, function() { $.mobile.loading('hide'); });}
                 this.authenticated(true, response);
                 var ps_root = cnmgr.get(my.original_shares_root_url, this);
-                ps_root.visit({}, our_mode_opts); }}}
+                ps_root.visit({}, our_mode_opts); }
+            else {
+                if (this.veiled) {
+                    this.veil(false, $.mobile.loading('hide')); }
+                else {
+                    $.mobile.loading('hide'); }}}}
 
     PublicRootShareNode.prototype.notify_subvisit_status = function(succeeded,
                                                                    token,
@@ -1912,7 +1916,7 @@ var spideroak = function () {
     RootContentNode.prototype.veil = function (conceal, callback) {
         /* If 'conceal' is true, conceal our baudy body.  Otherwise, gradually
            reveal and position the cursor in the username field.
-           Optional callback is a function to invoke as part of the un/veiling.
+           Optional 'callback' - function to invoke as part of the un/veiling.
         */
         function do_focus() {
             var $username = $('#my_login_username');
