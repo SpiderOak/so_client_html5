@@ -233,6 +233,8 @@ Currently implemented modes include:
 * `alt_page_selector`: selector to be used by
   ContentNode.layout_header() to work on an alternate page than the node's
   default one.
+* `no_dividers`: tell ContentNode.layout_content() to not include dividers
+  for plentiful content.
 
 === Content and Operational Menus ===
 Elaborate actions on content, like adding and removing share nodes, is
