@@ -43,7 +43,9 @@ var spideroak = function () {
         // XXX base_host_url may vary according to brand package.
         base_host_url: "https://spideroak.com",
         combo_root_url: "https://home",
+        recents_url: "https://recents",
         combo_root_page_id: "home",
+        recents_page_id: "recents",
         storage_root_page_id: "storage-home",
         original_shares_root_page_id: "original-home",
         public_shares_root_page_id: "share-home",
@@ -59,7 +61,8 @@ var spideroak = function () {
         root_storage_node_label: "Devices",
         preview_sizes: [25, 48, 228, 800],
         dividers_threshold: 10,
-        filter_threshold: 20,
+        filter_threshold: 10,
+        recents_max_size: 25,
         public_share_room_urls: {},
         simple_popup_id: 'simple-popup',
         depth_path_popup_id: 'depth-path-popup',
@@ -105,6 +108,7 @@ var spideroak = function () {
                 var internal = internalize_url(document.location.href);
                 return document_addrs[page].call(this, internal); }
             else if (data.toPage !== $.mobile.activePage.attr('id')) {
+                node_manager.get_recents().add_visited_url(page);
                 // Skip exact duplicates, for eg non-select popup dismissals.
                 return node_manager.get(page).visit(data.options,
                                                     mode_opts); }}}
@@ -223,20 +227,18 @@ var spideroak = function () {
             return url; }}
     function is_combo_root_url(url) {
         return (url === my.combo_root_url); }
+    function is_recents_url(url) {
+        return (url === generic.recents_url); }
     function is_content_root_url(url) {
         /* True if the 'url' is for one of the root content items.  We
            split off any search fragment.  Doesn't depend on the url having
            an established node. */
         url = url.split('?')[0];
         return ((url === my.combo_root_url)
+                || (url === generic.recents_url)
                 || (url === my.storage_root_url)
                 || (url === my.original_shares_root_url)
                 || (url === my.public_shares_root_url)); }
-    function is_content_root_page_id(url) {
-        return ((url === generic.combo_root_page_id)
-                || (url === generic.storage_root_page_id)
-                || (url === generic.public_shares_root_page_id)
-                || (url === generic.original_shares_root_page_id)); }
     function is_share_room_url(url) {
         /* True if the 'url' is for one of the familiar share rooms.
            Doesn't depend on the url having an established node. */
@@ -398,14 +400,13 @@ var spideroak = function () {
         this.root_url = url; }
     RootShareNode.prototype = new ShareNode();
 
-    function RecentContentNode(url, parent) {
+    function RecentContentsNode(url, parent) {
         ContentNode.call(this, url, parent);
         this.emblem = "Recently Visited Items";
-        // We don't care about the types of the items
-        this.items = [];
-        delete this.subdirs;
+        // We'll use subdirs for the items - we care not about the types:
+        this.items = this.subdirs;
         delete this.files; }
-    RecentContentNode.prototype = new ContentNode();
+    RecentContentsNode.prototype = new ContentNode();
 
     function PublicRootShareNode(url, parent) {
         RootShareNode.call(this, url, parent);
@@ -527,6 +528,14 @@ var spideroak = function () {
             // Will chain to original shares via notify_callback.
             $.mobile.loading('show');
             storage_root.visit(chngpg_opts, storage_mode_opts); }}
+
+    RecentContentsNode.prototype.visit = function (chngpg_opts, mode_opts) {
+        /* Present the accumulated list of recently visited nodes. */
+
+        // (Could mode_opts.hasOwnProperty('action') for recents editing.)
+
+        this.layout($.extend({no_dividers: true}, mode_opts));
+        this.show(chngpg_opts, mode_opts); }
 
     PublicRootShareNode.prototype.visit = function (chngpg_opts, mode_opts) {
         /* Obtain the known, non-original share rooms and present them. */
@@ -841,6 +850,19 @@ var spideroak = function () {
     }
     // Whitelist this method for use as a mode_opts 'action':
     PublicRootShareNode.prototype.enlisted_room_menu.is_action = true;
+
+    RecentContentsNode.prototype.add_visited_url = function (url) {
+        /* Register a recent visit.  Omit our own address and any
+           duplicates, disregarding query parameters. */
+        url = url.split('?')[0];
+        if ((url !== this.url)) {
+            var was = this.items.indexOf(url);
+            if (was !== 0) {
+                // If the item isn't already the first.
+                if (was !== -1) {
+                    this.items.splice(was, was); }
+                this.items.unshift(url);
+                this.items.splice(generic.recents_max_size); }}}
 
     PublicRootShareNode.prototype.add_item_external = function (credentials) {
         /* Visit a specified share room, according to 'credentials' object:
@@ -1413,7 +1435,9 @@ var spideroak = function () {
         var lensubdirs = subdirs ? subdirs.length : 0;
         files = files || this.files;
         var lenfiles = files ? files.length : 0;
-        var do_dividers = (lensubdirs + lenfiles) > generic.dividers_threshold;
+        var do_dividers = ((! (mode_opts && mode_opts.no_dividers))
+                           && ((lensubdirs + lenfiles)
+                               > generic.dividers_threshold));
         var do_filter = (lensubdirs + lenfiles) > generic.filter_threshold;
 
         function insert_item($item) {
@@ -1790,10 +1814,22 @@ var spideroak = function () {
         /* Private */
         var by_url = {};
 
+        // Cached references, for frequent access with impunity:
+        var combo_root = null;
+        var recents = null;
+
         /* Public */
         return {
             get_combo_root: function () {
-                return this.get(my.combo_root_url, null); },
+                if (! combo_root) {
+                    combo_root = this.get(my.combo_root_url, null); }
+                return combo_root; },
+
+            get_recents: function () {
+                if (! recents) {
+                    recents = this.get(generic.recents_url,
+                                       this.get_combo_root()); }
+                return recents; },
 
             get: function (url, parent) {
                 /* Retrieve a node according to 'url'.
@@ -1810,6 +1846,8 @@ var spideroak = function () {
                     if (is_content_root_url(url)) {
                         if (is_combo_root_url(url)) {
                             got = new RootContentNode(url, parent); }
+                        else if (is_recents_url(url)) {
+                            got = new RecentContentsNode(url, parent); }
                         else if (url === my.storage_root_url) {
                             got = new RootStorageNode(url, parent); }
                         else if (url === my.original_shares_root_url) {
@@ -1844,6 +1882,10 @@ var spideroak = function () {
 
             free: function (node) {
                 /* Remove a content node from index and free it for gc. */
+                if (combo_root && (node.url === combo_root.url)) {
+                    combo_root = null; }
+                else if (recents_root && node.url === recents_root.url) {
+                    recents_root = null; }
                 if (by_url.hasOwnProperty(node.url)) {
                     delete by_url[node.url]; }
                 node.free(); },
@@ -2108,6 +2150,7 @@ var spideroak = function () {
 
             my.combo_root_url = generic.combo_root_url;
             var combo_root = node_manager.get_combo_root();
+            var recents = node_manager.get_recents();
             var public_shares = node_manager.get(my.public_shares_root_url,
                                                  combo_root);
 
@@ -2203,6 +2246,8 @@ var spideroak = function () {
         switch (obj) {
         case (generic.combo_root_page_id):
             return generic.combo_root_url;
+        case (generic.recents_page_id):
+            return generic.recents_url;
         case (generic.storage_root_page_id):
             return my.storage_root_url;
         case (generic.original_shares_root_page_id):
