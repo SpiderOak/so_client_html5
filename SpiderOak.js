@@ -280,25 +280,47 @@ var spideroak = function () {
 
     /* ===== Data model ==== */
 
-    /* SpiderOak content includes storage (backups) and share rooms. The
-       data model distinguishes different kinds of those things - the
-       roots, devices, folders, and files - and wraps them in abstract
-       general types - the ContentNode and variants of it, where useful. */
+    /* Nodes coordinate data - remote content details, settings, account
+       info - and DOM presentation.  The collection is managed by the
+       node_manager, where the nodes are addressed by their url. */
 
-    function ContentNode(url, parent) {
-        /* Constructor for items representing SpiderOak-managed content.
-           - 'url' is absolute URL for the collection's root (top) node.
-           - 'parent' is containing node. The root's parent is null.
-           See JSON data examples in docs/api_json_examples.txt
+    function Node(url, parent) {
+        /* Constructor for any kinds of managed items.
+           'url' - address by which item is retrived from node_manager. For
+                   remotely managed content, it's the remote-data access URL.
+           'parent' - containing node
         */
-        if ( !(this instanceof ContentNode) ) {      // Coding failsafe.
+        if (! (this instanceof Node)) {      // Coding failsafe.
             throw new Error("Constructor called as a function");
         }
         if (url) {             // Skip if we're in prototype assignment.
             this.url = url;
             this.name = "";
+            // Top-level content nodes have content-specific root_url but
+            // combo-root (RootContentNode) parent.
             this.root_url = parent ? parent.root_url : url;
-            this.query_qualifier = "";
+            this.parent_url = parent ? parent.url : null;
+            this.$page = null;  // This node's jQuery-ified DOM data-role="page"
+            this.emblem = "";   // At least for debugging/.toString()
+            this.icon_path = ""; }}
+    Node.prototype.free = function () {
+        /* Free composite content to make available for garbage collection. */
+        if (this.$page) {
+            this.$page.remove();
+            this.$page = null; }}
+
+    function PanelNode(url, parent) {
+        /* Constructor for items representing application interface items.
+           - 'url' is absolute URL for the collection's root (top) node.
+           - 'parent' is containing node. The root's parent is null.
+        */
+        if ( !(this instanceof PanelNode) ) {      // Coding failsafe.
+            throw new Error("Constructor called as a function");
+        }
+        if (url) {             // Skip if we're in prototype assignment.
+            this.url = url;
+            this.name = "";
+            this.root_url = parent.root_url;
             this.parent_url = parent ? parent.url : null;
             this.subdirs = [];  // Urls of contained devices, folders.
             this.files = [];    // Urls of contained files.
@@ -306,11 +328,30 @@ var spideroak = function () {
             this.lastfetched = false;
             this.emblem = "";   // At least for debugging/.toString()
             this.icon_path = ""; }}
-    ContentNode.prototype.free = function () {
-        /* Free composite content to make available for garbage collection. */
-        if (this.$page) {
-            this.$page.remove();
-            this.$page = null; }}
+    ContentNode.prototype = new Node();
+
+
+    /* ContentNodes represent SpiderOak-managed content. That includes
+       distinct manifestations of storage (backups) content and share
+       rooms. Content-specific roots encompass the various remote content
+       collections.  An extrapolated RootContentNode, aka the "combo root",
+       consolidates them all. */
+
+    function ContentNode(url, parent) {
+        /* Constructor for items representing SpiderOak-managed content.
+           - 'url' is absolute URL for the collection's root (top) node.
+           - 'parent' is containing node. The root's parent is null.
+           See JSON data examples in docs/api_json_examples.txt
+        */
+        Node.call(this, url, parent);
+        if (url) {             // Skip if we're in prototype assignment.
+            this.query_qualifier = "";
+            this.subdirs = [];  // Urls of contained devices, folders.
+            this.files = [];    // Urls of contained files.
+            this.lastfetched = false;
+            this.emblem = "";   // At least for debugging/.toString()
+            this.icon_path = ""; }}
+    ContentNode.prototype = new Node();
 
     function StorageNode(url, parent) {
         ContentNode.call(this, url, parent);
@@ -356,6 +397,16 @@ var spideroak = function () {
         this.emblem = "Root Share";
         this.root_url = url; }
     RootShareNode.prototype = new ShareNode();
+
+    function RecentContentNode(url, parent) {
+        ContentNode.call(this, url, parent);
+        this.emblem = "Recently Visited Items";
+        // We don't care about the types of the items
+        this.items = [];
+        delete this.subdirs;
+        delete this.files; }
+    RecentContentNode.prototype = new ContentNode();
+
     function PublicRootShareNode(url, parent) {
         RootShareNode.call(this, url, parent);
         this.name = "Public Share Rooms";

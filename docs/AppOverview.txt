@@ -11,21 +11,26 @@ obtaining, assimilating, and presenting the !SpiderOak-managed user content
 data is organized - storage devices versus share rooms, and their contained
 folders and file "nodes".
 
-* `ContentNode` - Basis
-  * `RootContentNode` - A consolidated container of storage and share roots
-  * `FolderContentNode` - General behaviors used by storage and share folders
-  * `FileContentNode` - General behaviors used by storage and share files
-  * `StorageNode` - Backups content
-    * `RootStorageNode`
-    * `DeviceStorageNode`
-    * `DirectoryStorageNode`
-    * `FileStorageNode`
-  * `ShareNode` - Share Rooms and their contents
-    * `OriginalRootShareNode` - The list of share rooms published by the account
-    * `PublicRootShareNode` - Any share rooms visited
-    * `RoomShareNode` - a public or original share room
-    * `DirectoryShareNode`
-    * `FileShareNode`
+* `Node` - Abstract basis for all nodes.
+  * `ContentNode` - Abstract basis representing SpiderOak-managed content
+    * `RootContentNode` - Consolidated storage and share roots container
+    * `FolderContentNode` - General behaviors used by storage and share folders
+    * `FileContentNode` - General behaviors used by storage and share files
+    * `StorageNode` - Backups content
+      * `RootStorageNode`
+      * `DeviceStorageNode`
+      * `DirectoryStorageNode`
+      * `FileStorageNode`
+    * `ShareNode` - Share Rooms and their contents
+      * `OriginalRootShareNode` - List of share rooms published by an account
+      * `PublicRootShareNode` - Any share rooms visited
+      * `RoomShareNode` - a public or original share room
+      * `DirectoryShareNode`
+      * `FileShareNode`
+    * `RecentContentNode` - recently visited items list, most recent first
+  * `PanelNode` - abstract basis for console/UI panels
+    * `SettingsPanelNode` - settings collection
+    * `AccountPanelNode` - details of the remote account
 
 === Content Addressing ===
 
