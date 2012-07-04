@@ -1250,10 +1250,7 @@ var spideroak = function () {
         var $logout_button = $header.find('.logout-button');
         var $title = $header.find('.header-title');
         $title.text(this.title());
-        if (! this.loggedin_ish()) {
-            $logout_button.hide(); }
-        else {
-            $logout_button.show(); }}
+        $logout_button.hide(); }
 
     StorageNode.prototype.layout_header = function(mode_opts) {
         /* Fill in typical values for header fields of .my_page$().
