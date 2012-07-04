@@ -286,10 +286,10 @@ var spideroak = function () {
        general types - the ContentNode and variants of it, where useful. */
 
     function ContentNode(url, parent) {
-        /* Constructor for items representing stored content.
+        /* Constructor for items representing SpiderOak-managed content.
            - 'url' is absolute URL for the collection's root (top) node.
            - 'parent' is containing node. The root's parent is null.
-           See JSON data examples towards the bottom of this script.
+           See JSON data examples in docs/api_json_examples.txt
         */
         if ( !(this instanceof ContentNode) ) {      // Coding failsafe.
             throw new Error("Constructor called as a function");
@@ -300,7 +300,6 @@ var spideroak = function () {
             this.root_url = parent ? parent.root_url : url;
             this.query_qualifier = "";
             this.parent_url = parent ? parent.url : null;
-            this.is_container = true; // Typically.
             this.subdirs = [];  // Urls of contained devices, folders.
             this.files = [];    // Urls of contained files.
             this.$page = null;  // This node's jQuery-ified DOM data-role="page"
@@ -400,14 +399,12 @@ var spideroak = function () {
     function FileStorageNode(url, parent) {
         this.emblem = "Storage File";
         StorageNode.call(this, url, parent);
-        this.is_container = false;
         delete this.subdirs;
         delete this.files; }
     FileStorageNode.prototype = new StorageNode();
     function FileShareNode(url, parent) {
         this.emblem = "Share Room File";
         ShareNode.call(this, url, parent);
-        this.is_container = false;
         delete this.subdirs;
         delete this.files; }
     FileShareNode.prototype = new ShareNode();
