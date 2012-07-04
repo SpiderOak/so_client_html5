@@ -1884,8 +1884,8 @@ var spideroak = function () {
                 /* Remove a content node from index and free it for gc. */
                 if (combo_root && (node.url === combo_root.url)) {
                     combo_root = null; }
-                else if (recents_root && node.url === recents_root.url) {
-                    recents_root = null; }
+                else if (recents && node.url === recents.url) {
+                    recents = null; }
                 if (by_url.hasOwnProperty(node.url)) {
                     delete by_url[node.url]; }
                 node.free(); },
