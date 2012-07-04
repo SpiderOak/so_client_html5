@@ -106,8 +106,8 @@ var spideroak = function () {
                 return document_addrs[page].call(this, internal); }
             else if (data.toPage !== $.mobile.activePage.attr('id')) {
                 // Skip exact duplicates, for eg non-select popup dismissals.
-                return content_node_manager.get(page).visit(data.options,
-                                                            mode_opts); }}}
+                return node_manager.get(page).visit(data.options,
+                                                    mode_opts); }}}
 
     function establish_traversal_handler() {
         /* Establish page change event handler. */
@@ -142,18 +142,18 @@ var spideroak = function () {
            as registered storage.  We do not remove persistent settings. */
 
         if (my.original_shares_root_url) {
-            var original_shares_root = cnmgr.get(my.original_shares_root_url);
+            var original_shares_root = nmgr.get(my.original_shares_root_url);
             original_share_room_urls_list().map(
                 original_shares_root.clear_item)
             // remove_item, above, frees the rooms and contents.
-            cnmgr.free(original_shares_root); }
+            nmgr.free(original_shares_root); }
         my.original_shares_root_url = "";
 
         if (my.storage_root_url) {
-            content_node_manager.clear_hierarchy(my.storage_root_url); }
+            node_manager.clear_hierarchy(my.storage_root_url); }
         my.storage_root_url = "";
 
-        content_node_manager.free(content_node_manager.get_combo_root());
+        node_manager.free(node_manager.get_combo_root());
 
         my.username = "";
         my.storage_host = "";
@@ -462,7 +462,7 @@ var spideroak = function () {
                                     this.notify_subvisit_status.bind(this),
                                 notify_token: 'public-shares'};
         $.extend(public_mode_opts, mode_opts);
-        var public_root = cnmgr.get(my.public_shares_root_url);
+        var public_root = nmgr.get(my.public_shares_root_url);
         public_root.visit(chngpg_opts, public_mode_opts);
 
         if (! this.loggedin_ish()) {
@@ -472,7 +472,7 @@ var spideroak = function () {
             this.show(chngpg_opts, {}); }
 
         else {
-            var storage_root = content_node_manager.get(my.storage_root_url);
+            var storage_root = node_manager.get(my.storage_root_url);
             // Use a distinct copy of mode_opts:
             var storage_mode_opts = $.extend({}, public_mode_opts);
             storage_mode_opts.notify_token = 'storage';
@@ -580,7 +580,7 @@ var spideroak = function () {
                                        this.notify_subvisit_status.bind(this),
                                      notify_token: 'original-share'};
                 this.authenticated(true, response);
-                var ps_root = cnmgr.get(my.original_shares_root_url, this);
+                var ps_root = nmgr.get(my.original_shares_root_url, this);
                 ps_root.visit({}, our_mode_opts); }
             else {
                 if (this.veiled) {
@@ -637,7 +637,7 @@ var spideroak = function () {
         this.subdirs.sort(content_nodes_by_url_sorter)
         this.do_presentation({}, {passive: true});
         // XXX Feeble: always updating the combo root is too intertwined.
-        cnmgr.get_combo_root().layout(); }
+        node_manager.get_combo_root().layout(); }
 
     ContentNode.prototype.handle_visit_success = function (data, when,
                                                            chngpg_opts,
@@ -663,7 +663,7 @@ var spideroak = function () {
             $.mobile.loading('hide');
             alert("Visit '" + this.name + "' failed: "
                   + xhr.statusText + " (" + xhr.status + ")");
-            var combo_root = content_node_manager.get_combo_root();
+            var combo_root = node_manager.get_combo_root();
             if (! is_combo_root_url(this.url)) {
                 // Recover upwards, eventually to the top:
                 $.mobile.changePage(this.parent_url
@@ -747,7 +747,7 @@ var spideroak = function () {
                     + item_text + '</a>')}.bind(this);
 
         var $popup = $('#' + generic.simple_popup_id);
-        var subject_room = content_node_manager.get(subject_url);
+        var subject_room = node_manager.get(subject_url);
 
         var $listview = $popup.find('[data-role="listview"]');
         // Ditch prior contents:
@@ -825,7 +825,7 @@ var spideroak = function () {
         /* Visit a specified share room, according its' URL address.
            Return the room object. */
         register_public_share_room_url(url);
-        var room = content_node_manager.get(url, cnmgr.get_combo_root());
+        var room = node_manager.get(url, node_manager.get_combo_root());
         room.visit({},
                    {passive: true,
                     notify_callback: this.notify_subvisit_status.bind(this),
@@ -861,7 +861,7 @@ var spideroak = function () {
         if (is_public_share_room_url(room_url)) {
             if (! is_original_share_room_url(room_url)) {
                 // Free the nodes.
-                content_node_manager.clear_hierarchy(room_url); }
+                node_manager.clear_hierarchy(room_url); }
             unregister_public_share_room_url(room_url);
             this.unpersist_item(room_url);
             this.subdirs = public_share_room_urls_list();
@@ -875,7 +875,7 @@ var spideroak = function () {
         if (is_original_share_room_url(room_url)) {
             if (! is_public_share_room_url(room_url)) {
                 // Free the nodes.
-                content_node_manager.clear_hierarchy(room_url); }
+                node_manager.clear_hierarchy(room_url); }
             unregister_original_share_room_url(room_url);
             return true; }
         else { return false; }}
@@ -906,7 +906,7 @@ var spideroak = function () {
         return persisteds.hasOwnProperty(room_url); }
 
     /* ===== Containment ==== */
-    /* For content_node_manager.clear_hierarchy() */
+    /* For node_manager.clear_hierarchy() */
 
     ContentNode.prototype.contained_urls = function () {
         return [].concat(this.subdirs, this.files); }
@@ -966,12 +966,12 @@ var spideroak = function () {
                the attribute name for the subnode.
            (2) The contained item's parent is not always this object, eg for
                the content roots. */
-        var parent = content_node_manager.get(contents_parent);
+        var parent = node_manager.get(contents_parent);
         data_items.map(function (item) {
             var url = url_base + item[url_element];
             if (trailing_slash && (url.slice(url.length-1) !== '/')) {
                 url += "/"; }
-            var subnode = content_node_manager.get(url, parent);
+            var subnode = node_manager.get(url, parent);
             fields.map(function (field) {
                 if (field instanceof Array) {
                     subnode[field[1]] = item[field[0]]; }
@@ -986,7 +986,7 @@ var spideroak = function () {
                                                              mode_opts) {
         /* Embody the root storage node with 'data'.
            'when' is time soon before data was fetched. */
-        var combo_root = content_node_manager.get_combo_root();
+        var combo_root = node_manager.get_combo_root();
         var url, dev, devdata;
 
         this.name = my.username;
@@ -1148,16 +1148,16 @@ var spideroak = function () {
         // We avoid doing layout of these when not authenticated so the
         // re-presentation of the hidden sections doesn't show through.
         var storage_subdirs = (my.storage_root_url
-                               && cnmgr.get(my.storage_root_url,
-                                            this).subdirs
+                               && node_manager.get(my.storage_root_url,
+                                                   this).subdirs
                                || [])
         this.layout_content(mode_opts, storage_subdirs, false,
                             '.storage-list');
 
         // My share rooms section:
         var myshares_subdirs = (my.original_shares_root_url
-                                && cnmgr.get(my.original_shares_root_url,
-                                             this).subdirs
+                                && node_manager.get(my.original_shares_root_url,
+                                                    this).subdirs
                                 || [])
         this.layout_content(mode_opts, myshares_subdirs, false,
                             '.my-shares-list');
@@ -1262,7 +1262,7 @@ var spideroak = function () {
         var fields = {};
         fields.title = this.title();
         if (this.parent_url) {
-            var container = content_node_manager.get(this.parent_url);
+            var container = node_manager.get(this.parent_url);
             fields.left_url = '#' + this.parent_url;
             fields.left_label = container.name; }
         this.layout_header_fields(fields); }
@@ -1309,7 +1309,7 @@ var spideroak = function () {
 
         var fields = {};
         if (this.parent_url) {
-            var container = content_node_manager.get(this.parent_url);
+            var container = node_manager.get(this.parent_url);
             fields.left_url = '#' + this.parent_url;
             fields.left_label = container.name;
             fields.title = this.title(); }
@@ -1380,7 +1380,7 @@ var spideroak = function () {
                           + indicator + '">' + indicator + '</li>')
                 insert_item($item); }}
         function insert_subnode(suburl) {
-            var subnode = content_node_manager.get(suburl, this);
+            var subnode = node_manager.get(suburl, this);
             conditionally_insert_divider(subnode.name);
             insert_item(subnode.layout_item$(mode_opts)); }
 
@@ -1597,7 +1597,7 @@ var spideroak = function () {
                                                     mode_opts)));
         var ancestor_url = this.parent_url;
         while (ancestor_url) {
-            var ancestor = content_node_manager.get(ancestor_url);
+            var ancestor = node_manager.get(ancestor_url);
             $listview.append(ancestor.layout_item$(mode_opts));
             ancestor_url = ancestor.parent_url; }
 
@@ -1728,7 +1728,7 @@ var spideroak = function () {
     var tmgr = transit_manager;
 
 
-    var content_node_manager = function () {
+    var node_manager = function () {
         /* A singleton utility for getting and removing content node objects.
            "Getting" means finding existing ones or else allocating new ones.
         */
@@ -1812,7 +1812,7 @@ var spideroak = function () {
             bu: (SO_DEBUGGING ? by_url : null),
         }
     }()
-    var cnmgr = content_node_manager; // Compact name, for convenience.
+    var nmgr = node_manager; // Compact name, for convenience.
 
 
     /* ==== Login / Logout ==== */
@@ -1821,7 +1821,7 @@ var spideroak = function () {
         /* Visit the entrance page. Depending on session state, it might
            present a login challenge or it might present the top-level
            contents associated with the logged-in account. */
-        $.mobile.changePage(content_node_manager.get_combo_root().my_page$()); }
+        $.mobile.changePage(node_manager.get_combo_root().my_page$()); }
 
     function storage_login(login_info, url) {
         /* Login to storage account and commence browsing at devices.
@@ -1853,7 +1853,7 @@ var spideroak = function () {
             success: function (data) {
                 var match = data.match(/^(login|location):(.+)$/m);
                 if (!match) {
-                    var combo_root = content_node_manager.get_combo_root();
+                    var combo_root = node_manager.get_combo_root();
                     combo_root.show_status_message(
                         error_alert_message(_t('Temporary server failure'),
                                             _t('Please try again later.'))); }
@@ -1878,7 +1878,7 @@ var spideroak = function () {
                 if (remember_manager.active()
                     && (username = persistence_manager.get('username'))) {
                     $('#my_login_username').val(username); }
-                    var combo_root = content_node_manager.get_combo_root();
+                    var combo_root = node_manager.get_combo_root();
                 combo_root.show_status_message(
                     error_alert_message('Storage login', xhr.status));
                 $(document).trigger("error"); }
@@ -1894,7 +1894,7 @@ var spideroak = function () {
         // machinery apparently expecting some data registered for the
         // fromPage that's not present.
 
-        var combo_root = content_node_manager.get_combo_root();
+        var combo_root = node_manager.get_combo_root();
         combo_root.logout(); }
 
     RootContentNode.prototype.logout = function () {
@@ -1906,7 +1906,7 @@ var spideroak = function () {
                 // storage host. This leaves the username intact as a
                 // "remember" convenience for the user.
                 remember_manager.remove_storage_host(); }
-            content_node_manager.get_combo_root().visit(); }
+            node_manager.get_combo_root().visit(); }
 
         this.veil(true);
 
@@ -2031,7 +2031,7 @@ var spideroak = function () {
 
             data['password'] = $password.val();
             if (do_fade) {
-                var combo_root = content_node_manager.get_combo_root();
+                var combo_root = node_manager.get_combo_root();
                 combo_root.veil(true, function() { $password.val(""); });
                 var unhide_form_oneshot = function(event, data) {
                     combo_root.veil(false);
@@ -2059,9 +2059,9 @@ var spideroak = function () {
             establish_traversal_handler();
 
             my.combo_root_url = generic.combo_root_url;
-            var combo_root = content_node_manager.get_combo_root();
-            var public_shares = cnmgr.get(my.public_shares_root_url,
-                                          combo_root);
+            var combo_root = node_manager.get_combo_root();
+            var public_shares = node_manager.get(my.public_shares_root_url,
+                                                 combo_root);
 
             // Properly furnish login form:
             prep_login_form('.nav-login-storage', storage_login,
@@ -2165,8 +2165,8 @@ var spideroak = function () {
 
     function content_nodes_by_url_sorter(prev, next) {
         var prev_str = prev, next_str = next;
-        var prev_name = content_node_manager.get(prev).name;
-        var next_name = content_node_manager.get(next).name;
+        var prev_name = node_manager.get(prev).name;
+        var next_name = node_manager.get(next).name;
         if (prev_name && next_name) {
             prev_str = prev_name, next_str = next_name; }
         if (prev_str < next_str) { return -1; }
@@ -2175,7 +2175,7 @@ var spideroak = function () {
 
     if (SO_DEBUGGING) {
         // Expose the managers for access while debugging:
-        public_interface.cnmgr = cnmgr;
+        public_interface.nmgr = nmgr;
         public_interface.pmgr = pmgr; }
 
 
