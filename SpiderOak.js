@@ -1258,7 +1258,15 @@ var spideroak = function () {
                      ? $(mode_opts.alt_page_selector)
                      : this.my_page$());
         var $title = $page.find('[data-role="header"] .header-title');
-        $title.click(this.depth_path_menu.bind(this)); }
+        $title.click(this.depth_path_menu.bind(this));
+
+        var fields = {};
+        fields.title = this.title();
+        if (this.parent_url) {
+            var container = node_manager.get(this.parent_url);
+            fields.left_url = '#' + this.parent_url;
+            fields.left_label = container.name; }
+        this.layout_header_fields(fields); }
 
     ContentNode.prototype.layout_header_fields = function(fields) {
         /* Generalized header layout facility.
@@ -1327,15 +1335,8 @@ var spideroak = function () {
            Many storage node types will use these values as is, some will
            replace them.
          */
-        ContentNode.prototype.layout_header.call(this, mode_opts);
+        ContentNode.prototype.layout_header.call(this, mode_opts); }
 
-        var fields = {};
-        fields.title = this.title();
-        if (this.parent_url) {
-            var container = node_manager.get(this.parent_url);
-            fields.left_url = '#' + this.parent_url;
-            fields.left_label = container.name; }
-        this.layout_header_fields(fields); }
     RootStorageNode.prototype.layout_header = function(mode_opts) {
         StorageNode.prototype.layout_header.call(this, mode_opts);
 
