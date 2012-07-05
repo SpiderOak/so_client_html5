@@ -379,12 +379,16 @@
       </a>
     </div>
     <div data-role="content" data-theme="c">
-      <div class="spiel">
-        <p> Here are the storage devices your account has configured for
-          SpiderOak online backup.  Delve into the contents by tapping on
-          the entries.  Use the SpiderOak desktop or web interface to add
-          and remove folders for backup.
-        <p>You can view the backup storage folders that your account is making
+      <div class="spiel" data-role="collapsible" data-mini="true" data-theme="f"
+           data-collapsed="false"
+           data-collapsed-icon="arrow-r" data-expanded-icon="arrow-d">
+        <legend> Your Account's Backup Storage Devices </legend>
+        <p> Here are the storage devices that are configured for your
+          accounts SpiderOak online backup.  Delve into the contents by
+          tapping on the entries.  You cannot yet use the mobile app to
+          configure backup coverage - use the SpiderOak desktop or web
+          interface for that.
+        <p>You can view the storage contents that your account is making
           accessible to others in
           <a href="#" class="original_shares_root_url"> My Share Rooms</a>.
           <a href="#" class="public_shares_root_url"> Public Share
@@ -393,6 +397,7 @@
         <p class="emptiness-message">The "&empty;" sign indicates that your
           account currently doesn't publish any Share Rooms.</p>
       </div>
+      <p/>
       <ul class="content-items" data-role="listview"></ul>
     </div>
     <div data-role="footer" data-position="fixed" data-theme="a">
@@ -415,7 +420,11 @@
       </a>
     </div>
     <div data-role="content" data-theme="c">
-      <div class="spiel">
+      <div class="spiel" data-role="collapsible" data-mini="true" data-theme="f"
+           data-inset="true"
+           data-collapsed="false"
+           data-collapsed-icon="arrow-r" data-expanded-icon="arrow-d">
+        <legend> Share Rooms Published by Your Account </legend>
         <p> These are the SpiderOak Share Rooms that your account is
           publishing. Each share room is composed of folders selected from
           your account's
@@ -432,6 +441,7 @@
         <p class="emptiness-message">The "&empty;" sign indicates that your
           account currently doesn't publish any Share Rooms.</p>
       </div>
+      <p/>
       <ul class="content-items" data-role="listview"></ul>
     </div>
     <div data-role="footer" data-position="fixed" data-theme="a">
