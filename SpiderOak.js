@@ -1587,35 +1587,104 @@ var spideroak = function () {
             && (! mode_opts.hasOwnProperty('actions_menu_link_creator'))) {
             mode_opts.actions_menu_link_creator
                 = logout_link_button.bind(this); }
-        return FolderContentNode.prototype.layout_item$.call(this, mode_opts);
-    }
+        return FolderContentNode.prototype.layout_item$.call(this, mode_opts); }
 
-    ContentNode.prototype.layout_footer = function(mode_opts) {
-        /* Return markup with general and specific legend fields and urls. */
-        var $dashboard_li = $('<li class="dashboard-footer-item"/>')
-        $dashboard_li.append($('<a data-role="button"/>')
-                             .attr('href', "#home")
-                             .append($('<span class="dashboard-label"/>')
-                                     .text('Dashboard')));
-        var $recents_li = $('<li recents-footer-item/>')
-        $recents_li.append($('<a data-role="button"/>')
-                             .attr('href', "#recents").text("Recents"));
+    ContentNode.prototype.layout_footer_by_spec = function(spec_array,
+                                                           mode_opts) {
+        /* Populate the nodes' footer according to a 'spec_array', so that
+           the specific items in the produced footer can subsequently be
+           adjusted by .change_footer_item() using selectors.
+
+           The spec array is max 5-element sequence of specification objects:
+
+               [spec-obj-1, spec-obj-2, ...]
+
+           Each spec is an object that must have these properties:
+
+               {title: <the legend for the action>,
+                url: <an app-supported address, usually url>,
+                selector: <class for the item, for later selection>,
+                icon_name: <name of the action icon>}
+
+           The items in the constructed footer will be addressable by the
+           specified class-selector, and also by sequentially numbered
+           selector strings of the form "footer-item-N", where N starts
+           with 1. */
+
+        var $ul = $('<ul/>');
+        var element_count = 1;
+        var $anchor;
+        spec_array.map(function (spec) {
+            var $li = $('<li/>');
+            var classes = ("footer-item-" + element_count
+                           + " " + spec.selector);
+            $li.attr('class', classes);
+            $anchor = $('<a data-role="button"/>');
+            if (! is_compact_mode()) {
+                $anchor.attr('data-icon', spec.icon_name);
+                $anchor.attr('data-iconpos', "top"); }
+            $anchor.attr('href', spec.url);
+            // Enclose text in a labelled span so we can get at it surgically,
+            // from within intervening stuff that jQuery injects:
+            $anchor.append($('<span class="item-label"/>')
+                           .text(spec.title));
+            $li.append($anchor);
+            $ul.append($li);
+            element_count += 1; });
         var $footer = this.my_page$().find('[data-role="footer"]');
         var $navbar = $footer.find('[data-role="navbar"]');
-        $navbar.replaceWith($('<div data-role="navbar"/>')
-                            .append($('<ul/>').append($dashboard_li,
-                                                      $recents_li)));
-        var $navbar = $footer.find('[data-role="navbar"]');
+        $navbar.replaceWith($('<div data-role="navbar"/>').append($ul));
+        $navbar = $footer.find('[data-role="navbar"]');
         $navbar.navbar(); }
+
+    ContentNode.prototype.change_footer_item = function(selector,
+                                                        spec,
+                                                        mode_opts) {
+        /* Alter a footer item identified by 'selector', applying 'spec'.
+           Fields missing from the spec will be left unaltered.
+           A new selector will be appended (if not already present;
+           the old selector class will be retained).
+           See ContentNode.layout_footer_by_spec() for details. */
+        var $footer = this.my_page$().find('[data-role="footer"]');
+        var $navbar = $footer.find('[data-role="navbar"]');
+        var $target_li = $navbar.find(selector);
+        if ($target_li.length > 0) {
+            if (spec.title) {
+                $target_li.find('a span.item-label')
+                    .text(spec.title); }
+            if (spec.url) {
+                $target_li.find('a').attr('href', spec.url); }
+            if (spec.selector) {
+                // NOTE: We don't remove the prior class
+                var classes = $target_li.attr('class');
+                if (classes.indexOf(spec.selector) === -1) {
+                    $target_li.attr('class',
+                                    classes.concat(" "
+                                                   + spec.selector)); }}
+            if (! is_compact_mode() && spec.icon_name) {
+                $target_li.find('a').attr('data-icon', spec.icon_name) }
+            $navbar.navbar(); }}
+
+    ContentNode.prototype.layout_footer = function(mode_opts) {
+        /* Populate the footer for this node. */
+        this.layout_footer_by_spec([{title: "Dashboard",
+                                     url: "#home",
+                                     selector: "dashboard",
+                                     icon_name: "home"},
+                                    {title: "Recents",
+                                     url: "#recents",
+                                     selector: "recents",
+                                     icon_name: "recents"},
+                                    ],
+                                   mode_opts); }
 
     RootContentNode.prototype.layout_footer = function(mode_opts) {
         ContentNode.prototype.layout_footer.call(this, mode_opts);
-        var $change_anchor = this.my_page$().find('.dashboard-footer-item a');
-        $change_anchor.attr('href', "#about-spideroak");
-        $change_anchor.find('.dashboard-label').text("About SpiderOak");
-        var $footer = this.my_page$().find('[data-role="footer"]');
-        var $navbar = $footer.find('[data-role="navbar"]');
-        $navbar.navbar(); }
+        this.change_footer_item('.dashboard',
+                                {title: "About SpiderOak",
+                                 url: "#about-spideroak",
+                                 selector: "about-spideroak",
+                                 icon_name: "spideroak_footer"}); }
 
     ContentNode.prototype.my_page_from_dom$ = function () {
         /* Return a jquery DOM search for my page, by id. */
