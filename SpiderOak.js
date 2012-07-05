@@ -860,7 +860,7 @@ var spideroak = function () {
             if (was !== 0) {
                 // If the item isn't already the first.
                 if (was !== -1) {
-                    this.items.splice(was, was); }
+                    this.items.splice(was, 1); }
                 this.items.unshift(url);
                 this.items.splice(generic.recents_max_size); }}}
 
