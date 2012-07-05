@@ -1757,7 +1757,7 @@ var spideroak = function () {
         var mode_opts = {};
 
         var $listview = $popup.find('[data-role="listview"]');
-        $listview.empty()
+        $listview.empty();
 
         // refresh necessary so jQuery traversal stuff doesn't pass over:
         $listview.append(this.layout_item$($.extend({refresh: true},
