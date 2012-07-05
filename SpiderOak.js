@@ -1669,7 +1669,7 @@ var spideroak = function () {
         return window.location.href.split('#')[0] + '#' + this.url; }
 
     ContentNode.prototype.title = function () {
-        return this.name; }
+        return this.name || this.emblem; }
 
     RootContentNode.prototype.title = function () {
         return (my.username
