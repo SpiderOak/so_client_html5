@@ -4,8 +4,10 @@
 Contact:'' ''ken@spideroak.com
 
 Landmarks:
-* [#a2012-05-22 2012-05-22] Demo of emerging app available via Ken's sandbox; technical details doc started
-* [#a2012-05-11 2012-05-11] Rudimentary storage browsing, plus instructions for trying it
+* 2012-07-05 Here are [https://ken.dev.spideroak.com:888/ some links] to
+  versions of the app differing only in color scheme. Feedback is welcome.
+* 2012-05-22 Demo of emerging app available via Ken's sandbox; technical details doc started
+* 2012-05-11 Rudimentary storage browsing, plus instructions for trying it
 * 2012-04-06 Document created.
 
 == Resources ==
