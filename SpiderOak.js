@@ -141,9 +141,10 @@ var spideroak = function () {
         // Now let's direct the caller to the combo root:
         return my.combo_root_url; }
     function clear_storage_account() {
-        /* Obliterate internal settings and all content nodes for a clean slate.
-           All share artifacts, original and other, are removed, as well
-           as registered storage.  We do not remove persistent settings. */
+        /* Obliterate internal settings and all content nodes for a clean
+           slate.  All share artifacts, original and other, are removed, as
+           well as registered storage and recents.  We do not remove
+           persistent settings. */
 
         if (my.original_shares_root_url) {
             var original_shares_root = nmgr.get(my.original_shares_root_url);
@@ -157,6 +158,7 @@ var spideroak = function () {
             node_manager.clear_hierarchy(my.storage_root_url); }
         my.storage_root_url = "";
 
+        node_manager.free(node_manager.get_recents());
         node_manager.free(node_manager.get_combo_root());
 
         my.username = "";
