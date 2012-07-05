@@ -267,31 +267,38 @@ function, which recurses to the indicated server when required.
 
 == Incidental Technical Details and Hanging Issues ==
 === Special Browser Requirements ===
-While developing the html5 client app I did not have the luxury of
-situating the code to reside within the same domain as the storage
-servers.  To get around [#HTML5ClientAppSameOriginIssues CORS restrictions]
-(without JSONP, which the SpiderOak storage repo does not accept), I needed
-to run my browser with drastically reduced security.  I used Chip Black's
-suggestions for doing so with Google Chrome (and haven't figured
-out how to do that with Firefox, even when using the Force CORS addon -
-suggestions welcome).
+While developing the html5 client app I didn't have the luxury of
+situating the code within the same domain as the storage servers.  To run
+the client you have to configure your browser to disregard
+[#HTML5ClientAppSameOriginIssues CORS restrictions], which means
+drastically reduced security.  (Another workaround option, JSONP, is not
+available because it requires running the server to accept it, reducing
+general security.)
+
+I use Chip Black's suggestions for doing so with Google Chrome.  (I haven't
+figured out how to do that with, eg, Firefox, even when using the Force
+CORS addon - suggestions welcome).
 
 Here are the options you need to pass to Chrome:
 
 * `--allow-file-access-from-files --allow-http-access-from-files --disable-web-security --enable-file-cookies`
 
 To avoid using an insecure browser as my primary browsing session, I
-installed a copy of
-[https://tools.google.com/dlpage/chromesxs Chrome Canary], so I can run a
-separate, insecure session concurrent with my regular one.  I haven't hit
-any problems specific to running Canary, but I may have been lucky in the
-[https://spideroak.com/browse/share/klm/coalmine particular MacOS Canary build]
-that I'm using.  If you hit odd problems trying to get Canary going, try
-restarting regular Chrome with the arguments, just to establish that things
-work.
+installed a copy of [https://tools.google.com/dlpage/chromesxs Chrome Canary],
+so I can run a dedicated insecure Chrome session concurrent with my regular
+session one.  I haven't hit any problems specific to running Canary, but I
+may have been lucky in the [https://spideroak.com/browse/share/klm/coalmine
+particular MacOS Canary build] that I'm using.  If you hit odd problems
+trying to get Canary going, try restarting regular Chrome with the
+arguments, just to establish that things work.
 
 For more details about CORS restrictions and the project, see
 [[HTML5ClientAppSameOriginIssues]].
+
+I've created
+[https://ken.dev.spideroak.com:888/ an index.html in my developer's sandbox]
+which links to the versions of client app differing only by color theme.
+Preferences feedback and suggestions are welcome.
 
 === Managing the UI Theme ===
 The default set of jQuery Mobile theme swatches get us near enough to
