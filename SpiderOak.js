@@ -62,6 +62,7 @@ var spideroak = function () {
         preview_sizes: [25, 48, 228, 800],
         dividers_threshold: 10,
         filter_threshold: 10,
+        compact_threshold: 450,
         recents_max_size: 25,
         public_share_room_urls: {},
         simple_popup_id: 'simple-popup',
@@ -2290,6 +2291,9 @@ var spideroak = function () {
         if (prev_str < next_str) { return -1; }
         else if (prev_str > next_str) { return 1; }
         else { return 0; }}
+
+    function is_compact_mode() {
+        return $(document).height() < generic.compact_threshold; }
 
     if (SO_DEBUGGING) {
         // Expose the managers for access while debugging:
