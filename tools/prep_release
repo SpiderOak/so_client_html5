@@ -12,5 +12,7 @@ cd $app_dir
 # USE A MAKEFILE.
 echo "Making blue-themed SpiderOak_blue.html..."
 sed -e 's/"f"/"i"/' SpiderOak.html > SpiderOak_blue.html
+echo "Making green-themed SpiderOak_blue.html..."
+sed -e 's/"f"/"h"/' SpiderOak.html > SpiderOak_blue.html
 
 echo "Done."
