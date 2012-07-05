@@ -62,7 +62,7 @@ var spideroak = function () {
         preview_sizes: [25, 48, 228, 800],
         dividers_threshold: 10,
         filter_threshold: 10,
-        compact_threshold: 450,
+        compact_threshold: 500,
         recents_max_size: 25,
         public_share_room_urls: {},
         simple_popup_id: 'simple-popup',
