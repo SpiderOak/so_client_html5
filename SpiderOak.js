@@ -1588,8 +1588,30 @@ var spideroak = function () {
 
     ContentNode.prototype.layout_footer = function(mode_opts) {
         /* Return markup with general and specific legend fields and urls. */
-        // XXX Not yet implemented.
-    }
+        var $dashboard_li = $('<li class="dashboard-footer-item"/>')
+        $dashboard_li.append($('<a data-role="button"/>')
+                             .attr('href', "#home")
+                             .append($('<span class="dashboard-label"/>')
+                                     .text('Dashboard')));
+        var $recents_li = $('<li recents-footer-item/>')
+        $recents_li.append($('<a data-role="button"/>')
+                             .attr('href', "#recents").text("Recents"));
+        var $footer = this.my_page$().find('[data-role="footer"]');
+        var $navbar = $footer.find('[data-role="navbar"]');
+        $navbar.replaceWith($('<div data-role="navbar"/>')
+                            .append($('<ul/>').append($dashboard_li,
+                                                      $recents_li)));
+        var $navbar = $footer.find('[data-role="navbar"]');
+        $navbar.navbar(); }
+
+    RootContentNode.prototype.layout_footer = function(mode_opts) {
+        ContentNode.prototype.layout_footer.call(this, mode_opts);
+        var $change_anchor = this.my_page$().find('.dashboard-footer-item a');
+        $change_anchor.attr('href', "#about-spideroak");
+        $change_anchor.find('.dashboard-label').text("About SpiderOak");
+        var $footer = this.my_page$().find('[data-role="footer"]');
+        var $navbar = $footer.find('[data-role="navbar"]');
+        $navbar.navbar(); }
 
     ContentNode.prototype.my_page_from_dom$ = function () {
         /* Return a jquery DOM search for my page, by id. */
