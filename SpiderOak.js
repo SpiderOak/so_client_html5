@@ -627,6 +627,7 @@ var spideroak = function () {
                 this.authenticated(false, response);
                 this.layout(); }}
         else {
+            // Unnecessary relayout of header and footer is future-proofing:
             this.layout();
 
             if (token === 'storage') {
@@ -695,9 +696,7 @@ var spideroak = function () {
         // Do update, whether or not it was successful:
         this.subdirs = public_share_room_urls_list()
         this.subdirs.sort(content_nodes_by_url_sorter)
-        this.do_presentation({}, {passive: true});
-        // XXX Feeble: always updating the combo root is too intertwined.
-        node_manager.get_combo_root().layout(); }
+        this.do_presentation({}, {passive: true}); }
 
     ContentNode.prototype.handle_visit_success = function (data, when,
                                                            chngpg_opts,
