@@ -696,7 +696,10 @@ var spideroak = function () {
         // Do update, whether or not it was successful:
         this.subdirs = public_share_room_urls_list()
         this.subdirs.sort(content_nodes_by_url_sorter)
-        this.do_presentation({}, {passive: true}); }
+        this.do_presentation({}, {passive: true});
+        // NOTE: Necessary to avoid skeleton items in init combo-root view.
+        //       There should be a better, less arbitrarily intrusive way.
+        node_manager.get_combo_root().layout(); }
 
     ContentNode.prototype.handle_visit_success = function (data, when,
                                                            chngpg_opts,
