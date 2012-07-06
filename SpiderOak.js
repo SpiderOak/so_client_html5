@@ -524,7 +524,7 @@ var spideroak = function () {
             this.show(chngpg_opts, {}); }
 
         else {
-            var storage_root = node_manager.get(my.storage_root_url);
+            var storage_root = node_manager.get(my.storage_root_url, this);
             // Use a distinct copy of mode_opts:
             var storage_mode_opts = $.extend({}, public_mode_opts);
             storage_mode_opts.notify_token = 'storage';
