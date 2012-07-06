@@ -1,8 +1,8 @@
 /*
-* jQuery Mobile Framework Git Build: SHA1: 73d62f83dfbb6e1fc0b7352d871b4248ecf1d400 <> Date: Fri Jun 29 10:01:16 2012 -0700
+* jQuery Mobile Framework Git Build: SHA1: 5c4f4973b14d4cfd0b224ce0066a0a5396bbdfbf <> Date: Fri Jul 6 11:47:35 2012 +0200
 * http://jquerymobile.com
 *
-* Copyright 2011-12 (c) The jQuery Foundation
+* Copyright 2012 jQuery Foundation and other contributors
 * Dual licensed under the MIT or GPL Version 2 licenses.
 * http://jquery.org/license
 *
@@ -13,7 +13,7 @@
 .ui-mobile, .ui-mobile body { height: 99.9%; }
 .ui-mobile fieldset, .ui-page { padding: 0; margin: 0; }
 .ui-mobile a img, .ui-mobile fieldset { border-width: 0; }
-.ui-mobile-viewport {  margin: 0; overflow-x: visible; -webkit-text-size-adjust: none; -ms-text-size-adjust:none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); }
+.ui-mobile-viewport { margin: 0; overflow-x: visible; -webkit-text-size-adjust: none; -ms-text-size-adjust:none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); }
 body.ui-mobile-viewport,
 div.ui-mobile-viewport { overflow-x: hidden; }
 .ui-mobile [data-role=page], .ui-mobile [data-role=dialog], .ui-page { top: 0; left: 0; width: 100%; min-height: 100%; position: absolute; display: none; border: 0; }
@@ -643,6 +643,7 @@ div.ui-mobile-viewport { overflow-x: hidden; }
 	z-index: 10;
 }
 .ui-navbar { max-width: 100%; }
+.ui-navbar.ui-mini { margin: 0; }
 .ui-navbar ul { list-style:none; margin: 0; padding: 0; position: relative; display: block; border: 0; max-width: 100%; overflow:hidden; }
 .ui-navbar li .ui-btn { display: block; text-align: center; margin: 0 -1px 0 0; border-right-width: 0; }
 .ui-navbar li .ui-btn-icon-right .ui-icon { right: 6px; }
@@ -671,7 +672,7 @@ div.ui-mobile-viewport { overflow-x: hidden; }
 .ui-navbar li .ui-btn-icon-top .ui-btn-inner { padding-top: 30px; }
 .ui-navbar li .ui-btn-icon-bottom .ui-btn-inner { padding-bottom: 30px; }
 .ui-btn { display: block; text-align: center; cursor:pointer; position: relative; margin: .5em 0; padding: 0; }
-.ui-btn.ui-mini { margin-top: .25em; margin-bottom: .25em; }
+.ui-mini { margin-top: .25em; margin-bottom: .25em; }
 .ui-btn-left, .ui-btn-right, .ui-input-clear, .ui-btn-inline,
 .ui-grid-a .ui-btn, .ui-grid-b .ui-btn, .ui-grid-c .ui-btn, .ui-grid-d .ui-btn, .ui-grid-e .ui-btn, .ui-grid-solo .ui-btn { margin-right: 5px; margin-left: 5px; }
 .ui-btn-inner { font-size: 16px; padding: .6em 20px; min-width: .75em; display: block; position: relative; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; zoom: 1; }
@@ -685,8 +686,8 @@ div.ui-mobile-viewport { overflow-x: hidden; }
 .ui-header .ui-btn-inner,
 .ui-footer .ui-btn-inner,
 .ui-mini .ui-btn-inner { font-size: 12.5px; padding: .55em 11px .5em; }
-.ui-header .ui-fullsize .ui-btn-inner,
-.ui-footer .ui-fullsize .ui-btn-inner { font-size: 16px; padding: .6em 25px; }
+.ui-fullsize .ui-btn-inner,
+.ui-fullsize .ui-btn-inner { font-size: 16px; padding: .6em 20px; }
 .ui-btn-icon-notext { width: 24px; height: 24px; }
 .ui-btn-icon-notext .ui-btn-inner { padding: 0; height: 100%; }
 .ui-btn-icon-notext .ui-btn-inner .ui-icon { margin: 2px 1px 2px 3px; float: left; }
@@ -1017,7 +1018,6 @@ label.ui-select { font-size: 16px; line-height: 1.4; font-weight: normal; margin
 .ui-selectmenu .ui-listview { margin: 0; }
 .ui-selectmenu .ui-btn.ui-li-divider { cursor: default; }
 .ui-selectmenu-hidden { top: -99999px; left: -9999px; }
-.ui-selectmenu-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 99; }
 .ui-screen-hidden, .ui-selectmenu-list .ui-li .ui-icon { display: none; }
 .ui-selectmenu-list .ui-li .ui-icon { display: block; }
 .ui-li.ui-selectmenu-placeholder { display: none; }
@@ -1071,12 +1071,12 @@ ol.ui-listview .ui-li-jsnumbering:before { content: "" !important; }
 .ui-li>.ui-btn-inner { display: block; position: relative; padding: 0; }
 .ui-li .ui-btn-inner a.ui-link-inherit, .ui-li-static.ui-li { padding: .7em 15px; display: block; }
 .ui-li-has-thumb .ui-btn-inner a.ui-link-inherit, .ui-li-static.ui-li-has-thumb  { min-height: 60px; padding-left: 100px; }
-.ui-li-has-icon .ui-btn-inner a.ui-link-inherit, .ui-li-static.ui-li-has-icon {  min-height: 20px; padding-left: 40px; }
+.ui-li-has-icon .ui-btn-inner a.ui-link-inherit, .ui-li-static.ui-li-has-icon { min-height: 20px; padding-left: 40px; }
 .ui-li-has-count .ui-btn-inner a.ui-link-inherit, .ui-li-static.ui-li-has-count, .ui-li-divider.ui-li-has-count { padding-right: 45px; }
 .ui-li-has-arrow .ui-btn-inner a.ui-link-inherit, .ui-li-static.ui-li-has-arrow { padding-right: 40px; }
 .ui-li-has-arrow.ui-li-has-count .ui-btn-inner a.ui-link-inherit, .ui-li-static.ui-li-has-arrow.ui-li-has-count { padding-right: 75px; }
 .ui-li-heading { font-size: 16px; font-weight: bold; display: block; margin: .6em 0; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
-.ui-li-desc {  font-size: 12px; font-weight: normal; display: block; margin: -.5em 0 .6em; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
+.ui-li-desc { font-size: 12px; font-weight: normal; display: block; margin: -.5em 0 .6em; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
 .ui-li-thumb, .ui-listview .ui-li-icon { position: absolute; left: 1px; top: 0; max-height: 80px; max-width: 80px; }
 .ui-listview .ui-li-icon { max-height: 16px; max-width: 16px; left: 10px; top: .9em; }
 .ui-li-thumb, .ui-listview .ui-li-icon, .ui-li-content { float: left; margin-right: 10px; }
@@ -1126,7 +1126,7 @@ div.ui-slider-mini a.ui-slider-handle .ui-btn-inner { height: 30px; width: 30px;
 }	
 div.ui-slider-switch { height: 32px; margin-left: 0; width: 5.8em; }
 a.ui-slider-handle-snapping { -webkit-transition: left 70ms linear; -moz-transition: left 70ms linear; }
-div.ui-slider-switch .ui-slider-handle {  margin-top: 1px; }
+div.ui-slider-switch .ui-slider-handle { margin-top: 1px; }
 .ui-slider-inneroffset { margin: 0 16px; position: relative; z-index: 1; }
 div.ui-slider-switch.ui-slider-mini { width: 5em; height: 29px; }
 div.ui-slider-switch.ui-slider-mini .ui-slider-inneroffset { margin: 0 15px 0 14px; }
