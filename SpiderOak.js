@@ -815,8 +815,6 @@ var spideroak = function () {
         // Ditch prior contents:
         $listview.empty()
 
-        var popup_id = '#' + generic.simple_popup_id;
-        var $popup = $(popup_id);
         $popup.find('.title').html('<span class="subdued">Room: </span>'
                                    + elide(subject_room.title(), 50));
         $popup.find('.close-button').attr('href',
