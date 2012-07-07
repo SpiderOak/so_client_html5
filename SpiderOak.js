@@ -1536,7 +1536,7 @@ var spideroak = function () {
         /* Return a file-like content node's description as a jQuery item. */
         var $it = ContentNode.prototype.layout_item$.call(this, mode_opts);
 
-        var type = classify_file_by_name(this.name);
+        var type = describe_file_by_name(this.name);
         var pretty_type = type ? (type + ", ") : "";
         var $details = $('<p>' + pretty_type + bytesToSize(this.size) +'</p>');
 

@@ -67,54 +67,94 @@ function blather(msg, do_alert) {
     }
 }
 
-FILE_TYPE_BY_SUFFIX = {txt: "Text",
-                       pdf: "Adobe PDF",
-                       doc: "MS Word", docx: "MS Word (Open XML)",
-                       xls: "MS Excel",
-                       ppt: "MS Powerpoint",
-                       png: "Image", jpg: "Image", jpeg: "Image", gif: "Image",
-                       ico: "MS Icon",
-                       svg: "Structured Vector Graphics",
-                       ps: "PostScript", eps: "Extended PostScript",
-                       avi: "Video", mpg: "Video", mpeg: "Video",
-                       mov: "Video",
-                       mp3: "MPEG Audio", ogg: "Ogg Vorbis Audio",
-                       wav: "Waveform Audio",
-                       exe: "Executable",
-                       o: "Linkable Object Code",
-                       c: "C Source Code",
-                       sh: "Shell Script",
-                       py: "Python Script",
-                       pl: "Perl Script",
-                       tcl: "TCL Script",
-                       js: "Javascript",
-                       bat: "MS Batch Script",
-                       zip: "Compressed Archive (zip)",
-                       gz: "Compressed (gzip)",
-                       tgz: "Compressed Archive (gzip)",
-                       jar: "Java Archive",
-                       htm: "HyperText", html: "HyperText",
-                       php: "PHP HyperText",
-                       xml: "Extensible Markup Language",
-                      }
-function classify_file_by_name(name) {
-    /* Return a string inferred from a file's name.
-       Return an empty string if fail to infer anything.
-     */
+// This uses is for application to the tables below, and is used by the
+// functions immediately below them.
+function lookup_file_by_name(name, table) {
+    /* Retrieve the result of seeking 'name's suffix in 'table', doing some
+       finagling to get the proper suffix. */
     var splat = name.split('.');
     var extension = splat[splat.length-1];
     var is_backup = false;
-    var classification = FILE_TYPE_BY_SUFFIX[extension.toLowerCase()];
-    if (! classification) {
+    var got = table[extension.toLowerCase()];
+    if (! got) {
         if (splat.length > 2 && (extension.match(/[0-9]/)
                                  || extension.match("~")
                                  || extension.match("#"))) {
             is_backup = true;
             var extension = splat[splat.length-2];
-            classification = FILE_TYPE_BY_SUFFIX[extension];
+            got = table[extension];
         }}
-    return classification || "";
-}
+    return got || ""; }
+
+var FILE_CLASS_TO_SUFFIX = {text: ['txt'],
+                            acrobat: ['pdf'],
+                            doc: ['doc', 'docx'],
+                            picture: ['png', 'jpg', 'jpeg', 'gif', 'ico', 'svg',
+                                      'ps', 'eps'],
+                            video: ['mov', 'mpg', 'mpeg', 'avi', 'wmv'],
+                            audio: ['mp3', 'm4a', 'm4p',
+                                    'ogg', 'flac', 'aiff', 'au',
+                                    'pcm', 'wav', 'aac', 'wma'],
+                            exe: ['exe', 'o'],
+                            code: ['c', 'sh', 'py', 'pl', 'tcl', 'bat',
+                                   'js', 'css', 'html', 'htm', 'xml', 'php'],
+                            archive: ['zip', 'jar', 'tgz', 'tjz', 'tar'],
+                           }
+var FILE_SUFFIX_TO_CLASS = function (class_to_suffix) {
+    var got = {};
+    // Outer loop seems more clear than wrapping inner .map() in another .map().
+    var fcts_keys = Object.keys(class_to_suffix);
+    for (var i=0; i < fcts_keys.length; i++) {
+        var file_class = fcts_keys[i];
+        class_to_suffix[file_class].map(function (suffix) {
+            got[suffix] = file_class; }); }
+    return got; }(FILE_CLASS_TO_SUFFIX);
+
+var FILE_SUFFIX_TO_DESCRIPTION = {txt: "Text",
+                                  pdf: "Adobe PDF",
+                                  doc: "MS Word", docx: "MS Word (Open XML)",
+                                  xls: "MS Excel",
+                                  ppt: "MS Powerpoint",
+                                  png: "Image", jpg: "Image", jpeg: "Image",
+                                  gif: "Image",
+                                  ico: "MS Icon",
+                                  svg: "Structured Vector Graphics",
+                                  ps: "PostScript", eps: "Extended PostScript",
+                                  avi: "Video", mpg: "Video", mpeg: "Video",
+                                  mov: "Video",
+                                  wmv: "Windows Media Video",
+                                  mp3: "MPEG Audio", ogg: "Ogg Vorbis Audio",
+                                  wav: "Waveform Audio",
+                                  wma: "Windows Media Audio",
+                                  exe: "Executable",
+                                  o: "Linkable Object Code",
+                                  c: "C Source Code",
+                                  sh: "Shell Script",
+                                  py: "Python Script",
+                                  pl: "Perl Script",
+                                  tcl: "TCL Script",
+                                  js: "Javascript",
+                                  bat: "MS Batch Script",
+                                  zip: "Compressed Archive (zip)",
+                                  gz: "Compressed (gzip)",
+                                  tgz: "Compressed Archive (gzip)",
+                                  jar: "Java Archive",
+                                  htm: "HyperText", html: "HyperText",
+                                  php: "PHP HyperText",
+                                  xml: "Extensible Markup Language",
+                                  db: "Database",
+                                  dat: "Data",
+                                 }
+
+function describe_file_by_name(name) {
+    /* Return a brief description of file type according to file 'name' suffix.
+       Return empty string if we fail to infer anything. */
+    return lookup_file_by_name(name, FILE_SUFFIX_TO_DESCRIPTION); }
+function classify_file_by_name(name) {
+    /* Return a string inferred from a file's name.
+       Return empty string if we fail to infer anything. */
+    return lookup_file_by_name(name, FILE_SUFFIX_TO_CLASS); }
+
 function bytesToSize(bytes) {
     /* Return description of number of 'bytes' */
     /* Adapted from an entry found on:
