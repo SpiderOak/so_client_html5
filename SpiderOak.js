@@ -65,7 +65,8 @@ var spideroak = function () {
         compact_threshold: 500,
         recents_max_size: 25,
         public_share_room_urls: {},
-        simple_popup_id: 'simple-popup',
+        titled_choice_popup_id: 'titled-choice-popup',
+        titled_choice_popup_launcher_id: 'titled-choice-popup-launcher',
         depth_path_popup_id: 'depth-path-popup',
         top_level_info_ids: ['about-dashboard', 'about-spideroak'],
     };
@@ -808,15 +809,12 @@ var spideroak = function () {
                     + 'data-mini="true" data-iconpos="right">'
                     + item_text + '</a>')}.bind(this);
 
-        var $popup = $('#' + generic.simple_popup_id);
-        var subject_room = node_manager.get(subject_url);
-
+        var $popup = $('#' + generic.titled_choice_popup_id);
         var $listview = $popup.find('[data-role="listview"]');
         // Ditch prior contents:
         $listview.empty()
 
-        var popup_id = '#' + generic.simple_popup_id;
-        var $popup = $(popup_id);
+        var subject_room = node_manager.get(subject_url);
         $popup.find('.title').html('<span class="subdued">Room: </span>'
                                    + elide(subject_room.title(), 50));
         $popup.find('.close-button').attr('href',
@@ -850,9 +848,11 @@ var spideroak = function () {
         //$popup.popup(handlers);
         $popup.popup();
         $popup.parent().page();
+        var $popup_launcher = $('#' + generic.titled_choice_popup_launcher_id);
         $listview.listview('refresh');
-        $popup.popup('open');
-    }
+        // ***
+        $popup_launcher.click();
+        return false; }
     // Whitelist this method for use as a mode_opts 'action':
     PublicRootShareNode.prototype.enlisted_room_menu.is_action = true;
 
