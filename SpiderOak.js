@@ -1289,7 +1289,12 @@ var spideroak = function () {
         var $label;
 
         if (fields.hasOwnProperty('title')) {
-            $header.find('.header-title').html(elide(fields.title, 25)); }
+            var $icon = ($('<img/>')
+                         .attr('src', this.my_icon_image())
+                         .attr('alt', this.emblem)
+                         .attr('class', "so-image-icon"));
+            var $title = $('<span/>').text(elide(fields.title, 25));
+            $header.find('.header-title').empty().append($icon, $title); }
 
         var $right_slot = $header.find('.header-right-slot');
         if (fields.hasOwnProperty('right_url')) {
@@ -1762,7 +1767,11 @@ var spideroak = function () {
     RoomShareNode.prototype.my_icon_image = function() {
         return "icons/room_public.png"; }
     OriginalRootShareNode.prototype.my_icon_image = function() {
-        return "icons/so-room_original.png"; }
+        return "icons/room_original.png"; }
+    PublicRootShareNode.prototype.my_icon_image = function() {
+        return "icons/room_public.png"; }
+    RootContentNode.prototype.my_icon_image = function () {
+        return "images/spideroak_logo_orange.png"; }
 
     ContentNode.prototype.here = function () {
         /* Return the complete address of this content node, as part of the

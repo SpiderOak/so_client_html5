@@ -14,10 +14,14 @@
 [data-role=header] .header-title[data-theme=c] {
   /* Mostly white */
   border-color:  rgba(192,192,192,.2); }
+.header-title .so-image-icon {
+  margin-right: 8px;
+  vertical-align: middle;
+}
 .so-image-icon {
-  background-size: 16px 16px;
   width: 16px;
   height: 16px;
+  vertical-align: middle;
 }
 .ui-li-icon {
   margin-left: 10px;
