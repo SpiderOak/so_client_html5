@@ -9,12 +9,15 @@ tools_dir="$(dirname $0)"
 app_dir="$tools_dir/.."
 cd $app_dir
 
-# USE A MAKEFILE.
+blue_more="-e s/icons_orange/icons_blue/"
+blue_more="${blue_more} -e s/alternatives_orange/alternatives_blue/"
+
+# XXX USE A MAKEFILE.
 echo "Making neutral-themed SpiderOak_neutral.html..."
-sed -e 's/"f"/"g"/' SpiderOak.html > SpiderOak_neutral.html
+sed -e 's/"f"/"g"/g' $blue_more SpiderOak.html > SpiderOak_neutral.html
 echo "Making blue-themed SpiderOak_blue.html..."
-sed -e 's/"f"/"i"/' SpiderOak.html > SpiderOak_blue.html
+sed -e 's/"f"/"i"/g' $blue_more SpiderOak.html > SpiderOak_blue.html
 echo "Making green-themed SpiderOak_blue.html..."
-sed -e 's/"f"/"h"/' SpiderOak.html > SpiderOak_green.html
+sed -e 's/"f"/"h"/g' SpiderOak.html > SpiderOak_green.html
 
 echo "Done."
