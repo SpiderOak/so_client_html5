@@ -1473,7 +1473,7 @@ var spideroak = function () {
 
             if (do_filter) { $list.attr('data-filter', 'true'); }
             if (lensubdirs) {
-                divider_prefix = "/";
+                divider_prefix = "/ ";
                 for (var i=0; i < subdirs.length; i++) {
                     insert_subnode(subdirs[i]); }}
             if (lenfiles) {
