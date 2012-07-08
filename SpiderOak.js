@@ -1020,7 +1020,6 @@ var spideroak = function () {
     ContentNode.prototype.provision_items = function (data_items,
                                                       this_container,
                                                       url_base, url_element,
-                                                      trailing_slash,
                                                       fields,
                                                       contents_parent) {
         /* Register data item fields into subnodes of this node:
@@ -1028,7 +1027,6 @@ var spideroak = function () {
            'this_container' - the container into which to place the subnodes,
            'url_base' - the base url onto which the url_element is appended,
            'url_element' - the field name for the url of item within this node,
-           'trailing_slash' - true: url is given a trailing slash if absent,
            'fields' - an array of field names for properties to be copied (1),
            'contents_parent' - the node to attribute as the subnodes parent (2).
 
@@ -1041,8 +1039,6 @@ var spideroak = function () {
         var parent = node_manager.get(contents_parent);
         data_items.map(function (item) {
             var url = url_base + item[url_element];
-            if (trailing_slash && (url.slice(url.length-1) !== '/')) {
-                url += "/"; }
             var subnode = node_manager.get(url, parent);
             fields.map(function (field) {
                 if (field instanceof Array) {
@@ -1050,7 +1046,10 @@ var spideroak = function () {
                 else {
                     if (typeof item[field] !== "undefined") {
                         subnode[field] = item[field]; }}})
-            // TODO Scaling - make subdirs an object for hashed lookup.
+            if (subnode.name && (subnode.name[subnode.name.length-1] === "/")) {
+                // Remove trailing slash.
+                subnode.name = subnode.name.slice(0, subnode.name.length-1); }
+            // TODO Scaling - make subdirs an object for hashed lookup?
             if (this_container.indexOf(url) === -1) {
                 this_container.push(url); }})}
 
@@ -1067,7 +1066,7 @@ var spideroak = function () {
 
         this.subdirs = [];
         this.provision_items(data.devices, this.subdirs,
-                             this.url, 'encoded', true,
+                             this.url, 'encoded',
                              ['name', 'lastlogin', 'lastcommit'],
                              my.combo_root_url);
 
@@ -1078,7 +1077,7 @@ var spideroak = function () {
            'when' is time soon before data was fetched. */
 
         this.subdirs = [];
-        this.provision_items(data.dirs, this.subdirs, this.url, 1, true,
+        this.provision_items(data.dirs, this.subdirs, this.url, 1,
                              [[0, 'name']], this.url);
 
         if (data.hasOwnProperty('files')) {
@@ -1099,7 +1098,7 @@ var spideroak = function () {
         this.subdirs = [];
         var room_base = my.public_shares_root_url + data.share_id_b32 + "/";
         this.provision_items(data.share_rooms, this.subdirs,
-                             room_base, 'room_key', true,
+                             room_base, 'room_key',
                              [['room_name', 'name'],
                               ['room_description', 'description'],
                               'room_key', 'share_id'],
