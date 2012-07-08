@@ -668,9 +668,11 @@ var spideroak = function () {
         var share_id = base32.decode(splat[splat.length-3]);
         var room_key = splat[splat.length-2];
 
-        var which_msg = share_id + " / " + room_key;
+        var which_msg = ('Share ID <span class="message-subject">'
+                         + share_id + "</span>");
 
         if (succeeded !== true) {
+            which_msg += " with given Room Key";
             this.remove_status_message('result');
             var message = (_t("Sorry") + " - " + which_msg + " "
                            + content.statusText + " (" + content.status + ")");
@@ -686,8 +688,9 @@ var spideroak = function () {
         else {
             this.remove_status_message('error');
             if (this.adding_external) {
-                var $sm = this.show_status_message(_t("Added") + ": "
-                                                   + which_msg, 'result');
+                var $sm = this.show_status_message(_t("Added") + " ("
+                                                   + which_msg + ")",
+                                                   'result');
                 this.adding_external = false; }
             else {
                 this.remove_status_message('result'); }
@@ -878,13 +881,17 @@ var spideroak = function () {
 
         var share_id = credentials.shareid;
         var room_key = credentials.password;
-        var message = (share_id + " / " + room_key);
+        var message = ("Specificied room (Share ID "
+                       + '<span class="message-subject">'
+                       + share_id + "</span>)");
         var new_share_url = (my.public_shares_root_url
                              + base32.encode_trim(share_id)
                              + "/" + room_key
                              + "/");
         if (is_public_share_room_url(new_share_url)) {
-            this.show_status_message(message + " " + _t("already added")); }
+            this.remove_status_message('result');
+            this.show_status_message(message + " " + _t("already added"),
+                                     'error'); }
         else {
             this.remove_status_message('error');
             var $sm = this.show_status_message(_t("Working..."),
@@ -915,10 +922,13 @@ var spideroak = function () {
         var splat = room_url.split('/');
         var share_id = base32.decode(splat[splat.length-3]);
         var room_key = splat[splat.length-2];
-        var message = "Public share room " + (share_id + " / " + room_key);
+        var message = ("Public share room (Share ID"
+                       + '<span class="message-subject">'
+                       + share_id + "</span>)");
 
         if (! is_public_share_room_url(room_url)) {
-            this.show_status_message(message + " " + _t("not found.")); }
+            this.show_status_message(message + " " + _t("not found."),
+                                     'error'); }
         else {
             this.remove_status_message('error');
             this.adding_external = true;
@@ -1543,8 +1553,7 @@ var spideroak = function () {
         $title.html($title.html()
                     + '<div> <small> <span class="subdued">Share ID:</span> '
                     + this.share_id
-                    + ', <span class="subdued">Room Key:</span> '
-                    + this.room_key + ' </small> </div>');
+                    + ' </small> </div>');
         return $it; }
     FileContentNode.prototype.layout_item$ = function(mode_opts) {
         /* Return a file-like content node's description as a jQuery item. */
