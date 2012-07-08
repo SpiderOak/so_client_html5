@@ -503,6 +503,7 @@ var spideroak = function () {
         this.remove_status_message();
 
         this.show(chngpg_opts, {});
+        $.mobile.loading('show');
 
         if (mode_opts && mode_opts.logout) {
             this.logout();
