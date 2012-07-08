@@ -19,6 +19,9 @@
   width: 16px;
   height: 16px;
 }
+.ui-li-icon {
+  margin-left: 10px;
+}
 
 [data-role=header] .header-title[data-theme=f] {
    /* Orange - SpiderOak.html */
