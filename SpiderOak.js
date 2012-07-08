@@ -1726,11 +1726,29 @@ var spideroak = function () {
         return RootContentNode.prototype.my_page$.call(this); }
 
     ContentNode.prototype.my_content_items$ = function (selector) {
-        /* Return this node's jQuery contents litview object.
+        /* Return this node's jQuery contents listview object.
            Optional 'selector' is used, otherwise '.content-items'. */
         return this.my_page$().find(selector || '.content-items'); }
     ContentNode.prototype.get_storage_page_template$ = function() {
         return $("#" + generic.content_page_template_id); }
+
+    FileContentNode.prototype.my_icon_image = function() {
+        var icon = icon_name_by_file_name(this.name);
+        return (icon
+                ? "icons/" + icon + ".png"
+                : "icons/file.png"); }
+    FileStorageNode.prototype.my_icon_image = function() {
+        return FileContentNode.prototype.my_icon_image.call(this); }
+    FileShareNode.prototype.my_icon_image = function() {
+        return FileContentNode.prototype.my_icon_image.call(this); }
+    ContentNode.prototype.my_icon_image = function() {
+        return "icons/folder.png"; }
+    DeviceStorageNode.prototype.my_icon_image = function() {
+        return "icons/device.png"; }
+    RoomShareNode.prototype.my_icon_image = function() {
+        return "icons/room_public.png"; }
+    OriginalRootShareNode.prototype.my_icon_image = function() {
+        return "icons/so-room_original.png"; }
 
     ContentNode.prototype.here = function () {
         /* Return the complete address of this content node, as part of the
