@@ -41,8 +41,8 @@ Landmarks:
 || Done |||| Add header depth path navigation menu, with logout ||
 || Done |||| Finish headers ||
 || Done |||| Implement footers ||
-|| => |||| Show item-type icons on content listings ||
-|| - || Hybridization - Package for mobile device, including settling what exact provisions will be needed for [https://spideroak.com/pandora/wiki/HTML5ClientAppSameOriginIssues CORS], stashed user and share credentials, etc. || See [[HTML5ClientProjectHybrid]] ||
+|| Done || Show item-type icons on content listings, header title, etc || Still need to improve the icon set ||
+|| => || Hybridization - Package for mobile device, including settling what exact provisions will be needed for [https://spideroak.com/pandora/wiki/HTML5ClientAppSameOriginIssues CORS], stashed user and share credentials, etc. || See [[HTML5ClientProjectHybrid]] ||
 || - |||| Scope out and implement file-type-specific handling, beyond what the browser does ||
 || - |||| Implement Send-to menu ||
 || - |||| Implement session PIN security ||
