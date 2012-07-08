@@ -1493,7 +1493,13 @@ var spideroak = function () {
         else {
             href = "#" + this.url; }
         $anchor.attr('href', href);
-        $anchor.html($('<h4 class="item-title"/>').html(this.name));
+        $anchor.append($('<h4 class="item-title"/>').html(this.name));
+        var icon = this.my_icon_image();
+        if (icon) {
+            $anchor.children().before($('<img/>')
+                                      .attr('src', icon)
+                                      .attr('alt', this.emblem)
+                                      .attr('class', "ui-li-icon")); }
 
         var $it = $('<li/>').append($anchor);
 
@@ -1547,7 +1553,16 @@ var spideroak = function () {
                       + " " + date.toLocaleTimeString()
                       +'</p>');
         var $table = $('<table width="100%"/>');
-        var $td = $('<td colspan="2"/>').append($('<h4/>').html(this.name));
+        var $icon = ($('<img/>')
+                     .attr('src', this.my_icon_image())
+                     .attr('alt', this.emblem)
+                     .attr('class', "so-image-icon"));
+        var $name = $('<h4/>').html(this.name);
+        var $legend = ($('<table/>')
+                       .append($('<tr/>')
+                               .append($('<td valign="center"/>').append($icon),
+                                       $('<td/>').append($name))));
+        var $td = $('<td colspan="2"/>').append($legend);
         $table.append($('<tr/>').append($td));
         var $tr = $('<tr/>');
         $tr.append($('<td/>').append($details).attr('wrap', "none"));
@@ -1557,9 +1572,6 @@ var spideroak = function () {
         var $anchor = $it.find('a.item-url');
         $anchor.empty();
         $anchor.append($table);
-
-        // XXX use classification to select an icon:
-        $it.attr('data-icon', "false");
 
         return $it; }
 
@@ -1683,7 +1695,7 @@ var spideroak = function () {
                                 {title: "About SpiderOak",
                                  url: "#about-spideroak",
                                  selector: "about-spideroak",
-                                 icon_name: "spideroak_footer"}); }
+                                 icon_name: "so-logo-footer"}); }
 
     ContentNode.prototype.my_page_from_dom$ = function () {
         /* Return a jquery DOM search for my page, by id. */
