@@ -1087,8 +1087,12 @@ var spideroak = function () {
                 /* Add previews, if any, to the fields. */
                 if (("preview_" + size) in data.files) {
                     fields.push("preview_" + size); }})
-            this.provision_items(data.files, this.files, this.url, 'url', false,
-                                 fields, this.url); }
+            this.provision_items(data.files, this.files, this.url, 'url',
+                                 fields, this.url);
+            if (this.name && (this.name[this.name.length-1] === "/")) {
+                // Remove trailing slash.
+                this.name = this.name.slice(0, this.name.length-1); }
+        }
 
         this.lastfetched = when; }
 
