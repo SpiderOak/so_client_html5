@@ -11,6 +11,11 @@
   border-radius: 1em;
   cursor: context-menu;
 }
+[data-role=footer] .ui-icon {
+  width: 36px !important;
+  height: 36px !important;
+  margin-left: -18px !important; }
+
 [data-role=header] .header-title[data-theme=c] {
   /* Mostly white */
   border-color:  rgba(192,192,192,.2); }
