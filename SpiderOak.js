@@ -1681,11 +1681,11 @@ var spideroak = function () {
         this.layout_footer_by_spec([{title: "Dashboard",
                                      url: "#home",
                                      selector: "dashboard",
-                                     icon_name: "home"},
+                                     icon_name: "so-dashboard-footer"},
                                     {title: "Recents",
                                      url: "#recents",
                                      selector: "recents",
-                                     icon_name: "recents"},
+                                     icon_name: "so-recents-footer"},
                                     ],
                                    mode_opts); }
 
