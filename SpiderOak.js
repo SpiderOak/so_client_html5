@@ -1332,7 +1332,6 @@ var spideroak = function () {
         var $header = this.my_page$().find('[data-role="header"]');
         var $logout_button = $header.find('.logout-button');
         var $title = $header.find('.header-title');
-        $title.text(this.title());
         $logout_button.hide(); }
 
     StorageNode.prototype.layout_header = function(mode_opts) {
