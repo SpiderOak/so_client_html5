@@ -42,6 +42,7 @@ var spideroak = function () {
         // API v1.
         // XXX base_host_url may vary according to brand package.
         base_host_url: "https://spideroak.com",
+        icons_dir: app_alternatives.icons_dir, // from loaded alternatives_*.js
         combo_root_url: "https://home",
         recents_url: "https://recents",
         combo_root_page_id: "home",
@@ -1763,25 +1764,25 @@ var spideroak = function () {
 
     FileContentNode.prototype.my_icon_image = function() {
         var icon = icon_name_by_file_name(this.name);
-        return (icon
-                ? "icons/" + icon + ".png"
-                : "icons/file.png"); }
+        return generic.icons_dir + "/" + (icon
+                                          ?  icon + ".png"
+                                          : "file.png"); }
     FileStorageNode.prototype.my_icon_image = function() {
         return FileContentNode.prototype.my_icon_image.call(this); }
     FileShareNode.prototype.my_icon_image = function() {
         return FileContentNode.prototype.my_icon_image.call(this); }
     ContentNode.prototype.my_icon_image = function() {
-        return "icons/folder.png"; }
+        return generic.icons_dir + "/folder.png"; }
     DeviceStorageNode.prototype.my_icon_image = function() {
-        return "icons/device.png"; }
+        return generic.icons_dir + "/device.png"; }
     RoomShareNode.prototype.my_icon_image = function() {
-        return "icons/room_public.png"; }
+        return generic.icons_dir + "/room_public.png"; }
     OriginalRootShareNode.prototype.my_icon_image = function() {
-        return "icons/room_original.png"; }
+        return generic.icons_dir + "/room_original.png"; }
     PublicRootShareNode.prototype.my_icon_image = function() {
-        return "icons/room_public.png"; }
+        return generic.icons_dir + "/room_public.png"; }
     RootContentNode.prototype.my_icon_image = function () {
-        return "images/spideroak_logo_orange.png"; }
+        return generic.icons_dir + "/spideroak_logo.png"; }
 
     ContentNode.prototype.here = function () {
         /* Return the complete address of this content node, as part of the
