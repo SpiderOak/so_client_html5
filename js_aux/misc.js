@@ -86,29 +86,50 @@ function lookup_file_by_name(name, table) {
         }}
     return got || ""; }
 
-var FILE_CLASS_TO_SUFFIX = {text: ['txt'],
-                            acrobat: ['pdf'],
-                            doc: ['doc', 'docx'],
-                            picture: ['png', 'jpg', 'jpeg', 'gif', 'ico', 'svg',
-                                      'ps', 'eps'],
-                            video: ['mov', 'mpg', 'mpeg', 'avi', 'wmv'],
-                            audio: ['mp3', 'm4a', 'm4p',
-                                    'ogg', 'flac', 'aiff', 'au',
-                                    'pcm', 'wav', 'aac', 'wma'],
-                            exe: ['exe', 'o'],
-                            code: ['c', 'sh', 'py', 'pl', 'tcl', 'bat',
-                                   'js', 'css', 'html', 'htm', 'xml', 'php'],
-                            archive: ['zip', 'jar', 'tgz', 'tjz', 'tar'],
-                           }
-var FILE_SUFFIX_TO_CLASS = function (class_to_suffix) {
-    var got = {};
-    // Outer loop seems more clear than wrapping inner .map() in another .map().
-    var fcts_keys = Object.keys(class_to_suffix);
-    for (var i=0; i < fcts_keys.length; i++) {
-        var file_class = fcts_keys[i];
-        class_to_suffix[file_class].map(function (suffix) {
-            got[suffix] = file_class; }); }
-    return got; }(FILE_CLASS_TO_SUFFIX);
+var FILE_CLASS_TO_SUFFIX_AND_ICON = {
+    /* Map classifications to [0] a list of suffixes and [1] an icon name.
+       Change this to adjust the more targeted, derived tables. */
+    text: [['txt'],
+           'text'],
+    acrobat: [['pdf'],
+              'text'],
+    ebook: [['mobi', 'epub', 'azw'], 'ebook'],
+    doc: [['doc', 'docx'],
+          'doc'],
+    picture: [['png', 'jpg', 'jpeg', 'gif', 'ico', 'svg', 'ps', 'eps'],
+              'image'],
+    video: [['mov', 'mpg', 'mpeg', 'avi', 'wmv'],
+            'video'],
+    audio: [['mp3', 'm4a', 'm4p', 'ogg', 'flac', 'aiff',
+             'au', 'pcm', 'wav', 'aac', 'wma'],
+            'audio'],
+    exe: [['exe', 'o'],
+          'file'],
+    code: [['c', 'sh', 'py', 'pl', 'tcl', 'bat',
+            'js', 'css', 'html', 'htm', 'xml', 'php'],
+           'file'],
+    archive: [['zip', 'jar', 'tgz', 'tjz', 'tar'],
+              'file'],
+}
+var FILE_SUFFIX_TO_CLASS = {};
+var FILE_SUFFIX_TO_ICON = {};
+
+function derive(class_to_suffix_and_icon, suffix_to_class, suffix_to_icon) {
+    /* From 'class_to_suffix_and_icon', derive the contents of
+       'suffix_to_class' and 'suffix_to_icon'. */
+
+    var fctsai_keys = Object.keys(class_to_suffix_and_icon);
+    for (var i=0; i < fctsai_keys.length; i++) {
+        var file_class = fctsai_keys[i];
+        var entry = class_to_suffix_and_icon[file_class];
+        var suffixes = entry[0];
+        var icon = entry[1];
+        suffixes.map(function (suffix) {
+            suffix_to_class[suffix] = file_class;
+            suffix_to_icon[suffix] = icon; }); }}
+
+derive(FILE_CLASS_TO_SUFFIX_AND_ICON,
+       FILE_SUFFIX_TO_CLASS, FILE_SUFFIX_TO_ICON);
 
 var FILE_SUFFIX_TO_DESCRIPTION = {txt: "Text",
                                   pdf: "Adobe PDF",
@@ -154,6 +175,8 @@ function classify_file_by_name(name) {
     /* Return a string inferred from a file's name.
        Return empty string if we fail to infer anything. */
     return lookup_file_by_name(name, FILE_SUFFIX_TO_CLASS); }
+function icon_name_by_file_name(name) {
+    return lookup_file_by_name(name, FILE_SUFFIX_TO_ICON); }
 
 function bytesToSize(bytes) {
     /* Return description of number of 'bytes' */
