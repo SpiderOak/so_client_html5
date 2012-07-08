@@ -1,0 +1,57 @@
+.ui-icon-so-logo-footer, [data-them=f] .ui-icon-so-logo-footer, [data-them=c] .ui-icon-so-logo-footer {
+  background-image: url("spideroak_logo_orange.png") !important;
+  background-size: 36px 36px !important; }
+[data-them=g] .ui-icon-so-logo-footer, [data-them=i] .ui-icon-so-logo-footer {
+  background-image: url("spideroak_logo_blue.png") !important;
+  background-size: 36px 36px !important; }
+.ui-icon-so-audio {
+  background-image: url("audio.png") !important;
+  background-size: 18px 18px !important; }
+.ui-icon-so-collection {
+  background-image: url("collection.png") !important;
+  background-size: 18px 18px !important; };
+.ui-icon-so-dashboard {
+  background-image: url("dashboard.png") !important;
+  background-size: 18px 18px !important; }
+.ui-icon-so-dashboard-footer {
+  background-image: url("dashboard.png") !important;
+  background-size: 36px 36px !important; }
+.ui-icon-so-db {
+  background-image: url("db.png") !important;
+  background-size: 18px 18px !important; }
+.ui-icon-so-device {
+  background-image: url("device.png") !important;
+  background-size: 18px 18px !important; }
+.ui-icon-so-ebook {
+  background-image: url("ebook.png") !important;
+  background-size: 18px 18px !important; }
+.ui-icon-so-file {
+  background-image: url("file.png") !important;
+  background-size: 18px 18px !important; }
+.ui-icon-so-folder {
+  background-image: url("folder.png") !important;
+  background-size: 18px 18px !important; }
+.ui-icon-so-pic {
+  background-image: url("pic.png") !important;
+  background-size: 18px 18px !important; }
+.ui-icon-so-recents {
+  background-image: url("recents.png") !important;
+  background-size: 18px 18px !important; }
+.ui-icon-so-recents-footer {
+  background-image: url("recents.png") !important;
+  background-size: 36px 36px !important; }
+.ui-icon-so-room_original {
+  background-image: url("room_my.png") !important;
+  background-size: 18px 18px !important; }
+.ui-icon-so-room_public {
+  background-image: url("room_public.png") !important;
+  background-size: 18px 18px !important; }
+.ui-icon-so-settings {
+  background-image: url("settings.png") !important;
+  background-size: 18px 18px !important; }
+.ui-icon-so-text {
+  background-image: url("text.png") !important;
+  background-size: 18px 18px !important; }
+.ui-icon-so-video {
+  background-image: url("video.png") !important;
+  background-size: 18px 18px !important; }
