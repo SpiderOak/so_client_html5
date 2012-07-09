@@ -1466,7 +1466,7 @@ var spideroak = function () {
         function conditionally_insert_divider(t) {
             if (do_dividers && t && (t[0].toUpperCase() !== curinitial)) {
                 curinitial = t[0].toUpperCase();
-                indicator = divider_prefix + curinitial;
+                indicator = curinitial + divider_suffix;
                 $item = $('<li data-role="list-divider" id="divider-'
                           + indicator + '">' + indicator + '</li>')
                 insert_item($item); }}
@@ -1481,16 +1481,16 @@ var spideroak = function () {
                                + '&empty;</span>')); }
         else {
             var $item;
-            var curinitial, divider_prefix, indicator = "";
+            var curinitial, divider_suffix, indicator = "";
             var $cursor = $list;
 
             if (do_filter) { $list.attr('data-filter', 'true'); }
             if (lensubdirs) {
-                divider_prefix = "/ ";
+                divider_suffix = " /";
                 for (var i=0; i < subdirs.length; i++) {
                     insert_subnode(subdirs[i]); }}
             if (lenfiles) {
-                divider_prefix = "";
+                divider_suffix = "";
                 for (var i=0; i < files.length; i++) {
                     insert_subnode(files[i]); }}}
 
