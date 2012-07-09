@@ -790,39 +790,48 @@ var spideroak = function () {
         /* Create a menu for 'subject_url' using 'template_id'.  Return an
            anchor object that will popup the menu when clicked. */
 
-        var href = ('#' + this.url
-                    + '?action=enlisted_room_menu&subject='
-                    + subject_url)
+        var href = ('#' + generic.titled_choice_popup_id);
         href = transit_manager.distinguish_url(href);
 
         var $anchor = $('<a/>');
         $anchor.attr('href', href);
+        $anchor.attr('data-rel', "popup");
         $anchor.attr('data-icon', 'gear');
         $anchor.attr('title', "Actions menu");
+        var subject = node_manager.get(subject_url);
+        $anchor.bind('click', this.enlisted_room_menu.bind(subject));
         // Return it for deployment:
         return $anchor; }
 
-    PublicRootShareNode.prototype.enlisted_room_menu = function (subject_url) {
-        /* For an enlisted RoomShareNode 'subject_url', furnish the simple
-         * popup menu with context-specific actions. */
+    PublicRootShareNode.prototype.enlisted_room_menu = function () {
+        /* For an enlisted RoomShareNode bound to 'this', furnish the simple
+           popup menu with context-specific actions.  The actual launch of
+           the popup happens elsewhere.
+
+           Note that the 
+        */
+
+        // 'this' has been bound to the subject node:
+        var subject_room = this;
+        var subject_url = subject_room.url;
+        var public_root = node_manager.get(my.public_shares_root_url);
 
         var fab_anchor = function (action, subject_url, icon_name, item_text) {
-            var href = (this.here() + '?action=' + action
+            var href = (public_root.here() + '?action=' + action
                         + '&subject=' + subject_url);
             return ('<a href="' + href + '" data-icon="' + icon_name + '"'
                     + 'data-mini="true" data-iconpos="right">'
-                    + item_text + '</a>')}.bind(this);
+                    + item_text + '</a>')}.bind(public_root);
 
         var $popup = $('#' + generic.titled_choice_popup_id);
         var $listview = $popup.find('[data-role="listview"]');
         // Ditch prior contents:
         $listview.empty()
 
-        var subject_room = node_manager.get(subject_url);
         $popup.find('.title').html('<span class="subdued">Room: </span>'
                                    + elide(subject_room.title(), 50));
         $popup.find('.close-button').attr('href',
-                                          this.here() + '?refresh=true');
+                                          public_root.here() + '?refresh=true');
 
         var $remove_li = $('<li/>');
         $remove_li.append(fab_anchor('remove_item_external',
@@ -831,7 +840,7 @@ var spideroak = function () {
                                      _t("Drop this room from the list")));
 
         var $persistence_li = $('<li/>');
-        if (this.is_persisted(subject_url)) {
+        if (public_root.is_persisted(subject_url)) {
             $persistence_li.append(fab_anchor('unpersist_item',
                                               subject_url,
                                               'minus',
@@ -853,10 +862,9 @@ var spideroak = function () {
         $popup.popup();
         $popup.parent().page();
         $listview.listview('refresh');
-        $popup.popup('open');
-    }
-    // Whitelist this method for use as a mode_opts 'action':
-    PublicRootShareNode.prototype.enlisted_room_menu.is_action = true;
+        // ... so the click action continues:
+        //$popup.popup('open');
+        return true; }
 
     RecentContentsNode.prototype.add_visited_url = function (url) {
         /* Register a recent visit.  Omit our own address and any
