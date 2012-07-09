@@ -1301,10 +1301,7 @@ var spideroak = function () {
         var $label;
 
         if (fields.hasOwnProperty('title')) {
-            var $icon = ($('<img/>')
-                         .attr('src', this.my_icon_image())
-                         .attr('alt', this.emblem)
-                         .attr('class', "so-image-icon"));
+            var $icon = this.my_icon_image$("so-image-icon");
             var $title = $('<span/>').text(elide(fields.title, 25));
             $header.find('.header-title').empty().append($icon, $title); }
 
@@ -1513,12 +1510,9 @@ var spideroak = function () {
             href = "#" + this.url; }
         $anchor.attr('href', href);
         $anchor.append($('<h4 class="item-title"/>').html(this.name));
-        var icon = this.my_icon_image();
-        if (icon) {
-            $anchor.children().before($('<img/>')
-                                      .attr('src', icon)
-                                      .attr('alt', this.emblem)
-                                      .attr('class', "ui-li-icon")); }
+        var $icon = this.my_icon_image$("ui-li-icon");
+        if ($icon) {
+            $anchor.children().before($icon); }
 
         var $it = $('<li/>').append($anchor);
 
@@ -1571,10 +1565,7 @@ var spideroak = function () {
                       + " " + date.toLocaleTimeString()
                       +'</p>');
         var $table = $('<table width="100%"/>');
-        var $icon = ($('<img/>')
-                     .attr('src', this.my_icon_image())
-                     .attr('alt', this.emblem)
-                     .attr('class', "so-image-icon"));
+        var $icon = this.my_icon_image$("so-image-icon");
         var $name = $('<h4/>').html(this.name);
         var $legend = ($('<table/>')
                        .append($('<tr/>')
@@ -1762,26 +1753,40 @@ var spideroak = function () {
     ContentNode.prototype.get_storage_page_template$ = function() {
         return $("#" + generic.content_page_template_id); }
 
-    FileContentNode.prototype.my_icon_image = function() {
+    ContentNode.prototype.my_icon_image$ = function(image_class) {
+        /* Return this item's icon image element, with 'image_class'.
+           Return null if this item has no icon.
+
+           The image has this.emblem as the alternate text.
+
+           Typically, image class is one of "so-image-icon", for images
+           situated in arbitrary places, or ui-li-icon for images in jQm
+           icon image slots. */
+        var icon = this.my_icon_path();
+        if (! icon) { return null; }
+        return ($('<img/>').attr('src', icon).attr('alt', this.emblem)
+                .attr('class', image_class)); }
+
+    FileContentNode.prototype.my_icon_path = function() {
         var icon = icon_name_by_file_name(this.name);
         return generic.icons_dir + "/" + (icon
                                           ?  icon + ".png"
                                           : "file.png"); }
-    FileStorageNode.prototype.my_icon_image = function() {
-        return FileContentNode.prototype.my_icon_image.call(this); }
-    FileShareNode.prototype.my_icon_image = function() {
-        return FileContentNode.prototype.my_icon_image.call(this); }
-    ContentNode.prototype.my_icon_image = function() {
+    FileStorageNode.prototype.my_icon_path = function() {
+        return FileContentNode.prototype.my_icon_path.call(this); }
+    FileShareNode.prototype.my_icon_path = function() {
+        return FileContentNode.prototype.my_icon_path.call(this); }
+    ContentNode.prototype.my_icon_path = function() {
         return generic.icons_dir + "/folder.png"; }
-    DeviceStorageNode.prototype.my_icon_image = function() {
+    DeviceStorageNode.prototype.my_icon_path = function() {
         return generic.icons_dir + "/device.png"; }
-    RoomShareNode.prototype.my_icon_image = function() {
+    RoomShareNode.prototype.my_icon_path = function() {
         return generic.icons_dir + "/room_public.png"; }
-    OriginalRootShareNode.prototype.my_icon_image = function() {
+    OriginalRootShareNode.prototype.my_icon_path = function() {
         return generic.icons_dir + "/room_original.png"; }
-    PublicRootShareNode.prototype.my_icon_image = function() {
+    PublicRootShareNode.prototype.my_icon_path = function() {
         return generic.icons_dir + "/room_public.png"; }
-    RootContentNode.prototype.my_icon_image = function () {
+    RootContentNode.prototype.my_icon_path = function () {
         return generic.icons_dir + "/spideroak_logo.png"; }
 
     ContentNode.prototype.here = function () {
