@@ -1,10 +1,9 @@
-        == What the html5 client can and can't do without hybrid enhancement ==
+= HTML5 Application Hybridization =
 [[PageOutline]]
 
-Degree to which various necessary [[HTML5ClientProject]]
-functionalities are and aren't covered by pure HTML5:
+== What the html5 client can and can't do without hybrid enhancement ==
 
-||= Feature =||= Pure HTML5? =||= Comments =||
+||= Feature =||= Pure HTML5? =||= Notes =||
 || Filesystem access || no || html5 filesystem very limited - does not provide access to user regular files, system files ||
 || Secure storage || no || No reliably secure html5-only local storage. !PhoneGap provides, eg, platform keychain (iOS) and Account Manager (Android) interfaces.  (These native platform facilities are known to be low-strength however.) ||
 || Platform data-encryption APIs || no || For navy.  !PhoneGap also provides access to hardware encryption. (Platform hardware encryption facilities are also known to have wide-spread vulnerabilities.) ||
@@ -15,14 +14,20 @@ functionalities are and aren't covered by pure HTML5:
 
 == !PhoneGap hybridization facilities ==
 
-Ken's intial expectation of what !PhoneGap does:
+[http://phonegap.com/ !PhoneGap] is the predominant mobile web application
+"hybridization" facility, providing web applications with access to native
+platform-specific functionality via javascript.
 
-  !PhoneGap provides a javascript bridge to native platform facilities,
-  often presenting a common API for similar features across platforms.
+On first glance, it looks like the core features have a similar (or
+identical) API across underlying platforms, so the application code can be
+identical across platforms, while optional plug-ins provide
+platform-specific extensions.
 
 === Central Locations ===
 
-* [http://phonegap.com/ PhoneGap.com] provides the free product distribution
+* [http://phonegap.com/ PhoneGap.com] provides the free product
+  distribution that we'll be using, and hosts...
+* [http://docs.phonegap.com documentation] and the...
 * [http://wiki.phonegap.com PhoneGap wiki]
 * [http://incubator.apache.org/cordova/ Apache Cordova] is Apache's
   incubator of the !PhoneGap core technologies - Cordova is to !PhoneGap as
@@ -33,37 +38,47 @@ Ken's intial expectation of what !PhoneGap does:
 Here are documented common features of immediate interest (eg, in the
 [http://docs.phonegap.com/en/1.9.0/index.html V 1.9.0 docs]:
 
-* Events - Native events - I expect this to be needed at least for signaling
-  return to the already active app and OS-forced app exit.
+* Events - Native events - Eg for detecting return to the already active
+  app, OS-forced app exit, other OS-context conditions.
 
-* Storage - Web !LocalStorage for all devices - pass-through for devices
-  that have !LocalStorage, and full provisions for those that don't.  This
-  will be a transparent feature for us - we already use !LocalStorage, and
-  can depend on it regardless of platform.
+* Storage - [http://dev.w3.org/html5/webstorage/ Web LocalStorage] (and
+  [https://developer.mozilla.org/en/DOM/Storage MDN docs]) for all devices.
+  Pass-through for devices that have native !LocalStorage implementation,
+  and full provisions for those that don't.  This will be a transparent
+  feature for us - we already use !LocalStorage, and so will be able to
+  depend on it regardless of platform.
 
-* Notification - OS-mediated background interaction with the user
+* Notification - OS-mediated interaction with the user while the app is in
+  the background.
 
 * File - Eventually useful javascript access to native file system, for
   when we get to sync and backups.
 
 * Security - The !PhoneGap wiki
-  [http://wiki.phonegap.com/w/page/43660891/Security Security page]
+  [http://wiki.phonegap.com/w/page/43660891/Security security page]
   includes a link to a
   [https://github.com/phonegap/phonegap-plugins/tree/master/iPhone/Keychain iOS keychain plugin].
+
+  However, the security of neither the iOS keychain nor the Android Account
+  Manager are well esteemed.  We have to consider how client/server shared
+  token + session cookies could be used to provide extended sessions -
+  persisting through subsequent mobile device reboot, for instance.
 
   Currentness of stuff in the wiki appears to be mixed, at best, so we'll
   need to check for more recent developments, but this is a start.
 
-  According to a note on that page, in the "Application Security" section,
+  According to a note on that page (in the "Application Security" section),
   "cross domain network requests are possible from a !PhoneGap
   application".  I expect that means we will be free of
-  [[HTML5ClientAppSameOriginIssues]] restrictions within !PhoneGap.
+  [[HTML5ClientAppSameOriginIssues]] restrictions within !PhoneGap.  This
+  may settle an important operational issue, but also requires us to
+  account for the many security vulnerabilities it opens.
 
-  It also mentions !PhoneGap provisions for XSS prevention based on
-  whitelisting request domains (see "Cross site scripting (XSS)" section),
-  and refers to
+  The section also has mention of !PhoneGap provisions for XSS prevention
+  based on whitelisting request domains (see "Cross site scripting (XSS)"
+  section), and refers to
   [https://www.owasp.org/index.php/Top_10_2010-Main OWASP Top 10 Application Security Risks - 2010],
-  a decent list of essential application security concerns to tend.)
+  a decent list of essential application security concerns to tend.
 
 == Lawnchair: lightweight db wrapper ==
 
