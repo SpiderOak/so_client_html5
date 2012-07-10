@@ -1287,6 +1287,7 @@ var spideroak = function () {
                      : this.my_page$());
         var $title = $page.find('[data-role="header"] .header-title');
         $title.click(this.depth_path_menu.bind(this));
+        $title.bind('taphold', go_to_entrance);
 
         var fields = {};
         fields.title = this.title();
@@ -2073,7 +2074,8 @@ var spideroak = function () {
         /* Visit the entrance page. Depending on session state, it might
            present a login challenge or it might present the top-level
            contents associated with the logged-in account. */
-        $.mobile.changePage(node_manager.get_combo_root().my_page$()); }
+        // Use a string url so our transit machinery registers a visit.
+        $.mobile.changePage(my.combo_root_url); }
 
     function storage_login(login_info, url) {
         /* Login to storage account and commence browsing at devices.
