@@ -1119,8 +1119,13 @@ var spideroak = function () {
            'when' is time soon before data was fetched. */
         this.subdirs = [];
         var room_base = my.public_shares_root_url + data.share_id_b32 + "/";
+        // Introduce a room.room_tail with trailing slash:
+        data.share_rooms.map(function (room) {
+            if (room.room_key[room.room_key.length-1] !== "/") {
+                room.room_tail = room.room_key + "/"; }
+            else { room.room_tail = room.room_key; }});
         this.provision_items(data.share_rooms, this.subdirs,
-                             room_base, 'room_key',
+                             room_base, 'room_tail',
                              [['room_name', 'name'],
                               ['room_description', 'description'],
                               'room_key', 'share_id'],
