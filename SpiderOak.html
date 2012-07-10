@@ -34,17 +34,28 @@
     <div class="nav-login-storage" data-role="content">
       <div class="login-section">
         <form method="POST" id="root-login-form" class="login-form">
-          <ul data-role="listview" data-inset="true">
-            <li data-role="fieldcontain" class="ui-hide-label" data-theme="g">
-                <label for="my_login_username">Username:</label>
-                <input type="text" name="username" id="my_login_username"
-                       placeholder="Username"
-                       value data-theme="a">
-                <label for="my_login_password"> Password:</label>
-                <input type="password" name="password" id="my_login_password"
-                       placeholder="Password" data-theme="a">
-            </li>
-          </ul>
+          <table>
+            <tr>
+              <td> <img src="icons_orange/dashboard.png"
+                        class="form-icon">
+              </td>
+              <td width="100%">
+                <ul data-role="listview" data-inset="true">
+                  <li data-role="fieldcontain" class="ui-hide-label"
+                      data-theme="g">
+                    <label for="my_login_username">Username:</label>
+                    <input type="text" name="username" id="my_login_username"
+                           placeholder="Username"
+                           value data-theme="a">
+                    <label for="my_login_password"> Password:</label>
+                    <input type="password" name="password"
+                           id="my_login_password"
+                           placeholder="Password" data-theme="a">
+                  </li>
+                </ul>
+              </td>
+            </tr>
+          </table>
           <p class="compact-paragraph"/><!-- XXX -->
             <div class="ui-grid-a">
               <div class="ui-block-a" align="center">
@@ -190,32 +201,37 @@
           <div data-role="collapsible" data-mini="true" data-theme="f"
                data-collapsed-icon="arrow-r" data-expanded-icon="arrow-d">
             <legend> Visit a Public Share Room: </legend>
-            <p> Public Share Rooms are folders that people have made
-              publicly available from their SpiderOak backups. Anyone can
-              visit a Share Room if they know its Share ID and Room
-              Key. </p>
+            <p> Public Share Rooms are folders from SpiderOak backups that
+              people have made available.  To visit a Share Room, you have
+              to know its Share ID and Room Key. </p>
             <p> The list of public share rooms being visited in this
-              session are show below the form.  Share rooms visited with
-              the Persist setting "On" will remain enlisted across local
-              sessions, until un-persisted or immediately dropped from the
-              list. </p>
+              session are show below the following form.  Share rooms
+              visited with the Persist setting "On" will remain enlisted
+              across local sessions.  You can drop visited Share Rooms or
+              un-persist them using a menu on its list entry. </p>
           </div>
-          <ul data-role="listview" data-inset="true" data-mini="true"
-              data-theme="g">
-            <li data-role="fieldcontain" class="ui-hide-label"
-                data-inset="true" data-mini="true">
-              <label for="my_share_id">Share ID:</label>
-              <input type="text" name="shareid" id="my_share_id"
-                     placeholder="Share ID"
-                     value>
-            </li>
-            <li data-role="fieldcontain" class="ui-hide-label"
-                data-inset="true" data-mini="true">
-              <label for="my_login_password">Password:</label>
-              <input type="password" name="password" id="my_login_password"
-                     placeholder="Share Key">
-            </li>
-          </ul>
+          <table>
+            <tr>
+              <td> <img src="icons_orange/room_public.png"
+                        class="form-icon">
+              </td>
+              <td width="100%">
+                <ul data-role="listview" data-inset="true">
+                  <li data-role="fieldcontain" class="ui-hide-label"
+                      data-theme="d">
+                    <label for="my_share_id">Share ID:</label>
+                    <input type="text" name="shareid" id="my_share_id"
+                           placeholder="Share ID"
+                           value data-theme="a">
+                    <label for="my_login_password">Password:</label>
+                    <input type="password" name="password"
+                           id="my_login_password"
+                           placeholder="Share Key">
+                  </li>
+                </ul>
+              </td>
+            </tr>
+          </table>
           <div class="ui-grid-a" data-theme="a">
             <div class="ui-block-b" align="center">
               <input type="submit" data-inline="true" value="Visit"

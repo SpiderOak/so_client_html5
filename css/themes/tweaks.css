@@ -15,6 +15,13 @@
   width: 36px !important;
   height: 36px !important;
   margin-left: -18px !important; }
+.form-icon {
+  width: 2em;
+  height: 2em;
+  vertical-align: top;
+  margin-right: 15px;
+  margin-left: -10px
+}
 
 [data-role=header] .header-title[data-theme=c] {
   /* Mostly white */
