@@ -434,8 +434,10 @@ var spideroak = function () {
         this.emblem = "Share Room";
         this.room_url = url;
         var splat = url.split('/');
-        this.share_id = base32.decode(splat[splat.length-3]);
-        this.room_key = splat[splat.length-2]; }
+        if (splat[splat.length-1] === "") {
+            splat.pop(); }
+        this.share_id = base32.decode(splat[splat.length-2]);
+        this.room_key = splat[splat.length-1]; }
     RoomShareNode.prototype = new ShareNode();
 
     function FolderContentNode(url, parent) {
@@ -666,8 +668,10 @@ var spideroak = function () {
         var sub_job_id = token[0];
         var url = token[1];
         var splat = url.split('/');
-        var share_id = base32.decode(splat[splat.length-3]);
-        var room_key = splat[splat.length-2];
+        if (splat[splat.length-1] === "") {
+            splat.pop(); }
+        var share_id = base32.decode(splat[splat.length-2]);
+        var room_key = splat[splat.length-1];
 
         var which_msg = ('Share ID <span class="message-subject">'
                          + share_id + "</span>");
@@ -921,8 +925,10 @@ var spideroak = function () {
            internal object operation. */
         this.job_id += 1;
         var splat = room_url.split('/');
-        var share_id = base32.decode(splat[splat.length-3]);
-        var room_key = splat[splat.length-2];
+        if (splat[splat.length-1] === "") {
+            splat.pop(); }
+        var share_id = base32.decode(splat[splat.length-2]);
+        var room_key = splat[splat.length-1];
         var message = ("Public share room (Share ID"
                        + '<span class="message-subject">'
                        + share_id + "</span>)");
