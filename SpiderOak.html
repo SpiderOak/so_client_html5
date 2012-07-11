@@ -3,10 +3,10 @@
 
 <head>
   <meta charset="utf-8" />
-  <title>SpiderOak</title>
+  <title class="brand-title">SpiderOak</title>
   <!--[if lt IE 9]><script src="js_aux/html5.js"></script><![endif]-->
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="icons_orange/icons.css" />
+  <link rel="stylesheet" href="icons.css" />
   <link rel="stylesheet" href="css/themes/tweaks.css" />
   <link rel="stylesheet" href="css/themes/iphone.css" />
   <link rel="stylesheet" href="jquery.mobile-1.2.0_pre/jquery.mobile.structure.css"/>
@@ -16,7 +16,7 @@
   <script src="js_aux/misc.js"></script>
   <script src="jquery.mobile-1.2.0_pre/jquery.mobile.js"></script>
   </script>
-  <script src="./alternatives_orange.js"></script>
+  <script src="./brand.js"></script>
   <script src="./SpiderOak.js"></script>
 </head>
 
@@ -26,8 +26,10 @@
     <div data-role="header" data-position="fixed" data-theme="f">
       <a href="#logout" data-role="button" class="logout-button"
          data-theme="f" data-icon="delete" data-iconpos="notext"></a>
-      <h3 class="header-title" data-theme="f"> SpiderOak </h3>
-      <a alt="About the SpiderOak Dashboard" data-role="button"
+      <h3 class="header-title" data-theme="f">
+        <span class="brand-title"> SpiderOak </span>
+      </h3>
+      <a alt="About the Application Dashboard" data-role="button"
          href="#about-dashboard" data-icon="info" data-iconpos="notext"></a>
     </div>
 
@@ -36,7 +38,7 @@
         <form method="POST" id="root-login-form" class="login-form">
           <table>
             <tr>
-              <td> <img src="icons_orange/dashboard.png"
+              <td> <img src="icons/dashboard.png"
                         class="form-icon">
               </td>
               <td width="100%">
@@ -135,7 +137,11 @@
     <div data-role="footer" data-position="fixed" data-theme="a">
       <div data-role="navbar">
         <ul>
-          <li> <a href="#about-spideroak"> About SpiderOak</a> </li>
+          <li>
+            <a href="#about-spideroak">
+              About <span class="brand-label"> SpiderOak </span>
+            </a>
+          </li>
           <li> <a href="#recents"> Recents </a> </li>
         </ul>
       </div>
@@ -147,36 +153,49 @@
       <a href="#home" data-role="button"
          data-icon="arrow-l" data-iconpos="left"
          alt="Dashboard"> Dashboard </a>
-      <h3 class="header-title" data-theme="f"> About SpiderOak </h3>
-      <a alt="About the SpiderOak Dashboard" data-role="button"
+      <h3 class="header-title" data-theme="f">
+        About <span class="brand-title"> SpiderOak </span>
+      </h3>
+      <a alt="About the Application Dashboard" data-role="button"
          href="#about-dashboard" data-icon="arrow-r" data-iconpos="right">
         About the Dashboard</a>
     </div>
     <div data-role="content">
-      <h3> SpiderOak - Secure File Backup, Sync, and Sharing </h3>
-      <p> SpiderOak is an advanced automated offsite backup system with a
-        "Zero Knowledge" approach to encryption and privacy.  Capabilities
-        include archiving multiple devices with a unified and de-duplicated
-        storage repository, preservation of historical versions and deleted
-        files, configurable multi-platform file synchronization, web file
-        sharing, and a rich command line and graphical interface. </p>
-      <p>The SpiderOak mobile application provides easy access to
-        your data on the move, open ShareRooms, historical versions,
-        and quick email of files to friends, colleagues, and clients.</p>
-      <p>However - you don't need a SpiderOak account to enjoy benefits of
-        our mobile application. You can open a friend or colleague's
-        ShareRoom by entering their Share ID and a valid Room Key. You can
-        also email files through a secure link.</p>
-      <p>If you would like to learn more about SpiderOak, please visit
-        <a target="_blank" href="https://spideroak.com">
+      <h3>
+        <span class="brand-label"> SpiderOak </span>
+        - Secure File Backup, Sync, and Sharing
+      </h3>
+      <p> <span class="brand-label"> SpiderOak </span> is an advanced
+        automated offsite backup system with a "Zero Knowledge" approach to
+        encryption and privacy.  Capabilities include archiving multiple
+        devices with a unified and de-duplicated storage repository,
+        preservation of historical versions and deleted files, configurable
+        multi-platform file synchronization, web file sharing, and a rich
+        command line and graphical interface. </p>
+      <p>The <span class="brand-label"> SpiderOak </span> mobile
+        application provides easy access to your data on the move, open
+        ShareRooms, historical versions, and quick email of files to
+        friends, colleagues, and clients.</p>
+      <p>However - you don't need a <span class="brand-label">
+        SpiderOak </span> account to enjoy benefits of our mobile
+        application. You can open a friend or colleague's ShareRoom by
+        entering their Share ID and a valid Room Key. You can also email
+        files through a secure link.</p>
+      <p>If you would like to learn more about <span class="brand-title">
+          SpiderOak </span>, please visit
+        <a class="brand-service_home_link"
+           target="_blank" href="https://spideroak.com">
           SpiderOak.com</a> and download the SpiderOak desktop client to
         get started with your Free 2 GB account.</p>
-      <p>Thank you for using SpiderOak and please don't hesitate to send
-        comments or questions to <a href=mailto:mobile@spideroak.com
-                                    target="_blank">mobile@spideroak.com</a>.
+      <p>Thank you for using <span class="brand-title"> SpiderOak </span>
+        and please don't hesitate to contact us via
+        <a class="brand-service_support_link"
+           href=mailto:mobile@spideroak.com
+           target="_blank">mobile@spideroak.com</a>.
       </p>
-      <ul class="subdued"> SpiderOak All-Weather Mobile Hybrid
-        Client 1.0 </ul>
+      <ul class="subdued">
+        <span class="brand-title"> SpiderOak </span>
+        All-Weather Mobile Hybrid Client 1.0 </ul>
     </div>
     <div data-role="footer" data-position="fixed" data-theme="a">
       <div data-role="navbar">
@@ -201,7 +220,8 @@
           <div data-role="collapsible" data-mini="true" data-theme="f"
                data-collapsed-icon="arrow-r" data-expanded-icon="arrow-d">
             <legend> Visit a Public Share Room: </legend>
-            <p> Public Share Rooms are folders from SpiderOak backups that
+            <p> Public Share Rooms are folders from
+              <span class="brand-label"> SpiderOak </span> backups that
               people have made available.  To visit a Share Room, you have
               to know its Share ID and Room Key. </p>
             <p> The list of public share rooms being visited in this
@@ -212,7 +232,7 @@
           </div>
           <table>
             <tr>
-              <td> <img src="icons_orange/room_public.png"
+              <td> <img src="icons/room_public.png"
                         class="form-icon">
               </td>
               <td width="100%">
@@ -278,25 +298,28 @@
 
   <div data-role="page" id="about-dashboard" data-theme="c">
     <div data-role="header" data-position="fixed" data-theme="f">
-      <a alt="About the SpiderOak Dashboard" data-role="button"
+      <a alt="About the Application Dashboard" data-role="button"
          href="#home" data-icon="arrow-l" data-iconpos="left">
         Dashboard </a>
-      <h3 class="header-title" data-theme="f"> About the SpiderOak Dashboard </h3>
+      <h3 class="header-title" data-theme="f">
+        About the Application Dashboard </h3>
       <a href="#about-spideroak" data-role="button"
          data-icon="arrow-r" data-iconpos="right"
-         alt="Dashboard">About SpiderOak </a>
+         alt="Dashboard">About <span class="brand-title"> SpiderOak </span> </a>
     </div>
     <div data-role="content">
       <h2> The Dashboard </h2>
       <div>
-        <p> The SpiderOak mobile dashboard provides a consolidated,
-          top-level view of the content that your are backing up and
-          sharing using SpiderOak. </p>
+        <p> The <span class="brand-title"> SpiderOak </span> mobile
+          dashboard provides a consolidated, top-level view of the content
+          that your are backing up and sharing
+          using <span class="brand-label"> SpiderOak </span>. </p>
         <p> The dashboard always shows the list of publicly available Share
-          Rooms that you are visiting.  Above that it shows eather a login form,
-          by which you log in to a SpiderOak account, or your account's
-          backup storage devices and the list of Share Rooms published from
-          the account, once you've logged in.
+          Rooms that you are visiting.  Above that it shows eather a login
+          form, by which you log in to a <span class="brand-label">
+          SpiderOak </span> account, or your account's backup storage
+          devices and the list of Share Rooms published from the account,
+          once you've logged in.
         </p>
         <p> When the Dashboard "Remembering" slider is active, the account
           name you most recently use to log in will be retained for
@@ -415,9 +438,10 @@
            data-collapsed-icon="arrow-r" data-expanded-icon="arrow-d">
         <legend> Your Account's Backup Storage Devices </legend>
         <p> Here are the storage devices that are configured for your
-          accounts SpiderOak online backup.  Delve into the contents by
-          tapping on the entries.  You cannot yet use the mobile app to
-          configure backup coverage - use the SpiderOak desktop or web
+          account's <span class="brand-label"> SpiderOak </span> online
+          backup.  Delve into the contents by tapping on the entries.  You
+          cannot yet use the mobile app to configure backup coverage - use
+          the <span class="brand-label"> SpiderOak </span> desktop or web
           interface for that.
         <p>You can view the storage contents that your account is making
           accessible to others in
@@ -456,9 +480,9 @@
            data-collapsed="false"
            data-collapsed-icon="arrow-r" data-expanded-icon="arrow-d">
         <legend> Share Rooms Published by Your Account </legend>
-        <p> These are the SpiderOak Share Rooms that your account is
-          publishing. Each share room is composed of folders selected from
-          your account's
+        <p> These are the <span class="brand-label"> SpiderOak </span>
+          Share Rooms that your account is publishing. Each share room is
+          composed of folders selected from your account's
           <a href="#" class="storage_root_url"> backups storage
           folders </a>.  They're available for remote access by anyone that
           knows their Share ID and Room Key. </p>

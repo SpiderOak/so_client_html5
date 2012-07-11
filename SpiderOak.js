@@ -41,8 +41,9 @@ var spideroak = function () {
         /* Settings not specific to a particular login session: */
         // API v1.
         // XXX base_host_url may vary according to brand package.
-        base_host_url: "https://spideroak.com",
-        icons_dir: app_alternatives.icons_dir, // from loaded alternatives_*.js
+        base_host_url: brand.base_host_url,
+        icons_dir: "icons",
+        brand_images_dir: "brand_images",
         combo_root_url: "https://home",
         recents_url: "https://recents",
         combo_root_page_id: "home",
@@ -176,9 +177,9 @@ var spideroak = function () {
     // - the public share root, which is the same across all accounts
     //
     // There is also a collection of the shares originated by the account,
-    // in the OriginalRootShareNode.  Like all SpiderOak share rooms, the
-    // items are actually public shares, but the collection listing is only
-    // visible from within the account.
+    // in the OriginalRootShareNode.  Like all share rooms, the items are
+    // actually public shares, but the collection listing is only visible
+    // from within the account.
     //
     // Content urls are recognized by virtue of beginning with one of the
     // registered content roots. The storage root is registered when the user
@@ -337,14 +338,14 @@ var spideroak = function () {
     ContentNode.prototype = new Node();
 
 
-    /* ContentNodes represent SpiderOak-managed content. That includes
+    /* ContentNodes represent service-managed content. That includes
        distinct manifestations of storage (backups) content and share
        rooms. Content-specific roots encompass the various remote content
        collections.  An extrapolated RootContentNode, aka the "combo root",
        consolidates them all. */
 
     function ContentNode(url, parent) {
-        /* Constructor for items representing SpiderOak-managed content.
+        /* Constructor for items representing service-managed content.
            - 'url' is absolute URL for the collection's root (top) node.
            - 'parent' is containing node. The root's parent is null.
            See JSON data examples in docs/api_json_examples.txt
@@ -377,7 +378,7 @@ var spideroak = function () {
         /* Consolidated root of the storage and share content hierarchies. */
         ContentNode.call(this, url, parent);
         this.root_url = url;
-        this.emblem = "SpiderOak";
+        this.emblem = brand.title;
         this.name = "Dashboard";
         delete this.subdirs;
         delete this.files; }
@@ -1287,7 +1288,7 @@ var spideroak = function () {
                      : this.my_page$());
         var $title = $page.find('[data-role="header"] .header-title');
         $title.click(this.depth_path_menu.bind(this));
-        $title.bind('taphold', go_to_entrance);
+        $title.bind('taphold.SpiderOak', go_to_entrance);
 
         var fields = {};
         fields.title = this.title();
@@ -1713,7 +1714,7 @@ var spideroak = function () {
     RootContentNode.prototype.layout_footer = function(mode_opts) {
         ContentNode.prototype.layout_footer.call(this, mode_opts);
         this.change_footer_item('.dashboard',
-                                {title: "About SpiderOak",
+                                {title: "About " + brand.label,
                                  url: "#about-spideroak",
                                  selector: "about-spideroak",
                                  icon_name: "so-logo-footer"}); }
@@ -1799,7 +1800,7 @@ var spideroak = function () {
     PublicRootShareNode.prototype.my_icon_path = function() {
         return generic.icons_dir + "/room_public.png"; }
     RootContentNode.prototype.my_icon_path = function () {
-        return generic.icons_dir + "/spideroak_logo.png"; }
+        return generic.brand_images_dir + "/brand_logo.png"; }
 
     ContentNode.prototype.here = function () {
         /* Return the complete address of this content node, as part of the
@@ -2168,7 +2169,6 @@ var spideroak = function () {
             // Can't reach logout location without server - just clear and bail.
             finish(); }
         else {
-            // SpiderOak's logout url doesn't (as of 2012-06-15) remove cookies!
             $.ajax({url: my.storage_root_url + generic.storage_logout_suffix,
                     type: 'GET',
                     success: function (data) {
@@ -2227,8 +2227,8 @@ var spideroak = function () {
 
         var $submit = $form.find('[type="submit"]');
         var sentinel = new submit_button_sentinel([$name, $password], $submit)
-        $name.bind('keyup', sentinel);
-        $password.bind('keyup', sentinel);
+        $name.bind('keyup.SpiderOak', sentinel);
+        $password.bind('keyup.SpiderOak', sentinel);
         $submit.button()
         sentinel();
 
@@ -2254,7 +2254,7 @@ var spideroak = function () {
                 $remember_widget.val("off");
                 $remember_widget.trigger('change'); }}
         else {
-            console.error("spideroak:prep_login_form() - Unanticipated form"); }
+            console.error("prep_login_form() - Unanticipated form"); }
 
         var name_field_val = pmgr.get(name_field);
         if (name_field_val
@@ -2280,7 +2280,7 @@ var spideroak = function () {
                 persistence_manager.set('retaining_visits',
                                         remember_widget_on); }
             else {
-                console.error("spideroak:prep_login_form()"
+                console.error("prep_login_form()"
                               + " - Unanticipated form"); }
 
             data['password'] = $password.val();
@@ -2290,16 +2290,28 @@ var spideroak = function () {
                 var unhide_form_oneshot = function(event, data) {
                     combo_root.veil(false);
                     $.mobile.loading('hide');
-                    $(document).unbind("pagechange", unhide_form_oneshot);
-                    $(document).unbind("error", unhide_form_oneshot); }
-                $(document).bind("pagechange", unhide_form_oneshot)
-                $(document).bind("error", unhide_form_oneshot); }
+                    $(document).unbind("pagechange.SpiderOak",
+                                       unhide_form_oneshot);
+                    $(document).unbind("error.SpiderOak",
+                                       unhide_form_oneshot); }
+                $(document).bind("pagechange.SpiderOak", unhide_form_oneshot)
+                $(document).bind("error.SpiderOak", unhide_form_oneshot); }
             else {
                 $name.val("");
                 $password.val(""); }
             $name.focus();
             submit_handler(data);
             return false; }); }
+
+    function prep_html_branding() {
+        /* Do brand substitutions in application HTML text. */
+        $('.brand-title').text(brand.title);
+        $('.brand-label').text(brand.label);
+        $('.brand-service_support_link')
+            .replaceWith(brand.service_support_link);
+        $('.brand-service_home_link')
+            .replaceWith(brand.service_home_link);
+        }
 
 
     /* ==== Public interface ==== */
@@ -2317,6 +2329,9 @@ var spideroak = function () {
             var recents = node_manager.get_recents();
             var public_shares = node_manager.get(my.public_shares_root_url,
                                                  combo_root);
+
+            // Do HTML code brand substitutions:
+            prep_html_branding();
 
             // Properly furnish login form:
             prep_login_form('.nav-login-storage', storage_login,
