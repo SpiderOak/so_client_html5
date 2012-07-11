@@ -58,6 +58,9 @@
 [data-role=header] .header-title[data-theme=i] {
   /* Blue (vibrant) - SpiderOak_blue.html */
   border-color:  rgba(0,169,157,.2); }
+[data-role=header] .header-title[data-theme=e] {
+  /* Yellow */
+  border-color:  rgba(244,198,63,.2); }
 
 .status-message {
   margin-bottom: -1em !important;
