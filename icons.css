@@ -4,6 +4,16 @@
 .ui-icon-so-audio {
   background-image: url("icons/audio.png") !important;
   background-size: 18px 18px !important; }
+.ui-icon-so-carat-r {
+  background-image: url("icons/carat-r.png") !important;
+  background-color: transparent !important;
+  background-size: 18px 18px !important;
+  box-shadow: 0px 0px 0 rgba(255, 255, 255, .4) !important; }
+.ui-icon-so-carat-l {
+  background-image: url("icons/carat-l.png") !important;
+  background-color: transparent !important;
+  background-size: 18px 18px !important;
+  box-shadow: 0px 0px 0 rgba(255, 255, 255, .4) !important; }
 .ui-icon-so-collection {
   background-image: url("icons/collection.png") !important;
   background-size: 18px 18px !important; };

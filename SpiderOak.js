@@ -1528,6 +1528,7 @@ var spideroak = function () {
             $anchor.children().before($icon); }
 
         var $it = $('<li/>').append($anchor);
+        $it.attr('data-icon', "so-carat-r");
 
         if (mode_opts
             && mode_opts.hasOwnProperty('actions_menu_link_creator')) {
