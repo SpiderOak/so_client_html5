@@ -265,19 +265,28 @@ accounts that have their storage service provided by secondary servers.
 This redirection step is the reason for the elaborate storage_login
 function, which recurses to the indicated server when required.
 
-== Incidental Technical Details and Hanging Issues ==
+== Operational and Incidental Technical Details and Hanging Issues ==
+=== Producing the various renderings ===
+The script tools/prep_release produces various application renditions,
+varying branding, color scheme, and platform look and feel.  The script
+is also useful as guidance, fairly clearly indicating the locations of
+rendition-specific elements, and it has configuration variables towards to
+top for easy incorporation of new elements.
+
 === Special Browser Requirements ===
 While developing the html5 client app I didn't have the luxury of
-situating the code within the same domain as the storage servers.  To run
-the client you have to configure your browser to disregard
-[#HTML5ClientAppSameOriginIssues CORS restrictions], which means
-drastically reduced security.  (Another workaround option, JSONP, is not
-available because it requires running the server to accept it, reducing
-general security.)
+situating the code within the same domain as the storage servers.  That's
+changing with the Frank Sievetsen's addition of a reverse proxy, so people
+can visit the proxy with regular browser session and have it work. (I'm
+setting up
+[https://ken.dev.spideroak.com:888/ links in my developer's sandbox].)
+However, people wanting to run the application from local files still have
+to use a browser with relaxed security.
 
-I use Chip Black's suggestions for doing so with Google Chrome.  (I haven't
-figured out how to do that with, eg, Firefox, even when using the Force
-CORS addon - suggestions welcome).
+To run the client from local files you must configure your browser to allow
+that, and also disregard [#HTML5ClientAppSameOriginIssues CORS restrictions].
+That means drastically reduced security.  I use Chip Black's suggestions
+for doing so with Google Chrome..
 
 Here are the options you need to pass to Chrome:
 
@@ -368,7 +377,7 @@ just changing the location where they were originally found.
 As of 2012-05-30, `ContentNode.prototype.layout_header_fields()` shows
 examples of this elaboration.
 
-==== Consequences of typical $.ajax() requests default caching ====
+==== Consequences of default caching of typical $.ajax() ====
 Default caching of typical $.ajax() requests - including json ones - means
 that normal traversal of the content hierarchy won't update after first
 pass without explicitly asking for a refresh. We specifically override the
