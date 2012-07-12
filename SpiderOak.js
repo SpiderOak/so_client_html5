@@ -71,6 +71,15 @@ var spideroak = function () {
         depth_path_popup_id: 'depth-path-popup',
         top_level_info_ids: ['about-dashboard', 'about-spideroak'],
     };
+
+    if (SO_DEBUGGING) {
+        var hostname = window.location.hostname;
+        if ((hostname.slice(hostname.length-6) == "fx5.de")
+            && (generic.base_host_url === "https://spideroak.com")) {
+            generic.base_host_url = "https://www.fx5.de/so";
+            generic.storage_path_prefix = "/so" + generic.storage_path_prefix;
+            generic.shares_path_suffix = "/so" + generic.shares_path_suffix; }}
+
     var my = {
         /* Login session settings: */
         username: "",
