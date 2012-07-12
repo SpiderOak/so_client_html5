@@ -117,30 +117,60 @@ produce_release () {
   local platform="$1"; shift
 
   local target_dir="$brand-$color-$platform"
-  /bin/echo -n Working on $target_dir ...
-  blather
+  /bin/echo -n Working on $target_dir...
+  blather " "
 
   if [ ! -e "$target_dir" ]; then
     blather Create $target_dir.
-    mkdir "$target_dir"
+    mkdir "${target_dir}"
   fi
 
-  # Do the unconditional stuff:
+  # Context-independent stuff.
+
   for item in $unconditional_infrastructure; do
-    copy_sync $item $target_dir/
+    copy_sync $item "${target_dir}"/
   done
 
-  # echo "Making neutral-themed SpiderOak_neutral.html..."
-  # sed -e 's/"f"/"g"/g' SpiderOak.html > SpiderOak_neutral.html
-  # echo "Making blue-themed SpiderOak_blue.html..."
-  # sed -e 's/"f"/"i"/g' SpiderOak.html > SpiderOak_blue.html
-  # echo "Making green-themed SpiderOak_blue.html..."
-  # sed -e 's/"f"/"h"/g' SpiderOak.html > SpiderOak_green.html
+  # Context-sensitive stuff.
+
+  # Various color themes use image batches in one of fewer color categories.
+  # We resolve this with the ${color}_category variables:
+  eval color_category="\$${color}_category"
+
+  # icons dir:
+  copy_sync "${artifacts_dir}/icons_${color_category}/" "${target_dir}/icons"
+
+  # brand_images dir:
+  eval color_images="\$${color}_category"
+  copy_sync "${artifacts_dir}/brand_images_${brand}_${color_category}/" \
+            "${target_dir}/brand_images"
+
+  # brand.js brand settings:
+  copy_sync "${artifacts_dir}/brand_settings_${brand}.js" \
+            "${target_dir}/brand.js"
+
+  # SpiderOak.html:
+  eval to_swatch="\$${color}_swatch"
+  if [ -z "$to_swatch" ]; then
+    echo Failed target theme swatch ${color}_swatch identify, \
+      passing through 1>&2
+    to_swatch=${basis_swatch}
+  fi
+  rm -f "${target_dir}/SpiderOak.html"
+  if [ "${to_swatch}" = "${basis_swatch}" ]; then
+    blather "$color: ${basis_swatch} => ${to_swatch}"
+    cp -a "${app_dir}/SpiderOak.html" "${target_dir}/SpiderOak.html"
+  else
+    blather "color: ${basis_swatch} => ${to_swatch}"
+    sed -e 's/"f"/"'${to_swatch}'"/g' \
+        "${app_dir}/SpiderOak.html" \
+        > "${target_dir}/SpiderOak.html"
+  fi
 }
 
 copy_sync () {
-  # Copy contents of $1 to $2, tracking deletions.
-  # We incidentally avoid unnecessary copying.
+  # Copy contents of $1 to $2, using rsync to track deletions.
+  # That incidentally allows us to avoid unnecessary copying.
   rsync --delete --update --archive --exclude '*~' --exclude '#*' "$1" "$2"
 }
 
