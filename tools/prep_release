@@ -32,17 +32,18 @@ theme_colors="orange blue neutral green"
 
 # ... plus identification of the swatch here:
 
+basis_swatch="f"                # The swatch used in the dev copy.
 orange_swatch="f"
 neutral_swatch="g"
 green_swatch="h"
 blue_swatch="i"
 
-# ... identify the themes brand-independent resource_artifacts icons directory:
-
-orange_icons="icons_orange"
-blue_icons="icons_blue"
-green_icons="icons_blue"
-neutral_icons="icons_blue"
+# We have two batches of image artifacts - orange and blue.  The various
+# colored themes uses one of those batches, as follows:
+orange_category=orange
+blue_category=blue
+green_category=blue
+neutral_category=blue
 
 # ... and finally:
 #
