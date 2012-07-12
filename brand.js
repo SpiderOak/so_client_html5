@@ -1,1 +1,1 @@
-release_artifacts/brand_spideroak.js
+release_artifacts/brand_settings_spideroak.js
