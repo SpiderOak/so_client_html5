@@ -162,10 +162,8 @@ produce_release () {
   fi
   rm -f "${target_dir}/SpiderOak.html"
   if [ "${to_swatch}" = "${basis_swatch}" ]; then
-    blather "$color: ${basis_swatch} => ${to_swatch}"
     cp -a "${app_dir}/SpiderOak.html" "${target_dir}/SpiderOak.html"
   else
-    blather "color: ${basis_swatch} => ${to_swatch}"
     sed -e 's/"f"/"'${to_swatch}'"/g' \
         "${app_dir}/SpiderOak.html" \
         > "${target_dir}/SpiderOak.html"
