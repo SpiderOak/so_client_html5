@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash -e
 
 # Produce various releasable renderings of the SpiderOak mobile client app.
 
