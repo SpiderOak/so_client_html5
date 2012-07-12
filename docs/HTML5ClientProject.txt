@@ -12,7 +12,7 @@ Landmarks:
 
 == Resources ==
 * [[HTML5ClientProjectRisksAndUncertainties]] - Keep track of prevalent challenges to the project
-* [[HTML5ClientTechnicalDetails]], [[HTML5ClientProjectHybridVsPureHTML5]], [[HTML5ClientAppSameOriginIssues]] - Key aspects and issues of the html5 app, updated as the app develops - including [https://spideroak.com/pandora/wiki/HTML5ClientTechnicalDetails#SpecialBrowserRequirements instructions for trying it out]
+* [[HTML5ClientTechnicalDetails]], [[HTML5ClientProjectHybrid]], [[HTML5ClientAppSameOriginIssues]] - Key aspects and issues of the html5 app, updated as the app develops - including [https://spideroak.com/pandora/wiki/HTML5ClientTechnicalDetails#SpecialBrowserRequirements instructions for trying it out]
 * [[HTML5ClientProjectNotes]] - Stray notes and idea drafts for the project
 * Mike Crane's mobile UI docs are in [/../pandora/wiki/UX/Mobile/ mobile section] of his [/../pandora/wiki/UX UX specifications collection], more recently his ClientGraphicAssets page
 * !SpiderOak public [https://spideroak.com/apis/partners/web_storage_api Web Storage API documentation]
