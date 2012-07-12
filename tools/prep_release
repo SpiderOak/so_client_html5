@@ -93,6 +93,7 @@ artifacts_dir="$app_dir/release_artifacts"
 
 unconditional_infrastructure=\
 "$app_dir/css
+$app_dir/icons.css
 $app_dir/jquery.mobile-1.2.0_pre
 $app_dir/jquery-1.7.2
 $app_dir/custom-scripting.js
