@@ -121,8 +121,7 @@ produce_release () {
   local platform="$1"; shift
 
   local target_dir="$brand-$color-$platform"
-  /bin/echo -n Working on $target_dir...
-  blather " "
+  /bin/echo "Composing $target_dir"
 
   if [ ! -e "$target_dir" ]; then
     blather Create $target_dir.
