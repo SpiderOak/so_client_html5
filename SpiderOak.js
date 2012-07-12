@@ -74,8 +74,7 @@ var spideroak = function () {
 
     if (SO_DEBUGGING) {
         var hostname = window.location.hostname;
-        if ((hostname.slice(hostname.length-6) == "fx5.de")
-            && (generic.base_host_url === "https://spideroak.com")) {
+        if (hostname.slice(hostname.length-6) == "fx5.de") {
             generic.base_host_url = "https://www.fx5.de/so";
             generic.storage_path_prefix = "/so" + generic.storage_path_prefix;
             generic.shares_path_suffix = "/so" + generic.shares_path_suffix; }}
