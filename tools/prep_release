@@ -62,7 +62,10 @@ neutral_category=blue
 # Internal configuration and processing below.
 
 blathering=non-empty           # set to empty to eliminate blather messages
-blather () { if [ -n "$blathering" ]; then echo $0; fi; }
+blather () {
+  if [ -n "$blathering" ]; then
+    echo ${@}
+  fi; }
 
 # The html for the spideroak orange rendering is the basis from which all
 # the other renderings are derived.
