@@ -1,6 +1,8 @@
 = HTML5 Application Hybridization =
 [[PageOutline]]
 
+Part of the [[HTML5ClientProject]].
+
 == What the html5 client can and can't do without hybrid enhancement ==
 
 ||= Feature =||= Pure HTML5? =||= Notes =||
