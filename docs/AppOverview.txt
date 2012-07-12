@@ -287,18 +287,26 @@ To avoid using an insecure browser as my primary browsing session, I
 installed a copy of [https://tools.google.com/dlpage/chromesxs Chrome Canary],
 so I can run a dedicated insecure Chrome session concurrent with my regular
 session one.  I haven't hit any problems specific to running Canary, but I
-may have been lucky in the [https://spideroak.com/browse/share/klm/coalmine
-particular MacOS Canary build] that I'm using.  If you hit odd problems
-trying to get Canary going, try restarting regular Chrome with the
-arguments, just to establish that things work.
+may have been lucky in the
+[https://spideroak.com/browse/share/klm/coalmine particular Canary build]
+for MacOS that I'm using.  If you hit odd problems trying to get Canary
+going, try restarting regular Chrome with the arguments, just to establish
+that things work.
+
+  Note: I've added a tiny app to the same share room with the canary dmg.
+  Also useful only in Mac os, "Chrome Permissive.app" launches canary
+  (if you install canary in the default location, as
+  `/Applications/Google Chrome Canary.app`). Put a copy of this whole
+  directory hierarchy in your `/Applications` folder and launch it to
+  run Canary so it can run the HTML5 client.
 
 For more details about CORS restrictions and the project, see
 [[HTML5ClientAppSameOriginIssues]].
 
 I've created
 [https://ken.dev.spideroak.com:888/ an index.html in my developer's sandbox]
-which links to the versions of client app differing only by color theme.
-Preferences feedback and suggestions are welcome.
+which links to various renderings of the client app.  Preferences feedback
+and suggestions are welcome.
 
 === Managing the UI Theme ===
 The default set of jQuery Mobile theme swatches get us near enough to
