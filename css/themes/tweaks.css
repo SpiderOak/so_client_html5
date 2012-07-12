@@ -46,9 +46,6 @@
 [data-role=header] .header-title[data-theme=f] {
    /* Orange - SpiderOak.html */
   border-color:  rgba(252,142,32,.2); }
-[data-role=header] .header-title[data-theme=e] {
-  /* Yellow */
-  border-color:  rgba(244,198,63,.2); }
 [data-role=header] .header-title[data-theme=g] {
   /* Blue-gray - SpiderOak_neutral.html */
   border-color:  rgba(51,76,102,.2); }
