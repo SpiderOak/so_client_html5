@@ -1,24 +1,146 @@
 #!/bin/sh
 
-# Do processing to produce the releasable application.
+# Produce various releasable renderings of the SpiderOak mobile client app.
 
-# This is where we'll be accumulating the recipe as we develop facilities
-# and how the actual release is actually organized.
+# The process is organized around two things:
+#
+# 1. Configuration variables, in the Releases section below, which list the
+#    various brand and theme variations.  One of each theme variant will be
+#    created for each brand variant.
+# 2. Code and media resources situated in specific locations, using names
+#    connected with the configuration vars.
+#
+# To add a new brand rendering, add an entry to the "brands" list and the
+# following artifacts in the (defined below) 'artifacts_dir':
+#
+# brand_${name}.js - brand-specific js; adapt existing 'brand_spideroak.js'.
+# brand_images_${name}_orange/ - brand-specific images suitable for orange theme
+# brand_images_${name}_blue/ - brand-specific images suitable for blue and other
+#                              dark themes
 
-tools_dir="$(dirname $0)"
-app_dir="$tools_dir/.."
-cd $app_dir
+brands="spideroak avg"
 
-blue_more="-e s/icons_orange/icons_blue/"
-blue_more="${blue_more} -e s/alternatives_orange/alternatives_blue/g"
-blue_more="${blue_more} -e s/icons_orange/icons_blue/g"
+# To add a new theme platform, include the theme file name (sans .css) in
+# $theme_platforms:
 
-# XXX USE A MAKEFILE.
-echo "Making neutral-themed SpiderOak_neutral.html..."
-sed -e 's/"f"/"g"/g' $blue_more SpiderOak.html > SpiderOak_neutral.html
-echo "Making blue-themed SpiderOak_blue.html..."
-sed -e 's/"f"/"i"/g' $blue_more SpiderOak.html > SpiderOak_blue.html
-echo "Making green-themed SpiderOak_blue.html..."
-sed -e 's/"f"/"h"/g' $blue_more SpiderOak.html > SpiderOak_green.html
+theme_platforms="iphone"
 
-echo "Done."
+# To add a new theme color, add a swatch using the jQuery Mobile theme roller,
+# and add an entry in the theme_colors list:
+
+theme_colors="orange blue neutral green"
+
+# ... plus identification of the swatch here:
+
+orange_swatch="f"
+neutral_swatch="g"
+green_swatch="h"
+blue_swatch="i"
+
+# ... identify the themes brand-independent resource_artifacts icons directory:
+
+orange_icons="icons_orange"
+blue_icons="icons_blue"
+green_icons="icons_blue"
+neutral_icons="icons_blue"
+
+# ... and finally:
+#
+#    Manually edit $app_dir/css/themes/tweaks.css
+#
+# to add a border-color value in a section for that swatch:
+#
+#   [data-role=header] .header-title[data-theme=<swatch-letter>]
+#
+# (This adds a subdued border color for the header title, both for appearance
+# and as a cue that the title is clickable.)
+# Copy and adjust an existing one.  (Using the same value as the iphone.css
+# .ui-btn-up-<swatch> "border" value works well.)
+
+# ====================================================================
+# Internal configuration and processing below.
+
+blathering=non-empty           # set to empty to eliminate blather messages
+blather () { if [ -n "$blathering" ]; then echo $0; fi; }
+
+# The html for the spideroak orange rendering is the basis from which all
+# the other renderings are derived.
+#
+# The other renderings are derived using:
+#
+# - HTML textual conversions, adjusting theme swatches and doing some other
+#   textual substitutions
+# - resource selection, where resource directories (containing icons,
+#   javascript code) are composed with rendering-specific constituents
+# - javascript settings, used by the application script to do programmatic
+#   adjustments of release-specific legends and addresses
+# - CSS conditions, adjusting some style aspects according to, eg, jQm swatch
+#   choices
+
+# Resource organization: the renderings are located in the $releases_dir:
+
+script_dir=$(dirname "$0")
+
+cd "${script_dir}/../releases"
+
+releases_dir="$PWD"
+app_dir="$(dirname $PWD)"
+artifacts_dir="$app_dir/release_artifacts"
+
+unconditional_infrastructure=\
+"$app_dir/css
+$app_dir/jquery.mobile-1.2.0_pre
+$app_dir/jquery-1.7.2
+$app_dir/custom-scripting.js
+$app_dir/js_aux
+$app_dir/SpiderOak.js"
+
+# The releases are named <brand>-<theme-color>, for all combinations of
+# $brands, $theme_colors, and $theme_platforms:
+
+produce_all_releases () {
+  for brand in $brands; do
+    for color in $theme_colors; do
+      for platform in $theme_platforms; do
+        produce_release $brand $color $platform
+      done
+    done
+  done
+  echo "Done."
+}
+
+produce_release () {
+  # Create a release, using the following parameters:
+  local brand="$1"; shift
+  local color="$1"; shift
+  local platform="$1"; shift
+
+  local target_dir="$brand-$color-$platform"
+  /bin/echo -n Working on $target_dir ...
+  blather
+
+  if [ ! -e "$target_dir" ]; then
+    blather Create $target_dir.
+    mkdir "$target_dir"
+  fi
+
+  # Do the unconditional stuff:
+  for item in $unconditional_infrastructure; do
+    copy_sync $item $target_dir/
+  done
+
+  # echo "Making neutral-themed SpiderOak_neutral.html..."
+  # sed -e 's/"f"/"g"/g' SpiderOak.html > SpiderOak_neutral.html
+  # echo "Making blue-themed SpiderOak_blue.html..."
+  # sed -e 's/"f"/"i"/g' SpiderOak.html > SpiderOak_blue.html
+  # echo "Making green-themed SpiderOak_blue.html..."
+  # sed -e 's/"f"/"h"/g' SpiderOak.html > SpiderOak_green.html
+}
+
+copy_sync () {
+  # Copy contents of $1 to $2, tracking deletions.
+  # We incidentally avoid unnecessary copying.
+  rsync --delete --update --archive --exclude '*~' --exclude '#*' "$1" "$2"
+}
+
+produce_all_releases;
