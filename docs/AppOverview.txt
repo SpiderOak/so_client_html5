@@ -12,7 +12,7 @@ data is organized - storage devices versus share rooms, and their contained
 folders and file "nodes".
 
 * `Node` - Abstract basis for all nodes.
-  * `ContentNode` - Abstract basis representing SpiderOak-managed content
+  * `ContentNode` - Abstract basis representing !SpiderOak-managed content
     * `RootContentNode` - Consolidated storage and share roots container
     * `FolderContentNode` - General behaviors used by storage and share folders
     * `FileContentNode` - General behaviors used by storage and share files
@@ -149,31 +149,33 @@ their respective collections:
 
 === Dynamic Page Traversal ===
 Most content nodes ([#ContentNodeDataModel in the data model, above]) are
-presented as jQuery Mobile "pages" - `<div data-role="page>`. They are
-generated dynamically from cloned copies of static template DOM nodes,
-found in `SpiderOak.html`, upon in-app traversal of content URLs (see
-[#ContentAddressing Content Addressing], above).
-* The spideroak object's `handle_content_visit()` method is assigned to
-  handle the jQuery Mobile `pagebeforechange` event, which tracks changes
-  to the browser's `location.hash` setting.
+presented as jQuery Mobile "pages" - `<div data-role="page>`. Most are
+cloned copies of static `SpiderOak.html` template nodes, upon in-app
+traversal of content URLs (see [#ContentAddressing Content Addressing],
+above).
+* The spideroak object's `handle_content_visit()` function is assigned to
+  handle the jQuery Mobile `pagebeforechange` event, which is triggered by
+  changes to the browser's `location.hash` setting and
+  `$.mobile.changePage()` invocations.
 
-  Our handle_content_visit() routine discontinues default jQm traversal
-  machinery only for handling of string addresses.  That way, we can (and
-  do) use the standard jQm traversal facilities for the jQm objects that
-  our machinery fabricates, by passing them to $.mobile.changePage() as
-  jQm objects.
+  Our `handle_content_visit()` routine only discontinues default jQm
+  traversal machinery for handling of string addresses.  That way, the
+  standard jQm traversal facilities handles traversal to the jQm objects
+  that our machinery fabricates, by passing them to `$.mobile.changePage()`
+  as jQm objects.
 * A few different classes of addresses are used in the application, as
   described in the [#OrganizationofContentTraversal Content Traversal]
   section, above.
 * For navigation URLs that go to application content, including the user's
   !SpiderOak-managed content, we:
-  * Fetch a suitable `ContentNode`-based object for the node using
+  * Fetch a suitable `ContentNode`-based object for the node using...
   * `spideroak.content_node_manager.get()`, which returns an already
     existing node, if any, or else allocates a new one with suitable
     initial settings.
-  * The obtained `ContentNode` object uses its `.visit()` method to
-    handle the visit - fabricating a (jQm <div data-role="page"/>) page
-    object and using the traversal machinery to visit it.
+  * The obtained `ContentNode`-derived object uses its `.visit()` method to
+    handle the visit - cloning or directly using a (jQm <div
+    data-role="page"/>) page object and recursively using the traversal
+    machinery to visit it.
 * In most cases, `ContentNode.visit()`:
   * Fetches the node contents from the server if necessary (''intially,
     always necessary'')
@@ -204,14 +206,17 @@ found in `SpiderOak.html`, upon in-app traversal of content URLs (see
        the login form, with the username filled in and Remember Me is
        activated, as appropriate.
 See [#ContentNodenavigationmodes below] for details about the navigation
-modes.
+modes options.
 
 === Content Node navigation modes ===
 Special navigation behaviors are supported using query (search) parameters
-on the node hash locations, translated to the node_opts parameter passed
-through the `.visit()`, `.provision*()`, and `.show()`/`.layout*()` node
-methods.  (Some modes can only be used via the mode_opts method parameters,
-and not passed as URL query parameters.)
+on the URL hash locations or mode_opts object properties.  (The URL query
+parameters are translated to node_opts property settings by
+`handle_content_visit()`.)  The mode_opts settings are passed through the
+`.visit()`, `.provision*()`, and `.show()`/`.layout*()` node methods, which
+may have behaviors conditioned by the options.  (Some modes can only be
+used via the mode_opts method parameters, and not passed as URL query
+parameters.)
 
 Currently implemented modes include:
 * `refresh`: refetch the data for the node.
@@ -233,8 +238,8 @@ Currently implemented modes include:
 * `alt_page_selector`: selector to be used by
   ContentNode.layout_header() to work on an alternate page than the node's
   default one.
-* `no_dividers`: tell ContentNode.layout_content() to not include dividers
-  for plentiful content.
+* `no_dividers`: tell ContentNode.layout_content() to not inhibit creation
+  of dividers even when content is plentiful.
 
 === Content and Operational Menus ===
 Elaborate actions on content, like adding and removing share nodes, is
