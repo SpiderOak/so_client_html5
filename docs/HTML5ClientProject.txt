@@ -47,8 +47,8 @@ Landmarks:
 || - |||| Implement Send-to menu ||
 || - |||| Implement session PIN security ||
 || - |||| Identify and resolve crucial UI and functional issues ||
-|| Mostly Done || Provide an easy way to create app versions with different color schemes || Based on jQm themes, the main (provisional) orange one is converted to a various provisional alternates, eg a vibrant and a subdued blue. I've checked in a script to produce the alternates, and changed [https://ken.dev.spideroak.com:888/ my sandbox index page] to surface links to each. Using the jQm theme roller (see [../HTML5ClientTechnicalDetails#ManagingtheUITheme managing the UI theme] we can easily tailor the colors, etc. ||
-|| - || Automate creating different versions of the app for orange vs blue, specific enterprise branding and different storage servers, etc || The app 'generic' object has the technical parameters for server location, etc, should be easy to make distinct copies for different packages. ||
+|| Done || Provide an easy way to create app versions with different color schemes || Based on jQm themes, see [../HTML5ClientTechnicalDetails#ManagingtheUITheme managing the UI theme], we can easily tailor the colors, etc. ||
+|| Done || Systematically produce various application renditions, varying branding, color scheme, and platform look and feel. || The script tools/prep_release does the job. It identifies the locations of rendition-specific elements, and has configuration variables towards to top for easy incorporation of new elements. ||
 || - || Internationalize || A few stubs are in place, many more will need to be done then cataloging and translating, I guess ||
 || - || Polish. || Reconcile look and feel, different kinds of user feedback and activity timing issues, etc. ||
 || - |||| Plan v1 release ||
