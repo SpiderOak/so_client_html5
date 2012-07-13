@@ -75,7 +75,10 @@ var spideroak = function () {
     if (SO_DEBUGGING) {
         var hostname = window.location.hostname;
         if (hostname.slice(hostname.length-6) == "fx5.de") {
+            generic.fx5_proxying = true;
             generic.base_host_url = "https://www.fx5.de/so";
+            generic.alt_host_replace = "https://web-dc2.spideroak.com";
+            generic.alt_host_url = "https://www.fx5.de/so_dc2";
             generic.storage_path_prefix = "/so" + generic.storage_path_prefix;
             generic.shares_path_suffix = "/so" + generic.shares_path_suffix; }}
 
@@ -2124,8 +2127,14 @@ var spideroak = function () {
                 else if (match[1] === 'login') {
                     if (match[2].charAt(0) === "/") {
                         login_url = server_host_url + match[2]; }
-                    else {
-                        login_url = match[2]; }
+                    else if (generic.fx5_proxying) {
+                        var ahr = generic.alt_host_replace;
+                        if (match[2].slice(0, ahr.length) === ahr) {
+                            // Use the proxy location:
+                            login_url = (generic.alt_host_url
+                                         + match[2].slice(ahr.length)); }
+                        else {
+                            login_url = match[2]; }}
                     storage_login(login_info, login_url); }
                 else {
                     // Browser haz auth cookies, we haz relative location.
