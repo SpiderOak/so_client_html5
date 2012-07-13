@@ -97,7 +97,7 @@ var FILE_CLASS_TO_SUFFIX_AND_ICON = {
     doc: [['doc', 'docx'],
           'doc'],
     picture: [['png', 'jpg', 'jpeg', 'gif', 'ico', 'svg', 'ps', 'eps'],
-              'image'],
+              'picture'],
     video: [['mov', 'mpg', 'mpeg', 'avi', 'wmv'],
             'video'],
     audio: [['mp3', 'm4a', 'm4p', 'ogg', 'flac', 'aiff',
