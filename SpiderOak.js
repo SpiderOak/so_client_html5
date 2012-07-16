@@ -1909,7 +1909,7 @@ var spideroak = function () {
             if (disposition) {
                 return persistence_manager.set("remember_me", true); }
             else if (typeof disposition === "undefined") {
-                return persistence_manager.get("remember_me") || false; }
+                return persistence_manager.get("remember_me"); }
             else {
                 remember_manager.fields.map(function (key) {
                     persistence_manager.remove(key); });
@@ -2223,8 +2223,8 @@ var spideroak = function () {
             $(selector).delay(1000).fadeIn(2500, do_focus_and_callback);
             do_focus(); }}
 
-    function prep_login_form(content_selector, submit_handler, name_field,
-                             do_fade) {
+    function prep_credentials_form(content_selector, submit_handler, name_field,
+                                   do_fade) {
         // XXX This needs to be significantly refactored, to be
         //     content-node (RootContentNode versus PublicRootShareNode)
         //     specific, with some share faculties.
@@ -2253,7 +2253,8 @@ var spideroak = function () {
         var $remember_widget = $form.find('.remember');
         var remembering = remember_manager.active();
         if ($remember_widget.attr('id') === "remember-me") {
-            if (remembering && ($remember_widget.val() !== "on")) {
+            if ((remembering || remembering === null)
+                && ($remember_widget.val() !== "on")) {
                 $remember_widget.val("on");
                 // I believe why we need to also .change() is because the
                 // presented slider is just tracking the actual select widget.
@@ -2263,7 +2264,8 @@ var spideroak = function () {
                 $remember_widget.trigger('change'); }}
         else if ($remember_widget.attr('id') === "retain-visit") {
             var retaining = persistence_manager.get('retaining_visits');
-            if (retaining && ($remember_widget.val() !== "on")) {
+            if ((retaining || (retaining === null))
+                 && ($remember_widget.val() !== "on")) {
                 $remember_widget.find('option[value="on"]').attr('selected',
                                                                  'selected');
                 $remember_widget.val("on");
@@ -2272,7 +2274,7 @@ var spideroak = function () {
                 $remember_widget.val("off");
                 $remember_widget.trigger('change'); }}
         else {
-            console.error("prep_login_form() - Unanticipated form"); }
+            console.error("prep_credentials_form() - Unanticipated form"); }
 
         var name_field_val = pmgr.get(name_field);
         if (name_field_val
@@ -2298,7 +2300,7 @@ var spideroak = function () {
                 persistence_manager.set('retaining_visits',
                                         remember_widget_on); }
             else {
-                console.error("prep_login_form()"
+                console.error("prep_credentials_form()"
                               + " - Unanticipated form"); }
 
             data['password'] = $password.val();
@@ -2352,11 +2354,11 @@ var spideroak = function () {
             prep_html_branding();
 
             // Properly furnish login form:
-            prep_login_form('.nav-login-storage', storage_login,
-                            'username', true);
-            prep_login_form('.nav-visit-share',
-                            public_shares.add_item_external.bind(public_shares),
-                            'shareid', false);
+            prep_credentials_form('.nav-login-storage', storage_login,
+                                  'username', true);
+            prep_credentials_form('.nav-visit-share',
+                                  public_shares.add_item_external.bind(public_shares),
+                                  'shareid', false);
 
             // Hide everything below the banner, for subsequent unveiling:
             combo_root.veil(true);
