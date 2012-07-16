@@ -2245,8 +2245,8 @@ var spideroak = function () {
 
         var $submit = $form.find('[type="submit"]');
         var sentinel = new submit_button_sentinel([$name, $password], $submit)
-        $name.bind('keyup.SpiderOak', sentinel);
-        $password.bind('keyup.SpiderOak', sentinel);
+        $name.bind('input.SpiderOak', sentinel);
+        $password.bind('input.SpiderOak', sentinel);
         $submit.button()
         sentinel();
 
