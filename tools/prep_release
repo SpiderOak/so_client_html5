@@ -45,8 +45,6 @@ blue_category=blue
 green_category=blue
 neutral_category=blue
 
-# ... and finally:
-#
 #    Manually edit $app_dir/css/themes/tweaks.css
 #
 # to add a border-color value in a section for that swatch:
@@ -57,6 +55,11 @@ neutral_category=blue
 # and as a cue that the title is clickable.)
 # Copy and adjust an existing one.  (Using the same value as the iphone.css
 # .ui-btn-up-<swatch> "border" value works well.)
+
+# Finally, choose the rendering for the development version:
+dev_brand="spideroak"
+dev_color="orange"
+dev_platform="iphone"
 
 # ====================================================================
 # Internal configuration and processing below.
@@ -85,7 +88,14 @@ blather () {
 
 script_dir=$(dirname "$0")
 
-cd "${script_dir}/../releases"
+if [ ! -d "${script_dir}/../releases" ]; then
+    blather -n Creating releases dir:
+    mkdir -p "${script_dir}/../releases"
+    cd "${script_dir}/../releases"
+    blather $PWD
+else
+    cd "${script_dir}/../releases"
+fi
 
 releases_dir="$PWD"
 app_dir="$(dirname $PWD)"
@@ -111,7 +121,10 @@ produce_all_releases () {
       done
     done
   done
-  echo "Done."
+
+  link_dev_env
+
+  blather "Done."
 }
 
 produce_release () {
@@ -121,7 +134,7 @@ produce_release () {
   local platform="$1"; shift
 
   local target_dir="$brand-$color-$platform"
-  /bin/echo "Composing $target_dir"
+  blather "Composing $target_dir"
 
   if [ ! -e "$target_dir" ]; then
     blather Create $target_dir.
@@ -155,7 +168,7 @@ produce_release () {
   # SpiderOak.html:
   eval to_swatch="\$${color}_swatch"
   if [ -z "$to_swatch" ]; then
-    echo Failed target theme swatch ${color}_swatch identify, \
+    blather Failed target theme swatch ${color}_swatch identify, \
       passing through 1>&2
     to_swatch=${basis_swatch}
   fi
@@ -167,6 +180,20 @@ produce_release () {
         "${app_dir}/SpiderOak.html" \
         > "${target_dir}/SpiderOak.html"
   fi
+}
+
+link_dev_env () {
+  # Last, establish links for development environment:
+  blather Re-linking dev env
+  brand_images_link_prefix="releases/brand_images_${dev_brand}_${dev_color}"
+  icons_color_link_prefix="releases/icons_${dev_color}"
+  rm -f "${app_dir}"/icons \
+    && ln -s "release_artifacts/icons_${dev_color}" "${app_dir}/icons"
+  rm -f "${app_dir}"/brand.js \
+    && ln -s "release_artifacts/brand_settings_${dev_brand}.js" "${app_dir}/brand.js"
+  rm -f "${app_dir}"/brand_images \
+    && ln -s "release_artifacts/brand_images_${dev_brand}_${dev_color}" \
+             "${app_dir}/brand_images"
 }
 
 copy_sync () {
