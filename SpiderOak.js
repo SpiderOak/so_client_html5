@@ -2246,6 +2246,7 @@ var spideroak = function () {
         */
         var $content = $(content_selector);
         var $form = $(content_selector + " form");
+        var page_id = $content.closest('[data-role="page"]').attr('id');
 
         var $password = $form.find('input[name=password]');
         var $name = $form.find('input[name=' + name_field + ']');
@@ -2254,6 +2255,10 @@ var spideroak = function () {
         var sentinel = new submit_button_sentinel([$name, $password], $submit)
         bind_replace($name, 'input.SpiderOak', sentinel);
         bind_replace($password, 'input.SpiderOak', sentinel);
+        bind_replace($(document), 'pagebeforechange.SpiderOak',
+                     function (e) {
+                         if ($.mobile.activePage.attr('id') === page_id) {
+                             $password.val(""); }});
         $submit.button()
         sentinel();
 
