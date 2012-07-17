@@ -24,6 +24,12 @@ $(document).ready(function() {
     /* Nothing so far. */
 })
 
+function single_bind(object, binding, the_func) {
+    /* On 'object', add 'binding' to 'function', replacing existing binding if present.
+     */
+    object.unbind(binding, the_func);
+    object.bind(binding, the_func); }
+
 function error_alert_message(purpose, status_code) {
     /* Return a error message for 'purpose' with 'status_code'.
        'purpose' should name the problem, and 'status_code' can be one

@@ -129,7 +129,9 @@ var spideroak = function () {
 
     function establish_traversal_handler() {
         /* Establish page change event handler. */
-        $(document).bind("pagebeforechange.SpiderOak", handle_content_visit); }
+        single_bind($(document),
+                    "pagebeforechange.SpiderOak",
+                    handle_content_visit); }
 
 
     /* ==== Content Root Registration ====  */
@@ -1298,8 +1300,8 @@ var spideroak = function () {
                      ? $(mode_opts.alt_page_selector)
                      : this.my_page$());
         var $title = $page.find('[data-role="header"] .header-title');
-        $title.click(this.depth_path_menu.bind(this));
-        $title.bind('taphold.SpiderOak', go_to_entrance);
+        single_bind($title, 'click.SpiderOak', this.depth_path_menu.bind(this));
+        single_bind($title, 'taphold.SpiderOak', go_to_entrance);
 
         var fields = {};
         fields.title = this.title();
@@ -2245,8 +2247,8 @@ var spideroak = function () {
 
         var $submit = $form.find('[type="submit"]');
         var sentinel = new submit_button_sentinel([$name, $password], $submit)
-        $name.bind('input.SpiderOak', sentinel);
-        $password.bind('input.SpiderOak', sentinel);
+        single_bind($name, 'input.SpiderOak', sentinel);
+        single_bind($password, 'input.SpiderOak', sentinel);
         $submit.button()
         sentinel();
 
@@ -2314,8 +2316,10 @@ var spideroak = function () {
                                        unhide_form_oneshot);
                     $(document).unbind("error.SpiderOak",
                                        unhide_form_oneshot); }
-                $(document).bind("pagechange.SpiderOak", unhide_form_oneshot)
-                $(document).bind("error.SpiderOak", unhide_form_oneshot); }
+                single_bind($(document), "pagechange.SpiderOak",
+                            unhide_form_oneshot)
+                single_bind($(document), "error.SpiderOak",
+                            unhide_form_oneshot); }
             else {
                 $name.val("");
                 $password.val(""); }
