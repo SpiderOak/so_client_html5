@@ -2134,9 +2134,9 @@ var spideroak = function () {
                         if (match[2].slice(0, ahr.length) === ahr) {
                             // Use the proxy location:
                             login_url = (generic.alt_host_url
-                                         + match[2].slice(ahr.length)); }
-                        else {
-                            login_url = match[2]; }}
+                                         + match[2].slice(ahr.length)); }}
+                    else {
+                        login_url = match[2]; }
                     storage_login(login_info, login_url); }
                 else {
                     // Browser haz auth cookies, we haz relative location.
