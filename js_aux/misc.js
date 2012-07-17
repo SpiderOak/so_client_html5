@@ -24,11 +24,6 @@ $(document).ready(function() {
     /* Nothing so far. */
 })
 
-function single_bind(object, binding, the_func) {
-    /* On 'object', add 'binding' to 'function', replacing existing binding if present.
-     */
-    object.unbind(binding, the_func);
-    object.bind(binding, the_func); }
 
 function error_alert_message(purpose, status_code) {
     /* Return a error message for 'purpose' with 'status_code'.
@@ -238,6 +233,12 @@ function toastish(message, duration, theme) {
         $.mobile.showPageLoadingMsg(theme || "b", message, true); }, 0);
     setTimeout(function () { $.mobile.hidePageLoadingMsg(); }, duration); }
 
+function bind_replace(object, binding, the_func) {
+    /* On 'object', add 'binding' to 'function'.  Replace existing binding
+       if present. */
+    object.unbind(binding, the_func);
+    object.bind(binding, the_func); }
+
 function deploy_focus_oneshot(selector, event) {
     /* Deploy a reliable 'selector' input-field focus function on 'event'.
        Use to avoid page-loading timing complications, eg using jQm pageshow.
@@ -245,4 +246,4 @@ function deploy_focus_oneshot(selector, event) {
     var focus_oneshot = function(e, data) {
         $(selector).focus();
         $(document).unbind(event, focus_oneshot); }
-    $(document).bind(event, focus_oneshot); }
+    bind_replace($(document), event, focus_oneshot); }
