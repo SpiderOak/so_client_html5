@@ -2204,12 +2204,15 @@ var spideroak = function () {
            reveal and position the cursor in the username field.
            Optional 'callback' - function to invoke as part of the un/veiling.
         */
-        function do_focus() {
+        function do_conditional_focus() {
             var $username = $('#my_login_username');
-            if ($username.val() === "") { $username.focus(); }
-            else { $('#my_login_password').focus(); }}
-        function do_focus_and_callback() {
-            do_focus();
+            var $password = $('#my_login_password');
+            if (! ($username.is(':focus') || $password.is(':focus'))) {
+                if ($username.val() === "") {
+                    $username.focus(); }
+                else { $password.focus(); }}}
+        function do_conditional_focus_and_callback() {
+            do_conditional_focus();
             if (callback) { callback(); }}
         var selector = '#home [data-role="content"]';
         selector = selector.concat(', .error-status-message',
@@ -2222,8 +2225,9 @@ var spideroak = function () {
             // Surprisingly, doing focus before dispatching fadeIn doesn't work.
             // Also, username field focus doesn't *always* work before the
             // delay is done, hence the redundancy.  Sigh.
-            $(selector).delay(1000).fadeIn(2500, do_focus_and_callback);
-            do_focus(); }}
+            $(selector).delay(1000).fadeIn(2500,
+                                           do_conditional_focus_and_callback);
+            do_conditional_focus(); }}
 
     function prep_credentials_form(content_selector, submit_handler, name_field,
                                    do_fade) {
