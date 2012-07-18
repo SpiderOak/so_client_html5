@@ -12,7 +12,8 @@ Part of the [[HTML5ClientProject]].
 || Providing all necessary native UI operations || probably || jQm provides long-press (taphold), swipe, lots more. ||
 || Settings and persistent data || yes || html5 local storage on some recent releases. !PhoneGap transparently generalizes that across versions and platforms.  [#lawnchair Lawnchair] !NoSQL db facility may be useful. ||
 || Offline operation || yes || html5 cache manifest for application code. Will take some thought and design for caching of selected user content. ||
-|| Circumventing CORS restrictions || no, but... || we cannot circumvent CORS with just html5 (really, javascript) access without opening ploys that others can use - see [[HTML5ClientAppSameOriginIssues]] ||
+|| App operation - exit, suspend/resume, etc || no || Hybridization provides access to platform-specific operational events, like pause, resume, online, offline, etc, for handling operational changes. Hybridization is Even necessary for app exit., `window.close()` doesn't work unless you have a handle on the call that opened the window... ||
+|| Circumventing CORS restrictions || no || We cannot circumvent CORS with just html5 (really, javascript) access without opening ploys that others can use - see [[HTML5ClientAppSameOriginIssues]].  It [#cors_whitelisting looks like] the !PhoneGap `UIWebView` provides a simple whitelisting facility for targeted cross-origin access. ||
 
 == !PhoneGap hybridization facilities ==
 
@@ -69,16 +70,13 @@ Here are documented common features of immediate interest (eg, in the
   Currentness of stuff in the wiki appears to be mixed, at best, so we'll
   need to check for more recent developments, but this is a start.
 
-  According to a note on that page (in the "Application Security" section),
-  "cross domain network requests are possible from a !PhoneGap
-  application".  I expect that means we will be free of
-  [[HTML5ClientAppSameOriginIssues]] restrictions within !PhoneGap.  This
-  may settle an important operational issue, but also requires us to
-  account for the many security vulnerabilities it opens.
+  [=#cors_whitelisting Regarding Cross-Origin Resource Sharing restrictions]
+  (see [[HTML5ClientAppSameOriginIssues]]), it looks like !PhoneGap
+  provides a simple whitelisting facility to identify allowed CORS targets.
+  See a note in the "Application Security" section of the page, "cross
+  domain network requests are possible from a !PhoneGap application".
 
-  The section also has mention of !PhoneGap provisions for XSS prevention
-  based on whitelisting request domains (see "Cross site scripting (XSS)"
-  section), and refers to
+  The security section also includes reference to
   [https://www.owasp.org/index.php/Top_10_2010-Main OWASP Top 10 Application Security Risks - 2010],
   a decent list of essential application security concerns to tend.
 
