@@ -80,6 +80,11 @@
   margin-right: -1em !important;
   margin-left: -1em !important;
 }
+.spiel-columns {
+  column-width: 20em;
+  -webkit-column-width: 20em;
+  -moz-column-width: 20em;
+}
 
 .crushed-vertical {
   padding-top: 3px !important;

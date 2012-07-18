@@ -167,6 +167,7 @@
         About the Dashboard</a>
     </div>
     <div data-role="content">
+     <div class="spiel-columns">
       <h3>
         <span class="brand-label"> SpiderOak </span>
         - Secure File Backup, Sync, and Sharing
@@ -202,6 +203,7 @@
       <ul class="subdued">
         <span class="brand-title"> SpiderOak </span>
         All-Weather Mobile Hybrid Client 1.0 </ul>
+     </div>
     </div>
     <div data-role="footer" data-position="fixed" data-theme="a">
       <div data-role="navbar">
@@ -315,13 +317,14 @@
     </div>
     <div data-role="content">
       <h2> The Dashboard </h2>
-      <div>
+      <div class="spiel-columns">
         <p> The <span class="brand-title"> SpiderOak </span> mobile
           dashboard provides a consolidated, top-level view of the content
           that your are backing up and sharing
           using <span class="brand-label"> SpiderOak </span>. </p>
+
         <p> The dashboard always shows the list of publicly available Share
-          Rooms that you are visiting.  Above that it shows eather a login
+          Rooms that you are visiting.  Above that it shows either a login
           form, by which you log in to a <span class="brand-label">
           SpiderOak </span> account, or your account's backup storage
           devices and the list of Share Rooms published from the account,
@@ -331,11 +334,19 @@
           name you most recently use to log in will be retained for
           subsequent logins, until you change it or turn off
           remembering.</p>
+      </div>
+
+      <h3> Content Items </h3>
+      <div class="spiel-columns">
         <p> Whatever user-content is present, you can tap on the items to
           visit those items, delving into folders or downloading
           files. Empty sections are signified by a single, inert item
           with an "&empty;" empty symbol.
         </p>
+      </div>
+
+      <h3> Sections </h3>
+      <div class="spiel-columns">
         <p> You can also tap on the headers of the dashboard's respective
           content sections to enter that section's content root.  There you
           will find info about the section, as well as the same list of
@@ -349,31 +360,42 @@
           the respective room from the visited list or change the room's
           persistence on the list across local sessions. </p>
       </div>
-      <h2> Navigation </h2>
-      <div>
-          <p> Tapping the header title on any page pops up a path menu,
-            listing the folders successively containing the current
-            location, with the outermost dashboard at the bottom.  Tapping
-            on any item in the list returns you to that item. </p>
-          <p> If you instead tap <em> and hold </em> on any page's header
-            title, you will be returned directly to the dashboard. </p>
-          <p> In the left of the footer, the Recent button will bring you
-            to a list of recently visited content items,
-            most-recent-visited first.  Tap on any to return to it. </p>
-          <p> While logged in, the Dashboard item in any listing includes
-            a <a href="#logout" alt="Logout now" data-mini="true"
-            data-inline="true" data-role="button" data-icon="delete"
-            data-iconpos="notext"> </a> logout button on the right - tap on
-            it to return to the dashboard and log out.  (The button, here,
-            will also log you out if you're currently logged in, as will
-            the one on the dashboard entry in the header title path menu,
-            described above.) </p>
-          <p> On any screen, tapping on an inactive area will toggle the
-            header and footer from fixed mode, where they stay visible at
-            the top and bottom of the screen while scrolling, and in-line
-            mode, where they scroll at the top and bottom of the current
-            text. The header and footer are more constantly available in
-            fixed mode, but in-line mode frees up some screen space. </p>
+
+      <h2> General Navigation </h2>
+
+      <h3> Headers </h3>
+      <div class="spiel-columns">
+        <p> Tapping the header title on any page pops up a path menu,
+          listing the folders successively containing the current
+          location, with the outermost dashboard at the bottom.  Tapping
+          on any item in the list returns you to that item. </p>
+        <p> If you instead tap <em> and hold </em> on any page's header
+          title, you will be returned directly to the dashboard. </p>
+      </div>
+
+      <h3> Footers </h3>
+      <div class="spiel-columns">
+        <p> In the left of the footer, the Recent button will bring you
+          to a list of recently visited content items,
+          most-recent-visited first.  Tap on any to return to it. </p>
+      </div>
+
+      <h3> Anywhere </h3>
+      <div class="spiel-columns">
+        <p> While logged in, the Dashboard item in any listing includes
+          a <a href="#logout" alt="Logout now" data-mini="true"
+               data-inline="true" data-role="button" data-icon="delete"
+               data-iconpos="notext"> </a> logout button on the right - tap
+          on it to return to the dashboard and log out.  (The button, here,
+          will also log you out if you're currently logged in, as will the
+          one on the dashboard entry in the header title path menu, described
+          above.) </p>
+        <p> On any screen, tapping on an inactive area will toggle the
+          header and footer from fixed mode, where they stay visible at the
+          top and bottom of the screen while scrolling, and in-line mode,
+          where they scroll at the top and bottom of the current text. The
+          header and footer are more constantly available in fixed mode,
+          but in-line mode frees up some screen space. </p>
       </div>
     </div>
     <div data-role="footer" data-position="fixed" data-theme="a">
@@ -439,24 +461,29 @@
       </a>
     </div>
     <div data-role="content" data-theme="c">
-      <div class="spiel" data-role="collapsible" data-mini="true" data-theme="f"
+      <div data-role="collapsible" data-mini="true" data-theme="f"
            data-collapsed="false"
            data-collapsed-icon="arrow-r" data-expanded-icon="arrow-d">
         <legend> Your Account's Backup Storage Devices </legend>
-        <p> Here are the storage devices that are configured for your
-          account's <span class="brand-label"> SpiderOak </span> online
-          backup.  Delve into the contents by tapping on the entries.  You
-          cannot yet use the mobile app to configure backup coverage - use
-          the <span class="brand-label"> SpiderOak </span> desktop or web
-          interface for that.
-        <p>You can view the storage contents that your account is making
-          accessible to others in
-          <a href="#" class="original_shares_root_url"> My Share Rooms</a>.
-          <a href="#" class="public_shares_root_url"> Public Share
-          Rooms</a> lists the publicly accessible Share Rooms
-          that you are currently visiting with this app.</p>
-        <p class="emptiness-message">The "&empty;" sign indicates that your
-          account currently doesn't publish any Share Rooms.</p>
+        <div class="spiel-columns">
+          <p> Here are the storage devices that are configured for your
+            account's <span class="brand-label"> SpiderOak </span> online
+            backup.  Delve into the contents by tapping on the entries.  You
+            cannot yet use the mobile app to configure backup coverage - use
+            the <span class="brand-label"> SpiderOak </span> desktop or web
+            interface for that. </p>
+        </div>
+        <div class="spiel-columns">
+          <p>You can view the storage contents that your account is making
+            accessible to others in
+            <a href="#" class="original_shares_root_url"> My Share Rooms</a>.
+            <a href="#" class="public_shares_root_url"> Public Share
+              Rooms</a> lists the publicly accessible Share Rooms
+            that you are currently visiting with this app.</p>
+          <p class="emptiness-message spiel-columns">The "&empty;" sign indicates
+            that your account currently doesn't publish any Share
+            Rooms.</p>
+        </div>
       </div>
       <p/>
       <ul class="content-items" data-role="listview"></ul>
@@ -486,21 +513,25 @@
            data-collapsed="false"
            data-collapsed-icon="arrow-r" data-expanded-icon="arrow-d">
         <legend> Share Rooms Published by Your Account </legend>
-        <p> These are the <span class="brand-label"> SpiderOak </span>
-          Share Rooms that your account is publishing. Each share room is
-          composed of folders selected from your account's
-          <a href="#" class="storage_root_url"> backups storage
-          folders </a>.  They're available for remote access by anyone that
-          knows their Share ID and Room Key. </p>
-        <p> You can adjust your set of published Share Rooms using the
-          desktop or web interface. </p>
-        <p> There is a separate collection of publicly accessible Share
-          Rooms that are currently being visited in
-          <a href="#" class="public_shares_root_url"> Public Share
-          Rooms</a>, where you can add Room visits to the list and drop
-          currently listed ones.</p>
-        <p class="emptiness-message">The "&empty;" sign indicates that your
-          account currently doesn't publish any Share Rooms.</p>
+        <div class="spiel-columns">
+          <p> These are the <span class="brand-label"> SpiderOak </span>
+            Share Rooms that your account is publishing. Each share room is
+            composed of folders selected from your account's
+            <a href="#" class="storage_root_url"> backups storage
+              folders </a>.  They're available for remote access by anyone that
+            knows their Share ID and Room Key. </p>
+          <p> You can adjust your set of published Share Rooms using the
+            desktop or web interface. </p>
+          <p> There is a separate collection of publicly accessible Share
+            Rooms that are currently being visited in
+            <a href="#" class="public_shares_root_url"> Public Share
+              Rooms</a>, where you can add Room visits to the list and drop
+            currently listed ones.</p>
+        </div>
+        <div>
+          <p class="emptiness-message">The "&empty;" sign indicates that your
+            account currently doesn't publish any Share Rooms.</p>
+        </div>
       </div>
       <p/>
       <ul class="content-items" data-role="listview"></ul>
