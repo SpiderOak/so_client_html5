@@ -14,7 +14,7 @@ function submit_button_sentinel(inputs, $submit) {
         inputs.map(function ($input) {
             if ($input.val() === "") {
                 passed = false;
-                $submit.button('disable'); }}.bind(this));
+                $submit.button('disable'); }});
         if (passed) {
             $submit.button('enable'); }
         return true; }
