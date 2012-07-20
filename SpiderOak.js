@@ -688,12 +688,11 @@ var spideroak = function () {
         var share_id = base32.decode(splat[splat.length-2]);
         var room_key = splat[splat.length-1];
 
-        var which_msg = ('Share ID <span class="message-subject">'
-                         + share_id + "</span>");
-
         if (succeeded !== true) {
-            which_msg += " with given Room Key";
             this.remove_status_message('result');
+            which_msg += (_t("Share ID")
+                          + '<span class="message-subject">'
+                          + share_id + "</span>");
             var message = (_t("Sorry") + " - " + which_msg + " "
                            + content.statusText + " (" + content.status + ")");
             var remove = true;
@@ -708,8 +707,14 @@ var spideroak = function () {
         else {
             this.remove_status_message('error');
             if (this.adding_external) {
-                var $sm = this.show_status_message(_t("Added") + " ("
-                                                   + which_msg + ")",
+                var room = node_manager.get(url);
+                var digested_name = (room && room.title()
+                                     ? elide(room.title(), 30)
+                                     : ("(" + _t("Share ID") + " "
+                                        + share_id + ")"));
+                var which_msg = ('<span class="message-subject">'
+                                 + digested_name + "</span>");
+                var $sm = this.show_status_message(_t("Added") +" "+ which_msg,
                                                    'result');
                 this.adding_external = false; }
             else {
@@ -901,17 +906,21 @@ var spideroak = function () {
 
         var share_id = credentials.shareid;
         var room_key = credentials.password;
-        var message = ("Specificied room (Share ID "
-                       + '<span class="message-subject">'
-                       + share_id + "</span>)");
         var new_share_url = (my.public_shares_root_url
                              + base32.encode_trim(share_id)
                              + "/" + room_key
                              + "/");
         if (is_public_share_room_url(new_share_url)) {
             this.remove_status_message('result');
-            this.show_status_message(message + " " + _t("already added"),
-                                     'error'); }
+            var room = node_manager.get(new_share_url);
+            var digested_title = ((room && room.title())
+                                  ? elide(room.title(), 25)
+                                  : "(" + _t("Share ID") +" " + share_id + ")");
+            var message = (_t("Room")
+                           + ' <span class="message-subject">'
+                           + digested_title + "</span> "
+                           + _t("already added"))
+            this.show_status_message(message, 'error'); }
         else {
             this.remove_status_message('error');
             var $sm = this.show_status_message(_t("Working..."),
@@ -944,9 +953,13 @@ var spideroak = function () {
             splat.pop(); }
         var share_id = base32.decode(splat[splat.length-2]);
         var room_key = splat[splat.length-1];
-        var message = ("Public share room (Share ID"
+        var room = node_manager.get(room_url);
+        var digested_name = ((room && room.title())
+                             ? elide(room.title(), 25)
+                             : "(Share ID " + share_id + ")")
+        var message = ("Public share room "
                        + '<span class="message-subject">'
-                       + share_id + "</span>)");
+                       + digested_name + "</span>");
 
         if (! is_public_share_room_url(room_url)) {
             this.show_status_message(message + " " + _t("not found."),
