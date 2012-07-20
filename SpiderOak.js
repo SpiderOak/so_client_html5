@@ -1556,8 +1556,10 @@ var spideroak = function () {
             $anchor.children().before($icon); }
 
         var $it = $('<li/>').append($anchor);
-        $it.attr('data-icon', "so-carat-r");
-        $it.attr('data-transition', "slide");
+        $it.attr('data-icon',
+                 (mode_opts && mode_opts.icon) || "so-carat-r");
+        $it.attr('data-transition',
+                 (mode_opts && mode_opts.transition) || "slide");
 
         if (mode_opts
             && mode_opts.hasOwnProperty('actions_menu_link_creator')) {
@@ -1859,12 +1861,16 @@ var spideroak = function () {
         $listview.empty();
 
         // refresh necessary so jQuery traversal stuff doesn't pass over:
-        $listview.append(this.layout_item$($.extend({refresh: true},
+        $listview.append(this.layout_item$($.extend({refresh: true,
+                                                     icon: "refresh"},
                                                     mode_opts)));
         var ancestor_url = this.parent_url;
         while (ancestor_url) {
             var ancestor = node_manager.get(ancestor_url);
-            $listview.append(ancestor.layout_item$(mode_opts));
+            $listview.append(
+                ancestor.layout_item$($.extend({transition: "slideup",
+                                                icon: "so-carat-l"},
+                                               mode_opts)));
             ancestor_url = ancestor.parent_url; }
 
         $popup.popup();
