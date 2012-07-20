@@ -1,21 +1,56 @@
 /* JQuery Mobile Infrastructure settings and customizations. */
 
-/* ** Alternative settings format:
+so_init_manager = function () {
+    /* Gather reports that various components are ready, and launch the app
+       when all are prepared. */
+    var components = {app: false,
+                      jQm: false,
+                      PhoneGap: false,
+                      DOM: false,
+                     }
+    var launch = function () {
+        spideroak.init(); }
+    return {ready: function (component) {
+        /* Launch the app when the last 'component' is marked as ready. */
+        components[component] = true;
+        var remaining = Object.keys(components).filter(
+            function (component) {
+                return  components[component] ? false : component;} );
+        if (remaining.length === 0) {
+            // All of the components have reported in:
+            launch(); }
+    }}}()
+
+function onDeviceReady() {
+    /* Called by Cordova/PhoneGap when ready for our application. */
+    "use strict";               // ECMAScript 5
+
+    // Report that PhoneGap is ready (or not present):
+    so_init_manager.ready('PhoneGap'); }
+
 $(document).bind("mobileinit", function(){
-    $.mobile.defaultPageTransition = "fade";
-});
-*/
-$(document).bind("mobileinit", function(){
+    /* jQuery Mobile preliminary intializations. */
+    "use strict";               // ECMAScript 5
+
+    // $.support.cors and $.mobile.allowCrossDomainPages:
+    // see http://jquerymobile.com/test/docs/pages/phonegap.html
+    // We also populate the white list.
+    $.support.cors = true;
     $.extend($.mobile, {
-        "pushStateEnabled": false,
-        "defaultPageTransition": "fade",
+        pushStateEnabled: false,
+        defaultPageTransition: "fade",
+        allowCrossDomainPages: true,
     });
+
+    so_init_manager.ready('jQm');
 });
+
 $.ajaxSetup({
     beforeSend:function(){
-        $.mobile.loading('show'); },
-    // This would hide loading message much too soon on storage login, so we
-    // do the hiding explicitly.
+        $.mobile.loading('show'); }
+    // We don't use the 'complete' function to hide the loading message,
+    // because it winds up triggering much too soon.  Instead, we do the
+    // hiding explicitly.
     //complete:function(){
-    //    $.mobile.hidePageLoadingMsg(); },
+    //    $.mobile.hidePageLoadingMsg(); }
 });
