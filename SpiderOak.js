@@ -4,6 +4,7 @@
  * - jquery.mobile-1.0.1.css
  * - jquery-1.6.4.js
  * - jquery.mobile-1.0.1.js
+ * - cordova-1.9.0.js - PhoneGap API
  * - js_aux/misc.js - blather(), fragment_quote(), error_alert(), ...
  * - Nibbler 2010-04-07 - base32 encode, decode, and enhance with encode_trim.
  * - custom-scripting.js - jqm settings and contextual configuration
@@ -2494,7 +2495,7 @@ var spideroak = function () {
 
 
 
-    $(document).ready(function () {
+$(document).ready(function () {
     "use strict";               // ECMAScript 5
 
     // Development convenience: Go back to start page on full document reload.
