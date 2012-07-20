@@ -2392,7 +2392,8 @@ var spideroak = function () {
             prep_credentials_form('.nav-login-storage', storage_login,
                                   'username', true);
             prep_credentials_form('.nav-visit-share',
-                                  public_shares.add_item_external,
+                                  public_shares.add_item_external.bind(
+                                      public_shares),
                                   'shareid', false);
 
             // Hide everything below the banner, for subsequent unveiling:
