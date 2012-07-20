@@ -1544,6 +1544,7 @@ var spideroak = function () {
 
         var $it = $('<li/>').append($anchor);
         $it.attr('data-icon', "so-carat-r");
+        $it.attr('data-transition', "slide");
 
         if (mode_opts
             && mode_opts.hasOwnProperty('actions_menu_link_creator')) {
