@@ -165,20 +165,20 @@ produce_release () {
   copy_sync "${artifacts_dir}/brand_settings_${brand}.js" \
             "${target_dir}/brand.js"
 
-  # SpiderOak.html:
+  # index.html:
   eval to_swatch="\$${color}_swatch"
   if [ -z "$to_swatch" ]; then
     blather Failed target theme swatch ${color}_swatch identify, \
       passing through 1>&2
     to_swatch=${basis_swatch}
   fi
-  rm -f "${target_dir}/SpiderOak.html"
+  rm -f "${target_dir}/index.html"
   if [ "${to_swatch}" = "${basis_swatch}" ]; then
-    cp -a "${app_dir}/SpiderOak.html" "${target_dir}/SpiderOak.html"
+    cp -a "${app_dir}/index.html" "${target_dir}/index.html"
   else
     sed -e 's/"f"/"'${to_swatch}'"/g' \
-        "${app_dir}/SpiderOak.html" \
-        > "${target_dir}/SpiderOak.html"
+        "${app_dir}/index.html" \
+        > "${target_dir}/index.html"
   fi
 }
 
