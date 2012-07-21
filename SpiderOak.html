@@ -19,14 +19,22 @@
   <script src="cordova-1.9.0.js"></script>
   <script src="jquery-1.7.2/jquery-1.7.2.js"></script>
   <script src="custom-scripting.js"></script>
+  <script>
+    if (window.device) {
+        // Register function to report when PhoneGap device is ready:
+        document.addEventListener("deviceready", onDeviceReady, false); }
+    else {
+        // ... or just do the report, PhoneGap isn't present:
+        onDeviceReady(); }
+  </script>
   <script src="js_aux/nibbler.min.js"></script>
   <script src="js_aux/misc.js"></script>
   <script src="jquery.mobile-1.2.0_pre/jquery.mobile.js"></script>
-  <script src="./brand.js"></script>
-  <script src="./SpiderOak.js"></script>
+  <script src="brand.js"></script>
+  <script src="SpiderOak.js"></script>
 </head>
 
-<body>
+<body onload="so_init_manager.ready('DOM');">
 
   <div data-role="page" class="multiple-listviews" id="home" data-theme="a">
     <div data-role="header" data-position="fixed" data-theme="f">
