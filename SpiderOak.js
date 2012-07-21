@@ -2369,12 +2369,8 @@ var spideroak = function () {
         }
 
 
-    /* ==== Public interface ==== */
-
-    // ("public_interface" because "public" is reserved in strict mode.)
-    var public_interface = {
-        init: function () {
-            /* Do preliminary setup and launch into the combo root. */
+    var spideroak_init = function () {
+        /* Do preliminary setup and launch into the combo root. */
 
             if (window.location.hash) {
                 // Return to the application base URL, sans any hash fragment:
@@ -2412,7 +2408,16 @@ var spideroak = function () {
                                         settings.storage_web_url); }}
 
             // ... and go:
-            $.mobile.changePage(combo_root.url); },
+            $.mobile.changePage(combo_root.url); }
+
+    /* ==== Public interface ==== */
+
+    // ("public_interface" because "public" is reserved in strict mode.)
+    var public_interface = {
+        init: function () {
+            /* Do preliminary setup and launch into the combo root. */
+            spideroak_init();
+        },
 
     }
 
