@@ -296,14 +296,15 @@ Currently implemented modes include:
 * `notify_token`: object to be passed back to `notify_callback`. To be used
   by the initiator to identify the transaction and convey useful state.
 * `actions_menu_link_creator`: Pass in a function to be used by
-  `.layout_item$()` to get a link to a context-specific
-  actions-menu, for inclusion on the item's list entry as, eg, a
+  `.layout_item$()` to get a link to a context-specific actions-menu, for
+  inclusion on the item's list entry as, eg, a
   [http://jquerymobile.com/test/docs/lists/lists-split.html split-button].
-* `alt_page_selector`: selector to be used by
-  ContentNode.layout_header() to work on an alternate page than the node's
-  default one.
-* `no_dividers`: tell ContentNode.layout_content() to not inhibit creation
+* `alt_page_selector`: selector to be used by `ContentNode.layout_header()`
+  to work on an alternate page than the node's default one.
+* `no_dividers`: tell `ContentNode.layout_content()` to not inhibit creation
   of dividers even when content is plentiful.
+* `icon`: Name a particular icon, for use in `.layout_item$()`
+* `transition`: Name a specific transition effect, for use in `.layout_item$()`
 
 === Content and Operational Menus ===
 Elaborate actions on content, like adding and removing share nodes, is
