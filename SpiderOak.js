@@ -2376,6 +2376,10 @@ var spideroak = function () {
         init: function () {
             /* Do preliminary setup and launch into the combo root. */
 
+            if (window.location.hash) {
+                // Return to the application base URL, sans any hash fragment:
+                $.mobile.changePage(window.location.href.split('#')[0]); }
+
             // Setup traversal hook:
             establish_traversal_handler();
 
@@ -2509,20 +2513,9 @@ var spideroak = function () {
         public_interface.nmgr = nmgr;
         public_interface.pmgr = pmgr; }
 
-
     /* ==== Here we go: ==== */
     return public_interface;
 }();
 
-
-
-$(document).ready(function () {
-    "use strict";               // ECMAScript 5
-
-    // Development convenience: Go back to start page on full document reload.
-    // All the internal application state is gone, anyway.
-    if (window.location.hash) {
-        $.mobile.changePage(window.location.href.split('#')[0]); }
-
-    spideroak.init();
-});
+// Report that the app is ready:
+so_init_manager.ready('app');
