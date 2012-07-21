@@ -1861,9 +1861,10 @@ var spideroak = function () {
         $listview.empty();
 
         // refresh necessary so jQuery traversal stuff doesn't pass over:
-        $listview.append(this.layout_item$($.extend({refresh: true,
-                                                     icon: "refresh"},
-                                                    mode_opts)));
+        if (! this instanceof RecentContentsNode) {
+            $listview.append(this.layout_item$($.extend({refresh: true,
+                                                         icon: "refresh"},
+                                                        mode_opts))); }
         var ancestor_url = this.parent_url;
         while (ancestor_url) {
             var ancestor = node_manager.get(ancestor_url);
