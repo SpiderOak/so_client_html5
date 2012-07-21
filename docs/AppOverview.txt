@@ -160,7 +160,7 @@ Here are the steps to fabricate the object, itself:
 
 * Add `RecentContentsNode`, basing its prototype on `ContentNode`
 * Give it a distinct `.visit()` prototype method, skipping any provisioning
-  (unlikely normal items, its contents aren't constituted of remote data).
+  (unlike normal items, its contents aren't constituted from remote data).
 * Add to it a unique `.add_visited_url()`, for use by
   `handle_content_visit()` to register each traversal to a content item.
 
