@@ -2372,43 +2372,43 @@ var spideroak = function () {
     var spideroak_init = function () {
         /* Do preliminary setup and launch into the combo root. */
 
-            if (window.location.hash) {
-                // Return to the application base URL, sans any hash fragment:
-                $.mobile.changePage(window.location.href.split('#')[0]); }
+        if (window.location.hash) {
+            // Return to the application base URL, sans any hash fragment:
+            $.mobile.changePage(window.location.href.split('#')[0]); }
 
-            // Setup traversal hook:
-            establish_traversal_handler();
+        // Setup traversal hook:
+        establish_traversal_handler();
 
-            my.combo_root_url = generic.combo_root_url;
-            var combo_root = node_manager.get_combo_root();
-            var recents = node_manager.get_recents();
-            var public_shares = node_manager.get(my.public_shares_root_url,
-                                                 combo_root);
+        my.combo_root_url = generic.combo_root_url;
+        var combo_root = node_manager.get_combo_root();
+        var recents = node_manager.get_recents();
+        var public_shares = node_manager.get(my.public_shares_root_url,
+                                             combo_root);
 
-            // Do HTML code brand substitutions:
-            prep_html_branding();
+        // Do HTML code brand substitutions:
+        prep_html_branding();
 
-            // Properly furnish login form:
-            prep_credentials_form('.nav-login-storage', storage_login,
-                                  'username', true);
-            prep_credentials_form('.nav-visit-share',
-                                  public_shares.add_item_external.bind(
-                                      public_shares),
-                                  'shareid', false);
+        // Properly furnish login form:
+        prep_credentials_form('.nav-login-storage', storage_login,
+                              'username', true);
+        prep_credentials_form('.nav-visit-share',
+                              public_shares.add_item_external.bind(
+                                  public_shares),
+                              'shareid', false);
 
-            // Hide everything below the banner, for subsequent unveiling:
-            combo_root.veil(true);
+        // Hide everything below the banner, for subsequent unveiling:
+        combo_root.veil(true);
 
-            // Try a storage account if available from persistent settings
-            if (remember_manager.active()) {
-                var settings = remember_manager.fetch();
-                if (settings.username && settings.storage_host) {
-                    set_storage_account(settings.username,
-                                        settings.storage_host,
-                                        settings.storage_web_url); }}
+        // Try a storage account if available from persistent settings
+        if (remember_manager.active()) {
+            var settings = remember_manager.fetch();
+            if (settings.username && settings.storage_host) {
+                set_storage_account(settings.username,
+                                    settings.storage_host,
+                                    settings.storage_web_url); }}
 
-            // ... and go:
-            $.mobile.changePage(combo_root.url); }
+        // ... and go:
+        $.mobile.changePage(combo_root.url); }
 
     /* ==== Public interface ==== */
 
