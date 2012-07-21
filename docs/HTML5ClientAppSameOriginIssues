@@ -18,18 +18,10 @@ concerned). Hence the
 [https://spideroak.com/pandora/wiki/HTML5ClientArchitecture#SpecialBrowserRequirements special browser requirements]
 to exercise the preliminary app, as it develops.
 
-When actually deploying the html5 client, I expect we will have the option
-to originate the application code in the same domain as the storage
-servers.  However, at time of writing I don't know what potential mixes of
-storage services will be required for enterprise customers. Eg, whether all
-the storage hosting will be by / at !SpiderOak, or some enterprises will
-provide their own storage hosting, and/or (key question) whether there may
-eventually be need for combinations of hosting.  For that last question,
-it seems likely that proxy provisions and/or clever DNS arrangements could
-be used to satisfy the same-origin requirements for the clients.
-
-In any case, a hybrid-enabled application is likely to give us enough
-control over the browser widget to provide for any eventuality.
+Hybridizing the application using !PhoneGap resolves this problem.
+The !PhoneGap `UIWebView` widget isn't constrained by CORS restrictions.
+Instead, !PhoneGap provides a whitelist facility where you identify the
+sites from which the app is allowed to share resources.
 
 > [=#JSONP (JSONP)] A mistaken notion of
 > [http://en.wikipedia.org/wiki/JSONP JSONP] has been supposed to be the

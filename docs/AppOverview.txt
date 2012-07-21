@@ -150,7 +150,7 @@ their respective collections:
 === Dynamic Page Traversal ===
 Most content nodes ([#ContentNodeDataModel in the data model, above]) are
 presented as jQuery Mobile "pages" - `<div data-role="page>`. Most are
-cloned copies of static `SpiderOak.html` template nodes, upon in-app
+cloned copies of static `index.html` template nodes, upon in-app
 traversal of content URLs (see [#ContentAddressing Content Addressing],
 above).
 * The spideroak object's `handle_content_visit()` function is assigned to
@@ -180,7 +180,7 @@ above).
   * Fetches the node contents from the server if necessary (''intially,
     always necessary'')
   * Gets a jQuery object for the node's data-role="page", cloning the
-    !SpiderOak.html id="content-page-template" &lt;div&gt; if it hasn't
+    !index.html id="content-page-template" &lt;div&gt; if it hasn't
     already gotten a copy this way, and adjusting the basic structure.
   * Fills in the page header and footer according to the node's navigation
     context.  Different types of nodes have different actions and relative
