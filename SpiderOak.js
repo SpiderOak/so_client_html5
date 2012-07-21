@@ -2374,7 +2374,8 @@ var spideroak = function () {
         /* Do preliminary setup and launch into the combo root. */
 
         if (window.location.hash) {
-            // Return to the application base URL, sans any hash fragment:
+            // If we're initting with a hash fragment, discard the fragment
+            // so we start from the root node:
             $.mobile.changePage(window.location.href.split('#')[0]); }
 
         // Setup traversal hook:
@@ -2408,7 +2409,7 @@ var spideroak = function () {
                                     settings.storage_host,
                                     settings.storage_web_url); }}
 
-        // ... and go:
+        // ... and go, using the traversal hook:
         $.mobile.changePage(combo_root.url); }
 
     /* ==== Public interface ==== */
