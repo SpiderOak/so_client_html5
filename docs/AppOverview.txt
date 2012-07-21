@@ -136,16 +136,42 @@ their respective collections:
   share rooms being visited.
 
 === Application !Entry/Init Overview ===
-* $(document).ready() function calls spideroak.init()
-* spideroak.init():
-  * establishes the traversal handler
-  * initializes some application state
-  * prepares the login form submit callback and visibility controls
-  * arranges the combo-root gradual fade-in
-  * fetches persistent settings
-  * does a traversal to the combo root `RootContentNode`.
-* the `RootContentNode.visit()` and other content node `.visit()` methods
-  are described [#DyanamicPageTraversal next].
+* so_init_manager (in `custom-scripting.js`) has a roster of frameworks that
+  need to complete their initialization before the app can be
+  launched.  Calls to `so_init_manager.ready()` are included in
+  initialization-completion routines for the various frameworks, and when
+  the last one completes, `spideroak.init()` (below) is invoked.
+  * jQuery Mobile: an anonymous function that is bound (in
+    (`custom-scripting.js`) to the jQm `mobileinit` event calls
+    `so_init_manager.ready('jQm')`
+  * !PhoneGap: `onDeviceReady()` (also in `custom-scripting.js`) is either
+    registered (in `index.html`) on the !PhoneGap `deviceready` event, if
+    !PhoneGap is observed present.  If we are running outside of !PhoneGap
+    (useful for a few purposes), then `onDeviceReady()` is invoked directly.
+    `onDeviceReady()` calls `so_init_manager.ready('PhoneGap')`
+  * Document loaded/DOM: The `index.html` `body` element has an `onload`
+    trigger which calls `so_init_manager.ready('DOM')`.
+  * Application code: The last statement in `SpiderOak.js` is
+    `so_init_manager.ready('app')`.
+
+  This arrangement is insensitive to the order in which the frameworks
+  happen to initialize, or interdependencies between them.  When the
+  initialization of each has been accounted for, the main app inits.
+
+* `spideroak.init()`:
+  * establishes the traversal handler, `handle_content_visit()` on jQuery
+    Mobile's `pagebeforechange` traversal event.
+  * instantiates the `RootContentNode`, `RecentContentNode`, and
+    `PublicRootShareNode`.
+  * makes `index.html` DOM adjustments for branding
+  * prepares the various credentials forms submit callback and visibility
+    controls
+  * arranges the combo-root (`RootContentNode`) intial fade-in
+  # does initial fetch of persistent settings
+  * does a traversal to the combo-root `RootContentNode`, to be dispatched by
+    our `handle_content_visit()` jQm `pagebeforechange` handler.
+* the `RootContentNode` and other content node `.visit()` methods, which
+  handle traversal to them are described [#DyanamicPageTraversal next].
 
 === Dynamic Page Traversal ===
 Most content nodes ([#ContentNodeDataModel in the data model, above]) are
