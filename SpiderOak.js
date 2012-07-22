@@ -1547,6 +1547,8 @@ var spideroak = function () {
         else {
             href = "#" + this.url; }
         $anchor.attr('href', href);
+        $anchor.attr('data-transition',
+                     (mode_opts && mode_opts.transition) || "slide");
         $anchor.append($('<h4 class="item-title"/>').html(this.name));
         var $icon = this.my_icon_image$("ui-li-icon");
         if ($icon) {
@@ -1555,8 +1557,6 @@ var spideroak = function () {
         var $it = $('<li/>').append($anchor);
         $it.attr('data-icon',
                  (mode_opts && mode_opts.icon) || "so-carat-r");
-        $it.attr('data-transition',
-                 (mode_opts && mode_opts.transition) || "slide");
 
         if (mode_opts
             && mode_opts.hasOwnProperty('actions_menu_link_creator')) {
