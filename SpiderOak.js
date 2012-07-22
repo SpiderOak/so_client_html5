@@ -1953,19 +1953,26 @@ var spideroak = function () {
                 persistence_manager.set(key, obj[key]); })},
 
         remove_storage_host: function () {
-            /* How to inhibit auto-login, without losing the convenience of
-               a remembered username, in the absence of a way to remove the
-               authentication cookies. */
+            /* Remove the persisted value for the storage_host.  This is the
+               way to inhibit auto-login, without losing the convenience of
+               a remembered username (in the absence of a way to remove the
+               authentication cookies). */
             persistence_manager.remove('storage_host'); },
     };
     var remgr = remember_manager;
 
     var transit_manager = function () {
-        /* Facilities to detect repeated traversals of the same URL.  To
-           use, (1) when creating a url for traversal,
-               url = tm.distinguish(url)
-           handle_content_visit() will recognize repeats within recents_span
-           traversals, and let them pass.
+        /* Facilities to detect repeated traversals of the same URL.
+
+           To use, when handling a url that you expect might be spuriously
+           repeated (eg by jQm popup dismissal), use instead a treated
+           version of the url:
+
+               url = transit_manager.distinguish(url)
+
+           Then, handle_content_visit() will recognize repeats that happen
+           within recents_span traversals and let them pass (by using
+           transit_manager.is_repeat_url()).
         */
         var tm_param_name = "so_transit";
         var recent_transits = [];
