@@ -393,7 +393,7 @@ var spideroak = function () {
         ContentNode.call(this, url, parent);
         this.root_url = url;
         this.emblem = brand.title;
-        this.name = "Dashboard";
+        this.name = "Dash";
         delete this.subdirs;
         delete this.files; }
     RootContentNode.prototype = new ContentNode();
@@ -1729,7 +1729,7 @@ var spideroak = function () {
 
     ContentNode.prototype.layout_footer = function(mode_opts) {
         /* Populate the footer for this node. */
-        this.layout_footer_by_spec([{title: "Dashboard",
+        this.layout_footer_by_spec([{title: "Dash",
                                      url: "#home",
                                      selector: "dashboard",
                                      icon_name: "so-dashboard-footer"},
