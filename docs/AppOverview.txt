@@ -135,44 +135,6 @@ their respective collections:
 * `PublicRootShareNode`: adding to and omitting from the collection of
   share rooms being visited.
 
-==== Case Study: Implementing a Special Node Type ====
-Adding an exceptional node type, to maintain the roster of recently visited
-content items, involves unusually many of the various traversal
-arrangements.
-
-Here are the changes to plug the new object in to the surrounding traversal
-infrastrcuture:
-
-* In the `spideroak` object `generic` settings object, add a contrived
-  `recents_url`, for a `node_manager` address to the object.
-* Add an `is_recents_url()` predicate routine,
-  * and include that among those checked in `is_content_root_url()`.
-    (The recents collection is the root of a single-node hierarchy.)
-* Provide a root-type case in `node_manager.get()`
-  * and, to accommodate exceptionally frequent access, a dedicated
-    `.get_recents()` method, like `.get_combo_root()`.
-* Also in `generic` settings, add 'recents_page_id'
-  * and, in `internalize_url()`, provide for translating the
-    `recents_page_id` to the `recents_url`, so traversals to the `page_id`
-    are handled as node traversal.
-
-Here are the steps to fabricate the object, itself:
-
-* Add `RecentContentsNode`, basing its prototype on `ContentNode`
-* Give it a distinct `.visit()` prototype method, skipping any provisioning
-  (unlike normal items, its contents aren't constituted from remote data).
-* Add to it a unique `.add_visited_url()`, for use by
-  `handle_content_visit()` to register each traversal to a content item.
-
-There were some other, small changes to incorporate the functionality, eg
-adding a `no_dividers` `mode_option` and respect for it in
-`ContentNode.layout_content()`, or adding a `generic` `recents_max_size`
-setting, but that is essentially it.
-
-The traversal provisions are clearly more elaborate than the actual object
-implementation, and may bear some scrutiny for simplification and
-consolidation.  The above details should be good fodder for such scrutiny.
-
 === Application !Entry/Init Overview ===
 * so_init_manager (in `custom-scripting.js`) has a roster of frameworks that
   need to complete their initialization before the app can be
@@ -271,6 +233,44 @@ above).
        activated, as appropriate.
 See [#ContentNodenavigationmodes below] for details about the navigation
 modes options.
+
+==== Case Study: Implementing a Special Node Type ====
+Adding an exceptional node type, to maintain the roster of recently visited
+content items, involves unusually many of the various traversal
+arrangements.
+
+Here are the changes to plug the new object in to the surrounding traversal
+infrastrcuture:
+
+* In the `spideroak` object `generic` settings object, add a contrived
+  `recents_url`, for a `node_manager` address to the object.
+* Add an `is_recents_url()` predicate routine,
+  * and include that among those checked in `is_content_root_url()`.
+    (The recents collection is the root of a single-node hierarchy.)
+* Provide a root-type case in `node_manager.get()`
+  * and, to accommodate exceptionally frequent access, a dedicated
+    `.get_recents()` method, like `.get_combo_root()`.
+* Also in `generic` settings, add 'recents_page_id'
+  * and, in `internalize_url()`, provide for translating the
+    `recents_page_id` to the `recents_url`, so traversals to the `page_id`
+    are handled as node traversal.
+
+Here are the steps to fabricate the object, itself:
+
+* Add `RecentContentsNode`, basing its prototype on `ContentNode`
+* Give it a distinct `.visit()` prototype method, skipping any provisioning
+  (unlike normal items, its contents aren't constituted from remote data).
+* Add to it a unique `.add_visited_url()`, for use by
+  `handle_content_visit()` to register each traversal to a content item.
+
+There were some other, small changes to incorporate the functionality, eg
+adding a `no_dividers` `mode_option` and respect for it in
+`ContentNode.layout_content()`, or adding a `generic` `recents_max_size`
+setting, but that is essentially it.
+
+The traversal provisions are clearly more elaborate than the actual object
+implementation, and may bear some scrutiny for simplification and
+consolidation.  The above details should be good fodder for such scrutiny.
 
 === Content Node navigation modes ===
 Special navigation behaviors are supported using query (search) parameters
