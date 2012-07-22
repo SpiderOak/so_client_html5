@@ -304,50 +304,50 @@ The traversal provisions are clearly more elaborate than the actual object
 implementation, and may bear some scrutiny for simplification and
 consolidation.  The above details should be good fodder for such scrutiny.
 
-=== Content Node navigation modes ===
-Special navigation behaviors are supported using query (search) parameters
-on the URL hash locations or mode_opts object properties.  (The URL query
-parameters are translated to node_opts property settings by
-`handle_content_visit()`.)  The mode_opts settings are passed through the
-`.visit()`, `.provision*()`, and `.show()`/`.layout*()` node methods, which
-may have behaviors conditioned by the options.  (Some modes can only be
-used via the mode_opts method parameters, and not passed as URL query
-parameters.)
+=== Internal Transmission of Special Content and Operational Modes ===
+Special navigation behaviors are communicated internally using specific
+operational parameters.
+
+* Modes are conveyed in URL addresses as URL '?' query string parameters.
+
+* Modes are conveyed across method calls using the mode_opts parameter.
+  The mode_opts settings are passed through the `.visit()`,
+  `.provision*()`, and `.show()`/`.layout*()` node methods, which may have
+  behaviors conditioned by the options.  (Some modes can only be used via
+  the mode_opts method parameters, and are not recognized as URL query
+  parameters.)
+
+* `handle_content_visit()` translates from URL to mode_opts using
+  `query_params(url)` (defined in `js_aux/misc.js`).
+
+==== Content Node Navigation Modes ====
 
 Currently implemented modes include:
 * `refresh`: refetch the data for the node.
 * `logout`: return to the dashboard/combo root and logout from storage
-* `passive`: when showing a node, just adjust the DOM $page, don't do
-  $.mobile.changePage(). Useful for page updates in the background, or for
-  the `RootContentNode` composite page, which is informed by combined subnode
-  updates.
-* `notify_callback`: report visit success or failure to this callback.
+* `passive`: when showing a node, just adjust the DOM $page, don't transfer
+  browser focus by doing a $.mobile.changePage(). Useful for page updates
+  in the background, or for the `RootContentNode` composite page, which is
+  informed by combined subnode updates.
+* `notify_callback`: report visit success or failure to this callback function.
   The callback requires: the visit success (true or false), the
-  accompanying value of `notify_token`, and on failure, the XMLHttpResponse
-  (xhr) object.
-* `notify_token`: object to be passed back to `notify_callback`. To be used
-  by the initiator to identify the transaction and convey useful state.
+  accompanying value of `notify_token` (see below, and on failure, the
+  XMLHttpResponse (xhr) object.
+* `notify_token`: object to be passed back to `notify_callback`. A means
+  for the initiator to identify the transaction and convey useful state.
 * `actions_menu_link_creator`: Pass in a function to be used by
   `.layout_item$()` to get a link to a context-specific actions-menu, for
   inclusion on the item's list entry as, eg, a
   [http://jquerymobile.com/test/docs/lists/lists-split.html split-button].
-* `alt_page_selector`: selector to be used by `ContentNode.layout_header()`
-  to work on an alternate page than the node's default one.
 * `no_dividers`: tell `ContentNode.layout_content()` to not inhibit creation
   of dividers even when content is plentiful.
 * `icon`: Name a particular icon, for use in `.layout_item$()`
 * `transition`: Name a specific transition effect, for use in `.layout_item$()`
-
-=== Content and Operational Menus ===
-Elaborate actions on content, like adding and removing share nodes, is
-implemented with a combination of specific
-[#ContentNodenavigationmodes content navigation modes].
-
-* The state is conveyed in the address domain using the URL query string.
-
-* In the procedural domain, it is conveyed using the mode_opts parameter.
-  `handle_content_visit()` translates from URL to mode_opts using
-  `query_params()`.
+* `alt_page_selector`: A means for a content node to make adjustments to
+  pages in addition to its own.  Currently only supported by
+  `.layout_header()`, it is a selector passed in to identify the pages to
+  adjust.  (As of writing, used by `RootContentNode` to set the header of
+  some static info pages.)
 
 === Storage and Share Rooms ===
 Content urls are recognized by virtue of beginning with one of the
