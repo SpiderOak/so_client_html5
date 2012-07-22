@@ -367,13 +367,15 @@ accounts that have their storage service provided by secondary servers.
 This redirection step is the reason for the elaborate storage_login
 function, which recurses to the indicated server when required.
 
-== Operational and Incidental Technical Details and Hanging Issues ==
+== Operational and Incidental Technical Issues and Details ==
 === Producing the various renderings ===
 The script tools/prep_release produces various application renditions,
 varying branding, color scheme, and platform look and feel.  The script
-is also useful as guidance, fairly clearly indicating the locations of
-rendition-specific elements, and it has configuration variables towards to
-top for easy incorporation of new elements.
+is also useful as guidance, indicating the locations of rendition-specific
+elements.
+
+The script has external configuration variables towards to top, for easy
+incorporation of new elements.
 
 === Special Browser Requirements ===
 While developing the html5 client app I didn't have the luxury of
@@ -382,15 +384,17 @@ changing with the Frank Sievetsen's addition of a reverse proxy, so people
 can visit the proxy with regular browser session and have it work. (I'm
 setting up
 [https://ken.dev.spideroak.com:888/ links in my developer's sandbox].)
+
 However, people wanting to run the application from local files still have
-to use a browser with relaxed security.
+to use a browser with relaxed security:
 
-To run the client from local files you must configure your browser to allow
-that, and also disregard [#HTML5ClientAppSameOriginIssues CORS restrictions].
-That means drastically reduced security.  I use Chip Black's suggestions
-for doing so with Google Chrome..
+To run the client from local files you must run your browser with a flag
+that allows that, and also one to disregard
+[#HTML5ClientAppSameOriginIssues CORS restrictions].
+Be aware that this means drastically reduced security!
 
-Here are the options you need to pass to Chrome:
+I use Chip Black's suggestions for doing so with Google Chrome.  Here are
+the options you need to pass to Chrome:
 
 * `--allow-file-access-from-files --allow-http-access-from-files --disable-web-security --enable-file-cookies`
 
@@ -409,7 +413,7 @@ that things work.
   (if you install canary in the default location, as
   `/Applications/Google Chrome Canary.app`). Put a copy of this whole
   directory hierarchy in your `/Applications` folder and launch it to
-  run Canary so it can run the HTML5 client.
+  run Canary enabled to run local files with CORS restrictions eased.
 
 For more details about CORS restrictions and the project, see
 [[HTML5ClientAppSameOriginIssues]].
@@ -468,7 +472,7 @@ theme rolling
 [#Maintainingourthemethroughthethemeroller based on our existing code],
 rather than starting again from scratch.
 
-==== Special caution on reused content node pages ====
+=== Special caution on reused content node pages ===
 jQuery Mobile DOM "enhancements" don't just involve adding class (and
 other) attributes to tags - structures are injected around things, as
 well.  This means that elements location in the DOM may be different, before
@@ -479,7 +483,7 @@ just changing the location where they were originally found.
 As of 2012-05-30, `ContentNode.prototype.layout_header_fields()` shows
 examples of this elaboration.
 
-==== Consequences of default caching of typical $.ajax() ====
+=== Consequences of default caching of typical $.ajax() ===
 Default caching of typical $.ajax() requests - including json ones - means
 that normal traversal of the content hierarchy won't update after first
 pass without explicitly asking for a refresh. We specifically override the
@@ -488,23 +492,19 @@ visited nodes. This seems like a good tradeoff, reducing server load by
 requiring that the user explicitly ask for an update, but we should warn
 the user about it.
 
-==== Complicated popup menu provisions ====
+=== Complicated popup menu provisions ===
 The (new in jQuery Mobile 1.2) popup machinery requires special provisions
 to work properly with our `handle_content_visit()` `pagebeforechange`
 handler.
 
 It appears that the URL that launched the popup is fed back through
-changePage when the popup is dismissed, and the default machinery needs to
-see that traversal or, if it is not allowed to run its course in certain
-circumstances, subsequent popup launches either don't happen or the popup
-closes immediately.
-
-(The situation which can throw things off is the first time the popup is
-dismissed since page refresh, for dismissals that use data-rel="back" or
-clicking outside of the popup.  Not such a rare circumstance...)
+changePage when the popup is dismissed, and the default machinery
+(evidently) needs to see that traversal to account for closing of the
+popup.
 
 In order to recognize and properly pass through the second traversal, we
-treat URLs that are going to be used to trigger popups with
-`transit_manager.distinguish_url()`.  That will add a query parameter for
-`transit_manager.is_repeat_url()` to recognize a repeat, so
-`handle_content_visit()` can pass it through.
+treat URLs that are going to trigger popups with
+`transit_manager.distinguish_url()`.  That adds a query parameter for
+`handle_content_visit()` to recognize, using
+`transit_manager.is_repeat_url()`, and pass it through to the standard jQm
+traversal mechanism.
