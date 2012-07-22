@@ -39,7 +39,7 @@ Content model elements are address by the URLs of their JSON content items:
 * as the '#' fragment identifiers of the app's URL, for jQuery Mobile
   changePage navigation, and
 * as the key for retrieval (and allocation) within the app's internal node
-  database, mediated by the spideroak.content_node_manager object.
+  database, mediated by the `node_manager` object.
 
 The app adds a few encompassing objects: "root nodes". They contain and
 organize the actual content hierarchies.  The root nodes have URL
@@ -53,7 +53,7 @@ what I think is the most coherent and clear navigation model possible,
 given the various constituents.  (See [[HTML5ClientProjectConsolidatedRoot]]
 for some an accounting of the principle issues addressed.)
 
-* The actual content items are indexed in the content_node_manager by their
+* The actual content items are indexed in the `node_manager` by their
   JSON access URLs, and addressed in app URLs as the fragment identifiers.
 * The `RootStorageNode` contains the backup storage items, with a URL
   consisting of the storage server host (which can vary) and a trimmed,
@@ -70,11 +70,11 @@ for some an accounting of the principle issues addressed.)
   uses an arbitrary, internal address for it, sufficiently URL-like to be
   recognized as such by the jQm URL traversal machinery in changePage().
 
-The spideroak.content_node_manager is the broker by which everything
-obtains nodes, given their URL handles. It also is how nodes are nodes are
-allocated, when first encountered, and so requires identification of the
-parent node in any situations that might be first encounters (or first
-encounters after a logout).
+The `node_manager` is the broker by which everything obtains nodes, given
+their URL handles.  It also is the node allocator, fabricating new ones
+when first referenced.  For the latter purpose, it requires identification
+of the parent node in any situations that might be first encounters, in an
+entire session or since a logout.
 
 === Organization of Content Traversal ===
 
@@ -226,10 +226,9 @@ above).
   section, above.
 * For navigation URLs that go to application content, including the user's
   !SpiderOak-managed content, we:
-  * Fetch a suitable `ContentNode`-based object for the node using...
-  * `spideroak.content_node_manager.get()`, which returns an already
-    existing node, if any, or else allocates a new one with suitable
-    initial settings.
+  * Fetch a suitable `ContentNode`-based object for the node using
+    `node_manager.get()`, which returns an already existing node, if any,
+    or else allocates a new one with suitable initial settings.
   * The obtained `ContentNode`-derived object uses its `.visit()` method to
     handle the visit - cloning or directly using a (jQm <div
     data-role="page"/>) page object and recursively using the traversal
