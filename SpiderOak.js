@@ -691,19 +691,21 @@ var spideroak = function () {
         if (succeeded !== true) {
             this.remove_status_message('result');
             which_msg += (_t("Share ID")
-                          + '<span class="message-subject">'
-                          + share_id + "</span>");
+                          + ' <span class="message-subject">'
+                          + share_id + "</span> ");
             var message = (_t("Sorry") + " - " + which_msg + " "
                            + content.statusText + " (" + content.status + ")");
             var remove = true;
-            if (content.status === 404) {
-                this.show_status_message(message); }
-            else {
-                message = [].concat(message, " - omit it?");
-                remove = confirm(message); }
-            if (remove) {
-                this.remove_item(url);
-                this.unpersist_item(url); }}
+            this.show_status_message(message);
+            // We may wind up unpersisting items due to a transient
+            // problem, but prompting for each is too invasive, so for now
+            // we just silently omit them.
+            //if (content.status === 404) {
+            //    message = [].concat(message, " - omit it?");
+            //    remove = confirm(message); }
+            // if (remove) {
+            this.remove_item(url);
+            this.unpersist_item(url); }
         else {
             this.remove_status_message('error');
             if (this.adding_external) {
