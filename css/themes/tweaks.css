@@ -1,10 +1,6 @@
 #depth-path-popup {
  min-width: 300px;
 }
-/* Transitions tweak suggested on:
-   http://jquerymobile.com/demos/1.1.1/docs/pages/page-transitions.html
-   */
-.ui-page { -webkit-backface-visibility: hidden; }
 
 [data-role=header] .header-title {
   border-right: 3px solid;
