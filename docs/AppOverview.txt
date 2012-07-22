@@ -173,6 +173,38 @@ their respective collections:
 * the `RootContentNode` and other content node `.visit()` methods, which
   handle traversal to them are described [#DyanamicPageTraversal next].
 
+==== Facilities for Persisting Values ====
+
+Persistent settings are managed via two facilities:
+
+* the `persistence_manager`: provides a simple API for managing
+  persistently stored values javascript, preserving structures by using
+  JSON transparently:
+  * `.set(name, value)`
+  * `.get(name)`
+  * `.remove(name)`
+  * `.keys()`
+  * `.length()`
+
+* the `remember_manager`, a layer on top of the `persistence_manager` for
+  managing non-sensitive user account info, and whether or not retention of
+  user account info is elected ("remembering").
+  * The maintained fields:
+    * `username`
+    * `storage_host`
+    * `storage_web_url`
+  * `.unset()`: True if no persistent `remember_manager` fields are available.
+  * `.active()`: Establish UI "Remember Me" if passed a truthy value, return
+    whether or not it the mode is active if passed no value, else deactivate
+    if passed a non-truthy (false or related) value.
+  * `.fetch()`: Return an object with the currently remembered field values
+  * `.store(values_obj)`: Persist the set of field values, passed in an
+    object.  The object must have settings for all the maintained fields.
+  * `remove_storage_host()`: Remove the storage_host persisted value.
+    This is the way to inhibit auto-login, without losing the convenience
+    of a remembered username (in the absence of a way to remove the
+    authentication cookies).
+
 === Dynamic Page Traversal ===
 Most content nodes ([#ContentNodeDataModel in the data model, above]) are
 presented as jQuery Mobile "pages" - `<div data-role="page>`. Most are
