@@ -697,13 +697,8 @@ var spideroak = function () {
                            + content.statusText + " (" + content.status + ")");
             var remove = true;
             this.show_status_message(message);
-            // We may wind up unpersisting items due to a transient
-            // problem, but prompting for each is too invasive, so for now
-            // we just silently omit them.
-            //if (content.status === 404) {
-            //    message = [].concat(message, " - omit it?");
-            //    remove = confirm(message); }
-            // if (remove) {
+            // We may wind up unpersisting items due to a transient problem,
+            // but the situation is too complicated to settle by prompting.
             this.remove_item(url);
             this.unpersist_item(url); }
         else {
