@@ -21,14 +21,14 @@
 brands="spideroak avg"
 
 # To add a new theme platform, include the theme file name (sans .css) in
-# $theme_platforms:
+# $platform_styles:
 
-theme_platforms="iphone"
+platform_styles="iphone"
 
 # To add a new theme color, add a swatch using the jQuery Mobile theme roller,
-# and add an entry in the theme_colors list:
+# and add an entry in the color_schemes list:
 
-theme_colors="orange blue neutral green"
+color_schemes="orange blue neutral green"
 
 # ... plus identification of the swatch here:
 
@@ -111,12 +111,12 @@ $app_dir/js_aux
 $app_dir/SpiderOak.js"
 
 # The releases are named <brand>-<theme-color>, for all combinations of
-# $brands, $theme_colors, and $theme_platforms:
+# $brands, $color_schemes, and $platform_styles:
 
 produce_all_releases () {
   for brand in $brands; do
-    for color in $theme_colors; do
-      for platform in $theme_platforms; do
+    for color in $color_schemes; do
+      for platform in $platform_styles; do
         produce_release $brand $color $platform
       done
     done
