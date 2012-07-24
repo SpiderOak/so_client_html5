@@ -2,14 +2,26 @@
 
 # Produce various releasable renderings of the SpiderOak mobile client app.
 
-# The process is organized around two things:
+# The process is organized around three things:
 #
-# 1. Configuration variables, in the Releases section below, which list the
-#    various brand and theme variations.  One of each theme variant will be
-#    created for each brand variant.
-# 2. Code and media resources situated in specific locations, using names
-#    connected with the configuration vars.
+# 1. Configuration variables, in the Configure Variation Categories section.
+#    These variables define the variations within release categories, including
+#    aspects such as app branding, color scheme, and platform theme.
+# 2. Code and media resources situated in specific locations, with those that
+#    are variant-specific associated with the variation categories.
+# 3. Command arguments, identifying selections among the variant categories.
 #
+# If you invoke this script (or scripts that use it) without any parameters,
+# all variants for all categories will be produced.  Any arguments will be
+# used to select only the variants within their categories for production. So
+# if invoked with an argument naming one of the brand targets, then only that
+# brand will be updated, with the other categories (color scheme and platform
+# style) going through all their variants.
+
+
+# ==============================
+# Configure Variation Categories:
+
 # To add a new brand rendering, add an entry to the "brands" list and the
 # following artifacts in the (defined below) 'artifacts_dir':
 #
