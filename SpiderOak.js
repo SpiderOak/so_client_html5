@@ -2283,7 +2283,8 @@ var spideroak = function () {
         bind_replace($password, 'input.SpiderOak', sentinel);
         bind_replace($(document), 'pagebeforechange.SpiderOak',
                      function (e) {
-                         if ($.mobile.activePage.attr('id') === page_id) {
+                         if ($.mobile.activePage
+                             && ($.mobile.activePage.attr('id') === page_id)) {
                              $password.val(""); }});
         $submit.button()
         sentinel();
