@@ -143,12 +143,14 @@ select_variations () {
     elif [[ "$platform_styles" =~ "${arg}" ]]; then
       selected_platform_styles+="$arg "
     else
-      echo Unrecognized variant selector: "'$arg'". 1>&2
+      echo Unrecognized variant: "'$arg'". 1>&2
       errors=1
     fi
   done
 
   if [ -n "$errors" ]; then
+    echo Please retry with available variants... 1>&2
+    variants_message 1>&2
     exit 1
   fi
 
@@ -163,11 +165,18 @@ select_variations () {
   fi
 }
 
+variants_message () {
+  echo Available variations:
+  echo "  Brands: $brands"
+  echo "  Colors: $color_schemes"
+  echo "  Platforms: $platform_styles"
+}
+
 produce_releases () {
   # Loop through the elected categories, producing releases for each variation.
-  echo Brands: $selected_brands
-  echo Colors: $selected_color_schemes
-  echo Platforms: $selected_platform_styles
+  echo "  Selected brands: $selected_brands"
+  echo "  Selected colors: $selected_color_schemes"
+  echo "  Selected platforms: $selected_platform_styles"
   for brand in $selected_brands; do
     for color in $selected_color_schemes; do
       for platform in $selected_platform_styles; do
