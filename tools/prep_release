@@ -261,20 +261,22 @@ copy_sync () {
   rsync --delete --update --archive --exclude '*~' --exclude '#*' "$1" "$2"
 }
 
-select_variations "$@"
-produce_releases
-did_dev_env=""
-if [[ "$selected_brands" =~ "$dev_brand" ]]; then
-  if [[ "$selected_color_schemes" =~ "$dev_color" ]]; then
-    if [[ "$selected_platform_styles" =~ "$dev_platform" ]]; then
-      link_dev_env
-      did_dev_env=1
+if [ -z "$INHIBIT_PREP" ]; then
+  select_variations "$@"
+  produce_releases
+  did_dev_env=""
+  if [[ "$selected_brands" =~ "$dev_brand" ]]; then
+    if [[ "$selected_color_schemes" =~ "$dev_color" ]]; then
+      if [[ "$selected_platform_styles" =~ "$dev_platform" ]]; then
+        link_dev_env
+        did_dev_env=1
+      fi
     fi
   fi
-fi
-if [ -z "$did_dev_env" ]; then
-  echo -n Not doing dev env, variant "$dev_brand/$dev_color/$dev_platform "
-  echo not selected.
-fi
+  if [ -z "$did_dev_env" ]; then
+    echo -n Not doing dev env, variant "$dev_brand/$dev_color/$dev_platform "
+    echo not selected.
+  fi
 
-blather "Done."
+  blather "Done."
+fi
