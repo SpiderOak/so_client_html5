@@ -37,7 +37,7 @@ brands="spideroak avg"
 # To add a new theme platform, include the theme file name (sans .css) in
 # $platform_styles:
 
-platform_styles="iphone"
+platform_styles="ios"
 
 # To add a new theme color, add a swatch using the jQuery Mobile theme roller,
 # and add an entry in the color_schemes list:
@@ -73,7 +73,7 @@ neutral_category=blue
 # Finally, choose the rendering for the development version:
 dev_brand="spideroak"
 dev_color="orange"
-dev_platform="iphone"
+dev_platform="ios"
 
 # ====================================================================
 # Internal configuration and processing below.
