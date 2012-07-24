@@ -149,7 +149,7 @@ select_variations () {
   done
 
   if [ -n "$errors" ]; then
-    echo Please retry with available variants... 1>&2
+    echo Please retry with available variantions... 1>&2
     variants_message 1>&2
     exit 1
   fi
