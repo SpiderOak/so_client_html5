@@ -1858,7 +1858,7 @@ var spideroak = function () {
         $listview.empty();
 
         // refresh necessary so jQuery traversal stuff doesn't pass over:
-        if (! this instanceof RecentContentsNode) {
+        if (! (this instanceof RecentContentsNode)) {
             $listview.append(this.layout_item$($.extend({refresh: true,
                                                          icon: "refresh"},
                                                         mode_opts))); }
