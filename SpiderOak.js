@@ -1866,7 +1866,7 @@ var spideroak = function () {
         while (ancestor_url) {
             var ancestor = node_manager.get(ancestor_url);
             $listview.append(
-                ancestor.layout_item$($.extend({transition: "slideup",
+                ancestor.layout_item$($.extend({transition: "slidedown",
                                                 icon: "so-carat-l"},
                                                mode_opts)));
             ancestor_url = ancestor.parent_url; }
