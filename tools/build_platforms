@@ -21,9 +21,13 @@
 bundle_prefix=com.spideroak
 app_name=spideroak-client
 
+DO_RUN=""
 if [ -z "$*" ]; then
   # Whoops - we need prep_release, but want to prevent it from doing stuff:
   INHIBIT_PREP=1
+elif [ x--run == "x$1" ]; then
+  shift
+  DO_RUN=true
 fi
 
 export BUILD_PLATFORM=true
@@ -82,11 +86,18 @@ fabricate_ios () {
   cp ${artifacts_dir}/ios_project/project.pbxproj \
      ${target_dir}/${app_name}.xcodeproj/
 
+  # Derive a build script from the generated one that doesn't start the
+  # emulator, and use it:
   grep -v emulate "${target_dir}"/cordova/debug \
        > "${target_dir}"/cordova/debug-build-only
   chmod +x "${target_dir}"/cordova/debug-build-only
-  blather Building...
-  "${target_dir}"/cordova/debug-build-only > /dev/null
+  if [ -n "$DO_RUN" ]; then
+    blather Build and run...
+    "${target_dir}"/cordova/debug > /dev/null
+  else
+    blather Building...
+    "${target_dir}"/cordova/debug-build-only > /dev/null
+  fi
   ls -d "${target_dir}/build/${app_name}.app"
 }
 
