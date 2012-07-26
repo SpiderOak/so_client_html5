@@ -2,18 +2,19 @@
 
 # Build platform-specific versions of HTML5 app.
 #
-# PhoneGap is used to do the platform hybridization.
+# PhoneGap is used to do the platform hybridization. Building also depends
+# on having the platform's sdk, of course.
 #
 # Since the platform-specific versions depend on the elements of the
-# respective releases, we get prep_release to do its thing with the same
-# parameters, so that the relevant release is prepared.
+# respective releases, prep_release is used with the same parameters, so
+# that the relevant release is prepared.
 #
 # Unlike prep_release, we require that the command includes some explicitly
-# specified variant selectors, since building can take so long.  (You can
-# still build all the variants by specifying all the selectors, or by
-# passing in "--all" as the first argument.)
+# specified variant selectors, or "--all", since building takes
+# significantly longer than just assembling the releases.
 #
-# Aside from that, see the prep_release script for further instructions.
+# See the documentation at the top of the prep_release script for further
+# instructions.
 
 # TODO: Android stuff.
 
