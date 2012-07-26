@@ -13,11 +13,12 @@
 #    are variant-specific associated with the variation categories.
 # 3. Command arguments, identifying selections among the variant categories.
 #
-# If you invoke this script (or scripts that use it) without any parameters,
-# all variants for all categories will be produced.  Any arguments will be
-# used to select only the variants within their categories for production. So
-# if invoked with an argument naming one of the brand targets, then only that
-# brand will be updated, with the other categories (color scheme and platform
+# If you invoke this script (or scripts that use it) without any arguments,
+# or with the first argument = "--all", then all variants for all
+# categories will be produced.  Any other arguments will be used to select
+# only the variants within their categories for production. So if invoked
+# with an argument naming one of the brand targets, then only that brand
+# will be updated, with the other categories (color scheme and platform
 # style) going through all their variants.
 
 
@@ -134,24 +135,29 @@ selected_color_schemes=""
 select_variations () {
   # Loop through the command arguments, selecting them from their categories
   # for production.
-  errors=""
-  for arg in "$@"; do
-    if [[ "$brands" =~ "${arg}" ]]; then
-      selected_brands+="$arg "
-    elif [[ "$color_schemes" =~ "${arg}" ]]; then
-      selected_color_schemes+="$arg "
-    elif [[ "$platform_styles" =~ "${arg}" ]]; then
-      selected_platform_styles+="$arg "
-    else
-      echo Unrecognized variant: "'$arg'". 1>&2
-      errors=1
+  if [ x--all == "x$1" ]; then
+    selected_brands="$brands"
+    selected_color_schemes="$color_schemes"
+    selected_platform_styles="$platform_styles"
+  else
+    errors=""
+    for arg in "$@"; do
+      if [[ "$brands" =~ "${arg}" ]]; then
+        selected_brands+="$arg "
+      elif [[ "$color_schemes" =~ "${arg}" ]]; then
+        selected_color_schemes+="$arg "
+      elif [[ "$platform_styles" =~ "${arg}" ]]; then
+        selected_platform_styles+="$arg "
+      else
+        echo Unrecognized variant: "'$arg'". 1>&2
+        errors=1
+      fi
+    done
+    if [ -n "$errors" ]; then
+      echo Please retry with available variantions... 1>&2
+      variants_message 1>&2
+      exit 1
     fi
-  done
-
-  if [ -n "$errors" ]; then
-    echo Please retry with available variantions... 1>&2
-    variants_message 1>&2
-    exit 1
   fi
 
   if [ -z "$selected_brands" ]; then
