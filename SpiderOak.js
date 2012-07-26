@@ -2374,6 +2374,39 @@ var spideroak = function () {
             .replaceWith(brand.service_home_link);
         }
 
+    function establish_operation_handlers() {
+        /* Add handlers for cordova operational events. */
+        // See http://docs.phonegap.com/en/2.0.0/cordova_events_events.md.html
+        // for special iOS quirks, eg 'active' and 'resign'.
+        function addEventListener_single(event, func, useCapture) {
+            document.removeEventListener(event, func, useCapture);
+            document.addEventListener(event, func, useCapture); }
+        addEventListener_single("pause", spideroak_pause, false);
+        addEventListener_single("resume", spideroak_resume, false);
+        addEventListener_single("online", spideroak_online, false);
+        addEventListener_single("offline", spideroak_offline, false);
+        addEventListener_single("backbutton", spideroak_backbutton, false);
+        // Other events:
+        // batterycritical, batterylow, batterystatus, menubutton, searchbutton
+        // startcallbutton, endcallbutton, volumedownbutton, volumeupbutton
+    }
+    var spideroak_pause = function () {
+        /* Handle the Cordova "pause" event. */
+        console.log("spideroak_pause fired"); }
+    var spideroak_resume = function () {
+        /* Handle the Cordova "resume" event. */
+        console.log("spideroak_resume fired");
+        // For those times when the splash screen has gotten stuck "on":
+        navigator.splashscreen.hide(); }
+    var spideroak_offline = function () {
+        /* Handle the Cordova "offline" event. */
+        console.log("spideroak_offline fired"); }
+    var spideroak_online = function () {
+        /* Handle the Cordova "online" event. */
+        console.log("spideroak_online fired"); }
+    var spideroak_backbutton = function () {
+        /* Handle the Cordova "backbutton" event. */
+        console.log("spideroak_backbutton fired"); }
 
     var spideroak_init = function () {
         /* Do preliminary setup and launch into the combo root. */
@@ -2385,6 +2418,7 @@ var spideroak = function () {
 
         // Setup traversal hook:
         establish_traversal_handler();
+        establish_operation_handlers();
 
         my.combo_root_url = generic.combo_root_url;
         var combo_root = node_manager.get_combo_root();
