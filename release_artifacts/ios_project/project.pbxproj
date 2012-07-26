@@ -34,14 +34,9 @@
 		30A0434914DC770100060A13 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 30A0434614DC770100060A13 /* Localizable.strings */; };
 		30E1352710E2C1420031B30D /* Cordova.plist in Resources */ = {isa = PBXBuildFile; fileRef = 30E1352610E2C1420031B30D /* Cordova.plist */; };
 		30E5649213A7FCAF007403D8 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30E5649113A7FCAF007403D8 /* CoreMedia.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
-		5B37688115BE0EE7006EC77D /* icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 5B37688015BE0EE7006EC77D /* icon.png */; };
 		5B37688415BE0F53006EC77D /* Default-Portrait@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 5B37688315BE0F53006EC77D /* Default-Portrait@2x~ipad.png */; };
-		5B37688615BE1029006EC77D /* Default-Portrait@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 5B37688515BE1029006EC77D /* Default-Portrait@2x~ipad.png */; };
 		5B37688815BE1095006EC77D /* icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5B37688715BE1095006EC77D /* icon@2x.png */; };
 		5B37688915BE10B2006EC77D /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5B93EBA415BE07CE00ECD0CC /* Default@2x.png */; };
-		5B37688B15BE10D1006EC77D /* icon-72@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5B37688A15BE10D1006EC77D /* icon-72@2x.png */; };
-		5B5DC83615BE1372007A8EB3 /* icon-72.png in Resources */ = {isa = PBXBuildFile; fileRef = 5B5DC83515BE1372007A8EB3 /* icon-72.png */; };
-		5B5DC83815BE1389007A8EB3 /* Default-Portrait~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 5B5DC83715BE1389007A8EB3 /* Default-Portrait~ipad.png */; };
 		5B93312515BE145F008E506C /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = 5B93312415BE145F008E506C /* Default.png */; };
 		5B93EB9D15BE061600ECD0CC /* icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 5B93EB9C15BE061600ECD0CC /* icon.png */; };
 		5B93EBA115BE063400ECD0CC /* icon-72.png in Resources */ = {isa = PBXBuildFile; fileRef = 5B93EBA015BE063400ECD0CC /* icon-72.png */; };
@@ -49,7 +44,6 @@
 		5B93EBA915BE0A0200ECD0CC /* Default-Landscape~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 5B93EBA815BE0A0200ECD0CC /* Default-Landscape~ipad.png */; };
 		5B93EBAB15BE0A9000ECD0CC /* Default-Portrait~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 5B93EBAA15BE0A8F00ECD0CC /* Default-Portrait~ipad.png */; };
 		5B93EBAF15BE0C1600ECD0CC /* Default-Landscape@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 5B93EBAE15BE0C1600ECD0CC /* Default-Landscape@2x~ipad.png */; };
-		5BC6054615BE14C500885475 /* icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5BC6054515BE14C500885475 /* icon@2x.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -379,7 +373,7 @@
 		29B97313FDCFA39411CA2CEA /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0420;
+				LastUpgradeCheck = 0430;
 			};
 			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "spideroak-client" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -454,16 +448,10 @@
 				5B93EBA915BE0A0200ECD0CC /* Default-Landscape~ipad.png in Resources */,
 				5B93EBAB15BE0A9000ECD0CC /* Default-Portrait~ipad.png in Resources */,
 				5B93EBAF15BE0C1600ECD0CC /* Default-Landscape@2x~ipad.png in Resources */,
-				5B37688115BE0EE7006EC77D /* icon.png in Resources */,
 				5B37688415BE0F53006EC77D /* Default-Portrait@2x~ipad.png in Resources */,
-				5B37688615BE1029006EC77D /* Default-Portrait@2x~ipad.png in Resources */,
 				5B37688815BE1095006EC77D /* icon@2x.png in Resources */,
 				5B37688915BE10B2006EC77D /* Default@2x.png in Resources */,
-				5B37688B15BE10D1006EC77D /* icon-72@2x.png in Resources */,
-				5B5DC83615BE1372007A8EB3 /* icon-72.png in Resources */,
-				5B5DC83815BE1389007A8EB3 /* Default-Portrait~ipad.png in Resources */,
 				5B93312515BE145F008E506C /* Default.png in Resources */,
-				5BC6054615BE14C500885475 /* icon@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
