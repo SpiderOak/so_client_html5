@@ -1,0 +1,92 @@
+#!/bin/bash -e
+
+# Build platform-specific versions of HTML5 app.
+#
+# PhoneGap is used to do the platform hybridization.
+#
+# Since the platform-specific versions depend on the elements of the
+# respective releases, we get prep_release to do its thing with the same
+# parameters, so that the relevant release is prepared.
+#
+# Unlike prep_release, we require that the command includes some explicitly
+# specified variant selectors, since building can take so long.  (You can
+# still build all the variants by specifying all the selectors, or by
+# passing in "--all" as the first argument.)
+#
+# Aside from that, see the prep_release script for further instructions.
+
+# TODO: Android stuff.
+
+bundle_prefix=com.spideroak
+app_name=spideroak-client
+
+if [ -z "$*" ]; then
+  # Whoops - we need prep_release, but want to prevent it from doing stuff:
+  INHIBIT_PREP=1
+fi
+
+export BUILD_PLATFORM=true
+tools_dir=$(cd $(dirname "$0"); pwd)
+. ${tools_dir}/prep_release
+
+if [ -n "$INHIBIT_PREP" ]; then
+  echo $(basename $0) requires explicitly specified variations - 1>&2
+  variants_message 1>&2
+  exit 1
+fi
+
+phonegap_targets_dir="${releases_dir}/PhoneGap"
+phonegap_ios_tools="${tools_dir}/PhoneGap/bin_ios"
+
+fabricate_apps () {
+  # Loop through the elected categories, fabricating apps for each variant.
+  for brand in $selected_brands; do
+    for color in $selected_color_schemes; do
+      for platform in $selected_platform_styles; do
+        fabricate_$platform $brand $color
+      done
+    done
+  done
+}
+
+# Create a fabricate_<platform> routine for each supported platform.
+
+fabricate_ios () {
+  local brand="$1"; shift
+  local color="$1"; shift
+  local ios_app_spec="${brand}-${color}"
+  local target_dir="${phonegap_targets_dir}/${ios_app_spec}"
+  blather -n Fabricating ${ios_app_spec}
+  if [ ! -d "$target_dir" ]; then
+    blather , create.
+    ${phonegap_ios_tools}/create \
+      "$target_dir" \
+      ${bundle_prefix}.${app_name} \
+      ${app_name} \
+      ${app_name}
+  else
+    blather , refurnish.
+  fi
+
+  # Situate the application html5 components in the project:
+  cp -a ${releases_dir}/${ios_app_spec}-ios/* ${target_dir}/www/
+
+  # Situate adjusted project configuration files:
+  # For ExternalHosts whitelist:
+  cp ${artifacts_dir}/ios_project/Cordova.plist ${target_dir}/${app_name}/
+  # Situate the desktop and app brand icons, and files that reference them:
+  cp -a ${target_dir}/www/brand_images/* ${target_dir}/
+  cp ${artifacts_dir}/ios_project/${app_name}-Info.plist \
+     ${target_dir}/${app_name}/
+  cp ${artifacts_dir}/ios_project/project.pbxproj \
+     ${target_dir}/${app_name}.xcodeproj/
+
+  grep -v emulate "${target_dir}"/cordova/debug \
+       > "${target_dir}"/cordova/debug-build-only
+  chmod +x "${target_dir}"/cordova/debug-build-only
+  blather ... building ...
+  "${target_dir}"/cordova/debug-build-only > /dev/null
+  ls -d "${target_dir}/build/${app_name}.app"
+}
+
+fabricate_apps
