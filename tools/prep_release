@@ -278,5 +278,5 @@ if [ -z "$INHIBIT_PREP" ]; then
     echo not selected.
   fi
 
-  blather "Done."
+  blather "Prep done."
 fi
