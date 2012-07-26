@@ -268,6 +268,13 @@ copy_sync () {
 }
 
 if [ -z "$INHIBIT_PREP" ]; then
+  if [[ x"$*" =~ "x--help" ]]; then
+    blather usage: $(basename $0) "[ variant-selectors ... ]"
+    blather You can select any combination of variants.
+    blather Selecting none from a category will do all in that category.
+    variants_message
+    exit 0
+  fi
   select_variations "$@"
   produce_releases
   did_dev_env=""
