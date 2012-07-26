@@ -51,7 +51,7 @@ root, the `RootContentNode`, which provides a central pivot for
 navigation. Incorporation of this consolidated root provides the basis for
 what I think is the most coherent and clear navigation model possible,
 given the various constituents.  (See [[HTML5ClientProjectConsolidatedRoot]]
-for some an accounting of the principle issues addressed.)
+for the principle issues.)
 
 * The actual content items are indexed in the `node_manager` by their
   JSON access URLs, and addressed in app URLs as the fragment identifiers.
@@ -367,7 +367,68 @@ This redirection step is the reason for the elaborate storage_login
 function, which recurses to the indicated server when required.
 
 == Operational and Incidental Technical Issues and Details ==
-=== Producing the various renderings ===
+=== Development, release, and building the platform-specific versions ===
+The html5 app, as cloned from the
+[https://spideroak.com/git/so_html5/tree/SpiderOak.js git repository],
+is carefully arranged so that development is done in the files organized
+around the clone's root.  A few scripts in the ./tools subdirectory compose
+the releases, and build the platform-specific application packages, using
+the development copies and resources collected in specific subdirs.
+
+* The cloned repo's top level files, including `index.html`, `SpiderOak.js`,
+  and the other files included in the index.html header, are what the
+  developer edits.
+
+  Some of the top level files are actually symlinks into specific versions
+  of resources that vary for different renderings of the app.
+
+  This top level is organized so you can run by pointing your browser at
+  the index.html (though you need to specifically
+  [https://spideroak.com/pandora/wiki/HTML5ClientAppSameOriginIssues enable]
+  your browser to allow cross-origin operation for file-based pages), for
+  immediate feedback, or you can view release versions produced by some
+  scripts, described next.
+
+* The `tools/prep_release` script produces various, complete-unto-themselves
+  "release" collections of the html/javascript/css files, in the `releases`
+  subdirectory.  These releases vary according to branding, color scheme,
+  and platform theme, and are named accordingly.
+
+  They releases created by `prep_release` are not platform-specific
+  executables.  (As of this writing, only the iOS platform theme is
+  implemented, Android will be added soon).
+
+  This `prep_release` script is configured with lists of the variations
+  within a set of categories, currently brand, color scheme, and
+  platform style.  The script takes selection of no variants within a
+  category to mean doing all the variants for that category.  You can see
+  the available variants (without any work done) by invoking the script
+  with `--help`.
+
+  The script assembles the releases from a combination of the development
+  copies and resources residing in the `release_artifacts` subdirectory.
+
+* The `tools/build_platforms` script uses the results of (and machinery
+  from) the `tools/prep_release` script to assemble and compile
+  platform-specific executable application packages in the
+  `releases/PhoneGap` subdirectory.  It takes the same set of variant
+  specifiers as the `prep_release` script.
+
+  Unlike the latter, `build_platforms` does nothing if no variants at all
+  are selected.  You can explicitly get all variants built, without
+  enumerating all the variant selectors, by passing the flag `--all`.
+
+  `build_platforms` currently uses the respective platform SDK to build the
+  platform-specific packages.  There is also a relatively new !PhoneGap
+  resource that provides
+  [https://build.phonegap.com/ cloud build services] for all our concerned
+  platforms.  There are administrative project, propriety, and monetary
+  decisions to address before making the technical arrangements.  I've
+  checked a preliminary, untested `config.xml` in to the
+  `release_artifacts/PhoneGap` subdirectory to build on, if we decide to
+  use this service.
+
+=== Adjusting the jQuery Mobile styling, including the color schemes ===
 The script tools/prep_release produces various application renditions,
 varying branding, color scheme, and platform look and feel.  The script
 is also useful as guidance, indicating the locations of rendition-specific
@@ -507,3 +568,9 @@ treat URLs that are going to trigger popups with
 `handle_content_visit()` to recognize, using
 `transit_manager.is_repeat_url()`, and pass it through to the standard jQm
 traversal mechanism.
+
+Despite all this, the popup menu on the public share rooms split-button (in
+the public share rooms visit root) misbehaves if it is dismissed twice
+without any intervening selections or page travesals.  In that case, the
+system will traverse back to the prior page visited.  This needs to be
+fixed, but it is somewhat obscure, and darned stubborn.
