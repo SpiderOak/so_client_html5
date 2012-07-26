@@ -85,7 +85,7 @@ fabricate_ios () {
   grep -v emulate "${target_dir}"/cordova/debug \
        > "${target_dir}"/cordova/debug-build-only
   chmod +x "${target_dir}"/cordova/debug-build-only
-  blather ... building ...
+  blather Building...
   "${target_dir}"/cordova/debug-build-only > /dev/null
   ls -d "${target_dir}/build/${app_name}.app"
 }
