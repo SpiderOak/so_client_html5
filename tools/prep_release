@@ -101,20 +101,10 @@ blather () {
 
 # Resource organization: the renderings are located in the $releases_dir:
 
-script_dir=$(dirname "$0")
-
-if [ ! -d "${script_dir}/../releases" ]; then
-    blather -n Creating releases dir:
-    mkdir -p "${script_dir}/../releases"
-    cd "${script_dir}/../releases"
-    blather $PWD
-else
-    cd "${script_dir}/../releases"
-fi
-
-releases_dir="$PWD"
-app_dir="$(dirname $PWD)"
-artifacts_dir="$app_dir/release_artifacts"
+script_dir="$(dirname "$0")"    # Surprisingly, the interior quoting happens.
+app_dir="$(dirname "${script_dir}")"
+releases_dir="${app_dir}/releases"
+artifacts_dir="${app_dir}/release_artifacts"
 
 unconditional_infrastructure=\
 "$app_dir/css
@@ -198,7 +188,7 @@ produce_a_release () {
   local color="$1"; shift
   local platform="$1"; shift
 
-  local target_dir="$brand-$color-$platform"
+  local target_dir="${releases_dir}/$brand-$color-$platform"
   blather "Composing $target_dir"
 
   if [ ! -e "$target_dir" ]; then
@@ -208,9 +198,14 @@ produce_a_release () {
 
   # Context-independent stuff.
 
+  # Restrict Internal Field Separator to just newline, so whitespace in
+  # directory names is not treated as a delimiter in the following for loop.
+  wasIFS="$IFS"; IFS="
+"
   for item in $unconditional_infrastructure; do
-    copy_sync $item "${target_dir}"/
+    copy_sync "$item" "${target_dir}"/
   done
+  IFS="$wasIFS"
 
   # Context-sensitive stuff.
 
@@ -275,20 +270,23 @@ if [ -z "$INHIBIT_PREP" ]; then
     variants_message
     exit 0
   fi
-  select_variations "$@"
-  produce_releases
-  did_dev_env=""
-  if [[ "$selected_brands" =~ "$dev_brand" ]]; then
-    if [[ "$selected_color_schemes" =~ "$dev_color" ]]; then
-      if [[ "$selected_platform_styles" =~ "$dev_platform" ]]; then
-        link_dev_env
-        did_dev_env=1
-      fi
-    fi
+
+  if [ ! -d "${releases_dir}" ]; then
+    blather "(Creating releases dir.)"
+    mkdir -p "${releases_dir}"
   fi
-  if [ -z "$did_dev_env" ]; then
-    echo -n Not doing dev env, variant "$dev_brand/$dev_color/$dev_platform "
-    echo not selected.
+
+  select_variations "$@"
+
+  produce_releases
+
+  if [[ ("$selected_brands" =~ "$dev_brand")
+        && ("$selected_color_schemes" =~ "$dev_color")
+        && ("$selected_platform_styles" =~ "$dev_platform") ]]; then
+    link_dev_env
+  else
+    echo -n Not doing dev env, variant "combination "
+    echo $dev_brand / $dev_color / $dev_platform not selected.
   fi
 
   blather "Prep done."
