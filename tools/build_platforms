@@ -23,19 +23,19 @@ app_name=spideroak-client
 
 DO_RUN=""
 if [ -z "$*" ]; then
-  # Whoops - we need prep_release, but want to prevent it from doing stuff:
+  # Whoops - run prep_release to get stuff, but inhibit with action inhibited:
   INHIBIT_PREP=1
 elif [ x--run == "x$1" ]; then
-  shift
   DO_RUN=true
+  shift
 fi
 
 export BUILD_PLATFORM=true
-tools_dir=$(cd $(dirname "$0"); pwd)
-. ${tools_dir}/prep_release
+tools_dir="$(dirname "$0")"
+. "${tools_dir}/prep_release"
 
 if [ -n "$INHIBIT_PREP" ]; then
-  echo $(basename $0) requires explicitly specified variations - 1>&2
+  echo $(basename "$0") requires explicitly specified variations - 1>&2
   variants_message 1>&2
   exit 1
 fi
@@ -45,6 +45,12 @@ phonegap_ios_tools="${tools_dir}/PhoneGap/bin_ios"
 
 fabricate_apps () {
   # Loop through the elected categories, fabricating apps for each variant.
+
+  if [ ! -d "${phonegap_targets_dir}" ]; then
+    blather "(Creating phonegap targets dir ${phonegap_targets_dir})"
+    mkdir -p "${phonegap_targets_dir}"
+  fi
+
   for brand in $selected_brands; do
     for color in $selected_color_schemes; do
       for platform in $selected_platform_styles; do
@@ -63,28 +69,28 @@ fabricate_ios () {
   local target_dir="${phonegap_targets_dir}/${ios_app_spec}"
   blather -n Fabricating ${ios_app_spec}
   if [ ! -d "$target_dir" ]; then
-    blather , create.
-    ${phonegap_ios_tools}/create \
-      "$target_dir" \
-      ${bundle_prefix}.${app_name} \
-      ${app_name} \
-      ${app_name}
+    blather , create...
+    "${phonegap_ios_tools}"/create \
+      "${target_dir}" \
+      "${bundle_prefix}.${app_name}" \
+      "${app_name}" \
+      "${app_name}"
   else
-    blather , refurnish.
+    blather , refurnish...
   fi
 
   # Situate the application html5 components in the project:
-  cp -a ${releases_dir}/${ios_app_spec}-ios/* ${target_dir}/www/
+  cp -a "${releases_dir}/${ios_app_spec}-ios/"* "${target_dir}/www/"
 
   # Situate adjusted project configuration files:
   # For ExternalHosts whitelist:
-  cp ${artifacts_dir}/ios_project/Cordova.plist ${target_dir}/${app_name}/
+  cp "${artifacts_dir}"/ios_project/Cordova.plist "${target_dir}"/${app_name}/
   # Situate the desktop and app brand icons, and files that reference them:
-  cp -a ${target_dir}/www/brand_images/* ${target_dir}/
-  cp ${artifacts_dir}/ios_project/${app_name}-Info.plist \
-     ${target_dir}/${app_name}/
-  cp ${artifacts_dir}/ios_project/project.pbxproj \
-     ${target_dir}/${app_name}.xcodeproj/
+  cp -a "${target_dir}"/www/brand_images/* "${target_dir}"/
+  cp "${artifacts_dir}/ios_project/${app_name}"-Info.plist \
+     "${target_dir}/${app_name}"/
+  cp "${artifacts_dir}"/ios_project/project.pbxproj \
+     "${target_dir}/${app_name}".xcodeproj/
 
   # Derive a build script from the generated one that doesn't start the
   # emulator, and use it:
