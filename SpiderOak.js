@@ -1903,10 +1903,10 @@ var spideroak = function () {
             localStorage.removeItem(name); },
         keys: function () { return Object.keys(localStorage); },
         };
-    // Gratuitous 'persistence_manager.length' getter, for a technical example:
-    persistence_manager.__defineGetter__('length',
-                                         function() {
-                                             return localStorage.length; });
+    Object.defineProperty(persistence_manager, "length",
+                          {get: function() {return localStorage.length; },
+                           enumerable: true,
+                          });
     var pmgr = persistence_manager;            // Compact name.
 
 
