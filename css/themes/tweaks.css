@@ -11,6 +11,11 @@
 .header-title .ui-btn-inner {
   border-color: transparent;
 }
+.header-title .ui-shadow {
+  -moz-box-shadow: none !important;
+  -webkit-box-shadow: none !important;
+  box-shadow: none !important;
+}
 .ui-header .ui-btn-icon-left .ui-btn-inner,
 .ui-header .ui-btn-icon-right .ui-btn-inner {
   padding-left: 20px !important;

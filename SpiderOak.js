@@ -65,8 +65,8 @@ var spideroak = function () {
         preview_sizes: [25, 48, 228, 800],
         dividers_threshold: 10,
         filter_threshold: 10,
-        compact_threshold: 500,
-        compact_title_chars: 11,
+        compact_width_threshold: 400,
+        compact_title_chars: 8,
         expansive_title_chars: 25,
         recents_max_size: 25,
         public_share_room_urls: {},
@@ -913,10 +913,7 @@ var spideroak = function () {
             this.remove_status_message('result');
             var room = node_manager.get(new_share_url);
             var digested_title = ((room && room.title())
-                                  ? elide(room.title(),
-                                          is_compact_mode()
-                                          ? generic.compact_title_chars
-                                          : generic.expansive_title_chars)
+                                  ? elide_per(room.title())
                                   : "(" + _t("Share ID") +" " + share_id + ")");
             var message = (_t("Room")
                            + ' <span class="message-subject">'
@@ -1353,11 +1350,10 @@ var spideroak = function () {
                 || this.loggedin_ish()) {
                 $header_div.attr('data-icon', "arrow-d"); }
             $header_div.attr('data-iconpos', "right");
+            $header_div.attr('data-inline', "true");
             var $icon = this.my_icon_image$("so-image-icon");
             var $title = $('<span class="header-title-text"/>')
-                .text(elide(fields.title, (is_compact_mode()
-                                           ? generic.compact_title_chars
-                                           : generic.expansive_title_chars)));
+                .text(elide_per(fields.title));
             $header_div.append($icon, $title);
             $header.find('.header-title').empty().append($header_div);
             $header.find('.header-title-button').button();
@@ -1370,8 +1366,8 @@ var spideroak = function () {
                 if (! fields.right_label) {
                     $right_slot.hide(); }
                 else {
-                    replace_button_text($right_slot, elide(fields.right_label,
-                                                           15));
+                    replace_button_text($right_slot,
+                                        elide_per(fields.right_label));
                     $right_slot.show(); }}}
         else {
             $right_slot.hide(); }
@@ -1386,8 +1382,8 @@ var spideroak = function () {
                 if (! fields.left_label) {
                     $left_slot.hide(); }
                 else {
-                    replace_button_text($left_slot, elide(fields.left_label,
-                                                          15));
+                    replace_button_text($left_slot,
+                                        elide_per(fields.left_label));
                     $left_slot.show(); }}}
         else {
             $left_slot.hide(); }}
@@ -2476,7 +2472,6 @@ var spideroak = function () {
             /* Do preliminary setup and launch into the combo root. */
             spideroak_init();
         },
-
     }
 
 
@@ -2521,6 +2516,11 @@ var spideroak = function () {
     ContentNode.prototype.toString = function () {
         return "<" + this.emblem + ": " + this.url + ">"; }
 
+    function elide_per(text) {
+        /* Return text elided to length depending on compact mode. */
+        return elide(text, (is_compact_mode()
+                            ? generic.compact_title_chars
+                            : generic.expansive_title_chars)); }
 
     function no_op () { console.log("no-op"); }
 
@@ -2569,7 +2569,7 @@ var spideroak = function () {
         else { return 0; }}
 
     function is_compact_mode() {
-        return $(document).height() < generic.compact_threshold; }
+        return $(document).width() < generic.compact_width_threshold; }
 
     if (SO_DEBUGGING) {
         // Expose the managers for access while debugging:
