@@ -223,7 +223,7 @@ function elide(text, limit) {
     /* Return 'text', with any characters beyond 'limit' elided with "..."
        elipsis. */
     if (text.length <= limit) { return text; }
-    else { return text.slice(0, limit) + "..."; }}
+    else { return text.slice(0, limit) + ".."; }}
 
 function toastish(message, duration, theme) {
     /* Show android-ish toast 'message', timed-out after 'duration' millesecs.

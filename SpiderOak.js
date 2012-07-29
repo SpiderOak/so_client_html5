@@ -66,6 +66,8 @@ var spideroak = function () {
         dividers_threshold: 10,
         filter_threshold: 10,
         compact_threshold: 500,
+        compact_title_chars: 11,
+        expansive_title_chars: 25,
         recents_max_size: 25,
         public_share_room_urls: {},
         titled_choice_popup_id: 'titled-choice-popup',
@@ -911,7 +913,10 @@ var spideroak = function () {
             this.remove_status_message('result');
             var room = node_manager.get(new_share_url);
             var digested_title = ((room && room.title())
-                                  ? elide(room.title(), 25)
+                                  ? elide(room.title(),
+                                          is_compact_mode()
+                                          ? generic.compact_title_chars
+                                          : generic.expansive_title_chars)
                                   : "(" + _t("Share ID") +" " + share_id + ")");
             var message = (_t("Room")
                            + ' <span class="message-subject">'
@@ -952,7 +957,10 @@ var spideroak = function () {
         var room_key = splat[splat.length-1];
         var room = node_manager.get(room_url);
         var digested_name = ((room && room.title())
-                             ? elide(room.title(), 25)
+                             ? elide(room.title(),
+                                     is_compact_mode()
+                                     ? generic.compact_title_chars
+                                     : generic.expansive_title_chars)
                              : "(Share ID " + share_id + ")")
         var message = ("Public share room "
                        + '<span class="message-subject">'
@@ -1341,14 +1349,15 @@ var spideroak = function () {
         if (fields.hasOwnProperty('title')) {
             var $header_div = $('<div data-role="button" data-theme="none"/>');
             $header_div.attr('class', "header-title-button");
-            $header_div.attr('data-inline', "true");
             if ((! (this instanceof RootContentNode))
                 || this.loggedin_ish()) {
                 $header_div.attr('data-icon', "arrow-d"); }
             $header_div.attr('data-iconpos', "right");
             var $icon = this.my_icon_image$("so-image-icon");
             var $title = $('<span class="header-title-text"/>')
-                .text(elide(fields.title, 25));
+                .text(elide(fields.title, (is_compact_mode()
+                                           ? generic.compact_title_chars
+                                           : generic.expansive_title_chars)));
             $header_div.append($icon, $title);
             $header.find('.header-title').empty().append($header_div);
             $header.find('.header-title-button').button();
@@ -1851,10 +1860,7 @@ var spideroak = function () {
         return this.name || this.emblem; }
 
     RootContentNode.prototype.title = function () {
-        return (my.username
-                ? this.emblem + ': ' + my.username
-                : this.emblem); }
-
+        return my.username || this.emblem; }
 
     /* ===== Popup Menus ===== */
 
