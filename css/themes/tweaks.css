@@ -2,16 +2,16 @@
  min-width: 300px;
 }
 
-[data-role=header] .header-title {
-  border-right: 3px solid;
-  border-top: 1px solid;
-  border-left: 3px solid;
-  border-bottom: 1px solid;
-  -moz-border-radius: 1em;
-  -webkit-border-radius: 1em;
-  border-radius: 1em;
-  cursor: context-menu;
+.header-title > .ui-btn {
+  margin: 0;
 }
+.ui-header > .ui-btn {
+  margin-top: .5em !important;
+}
+.header-title-text {
+  font-size: medium;
+}
+
 [data-role=footer] .ui-icon {
   width: 36px !important;
   height: 36px !important;

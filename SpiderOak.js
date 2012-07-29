@@ -1339,9 +1339,18 @@ var spideroak = function () {
         var $label;
 
         if (fields.hasOwnProperty('title')) {
+            var $header_div = $('<div data-role="button" data-theme="none"/>');
+            $header_div.attr('class', "header-title-button");
+            $header_div.attr('data-inline', "true");
+            $header_div.attr('data-icon', "arrow-d");
+            $header_div.attr('data-iconpos', "right");
             var $icon = this.my_icon_image$("so-image-icon");
-            var $title = $('<span/>').text(elide(fields.title, 25));
-            $header.find('.header-title').empty().append($icon, $title); }
+            var $title = $('<span class="header-title-text"/>')
+                .text(elide(fields.title, 25));
+            $header_div.append($icon, $title);
+            $header.find('.header-title').empty().append($header_div);
+            $header.find('.header-title-button').button();
+        }
 
         var $right_slot = $header.find('.header-right-slot');
         if (fields.hasOwnProperty('right_url')) {
