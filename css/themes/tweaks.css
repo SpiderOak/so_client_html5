@@ -6,14 +6,19 @@
   margin: 0;
 }
 .ui-header > .ui-btn {
-  margin-top: .2em !important;
-}
-.header-title-text {
-  font-size: small;
+  margin-top: .1em !important;
 }
 .header-title .ui-btn-inner {
-  border-top: 0px solid white;
   border-color: transparent;
+}
+.ui-header .ui-btn-icon-left .ui-btn-inner,
+.ui-header .ui-btn-icon-right .ui-btn-inner {
+  padding-left: 20px !important;
+}
+.ui-header .ui-btn-left, .ui-header .ui-btn-right,
+.ui-header .ui-btn-icon-notext {
+  position: absolute;
+  top: 8px !important;
 }
 
 [data-role=footer] .ui-icon {
@@ -28,12 +33,10 @@
   margin-left: -10px
 }
 
-[data-role=header] .header-title[data-theme=c] {
-  /* Mostly white */
-  border-color:  rgba(192,192,192,.2); }
 .header-title .so-image-icon {
-  margin-right: 8px;
-  vertical-align: middle;
+  margin-right: 3px;
+  margin-left: -5px;
+  vertical-align: top;
 }
 .so-image-icon {
   width: 16px;
@@ -47,22 +50,6 @@
 .message-subject {
   font-style: italic;
 }
-
-[data-role=header] .header-title[data-theme=f] {
-   /* Orange - index.html */
-  border-color:  rgba(252,142,32,.2); }
-[data-role=header] .header-title[data-theme=g] {
-  /* Blue-gray - SpiderOak_neutral.html */
-  border-color:  rgba(51,76,102,.2); }
-[data-role=header] .header-title[data-theme=h] {
-  /* Green (vibrant) - SpiderOak_green.html */
-  border-color:  rgba(0,169,157,.2); }
-[data-role=header] .header-title[data-theme=i] {
-  /* Blue (vibrant) - SpiderOak_blue.html */
-  border-color:  rgba(0,169,157,.2); }
-[data-role=header] .header-title[data-theme=e] {
-  /* Yellow */
-  border-color:  rgba(244,198,63,.2); }
 
 .status-message {
   margin-bottom: -1em !important;

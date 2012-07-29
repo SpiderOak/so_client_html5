@@ -1,0 +1,11 @@
+.header-title-text {
+  font-size: small;
+}
+.header-title .ui-btn-icon-right .ui-icon {
+  margin-right: 5px !important;
+  margin-left: 5px !important;
+  padding-left: 2px !important;
+}
+.ui-header .ui-btn-icon-left .ui-icon {
+  left: 2px !important;
+}

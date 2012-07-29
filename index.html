@@ -14,6 +14,8 @@
   <link rel="apple-touch-icon-precomposed" href="brand-images/brand_logo.png" />
   <link rel="stylesheet" href="icons.css" />
   <link rel="stylesheet" href="css/themes/tweaks.css" />
+  <link rel="stylesheet" media="(max-device-width: 1500px)"
+        href="css/themes/tweaks-compact.css" />
   <link rel="stylesheet" href="css/themes/iphone.css" />
   <link rel="stylesheet" href="jquery.mobile-1.2.0_pre/jquery.mobile.structure.css"/>
   <script src="cordova-2.0.0.js"></script>
@@ -155,7 +157,7 @@
         <ul>
           <li>
             <a href="#about-spideroak">
-              About <span class="brand-label"> SpiderOak </span>
+              <span class="brand-label"> SpiderOak </span>
             </a>
           </li>
           <li> <a href="#recents"> Recents </a> </li>
@@ -168,12 +170,12 @@
     <div data-role="header" data-position="fixed" data-theme="f">
       <a href="#home" data-role="button"
          data-transition="reverse slide"
-         data-icon="so-carat-l" data-iconpos="left"
+         data-icon="so-carat-l" data-iconpos="left" data-mini="true"
          alt="Dashboard"> Dash </a>
       <h3 class="header-title" data-theme="f">
-        About <span class="brand-title"> SpiderOak </span>
+        <span class="brand-title"> SpiderOak </span>
       </h3>
-      <a alt="About the Dashboard" data-role="button"
+      <a alt="About the Dashboard" data-role="button" data-mini="true"
          data-transition="slide"
          href="#about-dashboard" data-icon="so-carat-r" data-iconpos="right">
         About the Dashboard</a>
@@ -229,7 +231,7 @@
 
   <div data-role="page" id="share-home">
     <div data-role="header" data-position="fixed" data-theme="f">
-      <a href="#home" data-icon="so-carat-l" data-role="button"
+      <a href="#home" data-icon="so-carat-l" data-role="button" data-mini="true"
          data-transition="slide" alt="Dashboard">
         Dash</a>
       <h3 class="header-title" data-theme="f"> Public Share Rooms </h3>
@@ -319,16 +321,16 @@
 
   <div data-role="page" id="about-dashboard" data-theme="c">
     <div data-role="header" data-position="fixed" data-theme="f">
-      <a alt="About the Dashboard" data-role="button"
+      <a alt="About the Dashboard" data-role="button" data-mini="true"
          data-transition="reverse slide"
          href="#home" data-icon="so-carat-l" data-iconpos="left">
         Dash </a>
       <h3 class="header-title" data-theme="f">
         About the Dashboard </h3>
-      <a href="#about-spideroak" data-role="button"
+      <a href="#about-spideroak" data-role="button" data-mini="true"
          data-transition="slide"
          data-icon="so-carat-r" data-iconpos="right"
-         alt="About...">About <span class="brand-title"> SpiderOak </span> </a>
+         alt="About..."><span class="brand-title"> SpiderOak </span> </a>
     </div>
     <div data-role="content">
       <h2> The Dashboard </h2>
