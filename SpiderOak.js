@@ -1698,9 +1698,8 @@ var spideroak = function () {
                            + " " + spec.selector);
             $li.attr('class', classes);
             $anchor = $('<a data-role="button"/>');
-            if (! is_compact_mode()) {
-                $anchor.attr('data-icon', spec.icon_name);
-                $anchor.attr('data-iconpos', "top"); }
+            $anchor.attr('data-icon', spec.icon_name);
+            $anchor.attr('data-iconpos', "top");
             $anchor.attr('href', spec.url);
             // Enclose text in a labelled span so we can get at it surgically,
             // from within intervening stuff that jQuery injects:
