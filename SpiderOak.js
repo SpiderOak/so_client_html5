@@ -954,10 +954,7 @@ var spideroak = function () {
         var room_key = splat[splat.length-1];
         var room = node_manager.get(room_url);
         var digested_name = ((room && room.title())
-                             ? elide(room.title(),
-                                     is_compact_mode()
-                                     ? generic.compact_title_chars
-                                     : generic.expansive_title_chars)
+                             ? elide_per(room.title())
                              : "(Share ID " + share_id + ")")
         var message = ("Public share room "
                        + '<span class="message-subject">'
