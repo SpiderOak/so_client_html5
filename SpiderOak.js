@@ -1679,6 +1679,7 @@ var spideroak = function () {
                {title: <the legend for the action>,
                 url: <an app-supported address, usually url>,
                 selector: <class for the item, for later selection>,
+                transition: transition effect (optional),
                 icon_name: <name of the action icon>}
 
            The items in the constructed footer will be addressable by the
@@ -1698,6 +1699,8 @@ var spideroak = function () {
             $anchor.attr('data-icon', spec.icon_name);
             $anchor.attr('data-iconpos', "top");
             $anchor.attr('href', spec.url);
+            if (spec.transition) {
+                $anchor.attr('data-transition', spec.transition); }
             // Enclose text in a labelled span so we can get at it surgically,
             // from within intervening stuff that jQuery injects:
             $anchor.append($('<span class="item-label"/>')
@@ -1741,13 +1744,15 @@ var spideroak = function () {
 
     ContentNode.prototype.layout_footer = function(mode_opts) {
         /* Populate the footer for this node. */
-        this.layout_footer_by_spec([{title: "Dash",
+        this.layout_footer_by_spec([{title: "Dashboard",
                                      url: "#home",
                                      selector: "dashboard",
+                                     transition: "slidedown",
                                      icon_name: "so-dashboard-footer"},
                                     {title: "Recents",
                                      url: "#recents",
                                      selector: "recents",
+                                     transition: "slidedown",
                                      icon_name: "so-recents-footer"},
                                     ],
                                    mode_opts); }
@@ -1758,6 +1763,7 @@ var spideroak = function () {
                                 {title: "About " + brand.label,
                                  url: "#about-spideroak",
                                  selector: "about-spideroak",
+                                 transition: "fade",
                                  icon_name: "so-logo-footer"}); }
 
     ContentNode.prototype.my_page_from_dom$ = function () {
