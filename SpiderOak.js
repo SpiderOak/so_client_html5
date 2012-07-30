@@ -1853,10 +1853,10 @@ var spideroak = function () {
         return window.location.href.split('#')[0] + '#' + this.url; }
 
     ContentNode.prototype.title = function () {
-        return this.name || this.emblem; }
+        return this.name || (is_compact_mode() ? brand.label : this.emblem); }
 
     RootContentNode.prototype.title = function () {
-        return my.username || this.emblem; }
+        return my.username || (is_compact_mode() ? brand.label : this.emblem); }
 
     /* ===== Popup Menus ===== */
 
