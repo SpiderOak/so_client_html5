@@ -1350,7 +1350,7 @@ var spideroak = function () {
             $header_div.attr('data-inline', "true");
             var $icon = this.my_icon_image$("so-image-icon");
             var $title = $('<span class="header-title-text"/>')
-                .text(elide_per(fields.title));
+                .text(fields.title);
             $header_div.append($icon, $title);
             $header.find('.header-title').empty().append($header_div);
             $header.find('.header-title-button').button();
@@ -1363,8 +1363,7 @@ var spideroak = function () {
                 if (! fields.right_label) {
                     $right_slot.hide(); }
                 else {
-                    replace_button_text($right_slot,
-                                        elide_per(fields.right_label));
+                    replace_button_text($right_slot, fields.right_label);
                     $right_slot.show(); }}}
         else {
             $right_slot.hide(); }
@@ -1379,8 +1378,7 @@ var spideroak = function () {
                 if (! fields.left_label) {
                     $left_slot.hide(); }
                 else {
-                    replace_button_text($left_slot,
-                                        elide_per(fields.left_label));
+                    replace_button_text($left_slot, fields.left_label);
                     $left_slot.show(); }}}
         else {
             $left_slot.hide(); }}

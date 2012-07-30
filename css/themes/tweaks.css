@@ -27,14 +27,47 @@
 }
 /* */
 
+@media (max-width: 400px) {
+  [data-role="header"] .ui-btn-inner {
+    font-size: small;
+  }
+}
 @media (min-width: 401px) {
   .header-title-text {
     font-size: medium;
   }
 }
-@media (max-width: 400px) {
-  .header-title-text {
-    font-size: small;
+/* Elide the back button, per a width set in width-dependent sections, below. */
+[data-role="header"] .ui-btn-inner, .header-title-text {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  -o-text-overflow: ellipsis;
+}
+
+@media (max-width: 500px) {
+  [data-role="header"] .ui-btn-inner {
+    max-width: 6.5em !important; }
+}
+@media (min-width: 501px) and (max-width: 600px) {
+  [data-role="header"] .ui-btn-inner {
+    max-width: 10em !important; }
+}
+@media (min-width: 601px) and (max-width: 800px) {
+  [data-role="header"] .ui-btn-inner {
+    max-width: 14em !important; }
+}
+@media (min-width: 701px) and (max-width: 1000px) {
+  [data-role="header"] .ui-btn-inner {
+    max-width: 20em !important; }
+}
+@media (min-width: 1001px) and (max-width: 1200px) {
+  [data-role="header"] .ui-btn-inner {
+    max-width: 300em !important; }
+}
+@media (min-width: 1200px) {
+  [data-role="header"] .ui-btn-inner {
+    max-width: 30em !important;
   }
 }
 @media (min-height: 600px) {
@@ -87,7 +120,6 @@
 .ui-li-icon {
   margin-left: 10px;
 }
-
 .message-subject {
   font-style: italic;
 }
