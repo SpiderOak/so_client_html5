@@ -1393,9 +1393,9 @@ var spideroak = function () {
                 this, alt_mode_opts); }.bind(this));
 
         var $header = this.my_page$().find('[data-role="header"]');
-        var $logout_button = $header.find('.logout-button');
+        var $back_button = $header.find('.back-button');
         var $title = $header.find('.header-title');
-        $logout_button.hide(); }
+        $back_button.hide(); }
 
     StorageNode.prototype.layout_header = function(mode_opts) {
         /* Fill in typical values for header fields of .my_page$().
