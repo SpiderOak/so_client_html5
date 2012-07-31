@@ -16,7 +16,8 @@ Landmarks:
 * [[HTML5ClientProjectNotes]] - Stray notes and idea drafts for the project
 * Mike Crane's mobile UI docs are in [/../pandora/wiki/UX/Mobile/ mobile section] of his [/../pandora/wiki/UX UX specifications collection], more recently his ClientGraphicAssets page
 * !SpiderOak public [https://spideroak.com/apis/partners/web_storage_api Web Storage API documentation]
-* [https://spideroak.com/git/so_html5/tree/SpiderOak.js html5 app] in the git repository web browser
+* The html5 app
+  [https://spideroak.com/git/so_html5/tree/ in our git repository]
 * html5 application artifacts (HTML, javascript, css, images, etc), via git ssh checkout:[[BR]]
   `git clone <user>@rhi.spideroak.com:/var/lib/git-repos/so_html5.git`
 * [https://spideroak.com/browse/share/klm/coalmine Google Chrome Canary installer] for
