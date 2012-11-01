@@ -23,7 +23,7 @@ app_name=spideroak-client
 
 DO_RUN=""
 if [ -z "$*" ]; then
-  # Whoops - run prep_release to get stuff, but inhibit with action inhibited:
+  # Whoops - run prep_release with action inhibited, to just get settings:
   INHIBIT_PREP=1
 elif [ x--run == "x$1" ]; then
   DO_RUN=true

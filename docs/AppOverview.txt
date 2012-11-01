@@ -370,10 +370,10 @@ function, which recurses to the indicated server when required.
 === Development, release, and building the platform-specific versions ===
 The html5 app, as cloned from the
 [https://spideroak.com/git/so_html5/tree/SpiderOak.js git repository],
-is carefully arranged so that development is done in the files organized
-around the clone's root.  A few scripts in the ./tools subdirectory compose
-the releases, and build the platform-specific application packages, using
-the development copies and resources collected in specific subdirs.
+is arranged so that development is done in the files organized around the
+clone's root.  A few scripts in the ./tools subdirectory compose the
+releases, and build the platform-specific application packages, using the
+development copies and resources collected in specific subdirs.
 
 * The cloned repo's top level files, including `index.html`, `SpiderOak.js`,
   and the other files included in the index.html header, are what the
@@ -394,7 +394,7 @@ the development copies and resources collected in specific subdirs.
   subdirectory.  These releases vary according to branding, color scheme,
   and platform theme, and are named accordingly.
 
-  They releases created by `prep_release` are not platform-specific
+  The releases created by `prep_release` are not platform-specific
   executables.  (As of this writing, only the iOS platform theme is
   implemented, Android will be added soon).
 
