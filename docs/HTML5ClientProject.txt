@@ -4,25 +4,28 @@
 Contact:'' ''ken@spideroak.com
 
 Landmarks:
-* 2012-07-05 Here are [https://ken.dev.spideroak.com:888/ some links] to
-  versions of the app differing only in color scheme. Feedback is welcome.
-* 2012-05-22 Demo of emerging app available via Ken's sandbox; technical details doc started
+* 2012-11-02 Open source on github
+* 2012-07-05 Established some links to versions of the app differing only
+  in branding and color scheme. Feedback is welcome.
+* 2012-05-22 Demo of emerging app available via Ken's sandbox; technical
+  details doc started
 * 2012-05-11 Rudimentary storage browsing, plus instructions for trying it
 * 2012-04-06 Document created.
 
 == Resources ==
-* [[HTML5ClientProjectRisksAndUncertainties]] - Keep track of prevalent challenges to the project
-* [[HTML5ClientTechnicalDetails]], [[HTML5ClientProjectHybrid]], [[HTML5ClientAppSameOriginIssues]] - Key aspects and issues of the html5 app, updated as the app develops - including [https://spideroak.com/pandora/wiki/HTML5ClientTechnicalDetails#SpecialBrowserRequirements instructions for trying it out]
-* [[HTML5ClientProjectNotes]] - Stray notes and idea drafts for the project
-* Mike Crane's mobile UI docs are in [/../pandora/wiki/UX/Mobile/ mobile section] of his [/../pandora/wiki/UX UX specifications collection], more recently his ClientGraphicAssets page
+* A trac milestone for the project tasks (taking over from the table, [#Pendingforv1release below], as of October, 2012
+* `docs/AppOverview`, `docs/HybridVsPureHTML5.txt`, `docs/HTML5ClientAppSameOriginIssues` - Key aspects and issues of the html5 app, updated as the app develops - including `docs/AppOverview#SpecialBrowserRequirements` instructions for trying it out
+* Mike Crane's mobile UI docs FIX: not yet made public
 * !SpiderOak public [https://spideroak.com/apis/partners/web_storage_api Web Storage API documentation]
-* The html5 app
-  [https://spideroak.com/git/so_html5/tree/ in our git repository]
-* html5 application artifacts (HTML, javascript, css, images, etc), via git ssh checkout:[[BR]]
-  `git clone <user>@rhi.spideroak.com:/var/lib/git-repos/so_html5.git`
+* [[HTML5ClientProjectRisksAndUncertainties]] - Keep track of prevalent challenges to the project
+* Source code for the html5 app and incidentals:
+  * A [GITHUB/so_html5/tree/ web view] of the app source code in our git repository
+  * git clone of the app artifacts - HTML, javascript, css, images, etc:[[BR]]
+  `git clone <user>@FIX:GITHUB/so_html5.git`
+* Visit [FIX: various renditions of the app] via a contemporary web browser, provided you have developer sandbox access
 * [https://spideroak.com/browse/share/klm/coalmine Google Chrome Canary installer] for
-  version proven to work in security inhibited mode necessary for
-  [https://spideroak.com/pandora/wiki/HTML5ClientTechnicalDetails#SpecialBrowserRequirements  special browser requirements] operation 
+  local-files visit, in order to use security inhibited mode for
+  `docs/HTML5ClientAppSameOriginIssues` - special browser operation
 
 == Pending for v1 release ==
 || Done |||| Arrange code infrastructure - git repo, HTML, javascript, css artifacts, etc ||
@@ -43,11 +46,13 @@ Landmarks:
 || Done |||| Finish headers ||
 || Done |||| Implement footers ||
 || Done || Show item-type icons on content listings, header title, etc || Still need to improve the icon set ||
-|| => || Hybridization - Package for mobile device, including settling what exact provisions will be needed for [https://spideroak.com/pandora/wiki/HTML5ClientAppSameOriginIssues CORS], stashed user and share credentials, etc. || See [[HTML5ClientProjectHybrid]] ||
+|| => || Hybridization - Package for mobile device, including settling what exact provisions will be needed for `docs/HTML5ClientAppSameOriginIssues` CORS, stashed user and share credentials, etc. || See `docs/HybridVsPureHTML5.txt` ||
 || - |||| Scope out and implement file-type-specific handling, beyond what the browser does ||
 || - |||| Implement Send-to menu ||
+|| - || Implement sustained login option || A la old/native client Auto-login - is there XMLHttpRequest correlate of OS X / iOS `didReceiveAuthenticationChallenge`? ||
 || - |||| Implement session PIN security ||
 || - |||| Identify and resolve crucial UI and functional issues ||
+|| - || Start to institute [http://en.wikipedia.org/wiki/JSDoc JSDoc] annotation of at least module, routines || Initially, just new code and established code that I touch for other reasons. Eventually the rest, if worthy. ||
 || Done || Provide an easy way to create app versions with different color schemes || Based on jQm themes, see [../HTML5ClientTechnicalDetails#ManagingtheUITheme managing the UI theme], we can easily tailor the colors, etc. ||
 || Done || Systematically produce various application renditions, varying branding, color scheme, and platform look and feel. || The script tools/prep_release does the job. It identifies the locations of rendition-specific elements, and has configuration variables towards to top for easy incorporation of new elements. ||
 || - || Internationalize || A few stubs are in place, many more will need to be done then cataloging and translating, I guess ||
@@ -57,12 +62,10 @@ Landmarks:
 
 == Pending for after v1 release ==
 
-|| - |||| On authentication time-out reauthoriziation, return to where you were interrupted ||
-|| - || Implement persistently stored recently-visited list || ||
-|| - || Implement favorites || What are the APIs for this? ||
+|| - || Implement distinct Android theme, autoselect between themes || ... probably css media selector will be useful, here ||
+|| - || Prefetching - Implement background fetching of current storage-node contents || [[HTML5ClientProjectNotes#Backgroundfetching]] has some early, possibly outmoded thoughts - the architecture that has been developed provides a lot to make this easy ||
 || - || Implement special UI features, eg storage bar || jQuery UI [http://jqueryui.com/demos/progressbar/ progress bar] ||
-|| - || Implement distinct Android theme, autoselect between themes || ... using css media selector, or will something like lesscss be needed? ||
-|| - |||| Implement background fetching of current storage-node contents - see [[HTML5ClientProjectNotes#Backgroundfetching]] ||
+|| - |||| Implement persistently stored recently-visited list ||
 || - |||| Evaluate plans for client-based write functionality, what if anything might be done for initial release ||
 || - |||| Fill in missing html5 app technical details documentation ||
 || - |||| Implement code tests - unit tests, functional tests ||
