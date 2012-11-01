@@ -66,7 +66,7 @@ that foundation, including device reading and writing.
     * File details
     * File previewers
     * "Storage bar" gauge and text indicating
-    * Other reconciliations with mobile app design spec
+    * Other reconciliations with mobile app design spec (Mike Crane's designs)
   * Flesh out internationalization
   * Implement tests - real unit and functional tests
   * Implement hybrid provisions for Android as well as iOS,
