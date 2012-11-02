@@ -33,7 +33,7 @@
 # brand_images_${name}_blue/ - brand-specific images suitable for blue and other
 #                              dark themes
 
-brands="spideroak avg"
+brands="spideroak acme"
 
 # To add a new theme platform, include the theme file name (sans .css) in
 # $platform_styles:
