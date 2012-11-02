@@ -57,8 +57,9 @@ November, 2012:
     * Sharing to other applications (Share / Send-to)
     * File details
     * File previewers
-    * "Storage bar" gauge and text indicating
-    * Other reconciliations with mobile app design spec (Mike Crane's designs)
+    * "Storage bar" gauge indicating storage capacity available and used
+    * Other reconciliations with mobile app design spec (Mike Crane's
+      designs - see `docs/UI_design_iOS.pdf` and `UI_design_Android.pdf`)
   * Flesh out internationalization
   * Implement tests - real unit and functional tests
   * Implement hybrid provisions for Android as well as iOS,
@@ -67,17 +68,17 @@ November, 2012:
     other suitable smart-annotation format
   * Polish UI
 
-* Once we have achieved parity with the existing, native application that
-  we'll be replacing, these are the high-priority next steps:
+* Once we have achieved parity to replace the existing, native application,
+  these are the high-priority next steps:
 
   * Optimization for performance - implement easy/low hanging fruit,
     including but not limited to conventional ways to optimize jQuery mobile
     behavior, implement batch fetches of folders and pre-fetching of
     anticipated next-visits
-  * Implement local backup and sync functionality! Existing mobile client
-    lacks local file system read - doesn't backup device. That will be the
-    next step (along with essential optimization), once reimplementation of
-    existing functionality is complete.
+  * Implement local backup and sync functionality.  (The existing, native
+    code mobile client doesn't read the local file systems.)  That will be
+    the next high-priority step (along with essential optimization), once
+    reimplementation of existing functionality is complete.
 
 What's Here
 ======
