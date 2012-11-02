@@ -15,11 +15,11 @@ Landmarks:
 == Resources ==
 * A trac milestone for the project tasks (taking over from the table, [#Pendingforv1release below], as of October, 2012
 * `docs/AppOverview`, `docs/HybridVsPureHTML5.txt`, `docs/HTML5ClientAppSameOriginIssues` - Key aspects and issues of the html5 app, updated as the app develops - including `docs/AppOverview#SpecialBrowserRequirements` instructions for trying it out
-* Mike Crane's mobile UI docs FIX: not yet made public
+* Mike Crane's mobile UI docs: `docs/UI_design_iOS.pdf`, `UI_design_Android.pdf`
 * !SpiderOak public [https://spideroak.com/apis/partners/web_storage_api Web Storage API documentation]
-* [[HTML5ClientProjectRisksAndUncertainties]] - Keep track of prevalent challenges to the project
+* `docs/HTML5ClientProjectRisksAndUncertainties.doc` - Keep track of prevalent challenges to the project
 * Source code for the html5 app and incidentals:
-  * A [GITHUB/so_html5/tree/ web view] of the app source code in our git repository
+  * A [FIX:GITHUB/so_html5/tree/ web view] of the app source code in our git repository
   * git clone of the app artifacts - HTML, javascript, css, images, etc:[[BR]]
   `git clone <user>@FIX:GITHUB/so_html5.git`
 * Visit [FIX: various renditions of the app] via a contemporary web browser, provided you have developer sandbox access
@@ -33,7 +33,7 @@ Landmarks:
 || Done |||| Implement storage login ||
 || Done |||| Implement storage navigation ||
 || Ongoing || Implement look-and-feel [/../pandora/raw-attachment/wiki/UX/Mobile Mike's mobile UX specs] || jQuery Mobile default theme seems closely modeled on iPhone UI ||
-|| Ongoing |||| Document the app designs: [[HTML5ClientTechnicalDetails]] ||
+|| Ongoing |||| Document the app designs: `docs/AppOverview.txt` ||
 || Done || Include file metadata (type, size, date) in list entries || Subdirectory details will be deferred to [#Backgroundfetching background fetching] ||
 || Done || Implement share rooms || JSON retrieval and content hierarchy navigation working, headers, footers, files, and edit mode of rooms pending ||
 || Done |||| Get all content navigation properly connecting, including traversing between shares and storage ||

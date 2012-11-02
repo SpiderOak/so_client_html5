@@ -1,7 +1,7 @@
 [[PageOutline]]
 = HTML5 Client Technical Details =
 Noteworthy technical !SpiderOak HTML5 client project technical details. See
-[[HTML5ClientProject]] for project status, etc.
+`docs/HTML5ClientProject.txt` for project status, etc.
 
 == Architectural Elements ==
 
@@ -50,8 +50,8 @@ The respective content-specific roots are encompassed by a consolidated
 root, the `RootContentNode`, which provides a central pivot for
 navigation. Incorporation of this consolidated root provides the basis for
 what I think is the most coherent and clear navigation model possible,
-given the various constituents.  (See [[HTML5ClientProjectConsolidatedRoot]]
-for the principle issues.)
+given the various constituents.  (See
+`docs/HTML5ClientProjectConsolidatedRoot.txt` for the principal issues.)
 
 * The actual content items are indexed in the `node_manager` by their
   JSON access URLs, and addressed in app URLs as the fragment identifiers.
@@ -368,12 +368,11 @@ function, which recurses to the indicated server when required.
 
 == Operational and Incidental Technical Issues and Details ==
 === Development, release, and building the platform-specific versions ===
-The html5 app, as cloned from the
-[https://spideroak.com/git/so_html5/tree/SpiderOak.js git repository],
-is arranged so that development is done in the files organized around the
-clone's root.  A few scripts in the ./tools subdirectory compose the
-releases, and build the platform-specific application packages, using the
-development copies and resources collected in specific subdirs.
+The html5 app, as cloned from the git repository, is arranged so that
+development is done in the files organized around the clone's root.  A few
+scripts in the ./tools subdirectory compose the releases, and build the
+platform-specific application packages, using the development copies and
+resources collected in specific subdirs.
 
 * The cloned repo's top level files, including `index.html`, `SpiderOak.js`,
   and the other files included in the index.html header, are what the
@@ -383,11 +382,10 @@ development copies and resources collected in specific subdirs.
   of resources that vary for different renderings of the app.
 
   This top level is organized so you can run by pointing your browser at
-  the index.html (though you need to specifically
-  [https://spideroak.com/pandora/wiki/HTML5ClientAppSameOriginIssues enable]
-  your browser to allow cross-origin operation for file-based pages), for
-  immediate feedback, or you can view release versions produced by some
-  scripts, described next.
+  the index.html (though you need to specifically enable your browser to
+  allow cross-origin operation for file-based pages), for immediate
+  feedback, or you can view release versions produced by some scripts,
+  described next.
 
 * The `tools/prep_release` script produces various, complete-unto-themselves
   "release" collections of the html/javascript/css files, in the `releases`
@@ -438,19 +436,12 @@ The script has external configuration variables towards to top, for easy
 incorporation of new elements.
 
 === Special Browser Requirements ===
-While developing the html5 client app I didn't have the luxury of
-situating the code within the same domain as the storage servers.  That's
-changing with the Frank Sievetsen's addition of a reverse proxy, so people
-can visit the proxy with regular browser session and have it work. (I'm
-setting up
-[https://ken.dev.spideroak.com:888/ links in my developer's sandbox].)
-
-However, people wanting to run the application from local files still have
-to use a browser with relaxed security:
+People wanting to run the application from local files have to use a
+browser with relaxed security:
 
 To run the client from local files you must run your browser with a flag
 that allows that, and also one to disregard
-[#HTML5ClientAppSameOriginIssues CORS restrictions].
+`docs/HTML5ClientAppSameOriginIssues` CORS restrictions].
 Be aware that this means drastically reduced security!
 
 I use Chip Black's suggestions for doing so with Google Chrome.  Here are
@@ -476,12 +467,9 @@ that things work.
   run Canary enabled to run local files with CORS restrictions eased.
 
 For more details about CORS restrictions and the project, see
-[[HTML5ClientAppSameOriginIssues]].
+`docs/HTML5ClientAppSameOriginIssues`.
 
-I've created
-[https://ken.dev.spideroak.com:888/ an index.html in my developer's sandbox]
-which links to various renderings of the client app.  Preferences feedback
-and suggestions are welcome.
+[FIX: create some active demo situation for general consumption?]
 
 === Managing the UI Theme ===
 The default set of jQuery Mobile theme swatches get us near enough to

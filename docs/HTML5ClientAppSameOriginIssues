@@ -12,11 +12,10 @@ While developing the !SpiderOak html5 application, Ken bumped into this
 obstacle because he didn't have the luxury of locating the developing code
 within the official spideroak.com domain, where the storage servers are
 situated (spideroak.com and web-dc2.spideroak.com - both covered by the
-spideroak.com domain; the developer sandboxes are in spideroak.com:888,
-which constitutes a distinct domain as far as browser security is
-concerned). Hence the
-[https://spideroak.com/pandora/wiki/HTML5ClientArchitecture#SpecialBrowserRequirements special browser requirements]
-to exercise the preliminary app, as it develops.
+spideroak.com domain; the developer sandboxes are on another port, which
+constitutes a distinct domain as far as browser security is
+concerned). Hence the special browser requirements to exercise the
+preliminary app, as it develops.
 
 Hybridizing the application using !PhoneGap resolves this problem.
 The !PhoneGap `UIWebView` widget isn't constrained by CORS restrictions.
