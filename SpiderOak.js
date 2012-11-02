@@ -1,12 +1,28 @@
-/* SpiderOak html5 client Main app.
+/* SpiderOak html5 client Main app. */
 
+/* Copyright 2012 SpiderOak, Inc.
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+*/
+
+/*
  * Works with:
- * - jquery.mobile-1.0.1.css
- * - jquery-1.6.4.js
- * - jquery.mobile-1.0.1.js
- * - cordova-1.9.0.js - PhoneGap API
- * - js_aux/misc.js - blather(), fragment_quote(), error_alert(), ...
- * - Nibbler 2010-04-07 - base32 encode, decode, and enhance with encode_trim.
+ * - jquery.mobile-1.2.0_pre/jquery.mobile.css
+ * - jquery.mobile-1.2.0_pre/jquery.mobile.js
+ * - jquery-1.7.2.js
+ * - cordova-2.0.0.js - PhoneGap API
+ * - js_aux/misc.js
+ * - js_aux/nibbler.js - Nibbler 2010-04-07 - base32, plus local enhancement
  * - custom-scripting.js - jqm settings and contextual configuration
  */
 
