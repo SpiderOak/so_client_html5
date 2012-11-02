@@ -31,19 +31,11 @@ Current Status
 Where we are at the point of open source release, in the beginning of
 November, 2012:
 
-The overall state of the SpiderOak mobile client is chaotic.  The existing
-(native per-platform) application is lacking - it does not actually do
-backups or other actions that require reading of the host mobile devices,
-and there are unresolved problem with some of the things it does do.
-
-While we are slowly continuing to attend to the existing problems, we have
-devoted resources to first replacing the existing functionality with this
-HTML5-based version, and then concentrating on basing full functionality on
-that foundation, including device reading and writing.
-
 * Fundamental infrastructure and implementation is in place for:
   * Replacing existing native app functionality
-  * Building platform, brand, and theme variants
+  * Automated composition and compilation of platform, brand, and theme
+    release variations.  (See `tools/prep_release` and `tools/build_platforms`,
+    described below.)
 
 * We have more to do to get to sufficient parity with the existing app:
   * The UI essentials are there, but there is a lot of fleshing-out and
