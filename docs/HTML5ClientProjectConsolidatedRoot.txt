@@ -1,34 +1,43 @@
 This is an explanation of the [[HTML5ClientProject]] consolidated root's
 purpose, elaborating details mentioned in [[HTML5ClientTechnicalDetails]].
 
-SpiderOak offers a variety of functions, and the relationship between those
-functions can be confusing to newcomers, and even to old hands.  In the
-process of implementation top-level navigation and login, I came to grips
-with one complication and arrived at an arrangement that is simpler than
-the existing and designed arrangements.  I think this arrangment to clarify 
+SpiderOak offers access to your backups storage in a variety of useful
+ways.  The variety of content collections - backups storage versus the list
+of share rooms available from an account versus the list of share rooms
+being publicly visited - can be confusing to new, and even experienced
+users, unless the app navigation is clear about what the differences and
+relationships are between these collections.
 
-The issue concerns the relationship between the list of share rooms
-originating from an account of yours with your backup storage, on one hand,
-and with access to public share rooms, on the other.
+This confusion can be hard to see once you understand these relationships,
+if you take them for granted.  Unfortunately, the organization of login and
+navigation in the current mobile app does not help, because it does take
+that understanding for granted, and does nothing (or worse) to clarify it.
+
+In grappling with organizing the login and navigation for the html5 client,
+I came up with a navigation arrangement that clearly conveys, in an
+immediate and direct way, what collections are available, both overall and
+according to whether or not you are logged in at the moment.
+
+This arrangement is based on clarifying these relationships by organizing
+the navigation to convey:
 
 * The fact that you have to login for access to an account's backup
   storage, and to access the list of share rooms originating from that
-  account, helps to convey the connection between these two collections.
+  account.  This helps to convey the connection between these two
+  collections.
 * The fact that you don't have to login for the list of share rooms that
-  your device is publicly visiting helps to convey the distinction from the
-  other two.
+  your device is publicly visiting.  This helps to convey the distinction
+  from the other two.
 
 This login requirement for the first two, and their connection, is obscured
-by arrangements where:
+by the native mobile app's arrangement, in a few ways:
 
-1. It is obscured when navigation to the respective collections is separate
-   from the login challenge, as it is in the native mobile clients.  This
-   separates the relevance of login to the respective collections.  You only
-   discover that you can't (or can) visit one of the collections when you
-   select it with a footer tab - and then you have to go elsewhere
-   (settings) to do the login.
+1. It is obscured by the native mobile client because navigation to the
+   respective collections is separate from the login challenge.  You
+   discover that you can't (or can) visit one of the collections only when
+   you select a collection with a footer tab.
 
-2. Navigation of the respective collections is disjoint - they're in
+2. Navigation into the respective collections is disjoint - they're in
    separate tabs in the native mobile clients.  This doesn't offer a
    single, comprehensive view of the various content collections, public
    and account-oriented, that are available at any moment.
