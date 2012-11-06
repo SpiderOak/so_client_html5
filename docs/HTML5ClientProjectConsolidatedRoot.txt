@@ -56,6 +56,11 @@ have the consolidated root "dashboard" as their parents, so ascending from
 them goes to the consolidated root, even if you got to them from one of the
 collection-specific pages.
 
+Note also that the sections of the consolidated root could be large, if the
+accounts contain many devices or share rooms.  This can be handled by
+making the sections collapsible, and having them start in collapsed state.
+This would take some finagling, but should be doable.
+
 Overall, this arrangement presents a central, comprehensive view of the
 content that is available via SpiderOak, clearly conveying how login status
 affects what you can see.  The prior arrangement obscures all of this,
