@@ -93,13 +93,14 @@ var spideroak = function () {
 
     if (SO_DEBUGGING) {
         var hostname = window.location.hostname;
-        if (hostname.slice(hostname.length-6) == "fx5.de") {
-            generic.fx5_proxying = true;
-            generic.base_host_url = "https://www.fx5.de/so";
+        if ((hostname.slice(0,4) === "ken.")
+            && (hostname.slice(hostname.length-13) === "spideroak.com")) {
+            generic.debug_proxying = true;
+            generic.base_host_url = "https://" + hostname;
             generic.alt_host_replace = "https://web-dc2.spideroak.com";
-            generic.alt_host_url = "https://www.fx5.de/so_dc2";
-            generic.storage_path_prefix = "/so" + generic.storage_path_prefix;
-            generic.shares_path_suffix = "/so" + generic.shares_path_suffix; }}
+            generic.alt_host_url = "https://" + hostname;
+            generic.storage_path_prefix = "" + generic.storage_path_prefix;
+            generic.shares_path_suffix = "" + generic.shares_path_suffix; }}
 
     var my = {
         /* Login session settings: */
@@ -2185,7 +2186,7 @@ var spideroak = function () {
                 else if (match[1] === 'login') {
                     if (match[2].charAt(0) === "/") {
                         login_url = server_host_url + match[2]; }
-                    else if (generic.fx5_proxying) {
+                    else if (generic.debug_proxying) {
                         var ahr = generic.alt_host_replace;
                         if (match[2].slice(0, ahr.length) === ahr) {
                             // Use the proxy location:
