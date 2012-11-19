@@ -32,11 +32,11 @@
 .ui-icon-so-collection {
   background-image: url("icons/collection.png") !important;
   background-size: 18px 18px !important; };
-.ui-icon-so-dashboard {
-  background-image: url("icons/dashboard.png") !important;
+.ui-icon-so-account {
+  background-image: url("icons/account.png") !important;
   background-size: 18px 18px !important; }
-.ui-icon-so-dashboard-footer {
-  background-image: url("icons/dashboard.png") !important;
+.ui-icon-so-account-footer {
+  background-image: url("icons/account.png") !important;
   background-size: 36px 36px !important; }
 .ui-icon-so-db {
   background-image: url("icons/db.png") !important;

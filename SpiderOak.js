@@ -412,7 +412,7 @@ var spideroak = function () {
         ContentNode.call(this, url, parent);
         this.root_url = url;
         this.emblem = brand.title;
-        this.name = "Dash";
+        this.name = "My Stuff";
         delete this.subdirs;
         delete this.files; }
     RootContentNode.prototype = new ContentNode();
@@ -1759,11 +1759,11 @@ var spideroak = function () {
 
     ContentNode.prototype.layout_footer = function(mode_opts) {
         /* Populate the footer for this node. */
-        this.layout_footer_by_spec([{title: "Dashboard",
+        this.layout_footer_by_spec([{title: "My Stuff",
                                      url: "#home",
-                                     selector: "dashboard",
+                                     selector: "account",
                                      transition: "slidedown",
-                                     icon_name: "so-dashboard-footer"},
+                                     icon_name: "so-account-footer"},
                                     {title: "Recents",
                                      url: "#recents",
                                      selector: "recents",
@@ -1771,15 +1771,6 @@ var spideroak = function () {
                                      icon_name: "so-recents-footer"},
                                     ],
                                    mode_opts); }
-
-    RootContentNode.prototype.layout_footer = function(mode_opts) {
-        ContentNode.prototype.layout_footer.call(this, mode_opts);
-        this.change_footer_item('.dashboard',
-                                {title: "About " + brand.label,
-                                 url: "#about-spideroak",
-                                 selector: "about-spideroak",
-                                 transition: "fade",
-                                 icon_name: "so-logo-footer"}); }
 
     ContentNode.prototype.my_page_from_dom$ = function () {
         /* Return a jquery DOM search for my page, by id. */
