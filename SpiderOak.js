@@ -93,8 +93,7 @@ var spideroak = function () {
 
     if (SO_DEBUGGING) {
         var hostname = window.location.hostname;
-        if ((hostname.slice(0,4) === "ken.")
-            && (hostname.slice(hostname.length-13) === "spideroak.com")) {
+        if (hostname.slice(hostname.length-14) === ".spideroak.com") {
             generic.debug_proxying = true;
             generic.base_host_url = "https://" + hostname;
             generic.alt_host_replace = "https://web-dc2.spideroak.com";
