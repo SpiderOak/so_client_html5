@@ -108,7 +108,7 @@ resources collected in specific subdirs.
   by pointing your browser at locally situated file-system files, rather
   than ones on a web server, you have to specifically enable your
   cross-origin operation for your browser - see
-  `docs/HTML5ClientAppSameOriginIssues`)
+  [special browser provisions](/SpiderOak/so_client_html5/wiki/HTML5-Client-Code---Technical-Details#wiki-Special_Browser_Requirements).)
 
 * The `docs` subdirectory contains accumulated project documentation,
   including notably:
