@@ -108,15 +108,11 @@ resources collected in specific subdirs.
   by pointing your browser at locally situated file-system files, rather
   than ones on a web server, you have to specifically enable your
   cross-origin operation for your browser - see
-  [special browser provisions](/SpiderOak/so_client_html5/wiki/HTML5-Client-Code---Technical-Details#wiki-Special_Browser_Requirements).)
+  [special browser provisions](/SpiderOak/so_client_html5/wiki/HTML5-Client-Code-Technical-Details#wiki-Special_Browser_Requirements).)
 
 * The `docs` subdirectory contains accumulated project documentation,
-  including notably:
-
-  * `docs/AppOverview.txt`, describing architectural and other technical
-    details of the application
-  * `docs/HTML5ClientProject.txt`, an historical record of the tasks done
-    and planned, before the open source release
+  including notably [code technical details](/SpiderOak/so_client_html5/wiki/HTML5-Client-Code-Technical-Details), describing architectural and other aspects
+    of the application code (replacing `docs/AppOverview.txt`)
 
 * The `release_artifacts` subdirectory contains version-specific
   ingredients of builds, used by the build machinery (described next) to
