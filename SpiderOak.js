@@ -1758,15 +1758,21 @@ var spideroak = function () {
 
     ContentNode.prototype.layout_footer = function(mode_opts) {
         /* Populate the footer for this node. */
-        this.layout_footer_by_spec([{title: "My Stuff",
-                                     url: "#home",
+        this.layout_footer_by_spec([{title: "Mine",
+                                     url: ("#" + generic.combo_root_page_id),
                                      selector: "account",
-                                     transition: "slidedown",
+                                     transition: "slideup",
                                      icon_name: "so-account-footer"},
-                                    {title: "Recents",
-                                     url: "#recents",
+                                    {title: "Public",
+                                     url: ("#" +
+                                           generic.public_shares_root_page_id),
+                                     selector: "room_public",
+                                     transition: "slideup",
+                                     icon_name: "so-room_public"},
+                                    {title: "Recent",
+                                     url: ("#" + generic.recents_page_id),
                                      selector: "recents",
-                                     transition: "slidedown",
+                                     transition: "slideup",
                                      icon_name: "so-recents-footer"},
                                     ],
                                    mode_opts); }
