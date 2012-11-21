@@ -64,7 +64,7 @@ November, 2012:
   * Implement tests - real unit and functional tests
   * Implement hybrid provisions for Android as well as iOS,
   * Propagate full releases for both platforms.
-  * Convert code comments to [http://en.wikipedia.org/wiki/JSDoc JSDoc] or
+  * Convert code comments to [JSDoc](http://en.wikipedia.org/wiki/JSDoc) or
     other suitable smart-annotation format
   * Polish UI
 
@@ -160,5 +160,5 @@ resources collected in specific subdirs.
   PhoneGap build tools that have been imported into this repository.
   Currently we only have the iOS platform-specific build implemented.  We
   do not yet use the relatively new (as of initial writing) PhoneGap
-  resource that provides [https://build.phonegap.com/ cloud build services]
+  resource that provides [cloud build services](https://build.phonegap.com/)
   for all our concerned platforms.
