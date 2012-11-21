@@ -92,22 +92,35 @@
           <p class="compact-paragraph"/><!-- XXX -->
             <div class="ui-grid-a">
               <div class="ui-block-a" align="center">
-                <input type="submit" data-inline="true" data-theme="b"
-                       value="Login" name="Login">
+                <a data-role="button" href="#share-home" alt="Edit"
+                   data-theme="f" data-inline="true" data-mini="true">
+                  Go to Public Share Rooms
+                </a>
               </div>
               <div class="ui-block-b" align="left">
                 <div data-role="controlgroup">
-                  <select name="slider" class="remember"
-                          id="remember-me" data-role="slider"
-                          data-mini="true">
-	            <option value="off">Off</option default="true">
-	            <option value="on">On</option>
-                  </select><br/>
-                  <label for="remember-me">
-                    <small>
-                      Remember Me
-                    </small>
-                  </label>
+                  <table>
+                    <tr>
+                      <td>
+                        <input type="submit" data-inline="true" data-theme="b"
+                               value="Login" name="Login">
+                    </tr>
+                    <tr>
+                      <td>
+                        <select name="slider" class="remember"
+                                id="remember-me" data-role="slider"
+                                data-mini="true" data-inline="true">
+	                  <option value="off">Off</option default="true">
+	                  <option value="on">On</option>
+                        </select><br/>
+                        <label for="remember-me">
+                          <small>
+                            Remember Me
+                          </small>
+                        </label>
+                      </td>
+                    </tr>
+                  </table>
                 </div>
               </div>
             </div>
@@ -158,13 +171,6 @@
             </li>
           </ul>
  -->
-      </div>
-      <div id="other-rooms-button" class="other-no-content"
-           data-theme="f">
-        <a data-role="button" href="#share-home" alt="Edit" data-theme="f"
-           data-icon="plus" data-iconpos="right">
-          Go to Public Share Rooms
-        </a>
       </div>
     </div>
     <div data-role="footer" data-position="fixed" data-theme="a">

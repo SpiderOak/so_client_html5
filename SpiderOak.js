@@ -1307,15 +1307,20 @@ var spideroak = function () {
         var public_share_urls = public_share_room_urls_list();
         var $public_shares_nonempty = $page.find('.other-content');
         var $public_shares_empty = $page.find('.other-no-content');
-        // Show the section or the button depending on whether there's content:
-        if (public_share_urls.length === 0) {
-            $public_shares_nonempty.hide();
-            $public_shares_empty.show(); }
-        else {
-            $public_shares_empty.hide();
-            $public_shares_nonempty.show();
-            this.layout_content(mode_opts, public_share_urls, false,
-                                '.other-shares-list'); }
+        if ($public_shares_nonempty.length === 0) {
+            // There is any other-content section:
+            $public_shares_empty.show();
+        } else {
+            // Show section or button depending on whether there are elements:
+            if (public_share_urls.length === 0) {
+                $public_shares_nonempty.hide();
+                $public_shares_empty.show(); }
+            else {
+                $public_shares_empty.hide();
+                $public_shares_nonempty.show();
+                this.layout_content(mode_opts, public_share_urls, false,
+                                    '.other-shares-list'); }
+        }
 
         this.layout_footer(mode_opts); }
 
