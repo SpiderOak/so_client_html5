@@ -54,8 +54,10 @@ var spideroak = function () {
 
     /* ==== Object-wide settings ==== */
 
+    /**
+     * Settings not specific to a particular login session:
+     */
     var generic = {
-        /* Settings not specific to a particular login session: */
         // API v1.
         // XXX base_host_url may vary according to brand package.
         base_host_url: brand.base_host_url,
@@ -103,8 +105,10 @@ var spideroak = function () {
             generic.storage_path_prefix = "" + generic.storage_path_prefix;
             generic.shares_path_suffix = "" + generic.shares_path_suffix; }}
 
+    /**
+     * Login session settings.
+     */
     var my = {
-        /* Login session settings: */
         username: "",
         storage_host: null,
         storage_web_url: null,  // Location of storage web UI for user.
