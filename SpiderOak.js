@@ -63,7 +63,9 @@ var spideroak = function () {
         brand_images_dir: "brand_images",
         combo_root_url: "https://home",
         recents_url: "https://recents",
+        favorites_url: "https://favorites",
         combo_root_page_id: "home",
+        favorites_page_id: "favorites",
         recents_page_id: "recents",
         storage_root_page_id: "storage-home",
         original_shares_root_page_id: "original-home",
@@ -178,7 +180,7 @@ var spideroak = function () {
     function clear_storage_account() {
         /* Obliterate internal settings and all content nodes for a clean
            slate.  All share artifacts, original and other, are removed, as
-           well as registered storage and recents.  We do not remove
+           well as registered storage, recents, favorites.  We do not remove
            persistent settings. */
 
         if (my.original_shares_root_url) {
@@ -194,6 +196,7 @@ var spideroak = function () {
         my.storage_root_url = "";
 
         node_manager.free(node_manager.get_recents());
+        node_manager.free(node_manager.get_favorites());
         node_manager.free(node_manager.get_combo_root());
 
         my.username = "";
@@ -266,6 +269,8 @@ var spideroak = function () {
         return (url === my.combo_root_url); }
     function is_recents_url(url) {
         return (url === generic.recents_url); }
+    function is_favorites_url(url) {
+        return (url === generic.favorites_url); }
     function is_content_root_url(url) {
         /* True if the 'url' is for one of the root content items.  We
            split off any search fragment.  Doesn't depend on the url having
@@ -273,6 +278,7 @@ var spideroak = function () {
         url = url.split('?')[0];
         return ((url === my.combo_root_url)
                 || (url === generic.recents_url)
+                || (url === generic.favorites_url)
                 || (url === my.storage_root_url)
                 || (url === my.original_shares_root_url)
                 || (url === my.public_shares_root_url)); }
@@ -445,6 +451,25 @@ var spideroak = function () {
         delete this.files; }
     RecentContentsNode.prototype = new ContentNode();
 
+    /**
+     * "Favorite" items container.
+     *
+     * Contains "favorites" - items, selected by the user, for which locally
+     * cached copies are maintained.
+     *
+     * @constructor
+     * @this {FavoriteContentsNode}
+     * @param {string} url The (reserved, internal) address of the container.
+     * @param {ContentNode} parent The immediately containing item.
+     */
+    function FavoriteContentsNode(url, parent) {
+        ContentNode.call(this, url, parent);
+        this.emblem = "Not Yet Implemented: Favorites";
+        // We'll use subdirs for the items - we care not about the types:
+        this.items = this.subdirs;
+        delete this.files; }
+    FavoriteContentsNode.prototype = new ContentNode();
+
     function PublicRootShareNode(url, parent) {
         RootShareNode.call(this, url, parent);
         this.name = "Public Share Rooms";
@@ -570,11 +595,22 @@ var spideroak = function () {
             storage_root.visit(chngpg_opts, storage_mode_opts); }}
 
     RecentContentsNode.prototype.visit = function (chngpg_opts, mode_opts) {
-        /* Present the accumulated list of recently visited nodes. */
+        /* Present the accumulated list of recently visited items. */
 
         // (Could mode_opts.hasOwnProperty('action') for recents editing.)
 
         this.layout($.extend({no_dividers: true}, mode_opts));
+        this.show(chngpg_opts, mode_opts); }
+
+    /**
+     * Focus on the list of selected favorite items.
+     *
+     * @this {FavoriteContentsNode}
+     * @param {object} chngpg_opts $.mobile.changePage() options dictionary.
+     * @param {object} mode_opts Content and operation mode options dictionary.
+     */
+    FavoriteContentsNode.prototype.visit = function (chngpg_opts, mode_opts) {
+        this.layout(mode_opts);
         this.show(chngpg_opts, mode_opts); }
 
     PublicRootShareNode.prototype.visit = function (chngpg_opts, mode_opts) {
@@ -897,18 +933,56 @@ var spideroak = function () {
     // Whitelist this method for use as a mode_opts 'action':
     PublicRootShareNode.prototype.enlisted_room_menu.is_action = true;
 
+    /**
+     * Register a visit to a {@link ContentNode} address.
+     *
+     * @this {ContentsNode}
+     * @param {string} url The address of the ContentNode being registered.
+     */
     RecentContentsNode.prototype.add_visited_url = function (url) {
         /* Register a recent visit.  Omit our own address and any
            duplicates, disregarding query parameters. */
         url = url.split('?')[0];
-        if ((url !== this.url)) {
+        if ((url !== this.url)
+            && (! is_content_roster(node_manager.get(url)))) {
             var was = this.items.indexOf(url);
             if (was !== 0) {
                 // If the item isn't already the first.
                 if (was !== -1) {
                     this.items.splice(was, 1); }
                 this.items.unshift(url);
-                this.items.splice(generic.recents_max_size); }}}
+                // Truncate to max size, with no effect if not there:
+                this.items.splice(generic.recents_max_size);
+
+                // XXX Un-elide following to exercise favorites registration:
+                //node_manager.get_favorites().add_favorite_url(url);
+            }}}
+
+    /**
+     * Register a {@link ContentNode}'s address as a favorite.  Returns 1
+     * if added, else 0.
+     *
+     * Favorites are persistently tallied, and cached locally so they are
+     * available even when offline.  An Error is thrown if the item is
+     * already a favorite.  Not Yet Implemented: We should refuse to add
+     * items when that would exceed the favorites storage limit.
+     *
+     * @this {FavoriteContentsNode}
+     * @param {string} url The address of the ContentNode being added.
+     */
+    FavoriteContentsNode.prototype.add_favorite_url = function (url) {
+        url = url.split('?')[0];
+        /* XXX Check for capacity, overage, etc. */
+        if ((url !== this.url)) {
+            if (this.items.indexOf(url) !== -1) {
+                return 0
+            } else {
+                var cursor = 0;
+                while ((cursor < this.items.length)
+                       && (url > this.items[cursor])) {
+                    cursor += 1; }
+                this.items.splice(cursor, 0, url);
+                return 1; }}}
 
     PublicRootShareNode.prototype.add_item_external = function (credentials) {
         /* Visit a specified share room, according to 'credentials' object:
@@ -1309,7 +1383,8 @@ var spideroak = function () {
         var $public_shares_empty = $page.find('.other-no-content');
         if ($public_shares_nonempty.length === 0) {
             // There is any other-content section:
-            $public_shares_empty.show();
+            if ($public_shares_empty.length !== 0) {
+                $public_shares_empty.show(); }
         } else {
             // Show section or button depending on whether there are elements:
             if (public_share_urls.length === 0) {
@@ -1774,6 +1849,12 @@ var spideroak = function () {
                                      selector: "room_public",
                                      transition: "slideup",
                                      icon_name: "so-room_public"},
+                                    {title: "Favorites",
+                                     url: ("#" +
+                                           generic.favorites_page_id),
+                                     selector: "favorites",
+                                     transition: "slideup",
+                                     icon_name: "so-favorites"},
                                     {title: "Recent",
                                      url: ("#" + generic.recents_page_id),
                                      selector: "recents",
@@ -1889,7 +1970,7 @@ var spideroak = function () {
         $listview.empty();
 
         // refresh necessary so jQuery traversal stuff doesn't pass over:
-        if (! (this instanceof RecentContentsNode)) {
+        if (! is_content_roster(this)) {
             $listview.append(this.layout_item$($.extend({refresh: true,
                                                          icon: "refresh"},
                                                         mode_opts))); }
@@ -2053,6 +2134,7 @@ var spideroak = function () {
         // Cached references, for frequent access with impunity:
         var combo_root = null;
         var recents = null;
+        var favorites = null;
 
         /* Public */
         return {
@@ -2066,6 +2148,12 @@ var spideroak = function () {
                     recents = this.get(generic.recents_url,
                                        this.get_combo_root()); }
                 return recents; },
+
+            get_favorites: function () {
+                if (! favorites) {
+                    favorites = this.get(generic.favorites_url,
+                                         this.get_combo_root()); }
+                return favorites; },
 
             get: function (url, parent) {
                 /* Retrieve a node according to 'url'.
@@ -2084,6 +2172,8 @@ var spideroak = function () {
                             got = new RootContentNode(url, parent); }
                         else if (is_recents_url(url)) {
                             got = new RecentContentsNode(url, parent); }
+                        else if (is_favorites_url(url)) {
+                            got = new FavoriteContentsNode(url, parent); }
                         else if (url === my.storage_root_url) {
                             got = new RootStorageNode(url, parent); }
                         else if (url === my.original_shares_root_url) {
@@ -2493,7 +2583,7 @@ var spideroak = function () {
     }
 
 
-    /* ==== Boilerplate ==== */
+    /* ==== Boilerplate/Utility ==== */
 
     ContentNode.prototype.show_status_message = function (html, kind) {
         /* Inject 'html' into the page DOM as a status message. Optional
@@ -2549,6 +2639,18 @@ var spideroak = function () {
         noop: no_op,
     }
 
+    /**
+     * Return true if object is one of the content type rosters.
+     *
+     * Content type rosters are content-like objects used only to list
+     * actual content objects.
+     *
+     * @param {object} obj The object being evaluated.
+     */
+    function is_content_roster(obj) {
+        return ((obj instanceof RecentContentsNode)
+                || (obj instanceof FavoriteContentsNode)); }
+
     function internalize_url(obj) {
         /* Return the "internal" version of the 'url'.
 
@@ -2568,6 +2670,8 @@ var spideroak = function () {
             return generic.combo_root_url;
         case (generic.recents_page_id):
             return generic.recents_url;
+        case (generic.favorites_page_id):
+            return generic.favorites_url;
         case (generic.storage_root_page_id):
             return my.storage_root_url;
         case (generic.original_shares_root_page_id):
