@@ -75,6 +75,7 @@ var spideroak = function () {
         my_shares_root_page_id: "my-shares",
         public_shares_root_page_id: "public-shares",
         content_page_template_id: "content-page-template",
+        settings_page_template_id: "settings-page-template",
         storage_login_path: "/browse/login",
         storage_logout_suffix: "logout",
         storage_path_prefix: "/storage/",
@@ -364,39 +365,45 @@ var spideroak = function () {
             this.$page.remove();
             this.$page = null; }}
 
+    /**
+     * UI panel pages that present specific sets of options or item details.
+     *
+     * Panels are used to present settings options or detailed information
+     * about individual content items.
+     *
+     * @constructor
+     * @this {PanelNode}
+     * @param {string} url The (reserved, internal) address of this panel.
+     * @param {ContentNode} parent The immediately containing panel or item.
+     */
     function PanelNode(url, parent) {
-        /* Constructor for items representing application interface items.
-           - 'url' is absolute URL for the collection's root (top) node.
-           - 'parent' is containing node. The root's parent is null.
-        */
-        if ( !(this instanceof PanelNode) ) {      // Coding failsafe.
-            throw new Error("Constructor called as a function");
-        }
+        Node.call(this, url, parent);
         if (url) {             // Skip if we're in prototype assignment.
-            this.url = url;
-            this.name = "";
-            this.root_url = parent.root_url;
-            this.parent_url = parent ? parent.url : null;
-            this.subdirs = [];  // Sub-panels
-            this.files = [];    // Individual settings items
             this.$page = null;  // This node's jQuery-ified DOM data-role="page"
+            this.query_qualifier = "";
+            this.subdirs = [];  // Sub-panels
             this.emblem = "";   // At least for debugging/.toString()
             this.icon_path = ""; }}
-    ContentNode.prototype = new Node();
+    PanelNode.prototype = new Node();
 
 
-    /* ContentNodes represent service-managed content. That includes
-       distinct manifestations of storage (backups) content and share
-       rooms. Content-specific roots encompass the various remote content
-       collections.  An extrapolated RootContentNode, aka the "combo root",
-       consolidates them all. */
-
+    /**
+     * Items that represent remote, service-managed content.
+     *
+     * ContentNodes represent service-managed content. That includes
+     * distinct manifestations of storage (backups) content and share
+     * rooms. Content-specific roots encompass the various remote content
+     * collections.  An extrapolated RootContentNode, aka the "combo root",
+     * consolidates them all.
+     *
+     * See JSON data examples in docs/api_json_examples.txt
+     *
+     * @constructor
+     * @this {ContentNode}
+     * @param {string} url The address of the remote content item.
+     * @param {ContentNode} parent The immediately containing item.
+     */
     function ContentNode(url, parent) {
-        /* Constructor for items representing service-managed content.
-           - 'url' is absolute URL for the collection's root (top) node.
-           - 'parent' is containing node. The root's parent is null.
-           See JSON data examples in docs/api_json_examples.txt
-        */
         Node.call(this, url, parent);
         if (url) {             // Skip if we're in prototype assignment.
             this.query_qualifier = "";
@@ -479,6 +486,23 @@ var spideroak = function () {
         delete this.files; }
     FavoriteContentsNode.prototype = new ContentNode();
 
+    /**
+     * "Settings" panel.
+     *
+     * Contains user-elected configuration options.
+     *
+     * @constructor
+     * @this {SettingsPanelNode}
+     * @param {string} url The (reserved, internal) address of this panel.
+     * @param {ContentNode} parent The immediately containing item.
+     */
+    function SettingsPanelNode(url, parent) {
+        PanelNode.call(this, url, parent);
+        this.emblem = "Not Yet Implemented: Settings";
+        // We'll use subdirs for the items - we care not about the types:
+        this.items = this.subdirs; }
+    SettingsPanelNode.prototype = new PanelNode();
+
     function PublicRootShareNode(url, parent) {
         RootShareNode.call(this, url, parent);
         this.name = "Public Share Rooms";
@@ -545,8 +569,36 @@ var spideroak = function () {
     DeviceStorageNode.prototype.is_device = function() {
         return true; }
 
+    /* ===== Panel access ==== */
+
+    /**
+     * Constitute and present a panel item.
+     *
+     * @this {PanelNode}
+     * @param {object} chngpg_opts $.mobile.changePage() options dictionary.
+     * @param {object} mode_opts Content and operation mode options dictionary.
+    */
+    PanelNode.prototype.visit = function (chngpg_opts, mode_opts) {
+        this.layout(mode_opts);
+        this.show(chngpg_opts, mode_opts); }
+
+    PanelNode.prototype.layout = function (chngpg_opts, mode_opts) {
+        // XXX Fill current settings values.
+        }
+
     /* ===== Remote data access ==== */
 
+    /**
+     * Constitute and present a remote data item.
+     *
+     * Fetch current data from server, provision, layout, and present.
+     * 'chngpg_opts': framework changePage() options, 'mode_opts': node
+     * provisioning and layout modal settings.
+     *
+     * @this {ContentNode}
+     * @param {object} chngpg_opts $.mobile.changePage() options dictionary.
+     * @param {object} mode_opts Content and operation mode options dictionary.
+    */
     ContentNode.prototype.visit = function (chngpg_opts, mode_opts) {
         /* Fetch current data from server, provision, layout, and present.
            'chngpg_opts': framework changePage() options,
@@ -1302,7 +1354,7 @@ var spideroak = function () {
 
     /* ==== Content node page presentation ==== */
 
-    ContentNode.prototype.my_page_id = function () {
+    Node.prototype.my_page_id = function () {
         /* Set the UI page id, escaping special characters as necessary. */
         return this.url; }
     RootContentNode.prototype.my_page_id = function () {
@@ -1313,7 +1365,8 @@ var spideroak = function () {
         return generic.my_shares_root_page_id; }
     PublicRootShareNode.prototype.my_page_id = function () {
         return generic.public_shares_root_page_id; }
-    ContentNode.prototype.show = function (chngpg_opts, mode_opts) {
+
+    Node.prototype.show = function (chngpg_opts, mode_opts) {
         /* Trigger UI focus on our content layout.
            If mode_opts "passive" === true, don't do a changePage.
          */
@@ -1652,7 +1705,7 @@ var spideroak = function () {
         $list.listview("refresh");
         return $page; }
 
-    ContentNode.prototype.layout_item$ = function(mode_opts) {
+    Node.prototype.layout_item$ = function(mode_opts) {
         /* Return a jQuery object with the basic content item layout. */
         var $anchor = $('<a/>').attr('class', "crushed-vertical item-url");
         var href;
@@ -1869,13 +1922,19 @@ var spideroak = function () {
                                      selector: "recents",
                                      transition: "slideup",
                                      icon_name: "so-recents-footer"},
+                                    {title: "Settings",
+                                     url: ("#" +
+                                           generic.settings_page_id),
+                                     selector: "settings",
+                                     transition: "slideup",
+                                     icon_name: "so-settings"},
                                     ],
                                    mode_opts); }
 
-    ContentNode.prototype.my_page_from_dom$ = function () {
+    Node.prototype.my_page_from_dom$ = function () {
         /* Return a jquery DOM search for my page, by id. */
         return $('#' + fragment_quote(this.my_page_id())); }
-    ContentNode.prototype.my_page$ = function (reinit) {
+    Node.prototype.my_page$ = function (reinit) {
         /* Return this node's jQuery page object, producing if not present.
 
            Optional 'reinit' means to discard existing page, if any,
@@ -1888,12 +1947,12 @@ var spideroak = function () {
             this.$page.remove();
             delete this.$page; }
         if (! this.$page) {
-            var $template = this.get_storage_page_template$();
+            var $template = this.get_page_template$();
             if (! $template) {
                 error_alert("Missing markup",
                             "Expected page #"
-                            + generic.content_page_template_id
-                            + " not present."); }
+                            + this.my_page_id()
+                            + " not found."); }
             this.$page = $template.clone();
             this.$page.attr('id', this.my_page_id());
             this.$page.attr('data-url', this.my_page_id());
@@ -1916,10 +1975,13 @@ var spideroak = function () {
         /* Return this node's jQuery contents listview object.
            Optional 'selector' is used, otherwise '.content-items'. */
         return this.my_page$().find(selector || '.content-items'); }
-    ContentNode.prototype.get_storage_page_template$ = function() {
+    ContentNode.prototype.get_page_template$ = function() {
         return $("#" + generic.content_page_template_id); }
 
-    ContentNode.prototype.my_icon_image$ = function(image_class) {
+    SettingsPanelNode.prototype.get_page_template$ = function() {
+        return $("#" + generic.settings_page_template_id); }
+
+    Node.prototype.my_icon_image$ = function(image_class) {
         /* Return this item's icon image element, with 'image_class'.
            Return null if this item has no icon.
 
@@ -1944,6 +2006,8 @@ var spideroak = function () {
         return FileContentNode.prototype.my_icon_path.call(this); }
     ContentNode.prototype.my_icon_path = function() {
         return generic.icons_dir + "/folder.png"; }
+    SettingsPanelNode.prototype.my_icon_path = function() {
+        return generic.icons_dir + "/settings.png"; }
     DeviceStorageNode.prototype.my_icon_path = function() {
         return generic.icons_dir + "/device.png"; }
     RoomShareNode.prototype.my_icon_path = function() {
@@ -2190,6 +2254,8 @@ var spideroak = function () {
                             got = new RecentContentsNode(url, parent); }
                         else if (is_favorites_url(url)) {
                             got = new FavoriteContentsNode(url, parent); }
+                        else if (is_settings_url(url)) {
+                            got = new SettingsPanelNode(url, parent); }
                         else if (url === my.storage_root_url) {
                             got = new RootStorageNode(url, parent); }
                         else if (url === my.my_shares_root_url) {
@@ -2663,9 +2729,10 @@ var spideroak = function () {
      *
      * @param {object} obj The object being evaluated.
      */
-    function is_content_roster(obj) {
+    function is_noncontent_node(obj) {
         return ((obj instanceof RecentContentsNode)
-                || (obj instanceof FavoriteContentsNode)); }
+                || (obj instanceof FavoriteContentsNode)
+                || (obj instanceof PanelNode)); }
 
     function internalize_url(obj) {
         /* Return the "internal" version of the 'url'.
@@ -2688,6 +2755,8 @@ var spideroak = function () {
             return generic.recents_url;
         case (generic.favorites_page_id):
             return generic.favorites_url;
+        case (generic.settings_page_id):
+            return generic.settings_url;
         case (generic.storage_root_page_id):
             return my.storage_root_url;
         case (generic.my_shares_root_page_id):

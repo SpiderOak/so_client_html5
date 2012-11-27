@@ -331,6 +331,86 @@
     </div>
   </div>
 
+  <div data-role="page" id="settings-page-template">
+    <div data-role="header" data-position="fixed" data-theme="f">
+      <a href="#home" data-icon="so-carat-l" data-role="button"
+         data-mini="true" class="back-button"
+         data-transition="slide" alt="My Stuff">
+        My Stuff</a>
+      <h3 class="header-title" data-theme="f"> Settings </h3>
+    </div>
+    <div data-role="content">
+      <div class="nav-settings-form">
+        <form method="POST" class="settings-form">
+          <div data-role="collapsible" data-mini="true" data-theme="f"
+               data-collapsed-icon="arrow-r" data-expanded-icon="arrow-d">
+            <legend> Settings </legend>
+            <p> General Settings </p>
+          </div>
+          <table>
+            <tr>
+              <td> <img src="icons/room_public.png"
+                        class="form-icon">
+              </td>
+              <td width="100%">
+                <ul data-role="listview" data-inset="true">
+                  <li data-role="fieldcontain" class="ui-hide-label"
+                      data-theme="d">
+                    <label for="my_share_id">Share ID:</label>
+                    <input type="text" name="shareid" id="my_share_id"
+                           autocapitalize="off" autocorrect="off"
+                           placeholder="Share ID"
+                           value data-theme="a">
+                    <label for="my_login_password">Password:</label>
+                    <input type="password" name="password"
+                           id="my_login_password"
+                           placeholder="Share Key">
+                  </li>
+                </ul>
+              </td>
+            </tr>
+          </table>
+          <div class="ui-grid-a" data-theme="a">
+            <div class="ui-block-b" align="center">
+              <input type="submit" data-inline="true" value="Visit"
+                     name="Login" data-theme="b"/>
+            </div>
+            <div class="ui-block-b" align="left">
+                <div data-role="controlgroup">
+                  <select name="slider" id="retain-visit" class="remember"
+                          data-role="slider"
+                          data-mini="true">
+	            <option value="off">Off</option default="true">
+	            <option value="on">On</option>
+                  </select><br/>
+                  <label for="retain-visit">
+                    <small>
+                      Persistent visit
+                    </small>
+                  </label>
+                </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div data-role="collapsible" data-mini="true" class="adjust-spiel"
+           data-theme="f"
+           data-collapsed-icon="arrow-r" data-expanded-icon="arrow-d">
+        <legend> Default Account </legend>
+        <p> Auto-visited account </p>
+      </div>
+      <hr class="page-content"/>
+      <ul class="content-items page-content" data-role="listview">
+      </ul>
+    </div>
+    <div data-role="footer" data-position="fixed" data-theme="a">
+      <div data-role="navbar">
+        <ul>
+        </ul>
+      </div>
+    </div>
+  </div>
+
   <div data-role="page" id="about-mystuff" data-theme="c">
     <div data-role="header" data-position="fixed" data-theme="f">
       <a alt="About 'My Stuff'" data-role="button" data-mini="true"
