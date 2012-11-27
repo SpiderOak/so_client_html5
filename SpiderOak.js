@@ -583,7 +583,13 @@ var spideroak = function () {
         this.show(chngpg_opts, mode_opts); }
 
     PanelNode.prototype.layout = function (chngpg_opts, mode_opts) {
-        // XXX Fill current settings values.
+        /* Deploy options page. */
+        this.layout_header(mode_opts);
+        this.layout_options(mode_opts);
+        this.layout_footer(mode_opts);
+    }
+
+    PanelNode.prototype.layout_options = function (mode_opts) {
         }
 
     /* ===== Remote data access ==== */
@@ -1461,7 +1467,7 @@ var spideroak = function () {
 
         this.layout_footer(mode_opts); }
 
-    ContentNode.prototype.layout_header = function(mode_opts) {
+    Node.prototype.layout_header = function(mode_opts) {
         /* Do the essential, common header layout.  If mode_opts
            'alt_page_selector' is passed in, alter that one instead of the
            node's default page. */
@@ -1483,7 +1489,7 @@ var spideroak = function () {
             fields.left_label = container.name; }
         this.layout_header_fields(fields); }
 
-    ContentNode.prototype.layout_header_fields = function(fields) {
+    Node.prototype.layout_header_fields = function(fields) {
         /* Generalized header layout facility.
 
            Populate this node's page header with fields settings:
@@ -1820,7 +1826,7 @@ var spideroak = function () {
                 = logout_link_button.bind(this); }
         return FolderContentNode.prototype.layout_item$.call(this, mode_opts); }
 
-    ContentNode.prototype.layout_footer_by_spec = function(spec_array,
+    Node.prototype.layout_footer_by_spec = function(spec_array,
                                                            mode_opts) {
         /* Populate the nodes' footer according to a 'spec_array', so that
            the specific items in the produced footer can subsequently be
@@ -1870,7 +1876,7 @@ var spideroak = function () {
         $navbar = $footer.find('[data-role="navbar"]');
         $navbar.navbar(); }
 
-    ContentNode.prototype.change_footer_item = function(selector,
+    Node.prototype.change_footer_item = function(selector,
                                                         spec,
                                                         mode_opts) {
         /* Alter a footer item identified by 'selector', applying 'spec'.
@@ -1898,7 +1904,7 @@ var spideroak = function () {
                 $target_li.find('a').attr('data-icon', spec.icon_name) }
             $navbar.navbar(); }}
 
-    ContentNode.prototype.layout_footer = function(mode_opts) {
+    Node.prototype.layout_footer = function(mode_opts) {
         /* Populate the footer for this node. */
         this.layout_footer_by_spec([{title: "Mine",
                                      url: ("#" + generic.combo_root_page_id),
@@ -2019,12 +2025,12 @@ var spideroak = function () {
     RootContentNode.prototype.my_icon_path = function () {
         return generic.brand_images_dir + "/brand_logo.png"; }
 
-    ContentNode.prototype.here = function () {
+    Node.prototype.here = function () {
         /* Return the complete address of this content node, as part of the
            application code, not just its JSON url.  */
         return window.location.href.split('#')[0] + '#' + this.url; }
 
-    ContentNode.prototype.title = function () {
+    Node.prototype.title = function () {
         return this.name || (is_compact_mode() ? brand.label : this.emblem); }
 
     RootContentNode.prototype.title = function () {
@@ -2032,7 +2038,7 @@ var spideroak = function () {
 
     /* ===== Popup Menus ===== */
 
-    ContentNode.prototype.depth_path_menu = function(event) {
+    Node.prototype.depth_path_menu = function(event) {
         /* Popup a menu showing from the containment navigation with more
            distant further down. Include a link to logout. */
 
