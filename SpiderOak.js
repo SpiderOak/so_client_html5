@@ -583,7 +583,7 @@ var spideroak = function () {
         var public_mode_opts = {passive: true,
                                 notify_callback:
                                     this.notify_subvisit_status.bind(this),
-                                notify_token: 'public-shares'};
+                                notify_token: 'public-shares-token'};
         $.extend(public_mode_opts, mode_opts);
         var public_root = nmgr.get(my.public_shares_root_url);
         public_root.visit(chngpg_opts, public_mode_opts);
@@ -598,7 +598,7 @@ var spideroak = function () {
             var storage_root = node_manager.get(my.storage_root_url, this);
             // Use a distinct copy of mode_opts:
             var storage_mode_opts = $.extend({}, public_mode_opts);
-            storage_mode_opts.notify_token = 'storage';
+            storage_mode_opts.notify_token = 'storage-token';
             // Will chain to original shares via notify_callback.
             $.mobile.loading('show');
             storage_root.visit(chngpg_opts, storage_mode_opts); }}
@@ -694,11 +694,11 @@ var spideroak = function () {
            'token': token they were passed to identify the transaction,
            'response': on failure: the resulting XHR object. */
 
-        if (token !== 'public-shares') {
+        if (token !== 'public-shares-token') {
             this.authenticated(true); }
 
         var $page = this.my_page$();
-        var selector = ((token === 'storage')
+        var selector = ((token === 'storage-token')
                         ? "#my-storage-leader"
                         : "#my-rooms-leader")
         var $leader = $(selector);
@@ -712,7 +712,7 @@ var spideroak = function () {
             // Unnecessary relayout of header and footer is future-proofing:
             this.layout();
 
-            if (token === 'storage') {
+            if (token === 'storage-token') {
                 // Ensure we're current page and chain to original shares root.
 
                 this.layout({}, {});
@@ -721,7 +721,7 @@ var spideroak = function () {
                 var our_mode_opts = {passive: true,
                                      notify_callback:
                                        this.notify_subvisit_status.bind(this),
-                                     notify_token: 'myshare-share'};
+                                     notify_token: 'myshares-token'};
                 this.authenticated(true, response);
                 var ps_root = nmgr.get(my.my_shares_root_url, this);
                 ps_root.visit({}, our_mode_opts); }
