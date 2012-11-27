@@ -66,17 +66,19 @@ var spideroak = function () {
         combo_root_url: "https://home",
         recents_url: "https://recents",
         favorites_url: "https://favorites",
+        settings_url: "https://settings",
         combo_root_page_id: "home",
-        favorites_page_id: "favorites",
         recents_page_id: "recents",
+        favorites_page_id: "favorites",
+        settings_page_id: "settings",
         storage_root_page_id: "storage-home",
-        original_shares_root_page_id: "original-home",
-        public_shares_root_page_id: "share-home",
+        my_shares_root_page_id: "my-shares",
+        public_shares_root_page_id: "public-shares",
         content_page_template_id: "content-page-template",
         storage_login_path: "/browse/login",
         storage_logout_suffix: "logout",
         storage_path_prefix: "/storage/",
-        original_shares_path_suffix: "shares",
+        my_shares_path_suffix: "shares",
         shares_path_suffix: "/share/",
         devices_query_expression: 'device_info=yes',
         versions_query_expression: 'format=version_info',
@@ -113,7 +115,7 @@ var spideroak = function () {
         storage_host: null,
         storage_web_url: null,  // Location of storage web UI for user.
         storage_root_url: null,
-        original_shares_root_url: null,
+        my_shares_root_url: null,
         // All the service's actual shares reside within:
         public_shares_root_url: generic.base_host_url + "/share/",
         original_share_room_urls: {},
@@ -184,16 +186,16 @@ var spideroak = function () {
     function clear_storage_account() {
         /* Obliterate internal settings and all content nodes for a clean
            slate.  All share artifacts, original and other, are removed, as
-           well as registered storage, recents, favorites.  We do not remove
-           persistent settings. */
+           well as registered storage, recents, favorites, settings.  We do
+           not remove persistent settings. */
 
-        if (my.original_shares_root_url) {
-            var original_shares_root = nmgr.get(my.original_shares_root_url);
+        if (my.my_shares_root_url) {
+            var my_shares_root = nmgr.get(my.my_shares_root_url);
             original_share_room_urls_list().map(
-                original_shares_root.clear_item)
+                my_shares_root.clear_item)
             // remove_item, above, frees the rooms and contents.
-            nmgr.free(original_shares_root); }
-        my.original_shares_root_url = "";
+            nmgr.free(my_shares_root); }
+        my.my_shares_root_url = "";
 
         if (my.storage_root_url) {
             node_manager.clear_hierarchy(my.storage_root_url); }
@@ -201,6 +203,7 @@ var spideroak = function () {
 
         node_manager.free(node_manager.get_recents());
         node_manager.free(node_manager.get_favorites());
+        node_manager.free(node_manager.get_settings());
         node_manager.free(node_manager.get_combo_root());
 
         my.username = "";
@@ -238,15 +241,15 @@ var spideroak = function () {
                                + base32.encode_trim(username)
                                + "/");
         // Original root is determined by storage root:
-        register_original_shares_root();
+        register_my_shares_root();
 
         return my.storage_root_url; }
 
-    function register_original_shares_root() {
+    function register_my_shares_root() {
         /* Identify original share rooms root url. Depends on established
            storage root.  Return the url. */
-        my.original_shares_root_url =
-            (my.storage_root_url + generic.original_shares_path_suffix); }
+        my.my_shares_root_url =
+            (my.storage_root_url + generic.my_shares_path_suffix); }
     function register_public_share_room_url(url) {
         /* Include url among the registered share rooms.  Returns the url. */
         generic.public_share_room_urls[url] = true;
@@ -275,6 +278,8 @@ var spideroak = function () {
         return (url === generic.recents_url); }
     function is_favorites_url(url) {
         return (url === generic.favorites_url); }
+    function is_settings_url(url) {
+        return (url === generic.settings_url); }
     function is_content_root_url(url) {
         /* True if the 'url' is for one of the root content items.  We
            split off any search fragment.  Doesn't depend on the url having
@@ -283,8 +288,9 @@ var spideroak = function () {
         return ((url === my.combo_root_url)
                 || (url === generic.recents_url)
                 || (url === generic.favorites_url)
+                || (url === generic.settings_url)
                 || (url === my.storage_root_url)
-                || (url === my.original_shares_root_url)
+                || (url === my.my_shares_root_url)
                 || (url === my.public_shares_root_url)); }
     function is_share_room_url(url) {
         /* True if the 'url' is for one of the familiar share rooms.
@@ -371,10 +377,9 @@ var spideroak = function () {
             this.name = "";
             this.root_url = parent.root_url;
             this.parent_url = parent ? parent.url : null;
-            this.subdirs = [];  // Urls of contained devices, folders.
-            this.files = [];    // Urls of contained files.
+            this.subdirs = [];  // Sub-panels
+            this.files = [];    // Individual settings items
             this.$page = null;  // This node's jQuery-ified DOM data-role="page"
-            this.lastfetched = false;
             this.emblem = "";   // At least for debugging/.toString()
             this.icon_path = ""; }}
     ContentNode.prototype = new Node();
@@ -463,7 +468,7 @@ var spideroak = function () {
      *
      * @constructor
      * @this {FavoriteContentsNode}
-     * @param {string} url The (reserved, internal) address of the container.
+     * @param {string} url The (reserved, internal) address of this container.
      * @param {ContentNode} parent The immediately containing item.
      */
     function FavoriteContentsNode(url, parent) {
@@ -716,9 +721,9 @@ var spideroak = function () {
                 var our_mode_opts = {passive: true,
                                      notify_callback:
                                        this.notify_subvisit_status.bind(this),
-                                     notify_token: 'original-share'};
+                                     notify_token: 'myshare-share'};
                 this.authenticated(true, response);
-                var ps_root = nmgr.get(my.original_shares_root_url, this);
+                var ps_root = nmgr.get(my.my_shares_root_url, this);
                 ps_root.visit({}, our_mode_opts); }
             else {
                 if (this.veiled) {
@@ -1123,7 +1128,7 @@ var spideroak = function () {
         return [].concat(this.subdirs, this.files); }
     RootContentNode.prototype.contained_urls = function () {
         return [].concat(this.storage_devices,
-                         this.original_shares, this.shares); }
+                         this.my_shares, this.shares); }
     RootStorageNode.prototype.contained_urls = function () {
         return [].concat(this.subdirs); }
     FileStorageNode.prototype.contained_urls = function () {
@@ -1305,7 +1310,7 @@ var spideroak = function () {
     RootStorageNode.prototype.my_page_id = function () {
         return generic.storage_root_page_id; }
     OriginalRootShareNode.prototype.my_page_id = function () {
-        return generic.original_shares_root_page_id; }
+        return generic.my_shares_root_page_id; }
     PublicRootShareNode.prototype.my_page_id = function () {
         return generic.public_shares_root_page_id; }
     ContentNode.prototype.show = function (chngpg_opts, mode_opts) {
@@ -1374,8 +1379,8 @@ var spideroak = function () {
                             '.storage-list');
 
         // My share rooms section:
-        var myshares_subdirs = (my.original_shares_root_url
-                                && node_manager.get(my.original_shares_root_url,
+        var myshares_subdirs = (my.my_shares_root_url
+                                && node_manager.get(my.my_shares_root_url,
                                                     this).subdirs
                                 || [])
         this.layout_content(mode_opts, myshares_subdirs, false,
@@ -1508,8 +1513,8 @@ var spideroak = function () {
         StorageNode.prototype.layout_header.call(this, mode_opts);
 
         var $page = this.my_page$();
-        $page.find('.original_shares_root_url')
-            .attr('href', '#' + my.original_shares_root_url);
+        $page.find('.my_shares_root_url')
+            .attr('href', '#' + my.my_shares_root_url);
         $page.find('.public_shares_root_url')
             .attr('href', '#' + my.public_shares_root_url);
         var $emptiness_message = $page.find('.emptiness-message');
@@ -1578,7 +1583,7 @@ var spideroak = function () {
                                     '#' + my.storage_root_url);
             var $originals = $('#my-rooms-leader');
             $originals.find('a').attr('href',
-                                      '#' + my.original_shares_root_url); }}
+                                      '#' + my.my_shares_root_url); }}
 
     ContentNode.prototype.layout_content = function (mode_opts,
                                                      subdirs,
@@ -2139,6 +2144,7 @@ var spideroak = function () {
         var combo_root = null;
         var recents = null;
         var favorites = null;
+        var settings = null;
 
         /* Public */
         return {
@@ -2157,6 +2163,12 @@ var spideroak = function () {
                 if (! favorites) {
                     favorites = this.get(generic.favorites_url,
                                          this.get_combo_root()); }
+                return favorites; },
+
+            get_settings: function () {
+                if (! settings) {
+                    settings = this.get(generic.settings_url,
+                                        this.get_combo_root()); }
                 return favorites; },
 
             get: function (url, parent) {
@@ -2180,7 +2192,7 @@ var spideroak = function () {
                             got = new FavoriteContentsNode(url, parent); }
                         else if (url === my.storage_root_url) {
                             got = new RootStorageNode(url, parent); }
-                        else if (url === my.original_shares_root_url) {
+                        else if (url === my.my_shares_root_url) {
                             got = new OriginalRootShareNode(url, parent); }
                         else if (url === my.public_shares_root_url) {
                             got = new PublicRootShareNode(url, parent); }
@@ -2678,8 +2690,8 @@ var spideroak = function () {
             return generic.favorites_url;
         case (generic.storage_root_page_id):
             return my.storage_root_url;
-        case (generic.original_shares_root_page_id):
-            return my.original_shares_root_url;
+        case (generic.my_shares_root_page_id):
+            return my.my_shares_root_url;
         case (generic.public_shares_root_page_id):
             return my.public_shares_root_url;
         default: return obj; }}
