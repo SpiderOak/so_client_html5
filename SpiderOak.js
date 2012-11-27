@@ -1005,7 +1005,7 @@ var spideroak = function () {
            duplicates, disregarding query parameters. */
         url = url.split('?')[0];
         if ((url !== this.url)
-            && (! is_content_roster(node_manager.get(url)))) {
+            && (! is_noncontent_node(node_manager.get(url)))) {
             var was = this.items.indexOf(url);
             if (was !== 0) {
                 // If the item isn't already the first.
@@ -2043,7 +2043,7 @@ var spideroak = function () {
         $listview.empty();
 
         // refresh necessary so jQuery traversal stuff doesn't pass over:
-        if (! is_content_roster(this)) {
+        if (! is_noncontent_node(this)) {
             $listview.append(this.layout_item$($.extend({refresh: true,
                                                          icon: "refresh"},
                                                         mode_opts))); }
