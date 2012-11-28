@@ -505,8 +505,8 @@ var spideroak = function () {
 
     function PublicRootShareNode(url, parent) {
         RootShareNode.call(this, url, parent);
-        this.name = "Public Share Rooms";
-        this.emblem = "Public Share Rooms";
+        this.name = "Visited Share Rooms";
+        this.emblem = "Visited Share Rooms";
         this.job_id = 0; }
     OriginalRootShareNode.prototype = new RootShareNode();
     function OriginalRootShareNode(url, parent) {
