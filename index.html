@@ -124,27 +124,30 @@
         </form>
       </div>
       <div class="content-section">
-          <ul data-role="listview" class="my-content-section my-content">
-            <li data-theme="f" id="my-storage-leader" data-icon="info">
-              <a alt="Storage Details" href="#" data-icon="none"
-                 class="compact-vertical">
-                My Storage: </a>
-            </li>
-          </ul>
+          <div data-role="collapsible" data-theme="f"
+               data-inset="false" data-mini="true" data-collapsed="true"
+               data-collapsed-icon="arrow-r" data-expanded-icon="arrow-d">
+                <legend> My Storage </legend>
+                <p> Devices that are configured for backup by your
+                  <span class="brand-title"> SpiderOak </span> account.
+                </p>
+          </div>
           <ul data-role="listview" class="storage-list my-content"
               data-theme="c">
             <li align="center">
               <p> <em> &empty; / Fetching... </em> </p>
             </li>
           </ul>
-          <ul data-role="listview" class="my-content-section my-content">
-            <li id="my-rooms-leader"
-                data-theme="f" data-icon="info">
-              <a class="compact-vertical" alt="Original share rooms details"
-                 data-icon="info">
-                My Share Rooms: </a>
-            </li>
-          </ul>
+          <div data-role="collapsible" data-mini="true" data-theme="f"
+               data-inset="false"
+               data-collapsed-icon="arrow-r" data-expanded-icon="arrow-d">
+            <legend> My Share Rooms </legend>
+            <p> Share Rooms you have selected to be made available from
+              your <span class="brand-title"> SpiderOak </span> account's
+              backup.  People visit a Share Room by using its
+              Share ID and Room Key.
+            </p>
+          </div>
           <ul data-role="listview" class="my-shares-list my-content"
               data-theme="c">
             <li align="center">
