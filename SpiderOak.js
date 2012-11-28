@@ -1426,7 +1426,6 @@ var spideroak = function () {
         var $page = this.my_page$();
 
         this.layout_header(chngpg_opts, mode_opts);
-        this.link_to_roots(chngpg_opts, mode_opts);
         // Storage content section:
         // We avoid doing layout of these when not authenticated so the
         // re-presentation of the hidden sections doesn't show through.
@@ -1630,22 +1629,6 @@ var spideroak = function () {
                                                          "mode", "edit"),
                       'right_label': "Edit"};
         this.layout_header_fields(fields); }
-
-    RootContentNode.prototype.link_to_roots = function (chngpg_opts, mode_opts){
-        /* Link section headers to the variable root nodes, if the storage
-           root is known. (The public root address is static, so hard-coded
-           in the HTML.) */
-
-        if (my.storage_root_url) {
-            // XXX Remove completely when we've made section dividers static
-            var $storage = $('#my-storage-leader');
-            //$storage.find('a').attr('href',
-            //                        '#' + my.storage_root_url);
-            $storage.find('a').removeAttr('href');
-            var $originals = $('#my-rooms-leader');
-            //$originals.find('a').attr('href',
-            //                          '#' + my.my_shares_root_url); }}
-            $originals.find('a').removeAttr('href'); }}
 
     ContentNode.prototype.layout_content = function (mode_opts,
                                                      subdirs,
