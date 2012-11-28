@@ -1906,12 +1906,12 @@ var spideroak = function () {
 
     Node.prototype.layout_footer = function(mode_opts) {
         /* Populate the footer for this node. */
-        this.layout_footer_by_spec([{title: "Mine",
+        this.layout_footer_by_spec([{title: "My Stuff",
                                      url: ("#" + generic.combo_root_page_id),
                                      selector: "account",
                                      transition: "slideup",
                                      icon_name: "so-account-footer"},
-                                    {title: "Public",
+                                    {title: "Anyone's",
                                      url: ("#" +
                                            generic.public_shares_root_page_id),
                                      selector: "room_public",
