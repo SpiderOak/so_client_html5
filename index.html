@@ -125,8 +125,10 @@
       </div>
       <div class="content-section">
           <ul data-role="listview" class="my-content-section my-content">
-            <li data-theme="f" id="my-storage-leader">
-                My Storage
+            <li data-theme="f" id="my-storage-leader" data-icon="info">
+              <a alt="Storage Details" href="#" data-icon="none"
+                 class="compact-vertical">
+                My Storage: </a>
             </li>
           </ul>
           <ul data-role="listview" class="storage-list my-content"
@@ -137,8 +139,10 @@
           </ul>
           <ul data-role="listview" class="my-content-section my-content">
             <li id="my-rooms-leader"
-                data-theme="f">
-                My Share Rooms
+                data-theme="f" data-icon="info">
+              <a class="compact-vertical" alt="Original share rooms details"
+                 data-icon="info">
+                My Share Rooms: </a>
             </li>
           </ul>
           <ul data-role="listview" class="my-shares-list my-content"
@@ -237,10 +241,6 @@
 
   <div data-role="page" id="public-shares">
     <div data-role="header" data-position="fixed" data-theme="f">
-      <a href="#home" data-icon="so-carat-l" data-role="button"
-         data-mini="true" class="back-button"
-         data-transition="slide" alt="My Stuff">
-        My Stuff</a>
       <h3 class="header-title" data-theme="f"> Share Rooms </h3>
     </div>
     <div data-role="content">
@@ -308,8 +308,8 @@
       <div data-role="collapsible" data-mini="true" class="adjust-spiel"
            data-theme="f"
            data-collapsed-icon="arrow-r" data-expanded-icon="arrow-d">
-        <legend> Adjust the visited Share Rooms list: </legend>
-        <p> Use the gear menu on each item to remove the item or change
+        <legend> Currently visiting: </legend>
+        <p> Use the Share Room item's gear menu to stop visiting it, or change
           whether it will be retained across local sessions. </p>
       </div>
       <hr class="page-content"/>

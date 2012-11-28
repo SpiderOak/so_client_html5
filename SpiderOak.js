@@ -505,8 +505,8 @@ var spideroak = function () {
 
     function PublicRootShareNode(url, parent) {
         RootShareNode.call(this, url, parent);
-        this.name = "Visited Share Rooms";
-        this.emblem = "Visited Share Rooms";
+        this.name = "Share Rooms";
+        this.emblem = "Share Rooms";
         this.job_id = 0; }
     OriginalRootShareNode.prototype = new RootShareNode();
     function OriginalRootShareNode(url, parent) {
@@ -1637,12 +1637,15 @@ var spideroak = function () {
            in the HTML.) */
 
         if (my.storage_root_url) {
+            // XXX Remove completely when we've made section dividers static
             var $storage = $('#my-storage-leader');
-            $storage.find('a').attr('href',
-                                    '#' + my.storage_root_url);
+            //$storage.find('a').attr('href',
+            //                        '#' + my.storage_root_url);
+            $storage.find('a').removeAttr('href');
             var $originals = $('#my-rooms-leader');
-            $originals.find('a').attr('href',
-                                      '#' + my.my_shares_root_url); }}
+            //$originals.find('a').attr('href',
+            //                          '#' + my.my_shares_root_url); }}
+            $originals.find('a').removeAttr('href'); }}
 
     ContentNode.prototype.layout_content = function (mode_opts,
                                                      subdirs,
