@@ -901,6 +901,8 @@ var spideroak = function () {
         if (succeeded) {
             // Show the content instead of the form
             $login_section.hide();
+            $("#my-storage-leader").show();
+            $("#my-rooms-leader").show();
             this.remove_status_message();
             $content_section.show();
             if (remember_manager.active()) {
@@ -911,6 +913,8 @@ var spideroak = function () {
             // Include the xhr.statusText in the form.
             this.veil(false);
             $content_section.hide();
+            $("#my-storage-leader").hide();
+            $("#my-rooms-leader").hide();
             $login_section.show();
             var username;
             if (remember_manager.active()
