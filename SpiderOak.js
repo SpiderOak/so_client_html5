@@ -756,10 +756,6 @@ var spideroak = function () {
             this.authenticated(true); }
 
         var $page = this.my_page$();
-        var selector = ((token === 'storage-token')
-                        ? "#my-storage-leader"
-                        : "#my-rooms-leader")
-        var $leader = $(selector);
 
         if (! succeeded) {
             $.mobile.loading('hide');
