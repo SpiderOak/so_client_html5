@@ -56,7 +56,7 @@ if [ -n "$INHIBIT_PREP" ]; then
 fi
 
 phonegap_targets_dir="${releases_dir}/PhoneGap"
-phonegap_ios_tools="${tools_dir}/PhoneGap/bin_ios"
+phonegap_ios_tools="${tools_dir}/PhoneGap_2.2.0/ios/bin"
 
 fabricate_apps () {
   # Loop through the elected categories, fabricating apps for each variant.
