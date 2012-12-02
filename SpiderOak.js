@@ -643,7 +643,8 @@ var spideroak = function () {
                                     this.notify_subvisit_status.bind(this),
                                 notify_token: 'public-shares-token'};
         $.extend(public_mode_opts, mode_opts);
-        var public_root = nmgr.get(my.public_shares_root_url);
+        var public_root = nmgr.get(my.public_shares_root_url,
+                                   my.public_shares_root_url);
         public_root.visit(chngpg_opts, public_mode_opts);
 
         if (! this.loggedin_ish()) {
@@ -1090,7 +1091,12 @@ var spideroak = function () {
         /* Visit a specified share room, according its' URL address.
            Return the room object. */
         register_public_share_room_url(url);
-        var room = node_manager.get(url, node_manager.get_combo_root());
+        // XXX Using 'this' as the (proper) parent is causing the name to
+        //     not get properly set.  (The name gets set when the share
+        //     room is also among the account's original shares, making
+        //     reproducing the problem a bit more intricate.)
+        //var room = node_manager.get(url, node_manager.get_combo_root());
+        var room = node_manager.get(url, this);
         room.visit({},
                    {passive: true,
                     notify_callback: this.notify_subvisit_status.bind(this),
