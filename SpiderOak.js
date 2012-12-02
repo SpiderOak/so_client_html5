@@ -54,9 +54,10 @@ var spideroak = function () {
 
     /* ==== Object-wide settings ==== */
 
-    /**
-     * Settings not specific to a particular login session:
-     */
+    /** URL of the currently occupied tab-bar tab */
+    var current_tab = null;
+
+    /** Constants not specific to a particular login session: */
     var generic = {
         // API v1.
         // XXX base_host_url may vary according to brand package.
@@ -108,9 +109,7 @@ var spideroak = function () {
             generic.storage_path_prefix = "" + generic.storage_path_prefix;
             generic.shares_path_suffix = "" + generic.shares_path_suffix; }}
 
-    /**
-     * Login session settings.
-     */
+    /** Login session settings. */
     var my = {
         username: "",
         storage_host: null,
@@ -352,10 +351,10 @@ var spideroak = function () {
         if (url) {             // Skip if we're in prototype assignment.
             this.url = url;
             this.name = "";
-            // Top-level content nodes have content-specific root_url but
-            // combo-root (RootContentNode) parent.
             this.root_url = parent ? parent.root_url : url;
             this.parent_url = parent ? parent.url : null;
+            /** Dynamically assigned to most recently occupied *content* tab. */
+            this.recent_tab = null;
             this.$page = null;  // This node's jQuery-ified DOM data-role="page"
             this.emblem = "";   // At least for debugging/.toString()
             this.icon_path = ""; }}
@@ -428,8 +427,10 @@ var spideroak = function () {
         this.room_url = parent ? parent.room_url : null; }
     ShareNode.prototype = new ContentNode();
 
+    /**
+     * Consolidated root of the storage and share content hierarchies.
+     */
     function RootContentNode(url, parent) {
-        /* Consolidated root of the storage and share content hierarchies. */
         ContentNode.call(this, url, parent);
         this.root_url = url;
         this.emblem = brand.title;
@@ -502,6 +503,23 @@ var spideroak = function () {
         // We'll use subdirs for the items - we care not about the types:
         this.items = this.subdirs; }
     SettingsPanelNode.prototype = new PanelNode();
+
+    /**
+     * Root "Settings" panel.
+     *
+     * @constructor
+     * @this {RootSettingsPanelNode}
+     * @param {string} url The (reserved, internal) address of this root panel.
+     * @param {ContentNode} parent The immediately containing item.
+     */
+    function RootSettingsPanelNode(url, parent) {
+        SettingsPanelNode.call(this, url, parent);
+        this.root_url = url;
+        this.emblem = "Settings";
+        this.name = "Settings";
+        delete this.subdirs;
+        delete this.files; }
+    RootSettingsPanelNode.prototype = new SettingsPanelNode();
 
     function PublicRootShareNode(url, parent) {
         RootShareNode.call(this, url, parent);
@@ -577,10 +595,22 @@ var spideroak = function () {
      * @this {PanelNode}
      * @param {object} chngpg_opts $.mobile.changePage() options dictionary.
      * @param {object} mode_opts Content and operation mode options dictionary.
-    */
+     */
     PanelNode.prototype.visit = function (chngpg_opts, mode_opts) {
         this.layout(mode_opts);
         this.show(chngpg_opts, mode_opts); }
+
+    /**
+     * Constitute and present the root settings panel.
+     *
+     * @this {RootSettinsPanelNode}
+     * @param {object} chngpg_opts $.mobile.changePage() options dictionary.
+     * @param {object} mode_opts Content and operation mode options dictionary.
+     */
+    RootSettingsPanelNode.prototype.visit = function (chngpg_opts, mode_opts) {
+        current_tab = this.url;
+        PanelNode.prototype.visit.call(this, chngpg_opts, mode_opts);
+    }
 
     PanelNode.prototype.layout = function (chngpg_opts, mode_opts) {
         /* Deploy options page. */
@@ -615,16 +645,23 @@ var spideroak = function () {
         else {
             this.show(chngpg_opts, mode_opts); }}
 
+    /**
+     * Do the special visit of the consolidated storage/share root
+     *
+     * Trigger visits to the respective root content nodes in 'passive'
+     * mode so they do not focus the browser on themselves. 'notify' mode
+     * is also provoked, so they report their success or failure to our
+     * notify_subvisit_status() method.
+     *
+     * See docs/AppOverview.txt "Content Node navigation modes" for
+     * details about mode controls.
+     *
+     * @this (RootContentNode)
+     * @param {object} chngpg_opts $.mobile.changePage() options dictionary.
+     * @param {object} mode_opts Content and operation mode options dictionary.
+     */
     RootContentNode.prototype.visit = function (chngpg_opts, mode_opts) {
-        /* Do the special visit of the consolidated storage/share root. */
-
-        // Trigger visits to the respective root content nodes in 'passive'
-        // mode so they do not focus the browser on themselves. 'notify' mode
-        // is also provoked, so they report their success or failure to our
-        // notify_subvisit_status() method.
-        //
-        // See docs/AppOverview.txt "Content Node navigation modes" for
-        // details about mode controls.
+        current_tab = this.url;
 
         this.veil(true);
 
@@ -662,8 +699,15 @@ var spideroak = function () {
             $.mobile.loading('show');
             storage_root.visit(chngpg_opts, storage_mode_opts); }}
 
+    /**
+     * Present the accumulated list of recently visited items.
+     *
+     * @this (RecentContentsNode)
+     * @param {object} chngpg_opts $.mobile.changePage() options dictionary.
+     * @param {object} mode_opts Content and operation mode options dictionary.
+     */
     RecentContentsNode.prototype.visit = function (chngpg_opts, mode_opts) {
-        /* Present the accumulated list of recently visited items. */
+        current_tab = this.url;
 
         // (Could mode_opts.hasOwnProperty('action') for recents editing.)
 
@@ -678,14 +722,24 @@ var spideroak = function () {
      * @param {object} mode_opts Content and operation mode options dictionary.
      */
     FavoriteContentsNode.prototype.visit = function (chngpg_opts, mode_opts) {
+        current_tab = this.url;
         this.layout(mode_opts);
         this.show(chngpg_opts, mode_opts); }
 
+    /**
+     * Obtain the known, non-original share rooms and present them.
+     *
+     * Our content is the set of remembered urls, from:
+     * - those visited in this session
+     * - those remembered across sessions
+     *
+     * @this {PublicRootShareNode}
+     * @param {object} chngpg_opts $.mobile.changePage() options dictionary.
+     * @param {object} mode_opts Content and operation mode options dictionary.
+     */
     PublicRootShareNode.prototype.visit = function (chngpg_opts, mode_opts) {
-        /* Obtain the known, non-original share rooms and present them. */
-        // Our content is the set of remembered urls, from:
-        // - those visited in this session
-        // - those remembered across sessions
+
+        current_tab = this.url
 
         this.remove_status_message('result');
         this.remove_status_message('error');
@@ -1091,7 +1145,7 @@ var spideroak = function () {
         /* Visit a specified share room, according its' URL address.
            Return the room object. */
         register_public_share_room_url(url);
-        // XXX Using 'this' as the (proper) parent is causing the name to
+        // XXX Using PublicRootShareNode as the parent is causing the name to
         //     not get properly set.  (The name gets set when the share
         //     room is also among the account's original shares, making
         //     reproducing the problem a bit more intricate.)
@@ -2253,7 +2307,7 @@ var spideroak = function () {
                         else if (is_favorites_url(url)) {
                             got = new FavoriteContentsNode(url, parent); }
                         else if (is_settings_url(url)) {
-                            got = new SettingsPanelNode(url, parent); }
+                            got = new RootSettingsPanelNode(url, parent); }
                         else if (url === my.storage_root_url) {
                             got = new RootStorageNode(url, parent); }
                         else if (url === my.my_shares_root_url) {
