@@ -1145,11 +1145,6 @@ var spideroak = function () {
         /* Visit a specified share room, according its' URL address.
            Return the room object. */
         register_public_share_room_url(url);
-        // XXX Using PublicRootShareNode as the parent is causing the name to
-        //     not get properly set.  (The name gets set when the share
-        //     room is also among the account's original shares, making
-        //     reproducing the problem a bit more intricate.)
-        //var room = node_manager.get(url, node_manager.get_combo_root());
         var room = node_manager.get(url, this);
         room.visit({},
                    {passive: true,
@@ -2318,7 +2313,7 @@ var spideroak = function () {
                             throw new Error("Content model management error");}}
 
                     // Contents:
-                    else if (parent && (is_combo_root_url(parent.url))) {
+                    else if (parent && (is_content_root_url(parent.url))) {
                         // Content node just below a root:
                         if (is_storage_url(url)) {
                             got = new DeviceStorageNode(url, parent); }
