@@ -1899,29 +1899,39 @@ var spideroak = function () {
                 = logout_link_button.bind(this); }
         return FolderContentNode.prototype.layout_item$.call(this, mode_opts); }
 
-    Node.prototype.layout_footer_by_spec = function(spec_array,
-                                                           mode_opts) {
-        /* Populate the nodes' footer according to a 'spec_array', so that
-           the specific items in the produced footer can subsequently be
-           adjusted by .change_footer_item() using selectors.
-
-           The spec array is max 5-element sequence of specification objects:
-
-               [spec-obj-1, spec-obj-2, ...]
-
-           Each spec is an object that must have these properties:
-
-               {title: <the legend for the action>,
-                url: <an app-supported address, usually url>,
-                selector: <class for the item, for later selection>,
-                transition: transition effect (optional),
-                icon_name: <name of the action icon>}
-
-           The items in the constructed footer will be addressable by the
-           specified class-selector, and also by sequentially numbered
-           selector strings of the form "footer-item-N", where N starts
-           with 1. */
-
+    /**
+     * Populate the footer navbar according to specifications.
+     *
+     * Populate the nodes' footer according to a 'spec_array', so that the
+     * specific items in the produced footer can subsequently be adjusted
+     * by {@link Node#change_footer_item} using selectors.
+     *
+     * The spec array is sequence of specification objects, one for each of
+     * (max, 5) footer tabs:
+     *
+     * [spec-obj-1, spec-obj-2, ...]
+     *
+     * Each spec is an object that must have these properties:
+     *
+     *   title: <the legend for the action>,
+     *   url: <the url of the target object>,
+     *   selector: <class for the item, for later selection>,
+     *   transition: transition effect (optional),
+     *   icon_name: <name of the action icon>}
+     *
+     * The items in the constructed footer will be addressable by the
+     * specified class-selector, and also by sequentially numbered
+     * selector strings of the form "footer-item-N", where N starts
+     * with 1.
+     *
+     * @see Node#change_footer_item
+     * @see Node#layout_footer
+     *
+     * @this {Node}
+     * @param {object} spec_array Footer entries specifications
+     * @param {object} mode_opts Content and operation mode options dictionary.
+     */
+    Node.prototype.layout_footer_by_spec = function(spec_array, mode_opts) {
         var $ul = $('<ul/>');
         var element_count = 1;
         var $anchor;
@@ -1931,6 +1941,9 @@ var spideroak = function () {
                            + " " + spec.selector);
             $li.attr('class', classes);
             $anchor = $('<a data-role="button"/>');
+            var focus_token = ctmgr.tab_focus_token(spec.url);
+            if (focus_token) {
+                $anchor.attr('so-tab-focus', focus_token); }
             $anchor.attr('data-icon', spec.icon_name);
             $anchor.attr('data-iconpos', "top");
             $anchor.attr('href', spec.url);
