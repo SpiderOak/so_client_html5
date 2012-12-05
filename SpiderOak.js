@@ -138,7 +138,7 @@ var spideroak = function () {
         var page = internalize_url(data.toPage);
 
         if ((typeof page === "string")
-            && (is_content_url(page)
+            && (is_node_url(page)
                 || document_addrs.hasOwnProperty(page))) {
             e.preventDefault();
             if (transit_manager.is_repeat_url(page)) {
@@ -174,7 +174,7 @@ var spideroak = function () {
 
         var storage_url = register_storage_root(storage_host, username,
                                                 storage_web_url);
-        if (! is_content_root_url(storage_url)) {
+        if (! is_root_url(storage_url)) {
             register_content_root_url(storage_url); }
 
         if (remember_manager.active()) {
@@ -281,7 +281,7 @@ var spideroak = function () {
         return (url === generic.favorites_url); }
     function is_settings_url(url) {
         return (url === generic.settings_url); }
-    function is_content_root_url(url) {
+    function is_root_url(url) {
         /* True if the 'url' is for one of the root content items.  We
            split off any search fragment.  Doesn't depend on the url having
            an established node. */
@@ -319,13 +319,13 @@ var spideroak = function () {
         return (my.public_shares_root_url
                 && (url.slice(0, my.public_shares_root_url.length)
                     === my.public_shares_root_url)); }
-    function is_content_url(url) {
-        /* True if url within registered content roots. */
+    function is_node_url(url) {
+        /* True if url within registered roots. */
         url = internalize_url(url); // ... for content root page ids.
         return (is_storage_url(url)
                 || is_share_url(url)
                 || is_combo_root_url(url)
-                || is_content_root_url(url)); }
+                || is_root_url(url)); }
 
     function public_share_room_urls_list() {
         /* Return an array of public share room urls being visited. */
@@ -2326,7 +2326,7 @@ var spideroak = function () {
                             throw new Error("Content model management error");}}
 
                     // Contents:
-                    else if (parent && (is_content_root_url(parent.url))) {
+                    else if (parent && (is_root_url(parent.url))) {
                         // Content node just below a root:
                         if (is_storage_url(url)) {
                             got = new DeviceStorageNode(url, parent); }
