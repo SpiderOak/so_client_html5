@@ -366,6 +366,24 @@ var spideroak = function () {
             this.$page = null; }}
 
     /**
+     * Return the object which contains the bunch of objects including this one.
+     *
+     * Specifically, return the object in the chain of parents which is
+     * situated in one of the root objects.
+     *
+     * @this {Node}
+     */
+    Node.prototype.outer_container = function () {
+        if (! this.parent_url) {
+            return null;
+        } else if (is_root_url(this.parent_url)) {
+            return this;
+        } else {
+            return node_manager.get(this.parent_url).container();
+        }
+    }
+
+    /**
      * UI panel pages that present specific sets of options or item details.
      *
      * Panels are used to present settings options or detailed information
@@ -1251,6 +1269,15 @@ var spideroak = function () {
     FileShareNode.prototype.contained_urls = function () {
         return []; }
 
+    /**
+     * True if this content object immediately contains the target object.
+     *
+     * @this {Node}
+     * @param {ContentNode} target object which may be immediately contained
+     */
+    ContentNode.prototype.contains = function (target) {
+        return this.contained_urls().indexOf(target.url) !== -1;
+    }
 
     /* ==== Provisioning - Data model assimilation of fetched data ==== */
 
