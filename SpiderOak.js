@@ -35,7 +35,7 @@
     "pagebeforechange" event. URLs included as href links must start with
     '#' to trigger jQuery Mobile's navigation detection, which by default
     tracks changes to location.hash.  handle_content_visit() dispatches those
-    URLs it receives that reside within the ones satisfy .is_content_root_url(),
+    URLs it receives that reside within the ones satisfying .is_root_url(),
     to which the root URLs are registered by the root visiting routines.
 
   - My routines which return jQuery objects end in '$', and - following common
@@ -587,6 +587,7 @@ var spideroak = function () {
         return false; }
     DeviceStorageNode.prototype.is_device = function() {
         return true; }
+
 
     /* ===== Panel access ==== */
 
@@ -1918,14 +1919,23 @@ var spideroak = function () {
         $navbar = $footer.find('[data-role="navbar"]');
         $navbar.navbar(); }
 
-    Node.prototype.change_footer_item = function(selector,
-                                                        spec,
-                                                        mode_opts) {
-        /* Alter a footer item identified by 'selector', applying 'spec'.
-           Fields missing from the spec will be left unaltered.
-           A new selector will be appended (if not already present;
-           the old selector class will be retained).
-           See ContentNode.layout_footer_by_spec() for details. */
+    /**
+     * Alter a footer item identified by 'selector', applying 'spec'.
+     *
+     * Fields missing from the spec will be left unaltered.  A new selector
+     * will be appended (if not already present; the old selector class
+     * will be retained). See {@link Node#layout_footer_by_spec} for entry
+     * specification details.
+     *
+     * @see Node#layout_footer_by_spec
+     * @see Node#layout_footer
+     *
+     * @this {Node}
+     * @param {string} selector jquery search that locates in the footer navbar
+     * @param {object} spec Dictionary specifying footer entry characteristics
+     * @param {object} mode_opts Content and operation mode options dictionary.
+     */
+    Node.prototype.change_footer_item = function(selector, spec, mode_opts) {
         var $footer = this.my_page$().find('[data-role="footer"]');
         var $navbar = $footer.find('[data-role="navbar"]');
         var $target_li = $navbar.find(selector);
@@ -1946,8 +1956,13 @@ var spideroak = function () {
                 $target_li.find('a').attr('data-icon', spec.icon_name) }
             $navbar.navbar(); }}
 
+    /**
+     * Populate the footer for this node.
+     *
+     * @this {Node}
+     * @param {object} mode_opts Content and operation mode options dictionary.
+     */
     Node.prototype.layout_footer = function(mode_opts) {
-        /* Populate the footer for this node. */
         this.layout_footer_by_spec([{title: "My Stuff",
                                      url: ("#" + generic.combo_root_page_id),
                                      selector: "account",
@@ -2295,19 +2310,21 @@ var spideroak = function () {
                                         this.get_combo_root()); }
                 return favorites; },
 
+            /** Retrieve a node according to 'url'.
+             *
+             * New nodes are produced on first reference.  No item provisioning
+             * happens here.
+             *
+             # @param {url} target node address
+             * @param {parent} is required for production of new nodes
+             */
             get: function (url, parent) {
-                /* Retrieve a node according to 'url'.
-                   'parent' is required for production of new nodes,
-                   which are produced on first reference.
-                   Provisioning nodes with remote data is done elsewhere,
-                   not here.
-                 */
                 url = url.split('?')[0];             // Strip query string.
                 var got = by_url[url];
                 if (! got) {
 
                     // Roots:
-                    if (is_content_root_url(url)) {
+                    if (is_root_url(url)) {
                         if (is_combo_root_url(url)) {
                             got = new RootContentNode(url, parent); }
                         else if (is_recents_url(url)) {
