@@ -355,7 +355,7 @@ var spideroak = function () {
             this.root_url = parent ? parent.root_url : url;
             this.parent_url = parent ? parent.url : null;
             /** Dynamically assigned to most recently occupied *content* tab. */
-            this.recent_tab = null;
+            this.recent_tab_url = null;
             this.$page = null;  // This node's jQuery-ified DOM data-role="page"
             this.emblem = "";   // At least for debugging/.toString()
             this.icon_path = ""; }}
@@ -617,6 +617,8 @@ var spideroak = function () {
      * @param {object} mode_opts Content and operation mode options dictionary.
      */
     PanelNode.prototype.visit = function (chngpg_opts, mode_opts) {
+        if (! mode_opts.passive) {
+            current_tab_manager.set_current_from(this); }
         this.layout(mode_opts);
         this.show(chngpg_opts, mode_opts); }
 
@@ -628,7 +630,8 @@ var spideroak = function () {
      * @param {object} mode_opts Content and operation mode options dictionary.
      */
     RootSettingsPanelNode.prototype.visit = function (chngpg_opts, mode_opts) {
-        current_tab = this.url;
+        if (! mode_opts.passive) {
+            current_tab_manager.set_current_from(this); }
         PanelNode.prototype.visit.call(this, chngpg_opts, mode_opts);
     }
 
@@ -648,17 +651,14 @@ var spideroak = function () {
      * Constitute and present a remote data item.
      *
      * Fetch current data from server, provision, layout, and present.
-     * 'chngpg_opts': framework changePage() options, 'mode_opts': node
-     * provisioning and layout modal settings.
      *
      * @this {ContentNode}
      * @param {object} chngpg_opts $.mobile.changePage() options dictionary.
      * @param {object} mode_opts Content and operation mode options dictionary.
     */
     ContentNode.prototype.visit = function (chngpg_opts, mode_opts) {
-        /* Fetch current data from server, provision, layout, and present.
-           'chngpg_opts': framework changePage() options,
-           'mode_opts': node provisioning and layout modal settings. */
+        if (! mode_opts.passive) {
+            current_tab_manager.set_current_from(this); }
 
         if (! this.up_to_date()) {
             this.fetch_and_dispatch(chngpg_opts, mode_opts); }
@@ -681,7 +681,8 @@ var spideroak = function () {
      * @param {object} mode_opts Content and operation mode options dictionary.
      */
     RootContentNode.prototype.visit = function (chngpg_opts, mode_opts) {
-        current_tab = this.url;
+        if (! mode_opts.passive) {
+            current_tab_manager.set_current_from(this); }
 
         this.veil(true);
 
@@ -727,7 +728,8 @@ var spideroak = function () {
      * @param {object} mode_opts Content and operation mode options dictionary.
      */
     RecentContentsNode.prototype.visit = function (chngpg_opts, mode_opts) {
-        current_tab = this.url;
+        if (! mode_opts.passive) {
+            current_tab_manager.set_current_from(this); }
 
         // (Could mode_opts.hasOwnProperty('action') for recents editing.)
 
@@ -742,7 +744,8 @@ var spideroak = function () {
      * @param {object} mode_opts Content and operation mode options dictionary.
      */
     FavoriteContentsNode.prototype.visit = function (chngpg_opts, mode_opts) {
-        current_tab = this.url;
+        if (! mode_opts.passive) {
+            current_tab_manager.set_current_from(this); }
         this.layout(mode_opts);
         this.show(chngpg_opts, mode_opts); }
 
@@ -758,8 +761,8 @@ var spideroak = function () {
      * @param {object} mode_opts Content and operation mode options dictionary.
      */
     PublicRootShareNode.prototype.visit = function (chngpg_opts, mode_opts) {
-
-        current_tab = this.url
+        if (! mode_opts.passive) {
+            current_tab_manager.set_current_from(this); }
 
         this.remove_status_message('result');
         this.remove_status_message('error');
@@ -2280,14 +2283,109 @@ var spideroak = function () {
     var tmgr = transit_manager;
 
 
-    var node_manager = function () {
-        /* A singleton utility for getting and removing content node objects.
-           "Getting" means finding existing ones or else allocating new ones.
-        */
-        // Type of newly minted nodes are according to get parameters.
+    /**
+     * Facilities to correctly maintain current tab focus.
+     *
+     * This singleton utility manages organization and imposition of
+     * information about the app's current tab focus.
+     *
+     * @this {function}
+     */
+    var current_tab_manager = function () {
+        /* Private */
 
-        // ???: Cleanup? Remove nodes when ascending above them?
-        // ???:
+        /** Object currently occupying the tab-bar */
+        var current_tab_url = null;
+        /** Class selector for the tab to be highlighted */
+        var tab_class = 'so-selected-tab';
+
+        /* Public */
+
+        return {
+            /** Assign the current tab according to the specified node.
+             *
+             * For root nodes, just assign and go on.
+             *
+             * We need to do some work when a visit is initiated of share
+             * room content from a non-content tab, because share rooms can
+             * simultaneously reside among both the account resources
+             * (orignal shares) and the list of currently visited anyone's
+             * shares.
+             *
+             * @param {node} the node by which we determine the current tab
+             */
+            set_current_from: function (node) {
+                var url = node.url;
+                if (is_root_url(url)) {
+                    // Explicitly visiting a tab
+                    current_tab_manager.focus(node.url);
+                } else {
+                    if (! is_noncontent_node(nmgr.get(current_tab_url))) {
+                        // Current tab is a content tab, so we must be
+                        // visiting directly:
+                        node.recent_tab_url = current_tab_url; }
+                    else if (node.recent_tab_url) {
+                        current_tab_url = node.recent_tab_url;
+                        current_tab_manager.focus(current_tab_url); }
+                    else {
+                        // Curent node isn't a content root, and it has no
+                        // registered recent tab, so infer one:
+                        // - Use anyone's shares, if its included there
+                        // - Use account's shares, if its included there
+                        // - Otherwise, leave the current setting.
+                        var container = node.outer_container();
+                        var anyones = node_manager.get_anyones();
+                        var myshares = node_manager.get_myshares();
+                        if (anyones.contains(container)) {
+                            current_tab_manager.focus(container.url); }
+                        else if (myshares.contains(container)) {
+                            current_tab_manager.focus(myshares.url); }
+                        else {
+                            blather('No recent or container tab for: "'
+                                    + node.name + '" - ' + node.url); }
+                        node.recent_tab_url = current_tab_url; }
+                }
+            },
+            /** If url is of tab under focus, return a token to distinguish it.
+             *
+             * Otherwise, return false.
+             *
+             * @param {string} tab_url Url of the tab's object to be evaluated
+             */
+            tab_focus_token: function (tab_url) {
+                if (url_tail(tab_url) === url_tail(current_tab_url)) {
+                    return tab_class; }
+                else { return false; }
+            },
+            /** Register specified tab url as the current focus.
+             *
+             * @param {string} tab_url Url to register.
+             */
+            focus: function (tab_url) {
+                current_tab_url = tab_url;
+            },
+            cturl: (SO_DEBUGGING
+                    ? function () { return current_tab_url;}
+                    : null),
+        }
+    }();
+    var ctmgr = current_tab_manager; // Compact name, for convenience.
+
+
+    /**
+     * Produce, provide access to, and dispose of app subject item nodes.
+     *
+     * This singleton utility manages items including content, content
+     * containers, and other (like settings) containers.  The '.get'
+     * routine is the primary interface, and either finds existing nodes
+     * matching the criteria, or creates them if not already present.
+     * The type of newly minted nodes is determined according to get parameters.
+     *
+     * @this {function}
+     */
+    var node_manager = function () {
+        // ???: More compact operation: Remove nodes when ascending above them?
+        // ???: Optimzations:
         // - prefetch offspring layer and defer release til 2 layers above.
         // - make fetch of multiple items contingent to device lastcommit time.
 
@@ -2885,6 +2983,7 @@ var spideroak = function () {
     if (SO_DEBUGGING) {
         // Expose the managers for access while debugging:
         public_interface.nmgr = nmgr;
+        public_interface.ctmgr = ctmgr;
         public_interface.pmgr = pmgr; }
 
     /* ==== Here we go: ==== */

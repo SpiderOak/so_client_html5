@@ -263,6 +263,23 @@ function deploy_focus_oneshot(selector, event) {
         $(document).unbind(event, focus_oneshot); }
     bind_replace($(document), event, focus_oneshot); }
 
+/** Return a url's trailing non-divider string.
+ *
+ * That is, the non-empty portion of the url after the final
+ * '/' and '#'.  Hence, that part needs to be distinct to
+ * distinguish among provided urls.
+ *
+ * @param {string} url Web address from which the tail is derived.
+ */
+function url_tail(url) {
+    if (! url) {
+        return "undefined"; }
+    // Remove trailing '#' or '/', if any:
+    url = url.replace(/[#/]$/, "");
+    // Get string that trails all remaining '/' and '#':
+    return url.split(/[#/]/).slice(-1)[0];
+}
+
 // Polyfill for context .bind(context), for it's lack in Safari.
 // Taken almost verbatim from
 // developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Function/bind
