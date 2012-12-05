@@ -54,17 +54,18 @@ var spideroak = function () {
 
     /* ==== Object-wide settings ==== */
 
-    /** URL of the currently occupied tab-bar tab */
-    var current_tab = null;
-
     /** Constants not specific to a particular login session: */
     var generic = {
         // API v1.
         // XXX base_host_url may vary according to brand package.
+        // TODO See about simplifying redundacy of *_url vs *_page_id (and
+        //      maybe the .my_page_id methods, etc).
         base_host_url: brand.base_host_url,
         icons_dir: "icons",
         brand_images_dir: "brand_images",
         combo_root_url: "https://home",
+        myshares_url: "https://my-shares",
+        anyones_url: "https://shares",
         recents_url: "https://recents",
         favorites_url: "https://favorites",
         settings_url: "https://settings",
@@ -74,7 +75,7 @@ var spideroak = function () {
         settings_page_id: "settings",
         storage_root_page_id: "storage-home",
         my_shares_root_page_id: "my-shares",
-        public_shares_root_page_id: "public-shares",
+        public_shares_root_page_id: "share",
         content_page_template_id: "content-page-template",
         settings_page_template_id: "settings-page-template",
         storage_login_path: "/browse/login",
@@ -2253,6 +2254,8 @@ var spideroak = function () {
 
         // Cached references, for frequent access with impunity:
         var combo_root = null;
+        var myshares = null;
+        var anyones = null;
         var recents = null;
         var favorites = null;
         var settings = null;
@@ -2263,6 +2266,16 @@ var spideroak = function () {
                 if (! combo_root) {
                     combo_root = this.get(my.combo_root_url, null); }
                 return combo_root; },
+
+            get_myshares: function () {
+                if (! myshares) {
+                    myshares = this.get(generic.myshares_url, null); }
+                return myshares; },
+
+            get_anyones: function () {
+                if (! anyones) {
+                    anyones = this.get(generic.anyones_url, null); }
+                return anyones; },
 
             get_recents: function () {
                 if (! recents) {
