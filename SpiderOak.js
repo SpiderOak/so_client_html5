@@ -2658,7 +2658,7 @@ var spideroak = function () {
                 // storage host. This leaves the username intact as a
                 // "remember" convenience for the user.
                 remember_manager.remove_storage_host(); }
-            node_manager.get_combo_root().visit(); }
+            node_manager.get_combo_root().visit({}, {}); }
 
         this.veil(true);
 
