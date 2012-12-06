@@ -354,7 +354,8 @@ var spideroak = function () {
             this.name = "";
             this.root_url = parent ? parent.root_url : url;
             this.parent_url = parent ? parent.url : null;
-            /** Dynamically assigned to most recently occupied *content* tab. */
+            /** Dynamically assigned to most recently occupied content tab. Use
+             * current_tab_manager.get_recent_tab_url() for the right value. */
             this.recent_tab_url = null;
             this.$page = null;  // This node's jQuery-ified DOM data-role="page"
             this.emblem = "";   // At least for debugging/.toString()
