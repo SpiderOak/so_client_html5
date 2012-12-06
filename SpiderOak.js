@@ -2328,18 +2328,29 @@ var spideroak = function () {
              * @param {node} the node by which we determine the current tab
              */
             set_current_from: function (node) {
+                var next_current = ctmgr.get_recent_tab_url(node);
+                if (current_tab_url !== next_current) {
+                    current_tab_manager.focus(next_current); }
+                if ((node.recent_tab_url !== next_current)
+                    && (! is_noncontent_node(nmgr.get(next_current)))) {
+                    node.recent_tab_url = next_current; }
+            },
+            /** Identify the current tab according to the specified node.
+             *
+             * @see spideroak.current_tab_manager#set_current_from.
+             *
+             * @param {node} the node by which we determine the current tab
+             */
+            get_recent_tab_url: function (node) {
                 var url = node.url;
                 if (is_root_url(url)) {
                     // Explicitly visiting a tab
-                    current_tab_manager.focus(node.url);
-                } else {
+                    return url; }
+                else {
                     if (! is_noncontent_node(nmgr.get(current_tab_url))) {
-                        // Current tab is a content tab, so we must be
-                        // visiting directly:
-                        node.recent_tab_url = current_tab_url; }
+                        return current_tab_url; }
                     else if (node.recent_tab_url) {
-                        current_tab_url = node.recent_tab_url;
-                        current_tab_manager.focus(current_tab_url); }
+                        return node.recent_tab_url; }
                     else {
                         // Curent node isn't a content root, and it has no
                         // registered recent tab, so infer one:
@@ -2350,13 +2361,16 @@ var spideroak = function () {
                         var anyones = node_manager.get_anyones();
                         var myshares = node_manager.get_myshares();
                         if (anyones.contains(container)) {
-                            current_tab_manager.focus(container.url); }
+                            return container.url; }
                         else if (myshares.contains(container)) {
-                            current_tab_manager.focus(myshares.url); }
+                            return myshares.url; }
                         else {
+                            // This can happen, eg if the containing room
+                            // was dropped, but the node is still in favorites.
                             blather('No recent or container tab for: "'
-                                    + node.name + '" - ' + node.url); }
-                        node.recent_tab_url = current_tab_url; }
+                                    + node.name + '" - ' + node.url);
+                            return current_tab_url; }
+                    }
                 }
             },
             /** If url is of tab under focus, return a token to distinguish it.
