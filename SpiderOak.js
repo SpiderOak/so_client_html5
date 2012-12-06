@@ -1647,6 +1647,21 @@ var spideroak = function () {
         var $title = $header.find('.header-title');
         $back_button.hide(); }
 
+    RecentContentsNode.prototype.layout_header = function (mode_opts) {
+        Node.prototype.layout_header.call(this, mode_opts);
+        var $header = this.my_page$().find('[data-role="header"]');
+        $header.find('.back-button').hide(); }
+
+    FavoriteContentsNode.prototype.layout_header = function (mode_opts) {
+        Node.prototype.layout_header.call(this, mode_opts);
+        var $header = this.my_page$().find('[data-role="header"]');
+        $header.find('.back-button').hide(); }
+
+    RootSettingsPanelNode.prototype.layout_header = function (mode_opts) {
+        Node.prototype.layout_header.call(this, mode_opts);
+        var $header = this.my_page$().find('[data-role="header"]');
+        $header.find('.back-button').hide(); }
+
     StorageNode.prototype.layout_header = function(mode_opts) {
         /* Fill in typical values for header fields of .my_page$().
            Many storage node types will use these values as is, some will
@@ -1697,7 +1712,9 @@ var spideroak = function () {
 
         var fields = {};
         if (this.parent_url) {
-            var container = node_manager.get(this.parent_url);
+            var container = nmgr.get(is_root_url(this.parent_url)
+                                     ? ctmgr.get_recent_tab_url(this)
+                                     : this.parent_url);
             fields.left_url = '#' + this.parent_url;
             fields.left_label = container.name;
             fields.title = this.title(); }
