@@ -4,75 +4,28 @@ purpose, elaborating details mentioned in [[HTML5ClientTechnicalDetails]].
 SpiderOak offers access to your backups storage in a variety of useful
 ways.  The variety of content collections - backups storage versus the list
 of share rooms available from an account versus the list of share rooms
-being publicly visited - can be confusing to new, and even experienced
-users, unless the app navigation is clear about what the differences and
-relationships are between these collections.
+being publicly visited - can be confusing, unless the app navigation is
+clear about what the differences and relationships are between these
+collections.
 
-This confusion can be hard to see once you understand these relationships,
-if you take them for granted.  Unfortunately, the organization of login and
-navigation in the current mobile app does not help, because it does take
-that understanding for granted, and does nothing (or worse) to clarify it.
+That it's confusing can be hard to see once you understand these
+relationships, and take them for granted.  Unfortunately, the organization
+of login and navigation in the previous mobile app does nothing to clarify
+the relationship.
 
-In grappling with organizing the login and navigation for the html5 client,
-I came up with a navigation arrangement that clearly conveys, in an
-immediate and direct way, what collections are available, both overall and
-according to whether or not you are logged in at the moment.
+The HTML5 client is more clear about the division between share-room lists
+by segregating resources associated with, and visible to an account in the
+My Stuff tab, including the storage content and list of account-originated
+share rooms.  This way, nobody is surprised when the list of the account's
+original share rooms disappears while not logged in.
 
-This arrangement is based on clarifying these relationships by organizing
-the navigation to convey:
+Conversely, the list of anyone's share rooms that are explicitly being
+visited has its own tab, and remains present (and adjustable) regardless of
+login status.
 
-* The fact that you have to login for access to an account's backup
-  storage, and to access the list of share rooms originating from that
-  account.  This helps to convey the connection between these two
-  collections.
-* The fact that you don't have to login for the list of share rooms that
-  your device is publicly visiting.  This helps to convey the distinction
-  from the other two.
-
-This login requirement for the first two, and their connection, is obscured
-by the native mobile app's arrangement, in a few ways:
-
-1. It is obscured by the native mobile client because navigation to the
-   respective collections is separate from the login challenge.  You
-   discover that you can't (or can) visit one of the collections only when
-   you select a collection with a footer tab.
-
-2. Navigation into the respective collections is disjoint - they're in
-   separate tabs in the native mobile clients.  This doesn't offer a
-   single, comprehensive view of the various content collections, public
-   and account-oriented, that are available at any moment.
-
-In the consolidated root I've arranged, when login is necessary, the
-sections for the backups storage content and for the list of personally
-originated share rooms are replaced by a single login challenge.  When
-logged in, the login challenge is replaced by the roots of the account's
-respective collections.
-
-The publicly accessed share rooms being visited by the device, on the other
-hand, are always visible in the consolidated root, regardless of login
-status.  If the device doesn't currently have any public share room visits
-ongoing, it shows a big button with a "+" to get to a screen to add some.
-
-Note that the arrangement I've implemented still has separate pages for the
-individual sections, to provide places to take administrative actions for
-those sections.  Clicking on the section separators in the consolidated
-root goes to those separate sections.
-
-These pages don't get in the way.  They are only used for management of or
-background info about the collections.  Traversal into the top level
-contents of each section - the devices and share rooms - goes to nodes that
-have the consolidated root "dashboard" as their parents, so ascending from
-them goes to the consolidated root, even if you got to them from one of the
-collection-specific pages.
-
-Note also that the sections of the consolidated root could be large, if the
-accounts contain many devices or share rooms.  This can be handled by
-making the sections collapsible, and having them start in collapsed state.
-This would take some finagling, but should be doable.
-
-Overall, this arrangement presents a central, comprehensive view of the
-content that is available via SpiderOak, clearly conveying how login status
-affects what you can see.  The prior arrangement obscures all of this,
-doing nothing to reduce the confusion people have about the variety of
-content collections they have available via SpiderOak.  That variety is
-useful, and the confusion is not necessary.
+What happens when you add a share room from your account to the roster of
+anyone's share rooms being visited by the application?  Then the share room
+is listed in both tabs.  The application keeps track of the tab by which
+you most recently entered the share room, and uses the most recent tab when
+you return to the share room contents from the Recents tab, or to determine
+which of the tabs to point back to when returning to the top from the room.
