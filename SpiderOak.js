@@ -836,10 +836,7 @@ var spideroak = function () {
         var $page = this.my_page$();
 
         if (! succeeded) {
-            $.mobile.loading('hide');
-            if (token === "storage") {
-                this.authenticated(false, response);
-                this.layout(); }}
+            this.logout(); }
         else {
             // Unnecessary relayout of header and footer is future-proofing:
             this.layout();
