@@ -1715,7 +1715,7 @@ var spideroak = function () {
             var container = nmgr.get(is_root_url(this.parent_url)
                                      ? ctmgr.get_recent_tab_url(this)
                                      : this.parent_url);
-            fields.left_url = '#' + this.parent_url;
+            fields.left_url = '#' + container.url;
             fields.left_label = container.name;
             fields.title = this.title(); }
         else {
