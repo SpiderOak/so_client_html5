@@ -1161,7 +1161,7 @@ var spideroak = function () {
                                                'result');
             this.adding_external = true;
             $sm.hide();
-            $sm.delay(1000).fadeIn(2000); // Give time for error to appear.
+            $sm.fadeIn(2000); // Give time for error to appear.
             return this.add_item(new_share_url); }}
 
     PublicRootShareNode.prototype.add_item = function (url) {
