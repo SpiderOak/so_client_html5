@@ -685,8 +685,6 @@ var spideroak = function () {
         if (! mode_opts.passive) {
             current_tab_manager.set_current_from(this); }
 
-        this.veil(true);
-
         this.remove_status_message();
 
         this.show(chngpg_opts, {});
@@ -713,6 +711,7 @@ var spideroak = function () {
             this.show(chngpg_opts, {}); }
 
         else {
+            this.veil(true);
             var storage_root = node_manager.get(my.storage_root_url, this);
             // Use a distinct copy of mode_opts:
             var storage_mode_opts = $.extend({}, public_mode_opts);
@@ -2781,7 +2780,6 @@ var spideroak = function () {
                 // Minimal - the submit button sentinel should prevent this.
                 return false; }
             data[name_field] = $name.val();
-            $name.val("");
             var remember_widget_on = $remember_widget.val() === "on"
             if ($remember_widget.attr('id') === "remember-me") {
                 remember_manager.active(remember_widget_on); }
@@ -2795,7 +2793,6 @@ var spideroak = function () {
             data['password'] = $password.val();
             if (do_fade) {
                 var combo_root = node_manager.get_combo_root();
-                combo_root.veil(true, function() { $password.val(""); });
                 var unhide_form_oneshot = function(event, data) {
                     combo_root.veil(false);
                     $.mobile.loading('hide');
@@ -2807,9 +2804,8 @@ var spideroak = function () {
                              unhide_form_oneshot)
                 bind_replace($(document), "error.SpiderOak",
                              unhide_form_oneshot); }
-            else {
-                $name.val("");
-                $password.val(""); }
+            $name.val("");
+            $password.val("");
             $name.focus();
             submit_handler(data);
             return false; }); }
