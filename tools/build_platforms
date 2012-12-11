@@ -81,7 +81,11 @@ fabricate_ios () {
   local brand="$1"; shift
   local color="$1"; shift
   local ios_app_spec="${brand}-${color}"
-  local target_dir="${phonegap_targets_dir}/${ios_app_spec}"
+  local target_dir="${phonegap_targets_dir}/ios/${ios_app_spec}"
+  if [ ! -d "${phonegap_targets_dir}/ios" ]; then
+    blather -n Creating ios build directory "${phonegap_targets_dir}/ios"
+    mkdir -p "${phonegap_targets_dir}/ios";
+  fi
   blather -n Fabricating ${ios_app_spec}
   if [ ! -d "$target_dir" ]; then
     blather , create...
