@@ -35,6 +35,8 @@
 
 bundle_prefix=com.spideroak
 app_name=spideroak-client
+ios_plat_dir=ios
+android_plat_dir=android        # Not yet implemented.
 
 DO_RUN=""
 if [ -z "$*" ]; then
@@ -81,11 +83,12 @@ fabricate_ios () {
   local brand="$1"; shift
   local color="$1"; shift
   local ios_app_spec="${brand}-${color}"
-  local target_dir="${phonegap_targets_dir}/ios/${ios_app_spec}"
-  if [ ! -d "${phonegap_targets_dir}/ios" ]; then
-    blather -n Creating ios build directory "${phonegap_targets_dir}/ios"
-    mkdir -p "${phonegap_targets_dir}/ios";
+  local ios_container="${phonegap_targets_dir}/${ios_plat_dir}"
+  if [ ! -d "${ios_container}" ]; then
+    blather Creating ios build directory "${ios_container}"
+    mkdir -p "${ios_container}"
   fi
+  local target_dir="${ios_container}/${ios_app_spec}"
   blather -n Fabricating ${ios_app_spec}
   if [ ! -d "$target_dir" ]; then
     blather , create...
