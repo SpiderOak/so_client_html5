@@ -58,7 +58,9 @@ if [ -n "$INHIBIT_PREP" ]; then
 fi
 
 phonegap_targets_dir="${releases_dir}/PhoneGap"
-phonegap_ios_tools="${tools_dir}/PhoneGap_2.2.0/ios/bin"
+#phonegap_ios_tools_version=PhoneGap_2.2.0
+phonegap_ios_tools_version=PhoneGap_2.0.0
+phonegap_ios_tools="${tools_dir}/${phonegap_ios_tools_version}/ios/bin"
 
 fabricate_apps () {
   # Loop through the elected categories, fabricating apps for each variant.
@@ -89,7 +91,7 @@ fabricate_ios () {
     mkdir -p "${ios_container}"
   fi
   local target_dir="${ios_container}/${ios_app_spec}"
-  blather -n Fabricating ${ios_app_spec}
+  blather -n Fabricating iOS ${ios_app_spec} with ${phonegap_ios_tools_version}
   if [ ! -d "$target_dir" ]; then
     blather , create...
     "${phonegap_ios_tools}"/create \
@@ -100,10 +102,19 @@ fabricate_ios () {
   else
     blather , refurnish...
   fi
+#  if [ -x "${phonegap_ios_tools}"/update_cordova_subproject ]; then
+#    blather update_cordova_subproject...
+#    "${phonegap_ios_tools}"/update_cordova_subproject \
+#      "${target_dir}/${app_name}.xcodeproj"
+#  else
+#    blather "(no update_cordova_subproject)"
+#  fi
 
+  blather Situate web sources...
   # Situate the application html5 components in the project:
   cp -a "${releases_dir}/${ios_app_spec}-ios/"* "${target_dir}/www/"
 
+  blather Situate project configuration files...
   # Situate adjusted project configuration files:
   # For ExternalHosts whitelist:
   cp "${artifacts_dir}"/ios_project/Cordova.plist "${target_dir}"/${app_name}/
@@ -114,6 +125,7 @@ fabricate_ios () {
   cp "${artifacts_dir}"/ios_project/project.pbxproj \
      "${target_dir}/${app_name}".xcodeproj/
 
+  blather Adjust build script to not start the emulator by default...
   # Derive a build script from the generated one that doesn't start the
   # emulator, and use it:
   grep -v emulate "${target_dir}"/cordova/debug \
