@@ -17,37 +17,12 @@
  under the License.
  */
 
-#import "ViewController.h"
+#import <Foundation/Foundation.h>
 
-@interface ViewController ()
+@protocol CDVScreenOrientationDelegate <NSObject>
 
-@end
-
-@implementation ViewController
-
-- (void)viewWillAppear:(BOOL)animated
-{
-    // View defaults to full size.  If you want to customize the view's size, or its subviews (e.g. webView),
-    // you can do so here.
-
-    [super viewWillAppear:animated];
-}
-
-- (void)viewDidLoad
-{
-    [super viewDidLoad];
-    // Do any additional setup after loading the view, typically from a nib.
-}
-
-- (void)viewDidUnload
-{
-    [super viewDidUnload];
-    // Release any retained subviews of the main view.
-}
-
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
-{
-    return [super shouldAutorotateToInterfaceOrientation:interfaceOrientation];
-}
+- (NSUInteger)supportedInterfaceOrientations;
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation;
+- (BOOL)shouldAutorotate;
 
 @end

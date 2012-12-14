@@ -25,7 +25,7 @@
 	<key>OpenAllWhitelistURLsInWebView</key>
 	<false/>
 	<key>BackupWebStorage</key>
-	<true/>
+	<string>cloud</string>
 	<key>ExternalHosts</key>
 	<array/>
 	<key>Plugins</key>
@@ -66,6 +66,10 @@
 		<string>CDVEcho</string>
 		<key>Battery</key>
 		<string>CDVBattery</string>
+		<key>Globalization</key>
+		<string>CDVGlobalization</string>
+		<key>InAppBrowser</key>
+		<string>CDVInAppBrowser</string>		
 	</dict>
 </dict>
 </plist>

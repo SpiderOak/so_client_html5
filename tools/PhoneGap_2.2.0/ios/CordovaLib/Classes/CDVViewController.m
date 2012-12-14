@@ -76,7 +76,6 @@
 
         self.wwwFolderName = @"www";
         self.startPage = @"index.html";
-        [self setWantsFullScreenLayout:YES];
 
         [self printMultitaskingInfo];
         [self printDeprecationNotice];
@@ -86,8 +85,6 @@
         [self loadSettings];
         // set the whitelist
         self.whitelist = [[CDVWhitelist alloc] initWithArray:[self.settings objectForKey:@"ExternalHosts"]];
-        // register this viewcontroller with the NSURLProtocol
-        [CDVURLProtocol registerViewController:self];
     }
 }
 
@@ -107,8 +104,8 @@
 
 - (void)printDeprecationNotice
 {
-    if (!IsAtLeastiOSVersion(@"4.2")) {
-        NSLog(@"CRITICAL: For Cordova 2.0, you will need to upgrade to at least iOS 4.2 or greater. Your current version of iOS is %@.",
+    if (!IsAtLeastiOSVersion(@"5.0")) {
+        NSLog(@"CRITICAL: For Cordova 2.0, you will need to upgrade to at least iOS 5.0 or greater. Your current version of iOS is %@.",
             [[UIDevice currentDevice] systemVersion]
             );
     }
@@ -216,8 +213,8 @@
     /*
      * Fire up CDVLocalStorage to work-around WebKit storage limitations: on all iOS 5.1+ versions for local-only backups, but only needed on iOS 5.1 for cloud backup.
      */
-    if (IsAtLeastiOSVersion(@"5.1") && (([backupWebStorage isEqualToString:@"local"]) ||
-            ([backupWebStorage isEqualToString:@"cloud"] && !IsAtLeastiOSVersion(@"6.0")))) {
+    if (IsAtLeastiOSVersion(@"5.1") && (([backupWebStorageType isEqualToString:@"local"]) ||
+            ([backupWebStorageType isEqualToString:@"cloud"] && !IsAtLeastiOSVersion(@"6.0")))) {
         [self registerPlugin:[[CDVLocalStorage alloc] initWithWebView:self.webView settings:[NSDictionary dictionaryWithObjectsAndKeys:
                     @"backupType", backupWebStorageType, nil]] withClassName:NSStringFromClass([CDVLocalStorage class])];
     }
@@ -405,6 +402,13 @@
     return [[CDVCordovaView alloc] initWithFrame:bounds];
 }
 
+- (NSString*)originalUserAgent
+{
+    UIWebView* testWebView = [[UIWebView alloc] initWithFrame:CGRectZero];
+
+    return [testWebView stringByEvaluatingJavaScriptFromString:@"navigator.userAgent"];
+}
+
 - (void)createGapView
 {
     CGRect webViewBounds = self.view.bounds;
@@ -412,6 +416,18 @@
     webViewBounds.origin = self.view.bounds.origin;
 
     if (!self.webView) {
+        // generate a GUID to append to the User-Agent
+        CFUUIDRef uuidRef = CFUUIDCreate(kCFAllocatorDefault);
+        CFStringRef uuidString = CFUUIDCreateString(kCFAllocatorDefault, uuidRef);
+        NSString* modifiedUA = [NSString stringWithFormat:@"%@ (%@)", [self originalUserAgent], uuidString];
+        CFRelease(uuidString);
+        CFRelease(uuidRef);
+
+        // setting the UserAgent must occur before the UIWebView is instantiated.
+        // This is read per instantiation, so it does not affect the main Cordova UIWebView
+        NSDictionary* dict = [[NSDictionary alloc] initWithObjectsAndKeys:modifiedUA, @"UserAgent", nil];
+        [[NSUserDefaults standardUserDefaults] registerDefaults:dict];
+
         self.webView = [self newCordovaViewWithFrame:webViewBounds];
         self.webView.autoresizingMask = (UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight);
 
@@ -419,6 +435,9 @@
         [self.view sendSubviewToBack:self.webView];
 
         self.webView.delegate = self;
+
+        // register this viewcontroller with the NSURLProtocol, only after the User-Agent is set
+        [CDVURLProtocol registerViewController:self];
     }
 }
 
@@ -522,29 +541,6 @@
      */
     else if ([url isFileURL]) {
         return YES;
-    } else if ([self.whitelist schemeIsAllowed:[url scheme]]) {
-        if ([self.whitelist URLIsAllowed:url] == YES) {
-            NSNumber* openAllInWhitelistSetting = [self.settings objectForKey:@"OpenAllWhitelistURLsInWebView"];
-            if ((nil != openAllInWhitelistSetting) && [openAllInWhitelistSetting boolValue]) {
-                NSLog(@"OpenAllWhitelistURLsInWebView set: opening in webview");
-                return YES;
-            }
-
-            // mainDocument will be nil for an iFrame
-            NSString* mainDocument = [theWebView.request.mainDocumentURL absoluteString];
-
-            // anchor target="_blank" - load in Mobile Safari
-            if ((navigationType == UIWebViewNavigationTypeOther) && (mainDocument != nil)) {
-                [[UIApplication sharedApplication] openURL:url];
-                return NO;
-            }
-            // other anchor target - load in Cordova webView
-            else {
-                return YES;
-            }
-        }
-
-        return NO;
     }
 
     /*
@@ -577,16 +573,19 @@
     }
 
     /*
-     * We don't have a Cordova or web/local request, load it in the main Safari browser.
-     * pass this to the application to handle.  Could be a mailto:dude@duderanch.com or a tel:55555555 or sms:55555555 facetime:55555555
+     * Handle all other types of urls (tel:, sms:), and requests to load a url in the main webview.
      */
     else {
-        NSLog(@"AppDelegate::shouldStartLoadWithRequest: Received Unhandled URL %@", url);
+        // BOOL isIFrame = ([theWebView.request.mainDocumentURL absoluteString] == nil);
 
-        if ([[UIApplication sharedApplication] canOpenURL:url]) {
-            [[UIApplication sharedApplication] openURL:url];
-        } else { // handle any custom schemes to plugins
-            [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:CDVPluginHandleOpenURLNotification object:url]];
+        if ([self.whitelist schemeIsAllowed:[url scheme]]) {
+            return [self.whitelist URLIsAllowed:url];
+        } else {
+            if ([[UIApplication sharedApplication] canOpenURL:url]) {
+                [[UIApplication sharedApplication] openURL:url];
+            } else { // handle any custom schemes to plugins
+                [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:CDVPluginHandleOpenURLNotification object:url]];
+            }
         }
 
         return NO;
@@ -705,7 +704,7 @@
     self.imageView.tag = 1;
     self.imageView.center = center;
 
-    self.imageView.autoresizingMask = (UIViewAutoresizingFlexibleWidth & UIViewAutoresizingFlexibleHeight & UIViewAutoresizingFlexibleLeftMargin & UIViewAutoresizingFlexibleRightMargin);
+    self.imageView.autoresizingMask = (UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin);
     [self.imageView setTransform:startupImageTransform];
     [self.view.superview addSubview:self.imageView];
 
