@@ -39,11 +39,15 @@ ios_plat_dir=ios
 android_plat_dir=android        # Not yet implemented.
 
 DO_RUN=""
+VERBOSE=""
 if [ -z "$*" ]; then
   # Whoops - run prep_release with action inhibited, to just get settings:
   INHIBIT_PREP=1
 elif [ x--run == "x$1" ]; then
   DO_RUN=true
+  shift
+elif [ x--verbose == "x$1" ]; then
+  VERBOSE=true
   shift
 fi
 
@@ -58,9 +62,8 @@ if [ -n "$INHIBIT_PREP" ]; then
 fi
 
 phonegap_targets_dir="${releases_dir}/PhoneGap"
-#phonegap_ios_tools_version=PhoneGap_2.2.0
-phonegap_ios_tools_version=PhoneGap_2.0.0
-phonegap_ios_tools="${tools_dir}/${phonegap_ios_tools_version}/ios/bin"
+phonegap_ios_tools_version=2.2.0
+phonegap_ios_tools_dir="${tools_dir}/PhoneGap_${phonegap_ios_tools_version}/ios"
 
 fabricate_apps () {
   # Loop through the elected categories, fabricating apps for each variant.
@@ -91,28 +94,32 @@ fabricate_ios () {
     mkdir -p "${ios_container}"
   fi
   local target_dir="${ios_container}/${ios_app_spec}"
-  blather -n Fabricating iOS ${ios_app_spec} with ${phonegap_ios_tools_version}
+  blather Fabricating ${ios_app_spec} \
+          with PhoneGap iOS ${phonegap_ios_tools_version}
   if [ ! -d "$target_dir" ]; then
-    blather , create...
-    "${phonegap_ios_tools}"/create \
+    blather Create mode...
+    "${phonegap_ios_tools_dir}"/bin/create \
       "${target_dir}" \
       "${bundle_prefix}.${app_name}" \
       "${app_name}" \
       "${app_name}"
   else
-    blather , refurnish...
+    blather Refurnish mode...
   fi
-#  if [ -x "${phonegap_ios_tools}"/update_cordova_subproject ]; then
-#    blather update_cordova_subproject...
-#    "${phonegap_ios_tools}"/update_cordova_subproject \
-#      "${target_dir}/${app_name}.xcodeproj"
-#  else
-#    blather "(no update_cordova_subproject)"
-#  fi
 
   blather Situate web sources...
   # Situate the application html5 components in the project:
   cp -a "${releases_dir}/${ios_app_spec}-ios/"* "${target_dir}/www/"
+  rm -f "${target_dir}/www/cordova-*.js"
+  cp    "${phonegap_ios_tools_dir}"/CordovaLib/cordova.ios.js \
+        "${target_dir}/www/cordova-${phonegap_ios_tools_version}.js"
+  # Redo index.html, substituting the right cordova-X.Y.Z.js version number:
+  sedexpr='s/\(^.* src="cordova-\)'
+  sedexpr="$sedexpr"'[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*'
+  sedexpr="$sedexpr"'\(\.js.*AUTO EDIT CORDOVA VERSION.*$\)/'
+  sedexpr="$sedexpr"'\1'"${phonegap_ios_tools_version}"'\2/'
+  sed -e "$sedexpr" "${releases_dir}/${ios_app_spec}-ios/index.html" \
+         > "${target_dir}/www/index.html"
 
   blather Situate project configuration files...
   # Situate adjusted project configuration files:
@@ -125,18 +132,22 @@ fabricate_ios () {
   cp "${artifacts_dir}"/ios_project/project.pbxproj \
      "${target_dir}/${app_name}".xcodeproj/
 
-  blather Adjust build script to not start the emulator by default...
-  # Derive a build script from the generated one that doesn't start the
-  # emulator, and use it:
-  grep -v emulate "${target_dir}"/cordova/debug \
-       > "${target_dir}"/cordova/debug-build-only
-  chmod +x "${target_dir}"/cordova/debug-build-only
-  if [ -n "$DO_RUN" ]; then
-    blather Build and run...
-    "${target_dir}"/cordova/debug > /dev/null
+  blather Build...
+  if [ -z "${VERBOSE}" ]; then
+    "${target_dir}"/cordova/build > /dev/null
   else
-    blather Building...
-    "${target_dir}"/cordova/debug-build-only > /dev/null
+    "${target_dir}"/cordova/build
+  fi
+
+  if [ -n "$DO_RUN" ]; then
+    blather ...and run...
+    if [ -z "${VERBOSE}" ]; then
+      "${target_dir}"/cordova/emulate > /dev/null
+    else
+      "${target_dir}"/cordova/emulate
+    fi
+  else
+    blather Done.
   fi
   ls -d "${target_dir}/build/${app_name}.app"
 }
