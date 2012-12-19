@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
+    id="com.phonegap.plugins.keychain"
+    version="1.0.0">
+
+    <name>iOS KeyChain</name>
+	
+    <engines>
+        <engine name="cordova" version="2.2.0" />
+    </engines>
+	
+    <asset src="www/keychain.js" target="keychain.js" />
+
+    <!-- ios -->
+    <platform name="ios">
+        <plugins-plist key="Keychain"
+                    string="CDVKeychain" />
+
+        <!-- Note: the ios src is based off src/ios implicitly --> 
+        <header-file src="CDVKeychain.h" />
+        <header-file src="SFHFKeychainUtils/SFHFKeychainUtils.h"/>
+        
+        <source-file src="CDVKeychain.m" />
+        <source-file src="SFHFKeychainUtils/SFHFKeychainUtils.m" />
+        
+        <framework src="Security.framework" />
+    </platform>
+</plugin>
