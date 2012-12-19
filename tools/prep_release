@@ -87,9 +87,9 @@ neutral_category=blue
 # .ui-btn-up-<swatch> "border" value works well.)
 
 # Finally, choose the rendering for the development version:
-dev_brand="spideroak"
-dev_color="orange"
-dev_platform="ios"
+prototype_brand="spideroak"
+prototype_color="orange"
+prototype_platform="ios"
 
 # ====================================================================
 # Internal configuration and processing below.
@@ -130,12 +130,28 @@ $app_dir/custom-scripting.js
 $app_dir/js_aux
 $app_dir/SpiderOak.js"
 
-# The releases are named <brand>-<theme-color>, for all combinations of
+# The releases are named <brand>-<color>-<platform>, for all combinations of
 # $brands, $color_schemes, and $platform_styles:
 
 selected_brands=""
 selected_platform_styles=""
 selected_color_schemes=""
+
+verify_prototype_synced () {
+  # Bail if the prototype copies of release artifacts have diverged.
+  local different=""
+  local release_settings="${artifacts_dir}/brand_settings_${prototype_brand}.js"
+  diff --brief brand.js "${release_settings}" || different=1
+  local release_icons="${artifacts_dir}/icons_${prototype_color}"
+  diff -r --brief icons "${release_icons}" || different=1
+  local release_images="${artifacts_dir}/brand_images_"
+  release_images="${release_images}${prototype_brand}_${prototype_color}"
+  diff -r --brief brand_images "${release_images}" || different=1
+  if [ -n "$different" ]; then
+    return 1
+  fi
+  return 0
+}
 
 select_variations () {
   # Loop through the command arguments, selecting them from their categories
@@ -257,17 +273,17 @@ produce_a_release () {
   fi
 }
 
-link_dev_env () {
-  # Last, establish links for development environment:
-  blather Re-linking dev env
-  brand_images_link_prefix="releases/brand_images_${dev_brand}_${dev_color}"
-  icons_color_link_prefix="releases/icons_${dev_color}"
-  rm -f "${app_dir}"/icons \
-    && ln -s "release_artifacts/icons_${dev_color}" "${app_dir}/icons"
+sync_prototype_copies () {
+  # Copy over the artifacts for the prototype/development environment:
+  blather Resync the prototype/development environment
+  local brand_images_prefix="releases/brand_images_${prototype_brand}_${prototype_color}"
+  local icons_color_prefix="releases/icons_${prototype_color}"
+  rm -rf "${app_dir}"/icons \
+    && cp -r "release_artifacts/icons_${prototype_color}" "${app_dir}/icons"
   rm -f "${app_dir}"/brand.js \
-    && ln -s "release_artifacts/brand_settings_${dev_brand}.js" "${app_dir}/brand.js"
-  rm -f "${app_dir}"/brand_images \
-    && ln -s "release_artifacts/brand_images_${dev_brand}_${dev_color}" \
+    && cp "release_artifacts/brand_settings_${prototype_brand}.js" "${app_dir}/brand.js"
+  rm -rf "${app_dir}"/brand_images \
+    && cp -r "release_artifacts/brand_images_${prototype_brand}_${prototype_color}" \
              "${app_dir}/brand_images"
 }
 
@@ -277,32 +293,37 @@ copy_sync () {
   rsync --delete --update --archive --exclude '*~' --exclude '#*' "$1" "$2"
 }
 
-if [ -z "$INHIBIT_PREP" ]; then
-  if [[ x"$*" =~ "x--help" ]]; then
-    blather usage: $(basename $0) "[ variant-selectors ... ]"
-    blather You can select any combination of variants.
-    blather Selecting none from a category will do all in that category.
-    variants_message
-    exit 0
+main () {
+  if [ -z "$INHIBIT_PREP" ]; then
+    if [[ x"$*" =~ "x--help" ]]; then
+      blather usage: $(basename $0) "[ variant-selectors ... ]"
+      blather You can select any combination of variants.
+      blather Selecting none from a category will do all in that category.
+      variants_message
+      exit 0
+    elif [[ x"$*" =~ "x--sync-prototype" ]]; then
+      sync_prototype_copies
+      exit 0
+    fi
+
+    if [ ! -d "${releases_dir}" ]; then
+      blather "(Creating releases dir.)"
+      mkdir -p "${releases_dir}"
+    fi
+
+    if ! verify_prototype_synced; then
+      echo Prototype artifacts diverge. 1>&2
+      echo Make sure any prototype artifact edits are preserved, and/or 1>&2
+      echo run with --sync-prototype option to overwrite prototype copies 1>&2
+      exit 1
+    fi
+
+    select_variations "$@"
+
+    produce_releases
+
+    blather "Prep done."
   fi
+}
 
-  if [ ! -d "${releases_dir}" ]; then
-    blather "(Creating releases dir.)"
-    mkdir -p "${releases_dir}"
-  fi
-
-  select_variations "$@"
-
-  produce_releases
-
-  if [[ ("$selected_brands" =~ "$dev_brand")
-        && ("$selected_color_schemes" =~ "$dev_color")
-        && ("$selected_platform_styles" =~ "$dev_platform") ]]; then
-    link_dev_env
-  else
-    echo -n Not doing dev env, variant "combination "
-    echo $dev_brand / $dev_color / $dev_platform not selected.
-  fi
-
-  blather "Prep done."
-fi
+main "$@"
