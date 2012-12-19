@@ -141,12 +141,12 @@ verify_prototype_synced () {
   # Bail if the prototype copies of release artifacts have diverged.
   local different=""
   local release_settings="${artifacts_dir}/brand_settings_${prototype_brand}.js"
-  diff --brief brand.js "${release_settings}" || different=1
+  diff --brief "${app_dir}/brand.js" "${release_settings}" || different=1
   local release_icons="${artifacts_dir}/icons_${prototype_color}"
-  diff -r --brief icons "${release_icons}" || different=1
+  diff -r --brief "${app_dir}/icons" "${release_icons}" || different=1
   local release_images="${artifacts_dir}/brand_images_"
   release_images="${release_images}${prototype_brand}_${prototype_color}"
-  diff -r --brief brand_images "${release_images}" || different=1
+  diff -r --brief "${app_dir}/brand_images" "${release_images}" || different=1
   if [ -n "$different" ]; then
     return 1
   fi
