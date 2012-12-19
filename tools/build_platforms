@@ -55,6 +55,10 @@ export BUILD_PLATFORM=true
 tools_dir="$(dirname "$0")"
 . "${tools_dir}/prep_release"
 
+pluginstaller_dir="${tools_dir}/pluginstall"
+pluginstaller="${pluginstaller_dir}/cli.js"
+plugins_dir="${artifacts_dir}/PhoneGap/Plugins"
+
 if [ -n "$INHIBIT_PREP" ]; then
   echo $(basename "$0") requires explicitly specified variations - 1>&2
   variants_message 1>&2
@@ -124,13 +128,16 @@ fabricate_ios () {
   blather Situate project configuration files...
   # Situate adjusted project configuration files:
   # For ExternalHosts whitelist:
-  cp "${artifacts_dir}"/ios_project/Cordova.plist "${target_dir}"/${app_name}/
+  cp "${artifacts_dir}"/ios_project/Cordova.plist "${target_dir}/${app_name}/"
   # Situate the desktop and app brand icons, and files that reference them:
   cp -a "${target_dir}"/www/brand_images/* "${target_dir}"/
   cp "${artifacts_dir}/ios_project/${app_name}"-Info.plist \
      "${target_dir}/${app_name}"/
   cp "${artifacts_dir}"/ios_project/project.pbxproj \
      "${target_dir}/${app_name}".xcodeproj/
+
+  blather Situate plugins...
+  situate_plugins ios "${target_dir}"
 
   blather Build...
   if [ -z "${VERBOSE}" ]; then
@@ -152,4 +159,39 @@ fabricate_ios () {
   ls -d "${target_dir}/build/${app_name}.app"
 }
 
+make_pluginstaller () {
+  # Ensure that the plugins installer is built.
+  # Simple criteria: the absence of the node_modules subdirectory.
+  if [ ! -e ${pluginstaller_dir}/node_modules ]; then
+    if ! type npm > /dev/null; then
+      echo npm, necessary to build PhoneGap plugin installer, not found. 1>&2
+      exit 1
+    fi
+    blather Pluginstall needs building.
+    blather Building pluginstall...
+    pushd ${pluginstaller_dir}
+    npm install
+    blather Testing pluginstall...
+    npm test > /dev/null
+    popd
+  fi
+}
+
+situate_plugins () {
+  # Situate all of the plugins in the indicated application package.
+  # XXX For now we're very coarse about this - include all plugins in the
+  #     ios packages.  Eventually - soon - we're going to have to
+  #     discriminate, idenitifying which plugins are for which platforms.
+  local package="$1" local platform="$2"
+
+  for plugin_path in "${plugins_dir}"/*; do
+    blather -n "... ${plugin_path##*/} - "
+    ${pluginstaller} "${package}" "${platform}" "${plugin_path}"
+  done
+}
+
+# Ensure that pluginstall is made:
+make_pluginstaller
+
+# Do the important stuff:
 fabricate_apps
