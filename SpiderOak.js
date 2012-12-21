@@ -43,7 +43,10 @@
 */
 
 // For misc.js:blather() and allowing dangerous stuff only during debugging.
-SO_DEBUGGING = true;
+// Use empty string for release/distribution.
+// Include any non-empty string for general debugging operation.
+// Use "+verbose" for some extra, UI-visible messages.
+SO_DEBUGGING = "basic -verbose";
 
 var spideroak = function () {
     /* SpiderOak application object, as a modular singleton. */
@@ -101,6 +104,7 @@ var spideroak = function () {
     };
 
     if (SO_DEBUGGING) {
+        /* Special Server provisions. */
         var hostname = window.location.hostname;
         if (hostname.slice(hostname.length-14) === ".spideroak.com") {
             generic.debug_proxying = true;
@@ -108,7 +112,8 @@ var spideroak = function () {
             generic.alt_host_replace = "https://web-dc2.spideroak.com";
             generic.alt_host_url = "https://" + hostname;
             generic.storage_path_prefix = "" + generic.storage_path_prefix;
-            generic.shares_path_suffix = "" + generic.shares_path_suffix; }}
+            generic.shares_path_suffix = "" + generic.shares_path_suffix; }
+    }
 
     /** Login session settings. */
     var my = {
@@ -686,6 +691,9 @@ var spideroak = function () {
             current_tab_manager.set_current_from(this); }
 
         this.remove_status_message();
+        if (SO_DEBUGGING.match(/\+verbose/)) {
+            this.show_status_message("Using base_host_url "
+                                     + generic.base_host_url); }
 
         this.show(chngpg_opts, {});
         $.mobile.loading('show');
