@@ -788,24 +788,32 @@ var spideroak = function () {
                 additions.push(item); }});
         return subdirs.concat(additions); }
 
+    /** Retrieve this node's data and deploy it.
+     *
+     *
+     *
+     * - On success, call this.handle_visit_success() with the retrieved
+     * JSON data, new Date() just prior to the retrieval, chngpg_opts,
+     *  mode_opts, a text status categorization, and the XMLHttpRequest
+     * object.
+     * - Otherwise, this.handle_visit_failure() is called with the
+     * XMLHttpResponse object, chngpg_opts, mode_opts, the text status
+     * categorization, and an exception object, present if an exception
+     * was caught.
+     *
+     * See the jQuery.ajax() documentation for XMLHttpResponse details.
+     *
+     * @this {ContentNode}
+     * @param {object} chngpg_opts $.mobile.changePage() options dictionary.
+     * @param {object} mode_opts Content and operation mode options dictionary.
+     * @param {number} tried Optional number of prior tries, zero if undefined.
+    */
     ContentNode.prototype.fetch_and_dispatch = function (chngpg_opts,
-                                                         mode_opts) {
-        /* Retrieve this node's data and deploy it.
-           'chngpg_opts' - Options for the framework's changePage function
-           'mode_opts': node provisioning and layout modal settings.
-
-           - On success, call this.handle_visit_success() with the retrieved
-             JSON data, new Date() just prior to the retrieval, chngpg_opts,
-             mode_opts, a text status categorization, and the XMLHttpRequest
-             object.
-           - Otherwise, this.handle_visit_failure() is called with the
-             XMLHttpResponse object, chngpg_opts, mode_opts, the text status
-             categorization, and an exception object, present if an exception
-             was caught.
-
-           See the jQuery.ajax() documentation for XMLHttpResponse details.
-        */
-
+                                                         mode_opts,
+                                                         tried) {
+        /* DOING 'tried' implementation not yet complete. */
+        if (! tried) {
+            tried = 0; }
         var when = new Date();
         var url = this.url + this.query_qualifier;
         $.ajax({url: url,
@@ -819,7 +827,8 @@ var spideroak = function () {
                 error: function (xhr, statusText, thrown) {
                     this.handle_visit_failure(xhr, chngpg_opts, mode_opts,
                                               statusText,
-                                              thrown)}.bind(this), })}
+                                              thrown,
+                                              tried)}.bind(this), })}
 
     RootContentNode.prototype.notify_subvisit_status = function(succeeded,
                                                                 token,
@@ -932,11 +941,29 @@ var spideroak = function () {
             mode_opts.notify_callback(true,
                                       mode_opts.notify_token); }}
 
+    /** Respond to failure of attempt to visit a remote node.
+     *
+     * Condition the action depending on the specific error and the number
+     * of prior tries - if we've already been through a retry, bail.
+     *
+     * @this {ContentNode}
+     * @param {object} xhr XML HTTP Response object.
+     * @param {object} chngpg_opts $.mobile.changePage() options dictionary.
+     * @param {object} mode_opts Content and operation mode options dictionary.
+     * @param {object} exception The exception that was thrown.
+     * @param {number} tried The number of prior tries.
+     */
     ContentNode.prototype.handle_visit_failure = function (xhr,
                                                            chngpg_opts,
                                                            mode_opts,
-                                                           exception) {
-        /* Do failed visit error handling with 'xhr' XMLHttpResponse report. */
+                                                           exception,
+                                                           tried) {
+        if ((xhr.status === 401) && (tried === 0)) {
+            // Unauthorized and this is our first retry -
+            // attempt to reauthenticate and repeat the visit.
+            // XXX Should this go in the root content node?
+            /* DOING 'tried' implementation not yet complete. */
+        }
         if (mode_opts.notify_callback) {
             mode_opts.notify_callback(false, mode_opts.notify_token, xhr); }
         else {
@@ -953,8 +980,10 @@ var spideroak = function () {
     RootContentNode.prototype.handle_visit_failure = function (xhr,
                                                                chngpg_opts,
                                                                mode_opts,
-                                                               exception) {
+                                                               exception,
+                                                               tried) {
         /* Do failed visit error handling with 'xhr' XMLHttpResponse report. */
+        /* DOING 'tried' implementation not yet complete. */
         this.layout();
         this.authenticated(false, xhr, exception); }
 
