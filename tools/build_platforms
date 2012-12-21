@@ -182,11 +182,16 @@ situate_plugins () {
   # XXX For now we're very coarse about this - include all plugins in the
   #     ios packages.  Eventually - soon - we're going to have to
   #     discriminate, idenitifying which plugins are for which platforms.
-  local package="$1" local platform="$2"
+  local platform="$1"
+  local package="$2"
 
   for plugin_path in "${plugins_dir}"/*; do
-    blather -n "... ${plugin_path##*/} - "
-    ${pluginstaller} "${package}" "${platform}" "${plugin_path}"
+    if [ -d "${plugin_path}"/src/"${platform}" ]; then
+      blather "... ${plugin_path##*/} ${platform}"
+      ${pluginstaller} "${platform}" "${package}" "${plugin_path}"
+    elif [ -z "${VERBOSE}" ]; then
+      blather "... (no ${plugin_path##*/} implementation for ${platform})"
+    fi
   done
 }
 
