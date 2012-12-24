@@ -287,6 +287,13 @@ function in_cordova() {
             && (typeof device.cordova !== "undefined")
             && device.cordova()); }
 
+/** Return the keychain, if available, else return undefined.
+ */
+function instantiate_keychain() {
+    try {
+        return cordova.require("cordova/plugin/keychain");
+    } catch (err) {
+        return undefined; }}
 
 // Polyfill for context .bind(context), for it's lack in Safari.
 // Taken almost verbatim from

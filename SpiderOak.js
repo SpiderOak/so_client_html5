@@ -54,7 +54,7 @@ var spideroak = function () {
 
     /* ==== Object-wide settings ==== */
 
-    var keychain = cordova.require("cordova/plugin/keychain");
+    var keychain = instantiate_keychain();
 
     /** Constants not specific to a particular login session: */
     var generic = {
@@ -178,23 +178,6 @@ var spideroak = function () {
         var storage_url = set_storage_account(username,
                                               storage_host,
                                               storage_web_url)
-        // XXX Experiment with keychain:
-        var keychainset_success_func =
-            function(value) {
-                alert("keychain set success, trying get...");
-                keychain.getForKey(function(value)
-                                   { alert("keychain get success, result: "
-                                           + value); },
-                                   function(err)
-                                   { alert("keychain get failed, result: "
-                                           + err); },
-                                   'some_username',
-                                   'keychain'); }
-        keychain.setForKey(keychainset_success_func,
-                           function(err) { alert("keychain set failed, err: "
-                                                 + err); },
-                           'some_username', 'keychain', username);
-
         $.mobile.changePage(storage_url);
     }
 
