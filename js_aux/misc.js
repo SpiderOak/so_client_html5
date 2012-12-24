@@ -13,8 +13,6 @@
    limitations under the License.
 */
 
-SO_DEBUGGING = false;            // for blather(), below.
-
 function translate(text) {
     /* Stub translate function for eventual i8n. */
     return text
@@ -279,6 +277,16 @@ function url_tail(url) {
     // Get string that trails all remaining '/' and '#':
     return url.split(/[#/]/).slice(-1)[0];
 }
+
+/** Best guess whether we're operating within Cordova/PhoneGap.
+ *
+ * False positives are possible, but there should be no false negatives.
+ */
+function in_cordova() {
+    return ((typeof device !== "undefined")
+            && (typeof device.cordova !== "undefined")
+            && device.cordova()); }
+
 
 // Polyfill for context .bind(context), for it's lack in Safari.
 // Taken almost verbatim from
