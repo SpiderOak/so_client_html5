@@ -57,6 +57,8 @@ var spideroak = function () {
 
     /* ==== Object-wide settings ==== */
 
+    var keychain = cordova.require("cordova/plugin/keychain");
+
     /** Constants not specific to a particular login session: */
     var generic = {
         // API v1.
