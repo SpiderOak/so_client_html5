@@ -168,13 +168,45 @@ var spideroak = function () {
 
     /* ==== Content Root Registration ====  */
 
+    /** Register user-specific storage details then visit storage root.
+     *
+     * @param {string} username the account name
+     * @param {string} storage_host the server for the account
+     * @param {string} storage_web_url the account's web UI entry address
+     */
+    function storage_session_embark(username, storage_host, storage_web_url) {
+        var storage_url = set_storage_account(username,
+                                              storage_host,
+                                              storage_web_url)
+        // XXX Experiment with keychain:
+        var keychainset_success_func =
+            function(value) {
+                alert("keychain set success, trying get...");
+                keychain.getForKey(function(value)
+                                   { alert("keychain get success, result: "
+                                           + value); },
+                                   function(err)
+                                   { alert("keychain get failed, result: "
+                                           + err); },
+                                   'some_username',
+                                   'keychain'); }
+        keychain.setForKey(keychainset_success_func,
+                           function(err) { alert("keychain set failed, err: "
+                                                 + err); },
+                           'some_username', 'keychain', username);
+
+        $.mobile.changePage(storage_url);
+    }
+
+    /** Register user-specific storage details.
+     *
+     * We preserve the details using remember_manager
+     *
+     * @param {string} username the account name
+     * @param {string} storage_host the server for the account
+     * @param {string} storage_web_url the account's web UI entry address
+     */
     function set_storage_account(username, storage_host, storage_web_url) {
-        /* Register confirmed user-specific storage details.  Return the
-           storage root URL.
-           'username' - the account name
-           'storage_host' - the server for the account
-           'storage_web_url' - the account's web UI entry address
-        */
 
         var storage_url = register_storage_root(storage_host, username,
                                                 storage_web_url);
@@ -186,14 +218,17 @@ var spideroak = function () {
                                     storage_host: storage_host,
                                     storage_web_url: storage_web_url}); }
 
-        // Now let's direct the caller to the combo root:
+        // Return combo root, as determined via register_content_root_url.
         return my.combo_root_url; }
-    function clear_storage_account() {
-        /* Obliterate internal settings and all content nodes for a clean
-           slate.  All share artifacts, original and other, are removed, as
-           well as registered storage, recents, favorites, settings.  We do
-           not remove persistent settings. */
 
+    /** Unregister user-specific storage details.
+     *
+     * Obliterate internal settings and all content nodes for a clean
+     * slate.  All share artifacts, original and other, are removed, as
+     * well as registered storage, recents, favorites, settings.  We do not
+     * remove persistent settings.
+     */
+    function clear_storage_account() {
         if (my.my_shares_root_url) {
             var my_shares_root = nmgr.get(my.my_shares_root_url);
             original_share_room_urls_list().map(
@@ -2254,7 +2289,7 @@ var spideroak = function () {
     var remember_manager = {
         /* Maintain user account info in persistent storage. */
 
-        // "remember_me" field not in fields, so its setting is retained
+        // "remember_me" field not in fields, so its' setting is retained
         // when remembering is disabled:
         fields: ['username', 'storage_host', 'storage_web_url'],
 
@@ -2649,11 +2684,9 @@ var spideroak = function () {
                     storage_login(login_info, login_url); }
                 else {
                     // Browser haz auth cookies, we haz relative location.
-                    // Go there, and machinery will intervene to handle it.
-                    $.mobile.changePage(
-                        set_storage_account(login_info['username'],
-                                            server_host_url,
-                                            match[2])); }
+                    storage_session_embark(login_info['username'],
+                                           server_host_url,
+                                           match[2]); }
             },
 
             error: function (xhr) {
