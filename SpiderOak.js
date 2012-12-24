@@ -42,11 +42,8 @@
     practice - my variables intended to contain jQuery objects start with '$'.
 */
 
-// For misc.js:blather() and allowing dangerous stuff only during debugging.
-// Use empty string for release/distribution.
-// Include any non-empty string for general debugging operation.
-// Use "+verbose" for some extra, UI-visible messages.
-SO_DEBUGGING = "basic -verbose";
+if (SO_DEBUGGING) {
+    console.log("SO_DEBUGGING: " + SO_DEBUGGING); }
 
 var spideroak = function () {
     /* SpiderOak application object, as a modular singleton. */
