@@ -753,7 +753,6 @@ var spideroak = function () {
             this.show(chngpg_opts, {}); }
 
         else {
-            this.veil(true);
             var storage_root = node_manager.get(my.storage_root_url, this);
             // Use a distinct copy of mode_opts:
             var storage_mode_opts = $.extend({}, public_mode_opts);
@@ -906,10 +905,7 @@ var spideroak = function () {
                 var ps_root = nmgr.get(my.my_shares_root_url, this);
                 ps_root.visit({}, our_mode_opts); }
             else {
-                if (this.veiled) {
-                    this.veil(false, $.mobile.loading('hide')); }
-                else {
-                    $.mobile.loading('hide'); }}}}
+                $.mobile.loading('hide'); }}}
 
     PublicRootShareNode.prototype.notify_subvisit_status = function(succeeded,
                                                                    token,
@@ -1053,7 +1049,6 @@ var spideroak = function () {
                 this.layout_header(); }}
         else {
             // Include the xhr.statusText in the form.
-            this.veil(false);
             $content_section.hide();
             $("#my-storage-leader").hide();
             $("#my-rooms-leader").hide();
@@ -1072,7 +1067,7 @@ var spideroak = function () {
                     clear_storage_account(); }}
             // Hide the storage and original shares sections
             $content_section.hide();
-            if (this.veiled) { this.veil(false); }}}
+        }}
 
     PublicRootShareNode.prototype.actions_menu_link = function (subject_url) {
         /* Create a menu for 'subject_url' using 'template_id'.  Return an
@@ -2725,8 +2720,6 @@ var spideroak = function () {
                 remember_manager.remove_storage_host(); }
             node_manager.get_combo_root().visit({}, {}); }
 
-        this.veil(true);
-
         if (! this.loggedin_ish()) {
             // Can't reach logout location without server - just clear and bail.
             finish(); }
@@ -2740,36 +2733,6 @@ var spideroak = function () {
                                     + xhr.status
                                     + " (" + xhr.statusText + ")");
                         finish(); }}); }}
-
-    RootContentNode.prototype.veil = function (conceal, callback) {
-        /* If 'conceal' is true, conceal our baudy body.  Otherwise, gradually
-           reveal and position the cursor in the username field.
-           Optional 'callback' - function to invoke as part of the un/veiling.
-        */
-        function do_conditional_focus() {
-            var $username = $('#my_login_username');
-            var $password = $('#my_login_password');
-            if (! ($username.is(':focus') || $password.is(':focus'))) {
-                if ($username.val() === "") {
-                    $username.focus(); }
-                else { $password.focus(); }}}
-        function do_conditional_focus_and_callback() {
-            do_conditional_focus();
-            if (callback) { callback(); }}
-        var selector = '#home [data-role="content"]';
-        selector = selector.concat(', .error-status-message',
-                                   ', .result-status-message');
-        if (conceal) {
-            $(selector).hide(0, callback);
-            this.veiled = true; }
-        else {
-            this.veiled = false;
-            // Surprisingly, doing focus before dispatching fadeIn doesn't work.
-            // Also, username field focus doesn't *always* work before the
-            // delay is done, hence the redundancy.  Sigh.
-            $(selector).delay(1000).fadeIn(2500,
-                                           do_conditional_focus_and_callback);
-            do_conditional_focus(); }}
 
     function prep_credentials_form(content_selector, submit_handler, name_field,
                                    do_fade) {
@@ -2860,7 +2823,6 @@ var spideroak = function () {
             if (do_fade) {
                 var combo_root = node_manager.get_combo_root();
                 var unhide_form_oneshot = function(event, data) {
-                    combo_root.veil(false);
                     $.mobile.loading('hide');
                     $(document).unbind("pagechange.SpiderOak",
                                        unhide_form_oneshot);
@@ -2948,9 +2910,6 @@ var spideroak = function () {
                               public_shares.add_item_external.bind(
                                   public_shares),
                               'shareid', false);
-
-        // Hide everything below the banner, for subsequent unveiling:
-        combo_root.veil(true);
 
         // Try a storage account if available from persistent settings
         if (remember_manager.active()) {
