@@ -23,7 +23,7 @@
  * Only the "basic" setting should be checked in.
  *
  * Include any non-empty string for general debugging messages.
- * "+verbose" - additonal, UI-visible messages status messages
- * "-alert-dummy-keychain" - inhibit alert about using dummy keychain
+ * ":verbose" - additonal, UI-visible messages status messages
+ * ":test_keychain_trivial" - elementary keychain plugin test
  */
-SO_DEBUGGING = "basic +alert-dummy-keychain";
+SO_DEBUGGING = "basic -test_keychain_trivial -verbose";

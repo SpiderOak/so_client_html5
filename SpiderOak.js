@@ -177,7 +177,9 @@ var spideroak = function () {
     function storage_session_embark(username, storage_host, storage_web_url) {
         var storage_url = set_storage_account(username,
                                               storage_host,
-                                              storage_web_url)
+                                              storage_web_url);
+        if (SO_DEBUGGING.match(/:test_keychain_trivial/)) {
+            test_keychain_trivial('so_username', 'keychain', username); }
         $.mobile.changePage(storage_url);
     }
 
@@ -708,7 +710,7 @@ var spideroak = function () {
             current_tab_manager.set_current_from(this); }
 
         this.remove_status_message();
-        if (SO_DEBUGGING.match(/\+verbose/)) {
+        if (SO_DEBUGGING.match(/:verbose/)) {
             this.show_status_message("Using base_host_url "
                                      + generic.base_host_url); }
 
