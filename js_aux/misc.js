@@ -283,17 +283,26 @@ function url_tail(url) {
  * False positives are possible, but there should be no false negatives.
  */
 function in_cordova() {
-    return ((typeof device !== "undefined")
+    return ((typeof window.device !== "undefined")
             && (typeof device.cordova !== "undefined")
             && device.cordova()); }
 
-/** Return the keychain, if available, else return undefined.
+/** Keychain object, for reuse via get_keychain.
  */
-function instantiate_keychain() {
+var keychain = null;
+
+/** Return the keychain, if available, else return undefined.
+ *
+ * If unavailable and dummy keychain alert is not inihibited, post an alert
+ * about using an insecure dummy substitute.
+ */
+function get_keychain() {
+    if (keychain) {
+        return keychain; }
     try {
-        return cordova.require("cordova/plugin/keychain");
+        return keychain = cordova.require("cordova/plugin/keychain");
     } catch (err) {
-        return undefined; }}
+        return keychain = undefined; }}
 
 // Polyfill for context .bind(context), for it's lack in Safari.
 // Taken almost verbatim from
