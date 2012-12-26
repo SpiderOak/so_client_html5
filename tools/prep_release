@@ -75,7 +75,7 @@ blue_category=blue
 green_category=blue
 neutral_category=blue
 
-#    Manually edit $app_dir/css/themes/tweaks.css
+#    Manually edit $app_dir/css/tweaks.css
 #
 # to add a border-color value in a section for that swatch:
 #
