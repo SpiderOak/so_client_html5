@@ -2463,8 +2463,44 @@ var spideroak = function () {
     var ctmgr = current_tab_manager; // Compact name, for convenience.
 
 
-    /**
-     * Produce, provide access to, and dispose of app subject item nodes.
+    /** Translate various names for an object to its canonical name/address.
+     *
+     */
+    var indirection_manager = function () {
+        /* Private */
+        var by_name = {};
+
+        return {
+            /** Translate a various name for an object to its canonical name.
+             *
+             * @return {string} canonical name
+             * @param {string} name
+             */
+            get: function(name) {
+                return by_name[name];
+            },
+            /** Associate a various name for an object to its canonical name.
+             *
+             * A canonical name can have multiple indirections.
+             *
+             * @param {string} name
+             * @param {string} canonical
+             */
+            set: function(name, canonical) {
+                by_name[name] = canonical;
+            },
+
+            /** Remove name registration - dissassociate from canonical name.
+             *
+             * @param {string} name
+             */
+            remove: function(name, canonical) {
+                delete by_name[name];
+            },
+        }
+    }()
+
+    /** Produce, provide access to, and dispose of item nodes.
      *
      * This singleton utility manages items including content, content
      * containers, and other (like settings) containers.  The '.get'
