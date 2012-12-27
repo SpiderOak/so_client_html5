@@ -45,8 +45,8 @@
 if (SO_DEBUGGING) {
     console.log("SO_DEBUGGING: " + SO_DEBUGGING); }
 
+/** SpiderOak application object, as a modular singleton. */
 var spideroak = function () {
-    /* SpiderOak application object, as a modular singleton. */
     "use strict";               // ECMAScript 5
 
 
