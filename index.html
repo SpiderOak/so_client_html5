@@ -328,80 +328,184 @@
     </div>
   </div>
 
-  <div data-role="page" id="settings-page-template">
+  <div data-role="page" class="multiple-listviews" id="settings-root">
     <div data-role="header" data-position="fixed" data-theme="f">
       <a href="#home" data-icon="so-carat-l" data-role="button"
          data-mini="true" class="back-button"
-         data-transition="slide" alt="My Stuff">
+         data-transition="slide" data-direction="reverse" alt="Settings">
         My Stuff</a>
       <h3 class="header-title" data-theme="f"> Settings </h3>
     </div>
     <div data-role="content">
-      <div class="nav-settings-form">
-        <form method="POST" class="settings-form">
-          <div data-role="collapsible" data-mini="true" data-theme="f"
-               data-inset="false"
-               data-collapsed-icon="arrow-r" data-expanded-icon="arrow-d">
-            <legend> Settings </legend>
-            <p> General Settings </p>
-          </div>
-          <table>
-            <tr>
-              <td> <img src="icons/room_public.png"
-                        class="form-icon">
-              </td>
-              <td width="100%">
-                <ul data-role="listview" data-inset="true">
-                  <li data-role="fieldcontain" class="ui-hide-label"
-                      data-theme="d">
-                    <label for="my_share_id">Share ID:</label>
-                    <input type="text" name="shareid" id="my_share_id"
-                           autocapitalize="off" autocorrect="off"
-                           placeholder="Share ID"
-                           value data-theme="a">
-                    <label for="my_login_password">Password:</label>
-                    <input type="password" name="password"
-                           id="my_login_password"
-                           placeholder="Share Key">
-                  </li>
-                </ul>
-              </td>
-            </tr>
-          </table>
-          <div class="ui-grid-a" data-theme="a">
-            <div class="ui-block-b" align="center">
-              <input type="submit" data-inline="true" value="Visit"
-                     name="Login" data-theme="b"/>
-            </div>
-            <div class="ui-block-b" align="left">
-                <div data-role="controlgroup">
-                  <select name="slider" id="retain-visit" class="remember"
-                          data-role="slider"
-                          data-mini="true">
-	            <option value="off">Off</option default="true">
-	            <option value="on">On</option>
-                  </select><br/>
-                  <label for="retain-visit">
-                    <small>
-                      Persistent visit
-                    </small>
-                  </label>
-                </div>
-            </div>
-          </div>
-        </form>
-      </div>
-      <div data-role="collapsible" data-mini="true" class="adjust-spiel"
-           data-inset="false" data-theme="f"
-           data-collapsed-icon="arrow-r" data-expanded-icon="arrow-d">
-        <legend> Default Account </legend>
-        <p> Auto-visited account </p>
-      </div>
-      <hr class="page-content"/>
-      <ul class="content-items page-content" data-role="listview">
-      </ul>
+      <form method="POST" class="settings-form">
+        <ul data-role="listview" data-inset="true">
+          <li data-icon="so-carat-r">
+            <a href="#settings-folder-layout"
+               data-transition="slide">
+              Folder Layout
+              <span class="so-listview-value ui-li-count"
+                    so-tag-content="folder-layout">
+                List
+              </span>
+            </a>
+          </li>
+          <li data-icon="so-carat-r">
+            <a href="#settings-logout-on-exit"
+               data-transition="slide">
+              Log out on exit
+              <span class="so-listview-value ui-li-count"
+                    so-tag-content="logout-on-exit">
+                After 5 min.
+              </span>
+            </a>
+          </li>
+        </ul>
+        <h4 class="settings-title"> Account </h4>
+        <ul data-role="listview" data-inset="true" data-inline="true">
+          <li data-icon="so-carat-r">
+            <a href="#user-account"
+               data-transition="slide">
+              Name
+              <span class="so-listview-value ui-li-count"
+                    so-tag-content="username">
+                Spider Oakley
+              </span>
+            </a>
+          </li>
+          <li data-icon="so-carat-r">
+            <a href="#PIN"
+               data-transition="slide">
+              PIN
+              <span class="so-listview-value ui-li-count"
+                    so-tag-content="PIN-active">
+                Off
+              </span>
+            </a>
+          </li>
+        </ul>
+        <div class="center-wrapper">
+          <input type="submit" data-inline="true" value="Logout"
+                 so-tag-disable-if="is-not-logged-in"
+                 align="center" name="Logout" data-theme="b"/>
+        </div>
+      </form>
     </div>
-    <div data-role="footer" data-position="fixed" data-theme="f">
+    <div data-role="footer" data-position="fixed" data-theme="a">
+      <div data-role="navbar">
+        <ul>
+          <li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div data-role="page" class="multiple-listviews" id="settings-folder-layout">
+    <div data-role="header" data-position="fixed" data-theme="f">
+      <a href="#settings-root" data-icon="so-carat-l" data-role="button"
+         data-mini="true" class="back-button"
+         data-transition="slide" data-direction="reverse" alt="Settings">
+        Settings</a>
+      <h3 class="header-title" data-theme="f"> Folder Layout </h3>
+    </div>
+    <div data-role="content">
+      <form method="POST" class="settings-form">
+        <ul data-role="listview" data-inset="true">
+          <li data-icon="so-carat-r">
+            <a href="#">
+              Hierarchical folder structure
+              <span class="so-listview-value ui-li-count"
+                    so-tag-checked="hierarchical-folder-layout">
+              </span>
+            </a>
+          </li>
+          <li data-icon="so-carat-r">
+            <a href="#">
+              List layout
+              <span class="so-listview-value ui-li-count"
+                    so-tag-checked="list-folder-layout">
+              </span>
+            </a>
+          </li>
+        </ul>
+        <div class="center-wrapper">
+          <input type="submit" data-inline="true" value="Logout"
+                 so-tag-disable-if="is-not-logged-in"
+                 align="center" name="Logout" data-theme="b"/>
+        </div>
+      </form>
+    </div>
+    <div data-role="footer" data-position="fixed" data-theme="a">
+      <div data-role="navbar">
+        <ul>
+          <li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div data-role="page" class="multiple-listviews" id="settings-logout-on-exit">
+    <div data-role="header" data-position="fixed" data-theme="f">
+      <a href="#settings-root" data-icon="so-carat-l" data-role="button"
+         data-mini="true" class="back-button"
+         data-transition="slide" data-direction="reverse" alt="Settings">
+        Settings</a>
+      <h3 class="header-title" data-theme="f"> Logout On Exit </h3>
+    </div>
+    <div data-role="content">
+      <form method="POST" class="settings-form">
+        <ul data-role="listview" data-inset="true">
+          <li data-icon="so-carat-r">
+            <a href="#settings-root?var=logout-on-exit-time&value=off">
+              Off
+              <span class="so-listview-value ui-li-count"
+                    so-tag-checked="logout-on-exit-time?value=Off">
+              </span>
+            </a>
+          </li>
+          <li data-icon="so-carat-r">
+            <a href="#settings-root?var=logout-on-exit-time&value=0">
+              Immediately
+              <span class="so-listview-value ui-li-count"
+                    so-tag-checked="logout-on-exit-time?value=0">
+              </span>
+            </a>
+          </li>
+          <li data-icon="so-carat-r">
+            <a href="#settings-root?var=logout-on-exit-time&value=5">
+              After 5 min
+              <span class="so-listview-value ui-li-count"
+                    so-tag-checked="logout-on-exit-time?value=5">
+              </span>
+            </a>
+          </li>
+          <li data-icon="so-carat-r">
+            <a href="#settings-root?var=logout-on-exit-time&value=10">
+              After 10 min
+              <span class="so-listview-value ui-li-count"
+                    so-tag-checked="logout-on-exit-time?value=10">
+              </span>
+            </a>
+          </li>
+          <li data-icon="so-carat-r">
+            <a href="#settings-root?var=logout-on-exit-time&value=30">
+              After 30 min
+              <span class="so-listview-value ui-li-count"
+                    so-tag-checked="logout-on-exit-time?value=30">
+              </span>
+            </a>
+          </li>
+          <li data-icon="so-carat-r">
+            <a href="#settings-root?var=logout-on-exit-time&value=60">
+              After 1 hour
+              <span class="so-listview-value ui-li-count"
+                    so-tag-checked="logout-on-exit-time?value=60">
+              </span>
+            </a>
+          </li>
+        </ul>
+      </form>
+    </div>
+    <div data-role="footer" data-position="fixed" data-theme="a">
       <div data-role="navbar">
         <ul>
           <li>
