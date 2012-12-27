@@ -66,20 +66,19 @@ var spideroak = function () {
         icons_dir: "icons",
         brand_images_dir: "brand_images",
         combo_root_url: "https://home",
-        myshares_url: "https://my-shares",
-        anyones_url: "https://shares",
-        recents_url: "https://recents",
-        favorites_url: "https://favorites",
-        settings_url: "https://settings",
         combo_root_page_id: "home",
-        recents_page_id: "recents",
-        favorites_page_id: "favorites",
-        settings_page_id: "settings",
-        storage_root_page_id: "storage-home",
+        myshares_url: "https://my-shares",
         my_shares_root_page_id: "my-shares",
+        anyones_url: "https://shares",                 // <
         public_shares_root_page_id: "share",
+        recents_url: "https://recents",
+        recents_page_id: "recents",
+        favorites_url: "https://favorites",
+        favorites_page_id: "favorites",
+        settings_url: "https://settings-root",
+        settings_root_page_id: "settings-root",
+        storage_root_page_id: "storage-home",
         content_page_template_id: "content-page-template",
-        settings_page_template_id: "settings-page-template",
         storage_login_path: "/browse/login",
         storage_logout_suffix: "logout",
         storage_path_prefix: "/storage/",
@@ -2095,7 +2094,7 @@ var spideroak = function () {
                                      icon_name: "so-recents-footer"},
                                     {title: "Settings",
                                      url: ("#" +
-                                           generic.settings_page_id),
+                                           generic.settings_root_page_id),
                                      selector: "settings",
                                      transition: "fade",
                                      icon_name: "so-settings"},
@@ -2150,7 +2149,7 @@ var spideroak = function () {
         return $("#" + generic.content_page_template_id); }
 
     SettingsPanelNode.prototype.get_page_template$ = function() {
-        return $("#" + generic.settings_page_template_id); }
+        return $("#" + generic.settings_root_page_id); }
 
     Node.prototype.my_icon_image$ = function(image_class) {
         /* Return this item's icon image element, with 'image_class'.
@@ -2965,13 +2964,21 @@ var spideroak = function () {
                             ? generic.compact_title_chars
                             : generic.expansive_title_chars)); }
 
-    function no_op () { console.log("no-op"); }
-
+    /** @private */
     var document_addrs = {
-        /* Map specific document fragment addresses from the application
-           document to internal functions/methods. */
         logout: storage_logout,
-        noop: no_op,
+        noop: function () {
+            console.log("no-op"); },
+    }
+
+    /** Map document fragment addresses to DOM pages or methods.
+     *
+     * @param {string} fragment The document fragment to visit.
+     */
+    function document_addrs_new(fragment) {
+        var intercept = fragment_intercepts[fragment]; 
+        if (intercept) { return intercept; }
+        // If we have a page object in the DOM:
     }
 
     /**
@@ -2987,28 +2994,30 @@ var spideroak = function () {
                 || (obj instanceof FavoriteContentsNode)
                 || (obj instanceof PanelNode)); }
 
-    function internalize_url(obj) {
-        /* Return the "internal" version of the 'url'.
-
-           - For non-string objects, returns the object
-           - For fragments of the application code's url, returns the fragment
-             (sans the '#'),
-           - Translates page-ids for root content nodes to their urls,
-           - Those last two, combined, transforms fragment references to root
-             content pages to the urls of those pages.
-
-           If none of the conditions holds, the original object is returned. */
-        if (typeof obj !== "string") { return obj; }
-        if (obj.split('#')[0] === window.location.href.split('#')[0]) {
-            obj = obj.split('#')[1]; }
-        switch (obj) {
+    /** Return the "internal" version of the 'url'.
+     *
+     * - For non-string objects, returns the object
+     * - For fragments of the application code's url, returns the fragment
+     *   (sans the '#'),
+     * - Translates page-ids for root content nodes to their urls,
+     * - Those last two, combined, transforms fragment references to root
+     *   content pages to the urls of those pages.
+     * If none of the conditions holds, the original object is returned.
+     *
+     * @param {object} subject
+     */
+    function internalize_url(subject) {
+        if (typeof subject !== "string") { return subject; }
+        if (subject.split('#')[0] === window.location.href.split('#')[0]) {
+            subject = subject.split('#')[1]; }
+        switch (subject) {
         case (generic.combo_root_page_id):
             return generic.combo_root_url;
         case (generic.recents_page_id):
             return generic.recents_url;
         case (generic.favorites_page_id):
             return generic.favorites_url;
-        case (generic.settings_page_id):
+        case (generic.settings_root_page_id):
             return generic.settings_url;
         case (generic.storage_root_page_id):
             return my.storage_root_url;
@@ -3016,7 +3025,7 @@ var spideroak = function () {
             return my.my_shares_root_url;
         case (generic.public_shares_root_page_id):
             return my.public_shares_root_url;
-        default: return obj; }}
+        default: return subject; }}
 
     function content_nodes_by_url_sorter(prev, next) {
         var prev_str = prev, next_str = next;
