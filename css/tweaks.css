@@ -9,6 +9,17 @@
  min-width: 300px;
 }
 
+/* Center elements, using <div class="center-wrapper"> stuff to center </div> */
+/* From http://stackoverflow.com/a/4396545 */
+.center-wrapper { text-align: center; }
+.center-wrapper * { margin: 0 auto; }
+
+/* We use ui-li-count to get the settings value near the arrow, but have to
+   override some of the indirect effect, like border: */
+.so-listview-value {
+  border: 0px solid #ccc !important;
+}
+
 .header-title > .ui-btn {
   margin: 0;
 }
