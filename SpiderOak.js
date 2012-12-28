@@ -68,17 +68,12 @@ var spideroak = function () {
         base_host_url: brand.base_host_url,
         icons_dir: "icons",
         brand_images_dir: "brand_images",
-        combo_root_url: "https://home",
+        combo_root_url: "https://home",         // For priming my.combo_root_url
         combo_root_page_id: "home",
-        myshares_url: "https://my-shares",
         my_shares_root_page_id: "my-shares",
-        anyones_url: "https://shares",                 // <
-        public_shares_root_page_id: "share",
-        recents_url: "https://recents",
+        published_root_page_id: "share",
         recents_page_id: "recents",
-        favorites_url: "https://favorites",
         favorites_page_id: "favorites",
-        settings_url: "https://settings-root",
         settings_root_page_id: "settings-root",
         storage_root_page_id: "storage-home",
         content_page_template_id: "content-page-template",
@@ -141,7 +136,7 @@ var spideroak = function () {
 
     function handle_content_visit(e, data) {
         /* Intercept URL visits and intervene for repository content. */
-        var page = internalize_url(data.toPage);
+        var page = urlize(data.toPage);
 
         if ((typeof page === "string")
             && (is_node_url(page)
@@ -153,7 +148,7 @@ var spideroak = function () {
                 return true; }
             var mode_opts = query_params(page);
             if (document_addrs.hasOwnProperty(page)) {
-                var internal = internalize_url(document.location.href);
+                var internal = urlize(document.location.href);
                 return document_addrs[page].call(this, internal); }
             else if (data.toPage !== $.mobile.activePage.attr('id')) {
                 node_manager.get_recents().add_visited_url(page);
@@ -302,20 +297,20 @@ var spideroak = function () {
     function is_combo_root_url(url) {
         return (url === my.combo_root_url); }
     function is_recents_url(url) {
-        return (url === generic.recents_url); }
+        return (url === id2url(generic.recents_page_id)); }
     function is_favorites_url(url) {
-        return (url === generic.favorites_url); }
+        return (url === id2url(generic.favorites_page_id)); }
     function is_settings_url(url) {
-        return (url === generic.settings_url); }
+        return (url === id2url(generic.settings_page_id)); }
     function is_root_url(url) {
         /* True if the 'url' is for one of the root content items.  We
            split off any search fragment.  Doesn't depend on the url having
            an established node. */
         url = url.split('?')[0];
         return ((url === my.combo_root_url)
-                || (url === generic.recents_url)
-                || (url === generic.favorites_url)
-                || (url === generic.settings_url)
+                || (url === id2url(generic.recents_page_id))
+                || (url === id2url(generic.favorites_page_id))
+                || (url === id2url(generic.settings_page_id))
                 || (url === my.storage_root_url)
                 || (url === my.my_shares_root_url)
                 || (url === my.public_shares_root_url)); }
@@ -347,7 +342,7 @@ var spideroak = function () {
                     === my.public_shares_root_url)); }
     function is_node_url(url) {
         /* True if url within registered roots. */
-        url = internalize_url(url); // ... for content root page ids.
+        url = urlize(url); // ... for content root page ids.
         return (is_storage_url(url)
                 || is_share_url(url)
                 || is_combo_root_url(url)
@@ -1507,7 +1502,7 @@ var spideroak = function () {
     OriginalRootShareNode.prototype.my_page_id = function () {
         return generic.my_shares_root_page_id; }
     PublicRootShareNode.prototype.my_page_id = function () {
-        return generic.public_shares_root_page_id; }
+        return generic.published_root_page_id; }
 
     Node.prototype.show = function (chngpg_opts, mode_opts) {
         /* Trigger UI focus on our content layout.
@@ -2078,9 +2073,9 @@ var spideroak = function () {
                                      selector: "account",
                                      transition: "fade",
                                      icon_name: "so-account-footer"},
-                                    {title: "Anyone's",
+                                    {title: "Shares",
                                      url: ("#" +
-                                           generic.public_shares_root_page_id),
+                                           generic.published_root_page_id),
                                      selector: "room_public",
                                      transition: "fade",
                                      icon_name: "so-room_public"},
@@ -2389,7 +2384,7 @@ var spideroak = function () {
              * We need to do some work when a visit is initiated of share
              * room content from a non-content tab, because share rooms can
              * simultaneously reside among both the account resources
-             * (orignal shares) and the list of currently visited anyone's
+             * (orignal shares) and the list of currently visited published
              * shares.
              *
              * @param {node} the node by which we determine the current tab
@@ -2421,13 +2416,13 @@ var spideroak = function () {
                     else {
                         // Curent node isn't a content root, and it has no
                         // registered recent tab, so infer one:
-                        // - Use anyone's shares, if its included there
+                        // - Use published shares, if its included there
                         // - Use account's shares, if its included there
                         // - Otherwise, leave the current setting.
                         var container = node.outer_container();
-                        var anyones = node_manager.get_anyones();
+                        var published = node_manager.get_published();
                         var myshares = node_manager.get_myshares();
-                        if (anyones.contains(container)) {
+                        if (published.contains(container)) {
                             return container.url; }
                         else if (myshares.contains(container)) {
                             return myshares.url; }
@@ -2525,43 +2520,47 @@ var spideroak = function () {
         // Cached references, for frequent access with impunity:
         var combo_root = null;
         var myshares = null;
-        var anyones = null;
+        var published = null;
         var recents = null;
         var favorites = null;
         var settings = null;
+
 
         /* Public */
         return {
             get_combo_root: function () {
                 if (! combo_root) {
-                    combo_root = this.get(my.combo_root_url, null); }
+                    combo_root = this.get(urlize(generic.combo_root_page_id),
+                                          null); }
                 return combo_root; },
 
             get_myshares: function () {
                 if (! myshares) {
-                    myshares = this.get(generic.myshares_url, null); }
+                    myshares = this.get(id2url(generic.myshares_root_page_id),
+                                        null); }
                 return myshares; },
 
-            get_anyones: function () {
-                if (! anyones) {
-                    anyones = this.get(generic.anyones_url, null); }
-                return anyones; },
+            get_published: function () {
+                if (! published) {
+                    published = this.get(id2url(generic.published_root_page_id),
+                                         null); }
+                return published; },
 
             get_recents: function () {
                 if (! recents) {
-                    recents = this.get(generic.recents_url,
+                    recents = this.get(id2url(generic.recents_page_id),
                                        this.get_combo_root()); }
                 return recents; },
 
             get_favorites: function () {
                 if (! favorites) {
-                    favorites = this.get(generic.favorites_url,
+                    favorites = this.get(id2url(generic.favorites_page_id),
                                          this.get_combo_root()); }
                 return favorites; },
 
             get_settings: function () {
                 if (! settings) {
-                    settings = this.get(generic.settings_url,
+                    settings = this.get(id2url(generic.settings_page_id),
                                         this.get_combo_root()); }
                 return favorites; },
 
@@ -3045,26 +3044,24 @@ var spideroak = function () {
      *
      * @param {object} subject
      */
-    function internalize_url(subject) {
+    function urlize(subject) {
         if (typeof subject !== "string") { return subject; }
         if (subject.split('#')[0] === window.location.href.split('#')[0]) {
             subject = subject.split('#')[1]; }
         switch (subject) {
         case (generic.combo_root_page_id):
-            return generic.combo_root_url;
         case (generic.recents_page_id):
-            return generic.recents_url;
+        case (generic.my_shares_root_page_id):
         case (generic.favorites_page_id):
-            return generic.favorites_url;
         case (generic.settings_root_page_id):
-            return generic.settings_url;
+        case (generic.published_root_page_id):
+            return id2url(subject);
         case (generic.storage_root_page_id):
             return my.storage_root_url;
-        case (generic.my_shares_root_page_id):
-            return my.my_shares_root_url;
-        case (generic.public_shares_root_page_id):
-            return my.public_shares_root_url;
         default: return subject; }}
+
+    function id2url(page_id) {
+        return "https://" + page_id; }
 
     function content_nodes_by_url_sorter(prev, next) {
         var prev_str = prev, next_str = next;
