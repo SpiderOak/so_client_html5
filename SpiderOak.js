@@ -29,14 +29,17 @@
 /*
   NOTES
 
+  - See
+    https://github.com/SpiderOak/so_client_html5/wiki/HTML5-Client-Code-Technical-Details
+    for technical documentation.  What's below may drift out of date.
+
   - Content visits:
     We intercept navigation to content (eg, $.mobile.changePage) repository
     URLs and intervene via binding of handle_content_visit to jQuery mobile
     "pagebeforechange" event. URLs included as href links must start with
     '#' to trigger jQuery Mobile's navigation detection, which by default
     tracks changes to location.hash.  handle_content_visit() dispatches those
-    URLs it receives that reside within the ones satisfying .is_root_url(),
-    to which the root URLs are registered by the root visiting routines.
+    URLs it receives that qualify as content and panel nodes.
 
   - My routines which return jQuery objects end in '$', and - following common
     practice - my variables intended to contain jQuery objects start with '$'.
