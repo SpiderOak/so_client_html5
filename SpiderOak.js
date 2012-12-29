@@ -2195,6 +2195,9 @@ var spideroak = function () {
     RootContentNode.prototype.my_icon_path = function () {
         return generic.brand_images_dir + "/brand_logo.png"; }
 
+    PanelNode.prototype.my_icon_path = function () {
+        return generic.brand_images_dir + "/settings.png"; }
+
     Node.prototype.here = function () {
         /* Return the complete address of this content node, as part of the
            application code, not just its JSON url.  */
