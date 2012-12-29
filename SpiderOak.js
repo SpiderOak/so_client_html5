@@ -66,9 +66,8 @@ var spideroak = function () {
         // TODO See about simplifying redundacy of *_url vs *_page_id (and
         //      maybe the .my_page_id methods, etc).
         base_host_url: brand.base_host_url,
-        icons_dir: "icons",
         brand_images_dir: "brand_images",
-        combo_root_url: "https://home",         // For priming my.combo_root_url
+        icons_dir: "icons",
         combo_root_page_id: "home",
         my_shares_root_page_id: "my-shares",
         published_root_page_id: "share",
@@ -93,6 +92,7 @@ var spideroak = function () {
         compact_title_chars: 8,
         expansive_title_chars: 25,
         recents_max_size: 25,
+        panels_by_url: {},
         public_share_room_urls: {},
         titled_choice_popup_id: 'titled-choice-popup',
         depth_path_popup_id: 'depth-path-popup',
@@ -136,20 +136,20 @@ var spideroak = function () {
 
     function handle_content_visit(e, data) {
         /* Intercept URL visits and intervene for repository content. */
-        var page = urlize(data.toPage);
+        var page = id2url(data.toPage);
 
         if ((typeof page === "string")
             && (is_node_url(page)
-                || document_addrs.hasOwnProperty(page))) {
+                || method_addresses.hasOwnProperty(page))) {
             e.preventDefault();
             if (transit_manager.is_repeat_url(page)) {
                 // Popup dismissal sends the URL back through, and the
                 // default machinery needs to see it.
                 return true; }
             var mode_opts = query_params(page);
-            if (document_addrs.hasOwnProperty(page)) {
-                var internal = urlize(document.location.href);
-                return document_addrs[page].call(this, internal); }
+            if (method_addresses.hasOwnProperty(page)) {
+                var internal = id2url(document.location.href);
+                return method_addresses[page].call(this, internal); }
             else if (data.toPage !== $.mobile.activePage.attr('id')) {
                 node_manager.get_recents().add_visited_url(page);
                 // Skip exact duplicates, for eg non-select popup dismissals.
@@ -333,17 +333,21 @@ var spideroak = function () {
         return (my.storage_root_url
                 && (url.slice(0, my.storage_root_url.length)
                     === my.storage_root_url)); }
+    /** True if the URL is for a content item in the user's storage area.
+     * Does not include the original shares root.
+     * Doesn't depend on the url having an established node. */
     function is_share_url(url) {
-        /* True if the URL is for a content item in the user's storage area.
-           Does not include the original shares root.
-           Doesn't depend on the url having an established node. */
         return (my.public_shares_root_url
                 && (url.slice(0, my.public_shares_root_url.length)
                     === my.public_shares_root_url)); }
+    /** True if the URL is for a non-content DOM page */
+    function is_panel_url(url) {
+        return generic.panels_by_url.hasOwnProperty(url); }
+    /** True if url within registered roots. */
     function is_node_url(url) {
-        /* True if url within registered roots. */
-        url = urlize(url); // ... for content root page ids.
+        url = id2url(url); // ... for content root page ids.
         return (is_storage_url(url)
+                || is_panel_url(url)
                 || is_share_url(url)
                 || is_combo_root_url(url)
                 || is_root_url(url)); }
@@ -2099,10 +2103,14 @@ var spideroak = function () {
                                     ],
                                    mode_opts); }
 
+    /** Return a jquery DOM search for my page, by id. */
     Node.prototype.my_page_from_dom$ = function () {
-        /* Return a jquery DOM search for my page, by id. */
         return $('#' + fragment_quote(this.my_page_id())); }
-    Node.prototype.my_page$ = function (reinit) {
+    /** Return this panel's jQuery page object.
+     */
+    PanelNode.prototype.my_page$ = Node.prototype.my_page_from_dom$;
+
+    ContentNode.prototype.my_page$ = function (reinit) {
         /* Return this node's jQuery page object, producing if not present.
 
            Optional 'reinit' means to discard existing page, if any,
@@ -2498,13 +2506,21 @@ var spideroak = function () {
         }
     }()
 
+    /** Retrieve the collection of pages with so-page-category=category.
+     *
+     * @param {string} category As assigned to the so-page-catgory tag attribute
+     */
+    function get_pages_by_category$(category) {
+        return $('[so-page-category="' + category + '"]');
+    }
+
     /** Produce, provide access to, and dispose of item nodes.
      *
      * This singleton utility manages items including content, content
-     * containers, and other (like settings) containers.  The '.get'
-     * routine is the primary interface, and either finds existing nodes
-     * matching the criteria, or creates them if not already present.
-     * The type of newly minted nodes is determined according to get parameters.
+     * containers, and other (like settings) nodes.  The '.get' routine is
+     * the primary interface, and either finds existing nodes matching the
+     * criteria, or creates them if not already present.  The type of newly
+     * minted nodes is determined according to get parameters.
      *
      * @this {function}
      */
@@ -2530,7 +2546,7 @@ var spideroak = function () {
         return {
             get_combo_root: function () {
                 if (! combo_root) {
-                    combo_root = this.get(urlize(generic.combo_root_page_id),
+                    combo_root = this.get(id2url(generic.combo_root_page_id),
                                           null); }
                 return combo_root; },
 
@@ -2595,6 +2611,10 @@ var spideroak = function () {
                             got = new PublicRootShareNode(url, parent); }
                         else {
                             throw new Error("Content model management error");}}
+
+                    // Panels:
+                    else if (is_panel_url(url)) {
+                        got = new PanelNode(url, parent); }
 
                     // Contents:
                     else if (parent && (is_root_url(parent.url))) {
@@ -2904,6 +2924,10 @@ var spideroak = function () {
         /* Handle the Cordova "backbutton" event. */
         console.log("spideroak_backbutton fired"); }
 
+    /** Fundamental application initialization.
+     *
+     * The DOM is ready, populate the root content nodes and panel.
+     */
     var spideroak_init = function () {
         /* Do preliminary setup and launch into the combo root. */
 
@@ -2916,12 +2940,14 @@ var spideroak = function () {
         establish_traversal_handler();
         establish_operation_handlers();
 
-        my.combo_root_url = generic.combo_root_url;
+        my.combo_root_url = id2url(generic.combo_root_page_id);
         var combo_root = node_manager.get_combo_root();
         var recents = node_manager.get_recents();
         var public_shares = node_manager.get(my.public_shares_root_url,
                                              combo_root);
-
+        get_pages_by_category$("panel").each(
+            function() {
+                generic.panels_by_url[id2url(this.id)] = $(this); });
         // Do HTML code brand substitutions:
         prep_html_branding();
 
@@ -2943,6 +2969,7 @@ var spideroak = function () {
 
         // ... and go, using the traversal hook:
         $.mobile.changePage(combo_root.url); }
+    
 
     /* ==== Public interface ==== */
 
@@ -3002,21 +3029,13 @@ var spideroak = function () {
                             ? generic.compact_title_chars
                             : generic.expansive_title_chars)); }
 
-    /** @private */
-    var document_addrs = {
+    /** Map document fragment addresses to methods.
+     *
+     */
+    var method_addresses = {
         logout: storage_logout,
         noop: function () {
             console.log("no-op"); },
-    }
-
-    /** Map document fragment addresses to DOM pages or methods.
-     *
-     * @param {string} fragment The document fragment to visit.
-     */
-    function document_addrs_new(fragment) {
-        var intercept = fragment_intercepts[fragment]; 
-        if (intercept) { return intercept; }
-        // If we have a page object in the DOM:
     }
 
     /**
@@ -3044,7 +3063,7 @@ var spideroak = function () {
      *
      * @param {object} subject
      */
-    function urlize(subject) {
+    function id2url(subject) {
         if (typeof subject !== "string") { return subject; }
         if (subject.split('#')[0] === window.location.href.split('#')[0]) {
             subject = subject.split('#')[1]; }
@@ -3055,13 +3074,10 @@ var spideroak = function () {
         case (generic.favorites_page_id):
         case (generic.settings_root_page_id):
         case (generic.published_root_page_id):
-            return id2url(subject);
+            return "https://" + subject;
         case (generic.storage_root_page_id):
             return my.storage_root_url;
         default: return subject; }}
-
-    function id2url(page_id) {
-        return "https://" + page_id; }
 
     function content_nodes_by_url_sorter(prev, next) {
         var prev_str = prev, next_str = next;
