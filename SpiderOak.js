@@ -1591,10 +1591,16 @@ var spideroak = function () {
 
         this.layout_footer(mode_opts); }
 
+    /** Configure the essential, common header layout, but dont't do the layout.
+     *
+     * If mode_opts 'alt_page_selector' is passed in, alter that one
+     * instead of the node's default page.
+     *
+     * @this {Node}
+     * @return {object} fields Dictionary of layout_header_fields settings
+     * @param {object} mode_opts Content and operation mode options dictionary
+     */
     Node.prototype.layout_header = function(mode_opts) {
-        /* Do the essential, common header layout.  If mode_opts
-           'alt_page_selector' is passed in, alter that one instead of the
-           node's default page. */
 
         // Every node gets the depth path menu.
         var $page = ((mode_opts && mode_opts.alt_page_selector)
@@ -1607,10 +1613,32 @@ var spideroak = function () {
 
         var fields = {};
         fields.title = this.title();
+        return fields; }
+
+    /** Do the essential, common header layout (not just configuration).
+     *
+     * If mode_opts 'alt_page_selector' is passed in, alter that one
+     * instead of the node's default page.
+     *
+     * @this {Node}
+     * @return {object} fields Dictionary of layout_header_fields settings
+     * @param {object} mode_opts Content and operation mode options dictionary
+     */
+    ContentNode.prototype.layout_header = function(mode_opts) {
+        var fields = Node.prototype.layout_header.call(this, mode_opts);
         if (this.parent_url) {
             var container = node_manager.get(this.parent_url);
             fields.left_url = '#' + this.parent_url;
             fields.left_label = container.name; }
+        this.layout_header_fields(fields);
+        return fields; }
+
+    PanelNode.prototype.layout_header = function(mode_opts) {
+        /* Do the essential Panel header layout.  If mode_opts
+           'alt_page_selector' is passed in, alter that one instead of the
+           node's default page. */
+
+        var fields = Node.prototype.layout_header.call(this, mode_opts);
         this.layout_header_fields(fields); }
 
     Node.prototype.layout_header_fields = function(fields) {
@@ -1673,7 +1701,7 @@ var spideroak = function () {
 
     RootContentNode.prototype.layout_header = function (mode_opts) {
         /* Do special RootContentNode header layout. */
-        ContentNode.prototype.layout_header.call(this, mode_opts);
+        var fields = ContentNode.prototype.layout_header.call(this, mode_opts);
         // Give the info pages the combo root's depth path menu:
         generic.top_level_info_ids.map(function (id) {
             var alt_mode_opts = {alt_page_selector: '#' + id};
@@ -1683,32 +1711,36 @@ var spideroak = function () {
         var $header = this.my_page$().find('[data-role="header"]');
         var $back_button = $header.find('.back-button');
         var $title = $header.find('.header-title');
-        $back_button.hide(); }
+        $back_button.hide();
+        return fields; }
 
     RecentContentsNode.prototype.layout_header = function (mode_opts) {
-        Node.prototype.layout_header.call(this, mode_opts);
+        var fields = Node.prototype.layout_header.call(this, mode_opts);
         var $header = this.my_page$().find('[data-role="header"]');
-        $header.find('.back-button').hide(); }
+        $header.find('.back-button').hide();
+        return fields; }
 
     FavoriteContentsNode.prototype.layout_header = function (mode_opts) {
-        Node.prototype.layout_header.call(this, mode_opts);
+        var fields = Node.prototype.layout_header.call(this, mode_opts);
         var $header = this.my_page$().find('[data-role="header"]');
-        $header.find('.back-button').hide(); }
+        $header.find('.back-button').hide();
+        return fields; }
 
-    RootSettingsPanelNode.prototype.layout_header = function (mode_opts) {
-        Node.prototype.layout_header.call(this, mode_opts);
+    RootPanelNode.prototype.layout_header = function (mode_opts) {
+        var fields = Node.prototype.layout_header.call(this, mode_opts);
         var $header = this.my_page$().find('[data-role="header"]');
-        $header.find('.back-button').hide(); }
+        $header.find('.back-button').hide();
+        return fields; }
 
     StorageNode.prototype.layout_header = function(mode_opts) {
         /* Fill in typical values for header fields of .my_page$().
            Many storage node types will use these values as is, some will
            replace them.
          */
-        ContentNode.prototype.layout_header.call(this, mode_opts); }
+        return ContentNode.prototype.layout_header.call(this, mode_opts); }
 
     RootStorageNode.prototype.layout_header = function(mode_opts) {
-        StorageNode.prototype.layout_header.call(this, mode_opts);
+        var fields = StorageNode.prototype.layout_header.call(this, mode_opts);
 
         var $page = this.my_page$();
         $page.find('.my_shares_root_url')
@@ -1718,9 +1750,10 @@ var spideroak = function () {
         var $emptiness_message = $page.find('.emptiness-message');
         (this.subdirs.length === 0
          ? $emptiness_message.show()
-         : $emptiness_message.hide()); }
+         : $emptiness_message.hide());
+        return fields; }
     PublicRootShareNode.prototype.layout_header = function(mode_opts) {
-        ShareNode.prototype.layout_header.call(this, mode_opts);
+        var fields = ShareNode.prototype.layout_header.call(this, mode_opts);
 
         // Inject a brief description.
         var $page = this.my_page$();
@@ -1731,9 +1764,10 @@ var spideroak = function () {
         var $adjust_spiel = $page.find('.adjust-spiel');
         (this.subdirs.length === 0
          ? $adjust_spiel.hide()
-         : $adjust_spiel.show()); }
+         : $adjust_spiel.show());
+        return fields; }
     OriginalRootShareNode.prototype.layout_header = function(mode_opts) {
-        ShareNode.prototype.layout_header.call(this, mode_opts);
+        var fields = ShareNode.prototype.layout_header.call(this, mode_opts);
         // Adjust the description.
         var $page = this.my_page$();
         var $emptiness_message = $page.find('.emptiness-message');
@@ -1742,13 +1776,13 @@ var spideroak = function () {
             .attr('href', '#' + my.public_shares_root_url);
         (this.subdirs.length === 0
          ? $emptiness_message.show()
-         : $emptiness_message.hide()); }
+         : $emptiness_message.hide());
+        return fields; }
 
     ShareNode.prototype.layout_header = function(mode_opts) {
         /* Fill in header fields of .my_page$(). */
-        ContentNode.prototype.layout_header.call(this, mode_opts);
+        var fields = ContentNode.prototype.layout_header.call(this, mode_opts);
 
-        var fields = {};
         if (this.parent_url) {
             var container = nmgr.get(is_root_url(this.parent_url)
                                      ? ctmgr.get_recent_tab_url(this)
