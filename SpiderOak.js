@@ -73,7 +73,7 @@ var spideroak = function () {
         published_root_page_id: "share",
         recents_page_id: "recents",
         favorites_page_id: "favorites",
-        settings_root_page_id: "settings-root",
+        panel_root_page_id: "settings-root",
         storage_root_page_id: "storage-home",
         content_page_template_id: "content-page-template",
         storage_login_path: "/browse/login",
@@ -300,17 +300,18 @@ var spideroak = function () {
         return (url === id2url(generic.recents_page_id)); }
     function is_favorites_url(url) {
         return (url === id2url(generic.favorites_page_id)); }
-    function is_settings_url(url) {
-        return (url === id2url(generic.settings_page_id)); }
+    function is_panel_root_url(url) {
+        return (url === id2url(generic.panel_root_page_id)); }
     function is_root_url(url) {
         /* True if the 'url' is for one of the root content items.  We
            split off any search fragment.  Doesn't depend on the url having
            an established node. */
         url = url.split('?')[0];
         return ((url === my.combo_root_url)
+                || (url === id2url(generic.published_root_page_id))
                 || (url === id2url(generic.recents_page_id))
                 || (url === id2url(generic.favorites_page_id))
-                || (url === id2url(generic.settings_page_id))
+                || (url === id2url(generic.panel_root_page_id))
                 || (url === my.storage_root_url)
                 || (url === my.my_shares_root_url)
                 || (url === my.public_shares_root_url)); }
@@ -412,8 +413,10 @@ var spideroak = function () {
     /**
      * UI panel pages that present specific sets of options or item details.
      *
-     * Panels are used to present settings options or detailed information
-     * about individual content items.
+     * Panels are used to present settings options and/or detailed
+     * information about individual content items. Their furnishing
+     * facilities provide for filling in variables, and they provide for
+     * receiving submitted changes.
      *
      * @constructor
      * @this {PanelNode}
@@ -423,12 +426,32 @@ var spideroak = function () {
     function PanelNode(url, parent) {
         Node.call(this, url, parent);
         if (url) {             // Skip if we're in prototype assignment.
-            this.$page = null;  // This node's jQuery-ified DOM data-role="page"
+            // Assume that the url fragment is the object's DOM id:
+            this.id = url.split('/').pop();
+            // All panels have the root panel as parent.
+            this.parent = id2url(generic.panel_root_page_id);
+            this.$page = $('#' + this.id);
             this.query_qualifier = "";
             this.subdirs = [];  // Sub-panels
-            this.emblem = "";   // At least for debugging/.toString()
-            this.icon_path = ""; }}
+            this.emblem = "Settings";
+            this.name = "Settings";
+            this.emblem = ""; }}
     PanelNode.prototype = new Node();
+
+    /**
+     * Root panel.
+     *
+     * @constructor
+     * @this {RootPanelNode}
+     * @param {string} url The (reserved, internal) address of this root panel.
+     * @param {ContentNode} parent The immediately containing item.
+     */
+    function RootPanelNode(url, parent) {
+        PanelNode.call(this, url, parent);
+        this.root_url = url;
+        this.emblem = "Settings";
+        this.name = "Settings"; }
+    RootPanelNode.prototype = new PanelNode();
 
 
     /**
@@ -532,40 +555,6 @@ var spideroak = function () {
         delete this.files; }
     FavoriteContentsNode.prototype = new ContentNode();
 
-    /**
-     * "Settings" panel.
-     *
-     * Contains user-elected configuration options.
-     *
-     * @constructor
-     * @this {SettingsPanelNode}
-     * @param {string} url The (reserved, internal) address of this panel.
-     * @param {ContentNode} parent The immediately containing item.
-     */
-    function SettingsPanelNode(url, parent) {
-        PanelNode.call(this, url, parent);
-        this.emblem = "Not Yet Implemented: Settings";
-        // We'll use subdirs for the items - we care not about the types:
-        this.items = this.subdirs; }
-    SettingsPanelNode.prototype = new PanelNode();
-
-    /**
-     * Root "Settings" panel.
-     *
-     * @constructor
-     * @this {RootSettingsPanelNode}
-     * @param {string} url The (reserved, internal) address of this root panel.
-     * @param {ContentNode} parent The immediately containing item.
-     */
-    function RootSettingsPanelNode(url, parent) {
-        SettingsPanelNode.call(this, url, parent);
-        this.root_url = url;
-        this.emblem = "Settings";
-        this.name = "Settings";
-        delete this.subdirs;
-        delete this.files; }
-    RootSettingsPanelNode.prototype = new SettingsPanelNode();
-
     function PublicRootShareNode(url, parent) {
         RootShareNode.call(this, url, parent);
         this.name = "Share Rooms";
@@ -649,13 +638,13 @@ var spideroak = function () {
         this.show(chngpg_opts, mode_opts); }
 
     /**
-     * Constitute and present the root settings panel.
+     * Constitute and present the root panel.
      *
-     * @this {RootSettinsPanelNode}
+     * @this {RootPanelNode}
      * @param {object} chngpg_opts $.mobile.changePage() options dictionary.
      * @param {object} mode_opts Content and operation mode options dictionary.
      */
-    RootSettingsPanelNode.prototype.visit = function (chngpg_opts, mode_opts) {
+    RootPanelNode.prototype.visit = function (chngpg_opts, mode_opts) {
         if (! mode_opts.passive) {
             current_tab_manager.set_current_from(this); }
         PanelNode.prototype.visit.call(this, chngpg_opts, mode_opts);
@@ -2096,7 +2085,7 @@ var spideroak = function () {
                                      icon_name: "so-recents-footer"},
                                     {title: "Settings",
                                      url: ("#" +
-                                           generic.settings_root_page_id),
+                                           generic.panel_root_page_id),
                                      selector: "settings",
                                      transition: "fade",
                                      icon_name: "so-settings"},
@@ -2108,7 +2097,9 @@ var spideroak = function () {
         return $('#' + fragment_quote(this.my_page_id())); }
     /** Return this panel's jQuery page object.
      */
-    PanelNode.prototype.my_page$ = Node.prototype.my_page_from_dom$;
+
+    PanelNode.prototype.my_page$ = function () {
+        return this.$page; }
 
     ContentNode.prototype.my_page$ = function (reinit) {
         /* Return this node's jQuery page object, producing if not present.
@@ -2154,8 +2145,8 @@ var spideroak = function () {
     ContentNode.prototype.get_page_template$ = function() {
         return $("#" + generic.content_page_template_id); }
 
-    SettingsPanelNode.prototype.get_page_template$ = function() {
-        return $("#" + generic.settings_root_page_id); }
+    PanelNode.prototype.get_page_template$ = function() {
+        return $("#" + generic.panel_root_page_id); }
 
     Node.prototype.my_icon_image$ = function(image_class) {
         /* Return this item's icon image element, with 'image_class'.
@@ -2182,7 +2173,7 @@ var spideroak = function () {
         return FileContentNode.prototype.my_icon_path.call(this); }
     ContentNode.prototype.my_icon_path = function() {
         return generic.icons_dir + "/folder.png"; }
-    SettingsPanelNode.prototype.my_icon_path = function() {
+    PanelNode.prototype.my_icon_path = function() {
         return generic.icons_dir + "/settings.png"; }
     DeviceStorageNode.prototype.my_icon_path = function() {
         return generic.icons_dir + "/device.png"; }
@@ -2579,7 +2570,7 @@ var spideroak = function () {
 
             get_settings: function () {
                 if (! settings) {
-                    settings = this.get(id2url(generic.settings_page_id),
+                    settings = this.get(id2url(generic.panel_root_page_id),
                                         this.get_combo_root()); }
                 return favorites; },
 
@@ -2604,13 +2595,16 @@ var spideroak = function () {
                             got = new RecentContentsNode(url, parent); }
                         else if (is_favorites_url(url)) {
                             got = new FavoriteContentsNode(url, parent); }
-                        else if (is_settings_url(url)) {
-                            got = new RootSettingsPanelNode(url, parent); }
+                        else if (is_panel_root_url(url)) {
+                            got = new RootPanelNode(url, parent); }
                         else if (url === my.storage_root_url) {
                             got = new RootStorageNode(url, parent); }
                         else if (url === my.my_shares_root_url) {
                             got = new OriginalRootShareNode(url, parent); }
                         else if (url === my.public_shares_root_url) {
+                            got = new PublicRootShareNode(url, parent); }
+                        else if (url ===
+                                 id2url(generic.published_root_page_id)) {
                             got = new PublicRootShareNode(url, parent); }
                         else {
                             throw new Error("Content model management error");}}
@@ -3074,8 +3068,9 @@ var spideroak = function () {
         case (generic.combo_root_page_id):
         case (generic.recents_page_id):
         case (generic.my_shares_root_page_id):
+        case (generic.published_root_page_id):
         case (generic.favorites_page_id):
-        case (generic.settings_root_page_id):
+        case (generic.panel_root_page_id):
         case (generic.published_root_page_id):
             return "https://" + subject;
         case (generic.storage_root_page_id):
