@@ -157,8 +157,10 @@ var spideroak = function () {
             else if (data.toPage !== $.mobile.activePage.attr('id')) {
                 node_manager.get_recents().add_visited_url(page);
                 // Skip exact duplicates, for eg non-select popup dismissals.
-                return node_manager.get(page).visit(data.options,
-                                                    mode_opts); }}}
+                var node = node_manager.get(page)
+                return node.visit(data.options, mode_opts); }
+        }
+    }
 
     function establish_traversal_handler() {
         /* Establish page change event handler. */
