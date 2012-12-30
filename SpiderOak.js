@@ -2580,7 +2580,7 @@ var spideroak = function () {
 
             get_myshares: function () {
                 if (! myshares) {
-                    myshares = this.get(id2url(generic.myshares_root_page_id),
+                    myshares = this.get(id2url(generic.my_shares_root_page_id),
                                         null); }
                 return myshares; },
 
