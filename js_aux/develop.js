@@ -23,7 +23,7 @@
  * Only the "basic" setting should be checked in.
  *
  * Include any non-empty string for general debugging messages.
- * ":verbose" - additonal, UI-visible messages status messages
- * ":test_keychain_trivial" - elementary keychain plugin test
+ * ":verbose:" - additonal, UI-visible messages status messages
+ * ":test_keychain_trivial:" - elementary keychain plugin test
  */
-SO_DEBUGGING = "basic -test_keychain_trivial -verbose";
+SO_DEBUGGING = ":basic: :content_urls: -test_keychain_trivial -verbose";
