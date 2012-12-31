@@ -150,7 +150,10 @@ var spideroak = function () {
                 // Popup dismissal sends the URL back through, and the
                 // default machinery needs to see it.
                 return true; }
+            // Extra the modal options from the query string,
             var mode_opts = query_params(page);
+            // ... and strip the query string from the page address:
+            page = page.split('?')[0];
             if (method_addresses.hasOwnProperty(page)) {
                 var internal = id2url(document.location.href);
                 return method_addresses[page].call(this, internal); }
@@ -352,7 +355,8 @@ var spideroak = function () {
         return generic.panels_by_url.hasOwnProperty(url); }
     /** True if url within registered roots. */
     function is_node_url(url) {
-        url = id2url(url); // ... for content root page ids.
+        // Consider sans query string, if any.
+        url = id2url(url.split('?')[0]);
         return (is_storage_url(url)
                 || is_panel_url(url)
                 || is_share_url(url)
