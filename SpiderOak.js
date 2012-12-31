@@ -412,7 +412,8 @@ var spideroak = function () {
         } else if (is_root_url(this.parent_url)) {
             return this;
         } else {
-            return node_manager.get(this.parent_url).container();
+            var parent = node_manager.get(this.parent_url)
+            return parent.container() || parent;
         }
     }
 
@@ -435,7 +436,7 @@ var spideroak = function () {
             // Assume that the url fragment is the object's DOM id:
             this.id = url.split('/').pop();
             // All panels have the root panel as parent.
-            this.parent = id2url(generic.panel_root_page_id);
+            this.parent_url = id2url(generic.panel_root_page_id);
             this.$page = $('#' + this.id);
             this.query_qualifier = "";
             this.subdirs = [];  // Sub-panels
