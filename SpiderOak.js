@@ -639,7 +639,7 @@ var spideroak = function () {
      * Constitute and present a panel item.
      *
      * @this {PanelNode}
-     * @param {object} chngpg_opts $.mobile.changePage() options dictionary.
+     * @param {object} chngpg_opts query string and change page options
      * @param {object} mode_opts Content and operation mode options dictionary.
      */
     PanelNode.prototype.visit = function (chngpg_opts, mode_opts) {
@@ -652,7 +652,7 @@ var spideroak = function () {
      * Constitute and present the root panel.
      *
      * @this {RootPanelNode}
-     * @param {object} chngpg_opts $.mobile.changePage() options dictionary.
+     * @param {object} chngpg_opts query string and change page options
      * @param {object} mode_opts Content and operation mode options dictionary.
      */
     RootPanelNode.prototype.visit = function (chngpg_opts, mode_opts) {
@@ -664,11 +664,11 @@ var spideroak = function () {
     PanelNode.prototype.layout = function (chngpg_opts, mode_opts) {
         /* Deploy options page. */
         this.layout_header(mode_opts);
-        this.layout_options(mode_opts);
+        this.layout_options(chngpg_opts);
         this.layout_footer(mode_opts);
     }
 
-    PanelNode.prototype.layout_options = function (mode_opts) {
+    Node.prototype.layout_options = function (mode_opts) {
         }
 
     /* ===== Remote data access ==== */
@@ -679,7 +679,7 @@ var spideroak = function () {
      * Fetch current data from server, provision, layout, and present.
      *
      * @this {ContentNode}
-     * @param {object} chngpg_opts $.mobile.changePage() options dictionary.
+     * @param {object} chngpg_opts query string and change page options
      * @param {object} mode_opts Content and operation mode options dictionary.
     */
     ContentNode.prototype.visit = function (chngpg_opts, mode_opts) {
@@ -703,7 +703,7 @@ var spideroak = function () {
      * details about mode controls.
      *
      * @this (RootContentNode)
-     * @param {object} chngpg_opts $.mobile.changePage() options dictionary.
+     * @param {object} chngpg_opts query string and change page options
      * @param {object} mode_opts Content and operation mode options dictionary.
      */
     RootContentNode.prototype.visit = function (chngpg_opts, mode_opts) {
@@ -751,7 +751,7 @@ var spideroak = function () {
      * Present the accumulated list of recently visited items.
      *
      * @this (RecentContentsNode)
-     * @param {object} chngpg_opts $.mobile.changePage() options dictionary.
+     * @param {object} chngpg_opts query string and change page options
      * @param {object} mode_opts Content and operation mode options dictionary.
      */
     RecentContentsNode.prototype.visit = function (chngpg_opts, mode_opts) {
@@ -767,7 +767,7 @@ var spideroak = function () {
      * Focus on the list of selected favorite items.
      *
      * @this {FavoriteContentsNode}
-     * @param {object} chngpg_opts $.mobile.changePage() options dictionary.
+     * @param {object} chngpg_opts query string and change page options
      * @param {object} mode_opts Content and operation mode options dictionary.
      */
     FavoriteContentsNode.prototype.visit = function (chngpg_opts, mode_opts) {
@@ -784,7 +784,7 @@ var spideroak = function () {
      * - those remembered across sessions
      *
      * @this {PublicRootShareNode}
-     * @param {object} chngpg_opts $.mobile.changePage() options dictionary.
+     * @param {object} chngpg_opts query string and change page options
      * @param {object} mode_opts Content and operation mode options dictionary.
      */
     PublicRootShareNode.prototype.visit = function (chngpg_opts, mode_opts) {
@@ -831,7 +831,7 @@ var spideroak = function () {
      * See the jQuery.ajax() documentation for XMLHttpResponse details.
      *
      * @this {ContentNode}
-     * @param {object} chngpg_opts $.mobile.changePage() options dictionary.
+     * @param {object} chngpg_opts query string and change page options
      * @param {object} mode_opts Content and operation mode options dictionary.
      * @param {number} tried Optional number of prior tries, zero if undefined.
     */
@@ -972,7 +972,7 @@ var spideroak = function () {
      *
      * @this {ContentNode}
      * @param {object} xhr XML HTTP Response object.
-     * @param {object} chngpg_opts $.mobile.changePage() options dictionary.
+     * @param {object} chngpg_opts query string and change page options
      * @param {object} mode_opts Content and operation mode options dictionary.
      * @param {object} exception The exception that was thrown.
      * @param {number} tried The number of prior tries.
@@ -2511,7 +2511,7 @@ var spideroak = function () {
     /** Translate various names for an object to its canonical name/address.
      *
      */
-    var indirection_manager = function () {
+    var settings_manager = function () {
         /* Private */
         var by_name = {};
 
@@ -2544,6 +2544,7 @@ var spideroak = function () {
             },
         }
     }()
+    var setmgr = settings_manager; // Compact name, for convenience.
 
     /** Retrieve the collection of pages with so-page-category=category.
      *
