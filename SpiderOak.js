@@ -639,32 +639,32 @@ var spideroak = function () {
      * Constitute and present a panel item.
      *
      * @this {PanelNode}
-     * @param {object} chngpg_opts query string and change page options
+     * @param {object} page_opts query string and page change options
      * @param {object} mode_opts Content and operation mode options dictionary.
      */
-    PanelNode.prototype.visit = function (chngpg_opts, mode_opts) {
+    PanelNode.prototype.visit = function (page_opts, mode_opts) {
         if (! mode_opts.passive) {
             current_tab_manager.set_current_from(this); }
         this.layout(mode_opts);
-        this.show(chngpg_opts, mode_opts); }
+        this.show(page_opts, mode_opts); }
 
     /**
      * Constitute and present the root panel.
      *
      * @this {RootPanelNode}
-     * @param {object} chngpg_opts query string and change page options
+     * @param {object} page_opts query string and page change options
      * @param {object} mode_opts Content and operation mode options dictionary.
      */
-    RootPanelNode.prototype.visit = function (chngpg_opts, mode_opts) {
+    RootPanelNode.prototype.visit = function (page_opts, mode_opts) {
         if (! mode_opts.passive) {
             current_tab_manager.set_current_from(this); }
-        PanelNode.prototype.visit.call(this, chngpg_opts, mode_opts);
+        PanelNode.prototype.visit.call(this, page_opts, mode_opts);
     }
 
-    PanelNode.prototype.layout = function (chngpg_opts, mode_opts) {
+    PanelNode.prototype.layout = function (page_opts, mode_opts) {
         /* Deploy options page. */
         this.layout_header(mode_opts);
-        this.layout_options(chngpg_opts);
+        this.layout_options(page_opts);
         this.layout_footer(mode_opts);
     }
 
@@ -679,17 +679,17 @@ var spideroak = function () {
      * Fetch current data from server, provision, layout, and present.
      *
      * @this {ContentNode}
-     * @param {object} chngpg_opts query string and change page options
+     * @param {object} page_opts query string and page change options
      * @param {object} mode_opts Content and operation mode options dictionary.
     */
-    ContentNode.prototype.visit = function (chngpg_opts, mode_opts) {
+    ContentNode.prototype.visit = function (page_opts, mode_opts) {
         if (! mode_opts.passive) {
             current_tab_manager.set_current_from(this); }
 
         if (! this.up_to_date()) {
-            this.fetch_and_dispatch(chngpg_opts, mode_opts); }
+            this.fetch_and_dispatch(page_opts, mode_opts); }
         else {
-            this.show(chngpg_opts, mode_opts); }}
+            this.show(page_opts, mode_opts); }}
 
     /**
      * Do the special visit of the consolidated storage/share root
@@ -703,10 +703,10 @@ var spideroak = function () {
      * details about mode controls.
      *
      * @this (RootContentNode)
-     * @param {object} chngpg_opts query string and change page options
+     * @param {object} page_opts query string and page change options
      * @param {object} mode_opts Content and operation mode options dictionary.
      */
-    RootContentNode.prototype.visit = function (chngpg_opts, mode_opts) {
+    RootContentNode.prototype.visit = function (page_opts, mode_opts) {
         if (! mode_opts.passive) {
             current_tab_manager.set_current_from(this); }
 
@@ -715,7 +715,7 @@ var spideroak = function () {
             this.show_status_message("Using base_host_url "
                                      + generic.base_host_url); }
 
-        this.show(chngpg_opts, {});
+        this.show(page_opts, {});
         $.mobile.loading('show');
 
         if (mode_opts && mode_opts.logout) {
@@ -730,13 +730,13 @@ var spideroak = function () {
         $.extend(public_mode_opts, mode_opts);
         var public_root = nmgr.get(my.public_shares_root_url,
                                    my.public_shares_root_url);
-        public_root.visit(chngpg_opts, public_mode_opts);
+        public_root.visit(page_opts, public_mode_opts);
 
         if (! this.loggedin_ish()) {
             // Not enough registered info to try authenticating:
             this.authenticated(false);
             this.layout(mode_opts);
-            this.show(chngpg_opts, {}); }
+            this.show(page_opts, {}); }
 
         else {
             var storage_root = node_manager.get(my.storage_root_url, this);
@@ -745,36 +745,36 @@ var spideroak = function () {
             storage_mode_opts.notify_token = 'storage-token';
             // Will chain to original shares via notify_callback.
             $.mobile.loading('show');
-            storage_root.visit(chngpg_opts, storage_mode_opts); }}
+            storage_root.visit(page_opts, storage_mode_opts); }}
 
     /**
      * Present the accumulated list of recently visited items.
      *
      * @this (RecentContentsNode)
-     * @param {object} chngpg_opts query string and change page options
+     * @param {object} page_opts query string and page change options
      * @param {object} mode_opts Content and operation mode options dictionary.
      */
-    RecentContentsNode.prototype.visit = function (chngpg_opts, mode_opts) {
+    RecentContentsNode.prototype.visit = function (page_opts, mode_opts) {
         if (! mode_opts.passive) {
             current_tab_manager.set_current_from(this); }
 
         // (Could mode_opts.hasOwnProperty('action') for recents editing.)
 
         this.layout($.extend({no_dividers: true}, mode_opts));
-        this.show(chngpg_opts, mode_opts); }
+        this.show(page_opts, mode_opts); }
 
     /**
      * Focus on the list of selected favorite items.
      *
      * @this {FavoriteContentsNode}
-     * @param {object} chngpg_opts query string and change page options
+     * @param {object} page_opts query string and page change options
      * @param {object} mode_opts Content and operation mode options dictionary.
      */
-    FavoriteContentsNode.prototype.visit = function (chngpg_opts, mode_opts) {
+    FavoriteContentsNode.prototype.visit = function (page_opts, mode_opts) {
         if (! mode_opts.passive) {
             current_tab_manager.set_current_from(this); }
         this.layout(mode_opts);
-        this.show(chngpg_opts, mode_opts); }
+        this.show(page_opts, mode_opts); }
 
     /**
      * Obtain the known, non-original share rooms and present them.
@@ -784,10 +784,10 @@ var spideroak = function () {
      * - those remembered across sessions
      *
      * @this {PublicRootShareNode}
-     * @param {object} chngpg_opts query string and change page options
+     * @param {object} page_opts query string and page change options
      * @param {object} mode_opts Content and operation mode options dictionary.
      */
-    PublicRootShareNode.prototype.visit = function (chngpg_opts, mode_opts) {
+    PublicRootShareNode.prototype.visit = function (page_opts, mode_opts) {
         if (! mode_opts.passive) {
             current_tab_manager.set_current_from(this); }
 
@@ -798,12 +798,12 @@ var spideroak = function () {
             var action = mode_opts.action;
             if (this[action] && this[action].is_action) {
                 var got = this[action](mode_opts.subject);
-                this.do_presentation(chngpg_opts, {});
+                this.do_presentation(page_opts, {});
                 return got; }}
 
         // this.add_item() only adds what's missing, and sets this.subdirs.
         this.get_subdir_prospects().map(this.add_item.bind(this));
-        this.do_presentation(chngpg_opts, mode_opts); }
+        this.do_presentation(page_opts, mode_opts); }
 
     PublicRootShareNode.prototype.get_subdir_prospects = function () {
         /* Load the subdirs list from active list and persistence. */
@@ -820,22 +820,22 @@ var spideroak = function () {
      *
      *
      * - On success, call this.handle_visit_success() with the retrieved
-     * JSON data, new Date() just prior to the retrieval, chngpg_opts,
+     * JSON data, new Date() just prior to the retrieval, page_opts,
      *  mode_opts, a text status categorization, and the XMLHttpRequest
      * object.
      * - Otherwise, this.handle_visit_failure() is called with the
-     * XMLHttpResponse object, chngpg_opts, mode_opts, the text status
+     * XMLHttpResponse object, page_opts, mode_opts, the text status
      * categorization, and an exception object, present if an exception
      * was caught.
      *
      * See the jQuery.ajax() documentation for XMLHttpResponse details.
      *
      * @this {ContentNode}
-     * @param {object} chngpg_opts query string and change page options
+     * @param {object} page_opts query string and page change options
      * @param {object} mode_opts Content and operation mode options dictionary.
      * @param {number} tried Optional number of prior tries, zero if undefined.
     */
-    ContentNode.prototype.fetch_and_dispatch = function (chngpg_opts,
+    ContentNode.prototype.fetch_and_dispatch = function (page_opts,
                                                          mode_opts,
                                                          tried) {
         /* DOING 'tried' implementation not yet complete. */
@@ -849,10 +849,10 @@ var spideroak = function () {
                 cache: false,
                 success: function (data, status, xhr) {
                     this.handle_visit_success(data, when,
-                                              chngpg_opts, mode_opts,
+                                              page_opts, mode_opts,
                                               status, xhr); }.bind(this),
                 error: function (xhr, statusText, thrown) {
-                    this.handle_visit_failure(xhr, chngpg_opts, mode_opts,
+                    this.handle_visit_failure(xhr, page_opts, mode_opts,
                                               statusText,
                                               thrown,
                                               tried)}.bind(this), })}
@@ -953,14 +953,14 @@ var spideroak = function () {
         node_manager.get_combo_root().layout(); }
 
     ContentNode.prototype.handle_visit_success = function (data, when,
-                                                           chngpg_opts,
+                                                           page_opts,
                                                            mode_opts,
                                                            status, xhr) {
         /* Deploy successfully obtained node data.
            See ContentNode.fetch_and_dispatch() for parameter details. */
         this.provision(data, when, mode_opts);
         this.layout(mode_opts);
-        this.show(chngpg_opts, mode_opts);
+        this.show(page_opts, mode_opts);
         if (mode_opts.notify_callback) {
             mode_opts.notify_callback(true,
                                       mode_opts.notify_token); }}
@@ -972,13 +972,13 @@ var spideroak = function () {
      *
      * @this {ContentNode}
      * @param {object} xhr XML HTTP Response object.
-     * @param {object} chngpg_opts query string and change page options
+     * @param {object} page_opts query string and page change options
      * @param {object} mode_opts Content and operation mode options dictionary.
      * @param {object} exception The exception that was thrown.
      * @param {number} tried The number of prior tries.
      */
     ContentNode.prototype.handle_visit_failure = function (xhr,
-                                                           chngpg_opts,
+                                                           page_opts,
                                                            mode_opts,
                                                            exception,
                                                            tried) {
@@ -1002,7 +1002,7 @@ var spideroak = function () {
                                     : combo_root.url); }}}
 
     RootContentNode.prototype.handle_visit_failure = function (xhr,
-                                                               chngpg_opts,
+                                                               page_opts,
                                                                mode_opts,
                                                                exception,
                                                                tried) {
@@ -1508,7 +1508,7 @@ var spideroak = function () {
     PublicRootShareNode.prototype.my_page_id = function () {
         return generic.published_root_page_id; }
 
-    Node.prototype.show = function (chngpg_opts, mode_opts) {
+    Node.prototype.show = function (page_opts, mode_opts) {
         /* Trigger UI focus on our content layout.
            If mode_opts "passive" === true, don't do a changePage.
          */
@@ -1518,17 +1518,17 @@ var spideroak = function () {
             && mode_opts
             && (!mode_opts.passive)) {
             // Use $page object so our handler defers to regular jQm traversal:
-            $.mobile.changePage($page, chngpg_opts); }
+            $.mobile.changePage($page, page_opts); }
         // Just in case, eg of refresh:
         $.mobile.loading('hide'); }
 
-    PublicRootShareNode.prototype.do_presentation = function (chngpg_opts,
+    PublicRootShareNode.prototype.do_presentation = function (page_opts,
                                                              mode_opts) {
         /* An exceptional, consolidated presentation routine. */
         // For use by this.visit() and this.notify_subvisit_status().
         this.subdirs.sort(content_nodes_by_url_sorter);
         this.layout(mode_opts);
-        this.show(chngpg_opts, mode_opts);
+        this.show(page_opts, mode_opts);
 
         if (mode_opts.notify_callback) {
             mode_opts.notify_callback(true,
@@ -1552,16 +1552,16 @@ var spideroak = function () {
         else {
             $content_items.show(); }}
 
-    PublicRootShareNode.prototype.show = function (chngpg_opts, mode_opts) {
+    PublicRootShareNode.prototype.show = function (page_opts, mode_opts) {
         /* Deploy content as markup on our page. */
-        ContentNode.prototype.show.call(this, chngpg_opts, mode_opts);
+        ContentNode.prototype.show.call(this, page_opts, mode_opts);
         deploy_focus_oneshot('#my_share_id', "pageshow"); }
 
-    RootContentNode.prototype.layout = function (chngpg_opts, mode_opts) {
+    RootContentNode.prototype.layout = function (page_opts, mode_opts) {
         /* Do layout arrangements - different than other node types. */
         var $page = this.my_page$();
 
-        this.layout_header(chngpg_opts, mode_opts);
+        this.layout_header(page_opts, mode_opts);
         // Storage content section:
         // We avoid doing layout of these when not authenticated so the
         // re-presentation of the hidden sections doesn't show through.
