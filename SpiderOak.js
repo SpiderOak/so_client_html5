@@ -2508,41 +2508,103 @@ var spideroak = function () {
     var ctmgr = current_tab_manager; // Compact name, for convenience.
 
 
-    /** Translate various names for an object to its canonical name/address.
+    /** Register the means to resolve values for settings, and evaluate them.
      *
+     * Duties:
+     * + store variables' values in plain or secure storage
+     * + adjust values according to settings structure:
+     *   - XXX
+     * + convey (optional) presentable name for a variable's value
      */
     var settings_manager = function () {
         /* Private */
+        /** Registry of settings definitions.
+         *
+         * Settings map names to a string identifying the type of
+         * get_setter method (see below) to use for setting and getting the
+         * value.
+         */
         var by_name = {};
 
-        return {
-            /** Translate a various name for an object to its canonical name.
+        /** Settings set and get methods.  Add new ones here.
+         *
+         * Each method must support two modes:
+         * get: Take one argument, the variable name.
+         *      Return either the resulting value, or a promise object that
+         *      will pass the value to the promise 'done' callbacks or
+         *      error status to 'fail' callbacks.
+         * set: Take two arguments, the variable name and value to assign.
+         *      Return either a boolean to signify assignment success, or a
+         *      promise object for assignment of 'done' and 'fail'
+         *      callbacks.
+         */
+        var getsetters = {
+            literal: function (name, value) {
+                if (typeof value === "undefined") {
+                    return persistence_manager.get(name);
+                } else {
+                    persistence_manager.set(name, value);
+                    return true;
+                }
+            },
+            /** Store values using secure storage.
              *
-             * @return {string} canonical name
+             * We return a promise object which will have its 'done'
+             * callbacks invoked when successful, or 'fail' callbacks
+             * invoked on failure.
+             */
+            secure: function (name, value) {
+                var kc = get_keychain();
+                var servicename = 'keychain';
+                var operation = (typeof value === "undefined"
+                                 ? kc.getForKey
+                                 : kc.setForKey);
+                var deferred = new jQuery.Deferred();
+                // Invoke the keychain getForKey or setForKey with the
+                // deferred objects conclusion triggers...
+                operation(deferred.resolve, deferred.fail, name, servicename);
+                // ... so the receiver can use the .promise object to
+                // register 'done' and 'fail' callbacks when the getForKey
+                // or setForKey concludes:
+                return deferred.promise();
+            },
+        } /* getsetters */
+
+        return {
+            /** Associate settings var with its getter and setter methods.
+             *
+             * The setting/getting method is the name of one of those in
+             * the get_setters object.
+             *
+             * @param {string} name Variable name
+             * @param {string} getsetter_id Name of getsetter method
+             * @param {string} the_default Default value
+             */
+            define: function(name, getsetter_id, the_default) {
+                by_name[name] = getsetter_id;
+                if (typeof the_default !== "undefined") {
+                    settings_manager.set(name, the_default); }
+            },
+            /** Set a settings variable, using its setter.
+             *
+             * @return {object} Either a boolean or a promise for success status
+             * @param {string} name
+             * @param {string} value
+             */
+            set: function(name, value) {
+                var method = set_getters[by_name[name]];
+                return method(name, value);
+            },
+            /** Set a settings variable, using its setter.
+             *
+             * @return {object} Either a string or a promise for the value
              * @param {string} name
              */
             get: function(name) {
-                return by_name[name];
+                var method = set_getters[by_name[name]];
+                return method(name);
             },
-            /** Associate a various name for an object to its canonical name.
-             *
-             * A canonical name can have multiple indirections.
-             *
-             * @param {string} name
-             * @param {string} canonical
-             */
-            set: function(name, canonical) {
-                by_name[name] = canonical;
-            },
-
-            /** Remove name registration - dissassociate from canonical name.
-             *
-             * @param {string} name
-             */
-            remove: function(name, canonical) {
-                delete by_name[name];
-            },
-        }
+        } /* return {} */
     }()
     var setmgr = settings_manager; // Compact name, for convenience.
 
