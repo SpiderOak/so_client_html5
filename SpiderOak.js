@@ -144,7 +144,7 @@ var spideroak = function () {
             e.preventDefault();
 
             if (SO_DEBUGGING.match(/:content_urls:/)) {
-                console.log(data.toPage + ": " + page); }
+                console.log(page + ": " + data.toPage); }
 
             if (transit_manager.is_repeat_url(page)) {
                 // Popup dismissal sends the URL back through, and the
@@ -639,8 +639,8 @@ var spideroak = function () {
      * Constitute and present a panel item.
      *
      * @this {PanelNode}
-     * @param {object} page_opts query string and page change options
-     * @param {object} mode_opts Content and operation mode options
+     * @param {object} page_opts $.mobile.changePage page change options
+     * @param {object} mode_opts User settings and operation mode options
      */
     PanelNode.prototype.visit = function (page_opts, mode_opts) {
         if (! mode_opts.passive) {
@@ -652,8 +652,8 @@ var spideroak = function () {
      * Constitute and present the root panel.
      *
      * @this {RootPanelNode}
-     * @param {object} page_opts query string and page change options
-     * @param {object} mode_opts Content and operation mode options
+     * @param {object} page_opts $.mobile.changePage page change options
+     * @param {object} mode_opts User settings and operation mode options
      */
     RootPanelNode.prototype.visit = function (page_opts, mode_opts) {
         if (! mode_opts.passive) {
@@ -679,8 +679,8 @@ var spideroak = function () {
      * Fetch current data from server, provision, layout, and present.
      *
      * @this {ContentNode}
-     * @param {object} page_opts query string and page change options
-     * @param {object} mode_opts Content and operation mode options
+     * @param {object} page_opts $.mobile.changePage page change options
+     * @param {object} mode_opts User settings and operation mode options
     */
     ContentNode.prototype.visit = function (page_opts, mode_opts) {
         if (! mode_opts.passive) {
@@ -703,8 +703,8 @@ var spideroak = function () {
      * details about mode controls.
      *
      * @this (RootContentNode)
-     * @param {object} page_opts query string and page change options
-     * @param {object} mode_opts Content and operation mode options
+     * @param {object} page_opts $.mobile.changePage page change options
+     * @param {object} mode_opts User settings and operation mode options
      */
     RootContentNode.prototype.visit = function (page_opts, mode_opts) {
         if (! mode_opts.passive) {
@@ -751,8 +751,8 @@ var spideroak = function () {
      * Present the accumulated list of recently visited items.
      *
      * @this (RecentContentsNode)
-     * @param {object} page_opts query string and page change options
-     * @param {object} mode_opts Content and operation mode options
+     * @param {object} page_opts $.mobile.changePage page change options
+     * @param {object} mode_opts User settings and operation mode options
      */
     RecentContentsNode.prototype.visit = function (page_opts, mode_opts) {
         if (! mode_opts.passive) {
@@ -767,8 +767,8 @@ var spideroak = function () {
      * Focus on the list of selected favorite items.
      *
      * @this {FavoriteContentsNode}
-     * @param {object} page_opts query string and page change options
-     * @param {object} mode_opts Content and operation mode options
+     * @param {object} page_opts $.mobile.changePage page change options
+     * @param {object} mode_opts User settings and operation mode options
      */
     FavoriteContentsNode.prototype.visit = function (page_opts, mode_opts) {
         if (! mode_opts.passive) {
@@ -784,8 +784,8 @@ var spideroak = function () {
      * - those remembered across sessions
      *
      * @this {PublicRootShareNode}
-     * @param {object} page_opts query string and page change options
-     * @param {object} mode_opts Content and operation mode options
+     * @param {object} page_opts $.mobile.changePage page change options
+     * @param {object} mode_opts User settings and operation mode options
      */
     PublicRootShareNode.prototype.visit = function (page_opts, mode_opts) {
         if (! mode_opts.passive) {
@@ -831,8 +831,8 @@ var spideroak = function () {
      * See the jQuery.ajax() documentation for XMLHttpResponse details.
      *
      * @this {ContentNode}
-     * @param {object} page_opts query string and page change options
-     * @param {object} mode_opts Content and operation mode options
+     * @param {object} page_opts $.mobile.changePage page change options
+     * @param {object} mode_opts User settings and operation mode options
      * @param {number} tried Optional number of prior tries, zero if undefined.
     */
     ContentNode.prototype.fetch_and_dispatch = function (page_opts,
@@ -972,8 +972,8 @@ var spideroak = function () {
      *
      * @this {ContentNode}
      * @param {object} xhr XML HTTP Response object.
-     * @param {object} page_opts query string and page change options
-     * @param {object} mode_opts Content and operation mode options
+     * @param {object} page_opts $.mobile.changePage page change options
+     * @param {object} mode_opts User settings and operation mode options
      * @param {object} exception The exception that was thrown.
      * @param {number} tried The number of prior tries.
      */
@@ -1609,7 +1609,7 @@ var spideroak = function () {
      *
      * @this {Node}
      * @return {object} fields Dictionary of layout_header_fields settings
-     * @param {object} mode_opts Content and operation mode options dictionary
+     * @param {object} mode_opts User settings and operation mode options dictionary
      */
     Node.prototype.layout_header = function(mode_opts) {
 
@@ -1633,7 +1633,7 @@ var spideroak = function () {
      *
      * @this {Node}
      * @return {object} fields Dictionary of layout_header_fields settings
-     * @param {object} mode_opts Content and operation mode options dictionary
+     * @param {object} mode_opts User settings and operation mode options dictionary
      */
     ContentNode.prototype.layout_header = function(mode_opts) {
         var fields = Node.prototype.layout_header.call(this, mode_opts);
@@ -2029,7 +2029,7 @@ var spideroak = function () {
      *
      * @this {Node}
      * @param {object} spec_array Footer entries specifications
-     * @param {object} mode_opts Content and operation mode options
+     * @param {object} mode_opts User settings and operation mode options
      */
     Node.prototype.layout_footer_by_spec = function(spec_array, mode_opts) {
         var $ul = $('<ul/>');
@@ -2076,7 +2076,7 @@ var spideroak = function () {
      * @this {Node}
      * @param {string} selector jquery search that locates in the footer navbar
      * @param {object} spec Dictionary specifying footer entry characteristics
-     * @param {object} mode_opts Content and operation mode options
+     * @param {object} mode_opts User settings and operation mode options
      */
     Node.prototype.change_footer_item = function(selector, spec, mode_opts) {
         var $footer = this.my_page$().find('[data-role="footer"]');
@@ -2103,7 +2103,7 @@ var spideroak = function () {
      * Populate the footer for this node.
      *
      * @this {Node}
-     * @param {object} mode_opts Content and operation mode options
+     * @param {object} mode_opts User settings and operation mode options
      */
     Node.prototype.layout_footer = function(mode_opts) {
         this.layout_footer_by_spec([{title: "My Stuff",
