@@ -97,6 +97,7 @@ var spideroak = function () {
         titled_choice_popup_id: 'titled-choice-popup',
         depth_path_popup_id: 'depth-path-popup',
         top_level_info_ids: ['about-dashboard', 'about-spideroak'],
+        keychain_servicename: 'keychain',
     };
 
     if (SO_DEBUGGING) {
@@ -664,11 +665,52 @@ var spideroak = function () {
     PanelNode.prototype.layout = function (page_opts, mode_opts) {
         /* Deploy options page. */
         this.layout_header(mode_opts);
-        this.layout_options(page_opts);
+        this.adjust_settings(page_opts); // XXX include call in other types, too
         this.layout_footer(mode_opts);
     }
 
-    Node.prototype.layout_options = function (mode_opts) {
+    /** Adjust page content according to settings.
+     *
+     * This is the bridge between presentation and manifestation of user
+     * settings and other state.
+     *
+     * @param {object} mode_opts User settings and operation mode options
+     */
+    Node.prototype.adjust_settings = function (mode_opts) {
+        /* We take the mode_opts.var_name and mode_opts.var_value and:
+         *
+         * 1. use settings manager to interpret mode_opts.var_name per .var_val
+         * 2. impose the interpreted value in the internal data model
+         * 3. adjust the page's value slots with per the settings manager
+         * 4. adjust the page's settings slots hrefs to effect assignments
+         */
+        /** Adjust the value slots on the page with the current values.
+         *
+         * @param {object} page$ The target jQm page
+         * @param {object} value_slots A settings_manager value slots object
+         */
+        function apply_settings_values(page$, value_slots) {
+        }
+        /** Adjust the settings href slots according to the settings parameters.
+         *
+         * @param {object} page$ The target jQm page
+         */
+        function adjust_settings_hrefs(page$) {
+        }
+        var mypage$ = this.my_page$();
+        var value_slots = mypage$.find('[so-value-item="true"]');
+        var result_promise;
+        if [ mode_opts.hasOwnProperty('var_name') ] {
+            result_promise = settings_manager.set(mode_opts.var_name,
+                                                  mode_opts.var_val);
+            // XXX We have to use prepare the promise to:
+            //     - show a busy cursor, if it is pending at this point,
+            //     - stop busy cursor, if it was started, when promise delivers
+            //     - apply the setting to the proper slot, when concluded
+        }
+        settings_manager.get_values(value_slots);
+        apply_settings_values(mypage$, value_slots);
+        adjust_settings_hrefs(mypage$);
         }
 
     /* ===== Remote data access ==== */
@@ -2508,13 +2550,20 @@ var spideroak = function () {
     var ctmgr = current_tab_manager; // Compact name, for convenience.
 
 
-    /** Register the means to resolve values for settings, and evaluate them.
+    /** Register and implement methods to effect user-controlled settings.
      *
-     * Duties:
-     * + store variables' values in plain or secure storage
-     * + adjust values according to settings structure:
-     *   - XXX
-     * + convey (optional) presentable name for a variable's value
+     * Settings are primed from the user_settings variable, to designate
+     * security mode and default values, for those that need it. Those not
+     * explicitly designated inherently get literal (not secure) mode and
+     * empty-string default value.
+     *
+     * Because one of our key/value storage mechanisms (the secure
+     * keychain) uses callbacks to convey results, our value setting and
+     * getting procedures return deferred object promises. To use the
+     * promises, the receiver registers 'done' and 'fail' callbacks to get
+     * the results when the deferred objects business is concluded. This is
+     * so even for simple local-storage based mechanisms, for
+     * consistency. So get used to it. (-:
      */
     var settings_manager = function () {
         /* Private */
@@ -2528,44 +2577,44 @@ var spideroak = function () {
 
         /** Settings set and get methods.  Add new ones here.
          *
-         * Each method must support two modes:
-         * get: Take one argument, the variable name.
-         *      Return either the resulting value, or a promise object that
-         *      will pass the value to the promise 'done' callbacks or
-         *      error status to 'fail' callbacks.
-         * set: Take two arguments, the variable name and value to assign.
-         *      Return either a boolean to signify assignment success, or a
-         *      promise object for assignment of 'done' and 'fail'
-         *      callbacks.
+         * Each method should return a deferred object promise, which will take
+         * 'done' and 'fail' callbacks to convey:
+         * - the value via 'done' callback from a successful .get,
+         *   or the error message via 'fail' callbacks.
+         * - true via 'done' from a successful .set, or the error via 'fail'.
+         *
+         * (The deferred approach is necessary for, eg, the secure get/set
+         * mechanism, and we're using it for all for consistency.)
          */
         var getsetters = {
+            /** Store values using persistence_manager / local.
+             *
+             * Our promise arrives already resolved.
+             */
             literal: function (name, value) {
+                var deferred = new jQuery.Deferred();
                 if (typeof value === "undefined") {
-                    return persistence_manager.get(name);
+                    deferred.resolve(persistence_manager.get(name));
                 } else {
                     persistence_manager.set(name, value);
-                    return true;
+                    deferred.resolve(true);
                 }
+                return deferred.promise();
             },
             /** Store values using secure storage.
              *
-             * We return a promise object which will have its 'done'
-             * callbacks invoked when successful, or 'fail' callbacks
-             * invoked on failure.
+             * Our promise actually concludes asynchronously.
              */
             secure: function (name, value) {
                 var kc = get_keychain();
-                var servicename = 'keychain';
-                var operation = (typeof value === "undefined"
-                                 ? kc.getForKey
-                                 : kc.setForKey);
                 var deferred = new jQuery.Deferred();
-                // Invoke the keychain getForKey or setForKey with the
-                // deferred objects conclusion triggers...
-                operation(deferred.resolve, deferred.fail, name, servicename);
-                // ... so the receiver can use the .promise object to
-                // register 'done' and 'fail' callbacks when the getForKey
-                // or setForKey concludes:
+                if (typeof value === "undefined") {
+                    kc.getForKey(deferred.resolve, deferred.fail,
+                                 name, generic.keychain_servicename);
+                } else {
+                    kc.setForKey(deferred.resolve, deferred.fail,
+                                 name, value, generic.keychain_servicename);
+                }
                 return deferred.promise();
             },
         } /* getsetters */
@@ -2581,13 +2630,14 @@ var spideroak = function () {
              * @param {string} the_default Default value
              */
             define: function(name, getsetter_id, the_default) {
+                // "default" is a reserved word, hence "the_default".
                 by_name[name] = getsetter_id;
                 if (typeof the_default !== "undefined") {
                     settings_manager.set(name, the_default); }
             },
-            /** Set a settings variable, using its setter.
+            /** Set using the designated setter.
              *
-             * @return {object} Either a boolean or a promise for success status
+             * @return {object} Either a boolean or a promise for status report
              * @param {string} name
              * @param {string} value
              */
