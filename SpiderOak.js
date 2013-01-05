@@ -665,7 +665,7 @@ var spideroak = function () {
     PanelNode.prototype.layout = function (page_opts, mode_opts) {
         /* Deploy options page. */
         this.layout_header(mode_opts);
-        this.adjust_settings(page_opts); // XXX include call in other types, too
+        //this.adjust_settings(page_opts); // XXX include call in other types, too
         this.layout_footer(mode_opts);
     }
 
@@ -698,9 +698,9 @@ var spideroak = function () {
         function adjust_settings_hrefs(page$) {
         }
         var mypage$ = this.my_page$();
-        var value_slots = mypage$.find('[so-value-item="true"]');
+        var value_slots = mypage$.find('[so-is-setting="true"]');
         var result_promise;
-        if [ mode_opts.hasOwnProperty('var_name') ] {
+        if (mode_opts.hasOwnProperty('var_name')) {
             result_promise = settings_manager.set(mode_opts.var_name,
                                                   mode_opts.var_val);
             // XXX We have to use prepare the promise to:

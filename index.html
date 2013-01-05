@@ -349,6 +349,7 @@
                data-transition="slide">
               Folder Layout
               <span class="so-listview-value ui-li-count"
+                    so-is-setting="true"
                     so-tag-content="folder-layout">
                 List
               </span>
@@ -359,6 +360,7 @@
                data-transition="slide">
               Log out on exit
               <span class="so-listview-value ui-li-count"
+                    so-is-setting="true"
                     so-tag-content="logout-on-exit">
                 After 5 min.
               </span>
@@ -372,6 +374,7 @@
                data-transition="slide">
               Name
               <span class="so-listview-value ui-li-count"
+                    so-is-setting="true"
                     so-tag-content="username">
                 Spider Oakley
               </span>
@@ -382,6 +385,7 @@
                data-transition="slide">
               PIN
               <span class="so-listview-value ui-li-count"
+                    so-is-setting="true"
                     so-tag-content="PIN-active">
                 Off
               </span>
@@ -390,6 +394,7 @@
         </ul>
         <div class="center-wrapper">
           <input type="submit" data-inline="true" value="Logout"
+                 so-is-setting="true"
                  so-tag-disable-if="is-not-logged-in"
                  align="center" name="Logout" data-theme="b"/>
         </div>
@@ -416,16 +421,20 @@
     <div data-role="content">
       <form method="POST" class="settings-form">
         <ul data-role="listview" data-inset="true">
-          <li data-icon="so-carat-r">
-            <a href= "https://settings-root?var=folder-layout&value=hierarchical">
+          <li data-icon="checkbox-off"
+              so-tag-var="folder-layout" so-tag-value="hierarchical">
+            <a href=
+               "https://settings-root?var_name=folder-layout&var_val=hierarchical">
               Hierarchical folder structure
               <span class="so-listview-value ui-li-count"
-                    so-tag-checked="hierarchical-folder-layout">
+                    so-tag-var="folder-layout" so-tag-value="hierarchical"
+                    so-tag-action="checkbox">
               </span>
             </a>
           </li>
-          <li data-icon="so-carat-r">
-            <a href="https://settings-root?var=folder-layout&value=list">
+          <li data-icon="checkbox-off" class="so-listview-value"
+              so-tag-var="folder-layout" so-tag-value="list">
+            <a href="https://settings-root?var_name=folder-layout&var_val=list">
               List layout
               <span class="so-listview-value ui-li-count"
                     so-tag-checked="list-folder-layout">
@@ -462,7 +471,7 @@
       <form method="POST" class="settings-form">
         <ul data-role="listview" data-inset="true">
           <li data-icon="so-carat-r">
-            <a href="https://settings-root?var=logout-on-exit-time&value=off">
+            <a href="https://settings-root?var_name=logout-on-exit-time&var_val=off">
               Off
               <span class="so-listview-value ui-li-count"
                     so-tag-checked="logout-on-exit-time?value=Off">
@@ -470,7 +479,7 @@
             </a>
           </li>
           <li data-icon="so-carat-r">
-            <a href="https://settings-root?var=logout-on-exit-time&value=0">
+            <a href="https://settings-root?var_name=logout-on-exit-time&var_val=0">
               Immediately
               <span class="so-listview-value ui-li-count"
                     so-tag-checked="logout-on-exit-time?value=0">
@@ -478,7 +487,7 @@
             </a>
           </li>
           <li data-icon="so-carat-r">
-            <a href="https://settings-root?var=logout-on-exit-time&value=5">
+            <a href="https://settings-root?var_name=logout-on-exit-time&var_val=5">
               After 5 min
               <span class="so-listview-value ui-li-count"
                     so-tag-checked="logout-on-exit-time?value=5">
@@ -486,7 +495,7 @@
             </a>
           </li>
           <li data-icon="so-carat-r">
-            <a href="https://settings-root?var=logout-on-exit-time&value=10">
+            <a href="https://settings-root?var_name=logout-on-exit-time&var_val=10">
               After 10 min
               <span class="so-listview-value ui-li-count"
                     so-tag-checked="logout-on-exit-time?value=10">
@@ -494,7 +503,7 @@
             </a>
           </li>
           <li data-icon="so-carat-r">
-            <a href="https://settings-root?var=logout-on-exit-time&value=30">
+            <a href="https://settings-root?var_name=logout-on-exit-time&var_val=30">
               After 30 min
               <span class="so-listview-value ui-li-count"
                     so-tag-checked="logout-on-exit-time?value=30">
@@ -502,7 +511,7 @@
             </a>
           </li>
           <li data-icon="so-carat-r">
-            <a href="https://settings-root?var=logout-on-exit-time&value=60">
+            <a href="https://settings-root?var_name=logout-on-exit-time&var_val=60">
               After 1 hour
               <span class="so-listview-value ui-li-count"
                     so-tag-checked="logout-on-exit-time?value=60">
