@@ -14,9 +14,9 @@
 .center-wrapper { text-align: center; }
 .center-wrapper * { margin: 0 auto; }
 
-/* We use ui-li-count to get the settings value near the arrow, but have to
-   override some of the indirect effect, like border: */
-.so-listview-value {
+/* Tweak to piggback settings value content displays on the ui-li-count
+   style/slot, to get settings value near the listview arrow. */
+.so-li-value {
   border: 0px solid #ccc !important;
 }
 

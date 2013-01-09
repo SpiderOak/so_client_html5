@@ -396,6 +396,7 @@
           <input type="submit" data-inline="true" value="Logout"
                  so-setting-display="button"
                  so-setting-disable-if="is-not-logged-in"
+                 so-setting-click-action="logout"
                  align="center" name="Logout" data-theme="b"/>
         </div>
       </form>
@@ -421,7 +422,7 @@
     <div data-role="content">
       <form method="POST" class="settings-form">
         <ul data-role="listview" data-inset="true">
-          <li data-icon="checkbox-off"
+          <li data-icon="checkbox-on"
               so-setting-display="checkbox"
               so-setting-name="folder-layout"
               so-setting-value="hierarchical">
@@ -463,17 +464,16 @@
     <div data-role="content">
       <form method="POST" class="settings-form">
         <ul data-role="listview" data-inset="true">
-          <li data-icon="so-carat-r">
-            <a href="https://settings-root?var_name=logout-on-exit-time&var_val=off">
-              Off
-              <span class="so-var-checkbox ui-li-count"
-                    so-setting-display="checkbox"
-                    so-setting-name="logout-on-exit-time"
-                    so-setting-value="off">
+          <li data-icon="checkbox-on"
+            so-setting-display="checkbox"
+            so-setting-name="logout-on-exit-time"
+            so-setting-value="off">
               </span>
+            <a href="https://settings-root?var_name=logout-on-exit-time&var_val=off&var_val_pretty=Off">
+              Off
             </a>
           </li>
-          <li data-icon="so-carat-r"
+          <li data-icon="checkbox-off"
               so-setting-display="checkbox"
               so-setting-name="logout-on-exit-time"
               so-setting-value="0">
@@ -481,7 +481,7 @@
               Immediate
             </a>
           </li>
-          <li data-icon="so-carat-r"
+          <li data-icon="checkbox-off"
               so-setting-display="checkbox"
               so-setting-name="logout-on-exit-time"
               so-setting-value="5">
@@ -489,7 +489,7 @@
               After 5 min
             </a>
           </li>
-          <li data-icon="so-carat-r"
+          <li data-icon="checkbox-off"
               so-setting-display="checkbox"
               so-setting-name="logout-on-exit-time"
               so-setting-value="5">
@@ -497,7 +497,7 @@
               After 10 min
             </a>
           </li>
-          <li data-icon="so-carat-r"
+          <li data-icon="checkbox-off"
               so-setting-display="checkbox"
               so-setting-name="logout-on-exit-time"
               so-setting-value="30">
@@ -505,7 +505,7 @@
               After 30 min
             </a>
           </li>
-          <li data-icon="so-carat-r"
+          <li data-icon="checkbox-off"
               so-setting-display="checkbox"
               so-setting-name="logout-on-exit-time"
               so-setting-value="60">
