@@ -4,14 +4,16 @@
  * third element indicates that the value should be retained in secure
  * storage.
  *
- * Entry fields: ["name", "getsetter-id" "default-value"]
+ * Entry fields:
+ *
+ *   ["name", "getsetter-id", "default-val", "pretty-default-val"]
  *
  * See the SpiderOak.js settings_manager for details.
  */
 user_settings =
-    [["folder-layout", "literal", "list"],
-     ["logout-on-exit", "literal", "off"],
+    [["folder-layout", "literal", "list", "List"],
+     ["logout-on-exit", "literal", "off", "Off"],
      ["account", "secure", ""],
-     ["PIN-mode", "secure", "off"],
-     ["PIN", "secure", "0000"],
+     ["PIN-mode", "literal", "off", "Off"],
+     ["PIN", "secure", "", "None"],
     ]
