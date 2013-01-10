@@ -679,39 +679,55 @@ var spideroak = function () {
     Node.prototype.adjust_settings = function (mode_opts) {
         /* We take the mode_opts.var_name and mode_opts.var_value and:
          *
-         * 1. use settings manager to interpret mode_opts.var_name per .var_val
-         * 2. impose the interpreted value in the internal data model
-         * 3. adjust the page's value slots with per the settings manager
-         * 4. adjust the page's settings slots hrefs to effect assignments
+         * 1. Establish setting per mode_opts.var_name, var_val, var_val_pretty
+         * 2. adjust page var slots per the prevailing settings - check, etc
+         * 2. adjust page per the prevailing settings
+         * 3. adjust page value slots per the prevailing settings
+         * 4. adjust page assignment items so their hrefs convey the settings
          */
-        /** Adjust the value slots on the page with the current values.
+
+        /** Adjust page variable display slots with the current values.
+         *
+         * Handles the various kinds of slots so-setting-display=[*], currently:
+         * - "content": Spans where the text content is the variable value
+         * - "checkbox": listview li with checkbox for the specific setting
+         * - "button": input buttons needing activation adjustments
          *
          * @param {object} page$ The target jQm page
-         * @param {object} value_slots A settings_manager value slots object
          */
-        function apply_settings_values(page$, value_slots) {
+        function apply_settings_values(page$) {
+            var settings_displays = mypage$.find('[so-setting-display]'),
+                contents_displays =
+                   settings_displays.find('[so-setting-display="content"]'),
+                checkbox_displays =
+                   settings_displays.find('[so-setting-display="checkbox"]'),
+                button_displays =
+                   settings_displays.find('[so-setting-display="button"]');
+            
         }
-        /** Adjust the settings href slots according to the settings parameters.
-         *
-         * @param {object} page$ The target jQm page
-         */
-        function adjust_settings_hrefs(page$) {
-        }
+
         var mypage$ = this.my_page$();
-        var value_slots = mypage$.find('[so-is-setting="true"]');
         var result_promise;
-        if (mode_opts.hasOwnProperty('var_name')) {
+        if (mode_opts && mode_opts.hasOwnProperty('var_name')) {
             result_promise = settings_manager.set(mode_opts.var_name,
-                                                  mode_opts.var_val);
-            // XXX We have to use prepare the promise to:
-            //     - show a busy cursor, if it is pending at this point,
-            //     - stop busy cursor, if it was started, when promise delivers
-            //     - apply the setting to the proper slot, when concluded
+                                                  mode_opts.var_val,
+                                                  mode_opts.var_val_pretty);
+            if (result_promise.state() === "pending") {
+                // Since the promise is not already resolved, we need to
+                // show a busy cursor until it is, and then either turn off
+                // the busy cursor and update the settings, if the promise
+                // is fulfilled, or post a toast indicating what went wrong.
+                $.mobile.loading('show');
+                result_promise.always(function () { $.mobile.loading('hide'); })
+                result_promise.done(
+                    // Reapply settings, now that a new value is established.
+                    function () { apply_settings_values(mypage$); }) ;
+                result_promise.fail(
+                    function () { ;});
+            }
+            apply_settings_values(mypage$);
         }
-        settings_manager.get_values(value_slots);
-        apply_settings_values(mypage$, value_slots);
-        adjust_settings_hrefs(mypage$);
-        }
+    }
 
     /* ===== Remote data access ==== */
 
@@ -2554,26 +2570,42 @@ var spideroak = function () {
      *
      * Settings are primed from the user_settings variable, to designate
      * security mode and default values, for those that need it. Those not
-     * explicitly designated inherently get literal (not secure) mode and
-     * empty-string default value.
+     * explicitly defined get literal (not secure) mode and empty-string
+     * default value.
+     *
+     * Settings values can have "pretty" values associated with them, for
+     * presentation of aliases in the UI. (Eg, "Immediate" for timeout
+     * value = 0 seconds, etc.)
      *
      * Because one of our key/value storage mechanisms (the secure
      * keychain) uses callbacks to convey results, our value setting and
-     * getting procedures return deferred object promises. To use the
-     * promises, the receiver registers 'done' and 'fail' callbacks to get
-     * the results when the deferred objects business is concluded. This is
-     * so even for simple local-storage based mechanisms, for
-     * consistency. So get used to it. (-:
+     * getting procedures return deferred object promises. To use them, the
+     * receiver registers'done' and 'fail' callbacks to get the results when
+     * the deferred objects business is concluded. This is so even for simple
+     * local-storage based mechanisms, for consistency.
+     * So get used to it. (-%
      */
     var settings_manager = function () {
         /* Private */
-        /** Registry of settings definitions.
+
+        /** Registry of getsetter methods per settings name.
          *
-         * Settings map names to a string identifying the type of
-         * get_setter method (see below) to use for setting and getting the
-         * value.
+         * Map names to a string identifying the type of getsetter method
+         * (see below) to use for setting and getting the value.
+         *
+         * @private
          */
-        var by_name = {};
+        var getsettter_by_name = {};
+
+        /** Registry of  methods per settings name.
+         *
+         * Map setting name and value to a pretty version of the value.
+         * The lookups are nested, with name mapping to an object that maps
+         * val to pretty val.
+         *
+         * @private
+         */
+        var pretty_by_name_and_val = {};
 
         /** Settings set and get methods.  Add new ones here.
          *
@@ -2626,8 +2658,8 @@ var spideroak = function () {
         /** Associate a pretty value for value of settings name.
          *
          * By associating the pretty value with the specific setting's
-         * value, the pretty value is obtained as an adjunct of the current
-         * value, whatever the current value happens to be.
+         * value, the pretty value can be obtained as an adjunct of the
+         * current value, whatever the current value happens to be.
          *
          * The most recently asserted association for a setting value prevails.
          *
