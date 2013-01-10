@@ -2585,6 +2585,8 @@ var spideroak = function () {
          *
          * (The deferred approach is necessary for, eg, the secure get/set
          * mechanism, and we're using it for all for consistency.)
+         *
+         * @private
          */
         var getsetters = {
             /** Store values using persistence_manager / local.
@@ -2604,20 +2606,40 @@ var spideroak = function () {
             /** Store values using secure storage.
              *
              * Our promise actually concludes asynchronously.
+             *
+             * @private
              */
             secure: function (name, value) {
                 var kc = get_keychain();
                 var deferred = new jQuery.Deferred();
                 if (typeof value === "undefined") {
-                    kc.getForKey(deferred.resolve, deferred.fail,
+                    kc.getForKey(deferred.resolve, deferred.reject,
                                  name, generic.keychain_servicename);
                 } else {
-                    kc.setForKey(deferred.resolve, deferred.fail,
+                    kc.setForKey(deferred.resolve, deferred.reject,
                                  name, value, generic.keychain_servicename);
                 }
                 return deferred.promise();
             },
         } /* getsetters */
+
+        /** Associate a pretty value for value of settings name.
+         *
+         * By associating the pretty value with the specific setting's
+         * value, the pretty value is obtained as an adjunct of the current
+         * value, whatever the current value happens to be.
+         *
+         * The most recently asserted association for a setting value prevails.
+         *
+         * @private
+         * @param {string} name Settings variable name
+         * @param {string} value Value for which we want a pretty value
+         * @param {string} pretty_val Version of value for display on forms
+         */
+        function assoc_pretty_val(name, value, pretty_value) {
+            var for_name = pretty_by_name_and_val[name] || {};
+            for_name[value] = pretty_value;
+        }
 
         return {
             /** Associate settings var with its getter and setter methods.
@@ -2625,34 +2647,52 @@ var spideroak = function () {
              * The setting/getting method is the name of one of those in
              * the get_setters object.
              *
+             * @public
              * @param {string} name Variable name
              * @param {string} getsetter_id Name of getsetter method
              * @param {string} the_default Default value
+             * @param {string} pretty_val Version of value for display on forms
              */
-            define: function(name, getsetter_id, the_default) {
+            define: function(name, getsetter_id, the_default, pretty_val) {
                 // "default" is a reserved word, hence "the_default".
-                by_name[name] = getsetter_id;
+                getsettter_by_name[name] = getsetter_id;
+                assoc_pretty_val(name, value, pretty_val);
                 if (typeof the_default !== "undefined") {
                     settings_manager.set(name, the_default); }
             },
             /** Set using the designated setter.
              *
-             * @return {object} Either a boolean or a promise for status report
-             * @param {string} name
-             * @param {string} value
+             * @return {object} promise A deferred object promise for the status
+             * @public
+             * @param {string} name Settings variable name
+             * @param {string} value The value to assign to the named variable.
+             * @param {string} pretty_val Version of value for display on forms
              */
-            set: function(name, value) {
-                var method = set_getters[by_name[name]];
+            set: function(name, value, pretty_val) {
+                assoc_pretty_val(name, value, pretty_val);
+                var method = set_getters[getsettter_by_name[name]];
                 return method(name, value);
             },
-            /** Set a settings variable, using its setter.
+            /** Get a settings variable, using its getter.
              *
-             * @return {object} Either a string or a promise for the value
-             * @param {string} name
+             * @return {object} promise A deferred object promise for the result
+             * @public
+             * @param {string} name Settings variable name
              */
             get: function(name) {
-                var method = set_getters[by_name[name]];
+                var method = set_getters[getsettter_by_name[name]];
                 return method(name);
+            },
+            /** Get the pretty name for a settings value.
+             *
+             * @return {object} A string or <undefined> for absent pretty value.
+             * @public
+             * @param {string} name Settings variable name
+             * @param {string} value Value for which we want a pretty value
+             */
+            get_pretty: function(name, value) {
+                var name_values = pretty_by_name_and_val[name];
+                return name_values && name_values[value];
             },
         } /* return {} */
     }()
