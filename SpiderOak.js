@@ -688,6 +688,9 @@ var spideroak = function () {
 
         /** Adjust page variable display slots with the current values.
          *
+         * We use settings_manager.get_immediate(), so we we can be used as
+         * the success callback on promises for settings_manager.get()
+         *
          * Handles the various kinds of slots so-setting-display=[*], currently:
          * - "content": Spans where the text content is the variable value
          * - "checkbox": listview li with checkbox for the specific setting
@@ -695,18 +698,16 @@ var spideroak = function () {
          *
          * @param {object} page$ The target jQm page
          */
-        function apply_settings_values(page$) {
-            var settings_displays = mypage$.find('[so-setting-display]'),
-                contents_displays =
-                   settings_displays.find('[so-setting-display="content"]'),
-                checkbox_displays =
-                   settings_displays.find('[so-setting-display="checkbox"]'),
-                button_displays =
-                   settings_displays.find('[so-setting-display="button"]');
-            
+        function apply_settings_values($page) {
+            var $contents_displays =
+                   $page.find('[so-setting-display="content"]'),
+                $checkbox_displays =
+                   $page.find('[so-setting-display="checkbox"]'),
+                $button_displays =
+                   $page.find('[so-setting-display="button"]');
         }
 
-        var mypage$ = this.my_page$();
+        var $mypage = this.my_page$();
         var result_promise;
         if (mode_opts && mode_opts.hasOwnProperty('var_name')) {
             result_promise = settings_manager.set(mode_opts.var_name,
@@ -714,19 +715,22 @@ var spideroak = function () {
                                                   mode_opts.var_val_pretty);
             if (result_promise.state() === "pending") {
                 // Since the promise is not already resolved, we need to
-                // show a busy cursor until it is, and then either turn off
-                // the busy cursor and update the settings, if the promise
-                // is fulfilled, or post a toast indicating what went wrong.
+                // show a busy cursor until it is, and then deactivate the
+                // busy cursor and update the settings if the promise is
+                // fulfilled, or else post a toast indicating what went
+                // wrong.
                 $.mobile.loading('show');
                 result_promise.always(function () { $.mobile.loading('hide'); })
                 result_promise.done(
-                    // Reapply settings, now that a new value is established.
-                    function () { apply_settings_values(mypage$); }) ;
-                result_promise.fail(
-                    function () { ;});
-            }
-            apply_settings_values(mypage$);
+                    // On success, apply settings once again - the newly
+                    // established value will be incorporated.
+                    function () { apply_settings_values($mypage); }) ;
+                result_promise.fail(function (err)
+                                    { msg = ("Failed to set " + var_name +
+                                             " to " + var_val + ": " + err)
+                                      toastish(msg, 3);}); }
         }
+        apply_settings_values($mypage);
     }
 
     /* ===== Remote data access ==== */
