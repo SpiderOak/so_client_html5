@@ -2726,6 +2726,19 @@ var spideroak = function () {
                 var name_values = pretty_by_name_and_val[name];
                 return name_values && name_values[value];
             },
+            /** Establish default settings.
+             *
+             */
+            init: function() {
+                user_settings.map(
+                    function (entry) {
+                        var name = entry[0],
+                        getset = entry[1],
+                        the_default = entry[2],
+                        pretty = entry[3];
+                        settings_manager.define(name, getset,
+                                                the_default, pretty); });
+            },
         } /* return {} */
     }()
     var setmgr = settings_manager; // Compact name, for convenience.
@@ -3166,6 +3179,7 @@ var spideroak = function () {
         // Setup traversal hook:
         establish_traversal_handler();
         establish_operation_handlers();
+        settings_manager.init();
 
         my.combo_root_url = id2url(generic.combo_root_page_id);
         var combo_root = node_manager.get_combo_root();
