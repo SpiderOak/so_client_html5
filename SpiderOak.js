@@ -2588,6 +2588,12 @@ var spideroak = function () {
     var settings_manager = function () {
         /* Private */
 
+        /** Map names to their most recently obtained value.
+         *
+         * @private
+         */
+        var immediate_by_name = {};
+
         /** Registry of getsetter methods per settings name.
          *
          * Map names to a string identifying the type of getsetter method
@@ -2618,6 +2624,9 @@ var spideroak = function () {
          * (The deferred approach is necessary for, eg, the secure get/set
          * mechanism, and we're using it for all for consistency.)
          *
+         * One duty of any getter is to assign immediate_by_name[name] to
+         * the obtained value, when successfully obtained.
+         *
          * @private
          */
         var getsetters = {
@@ -2628,6 +2637,8 @@ var spideroak = function () {
             literal: function (name, value) {
                 var deferred = new jQuery.Deferred();
                 if (typeof value === "undefined") {
+                    deferred.done(function (got_val)
+                                  { immediate_by_name[name] = got_val; });
                     deferred.resolve(persistence_manager.get(name));
                 } else {
                     persistence_manager.set(name, value);
@@ -2645,6 +2656,8 @@ var spideroak = function () {
                 var kc = get_keychain();
                 var deferred = new jQuery.Deferred();
                 if (typeof value === "undefined") {
+                    deferred.done(function (got_val)
+                                  { immediate_by_name[name] = got_val; });
                     kc.getForKey(deferred.resolve, deferred.reject,
                                  name, generic.keychain_servicename);
                 } else {
@@ -2677,20 +2690,27 @@ var spideroak = function () {
             /** Associate settings var with its getter and setter methods.
              *
              * The setting/getting method is the name of one of those in
-             * the get_setters object.
+             * the get_setters object.  initial_val is an initial value to
+             * assign.  pretty_val is a presentable version of this value.
+             *
+             * When we have an initial_val, we do a '.get()' immediately so
+             * successful assignment will be seen ASAP by
+             * '.get_immediate()'.
              *
              * @public
              * @param {string} name Variable name
              * @param {string} getsetter_id Name of getsetter method
-             * @param {string} the_default Default value
+             * @param {string} initial_val Default value
              * @param {string} pretty_val Version of value for display on forms
              */
-            define: function(name, getsetter_id, the_default, pretty_val) {
-                // "default" is a reserved word, hence "the_default".
+            define: function(name, getsetter_id, initial_val, pretty_val) {
+                // "default" is a reserved word, hence "initial_val".
                 getsettter_by_name[name] = getsetter_id;
-                assoc_pretty_val(name, value, pretty_val);
-                if (typeof the_default !== "undefined") {
-                    settings_manager.set(name, the_default); }
+                assoc_pretty_val(name, initial_val, pretty_val);
+                if (typeof initial_val !== "undefined") {
+                    settings_manager.set(name, initial_val);
+                    // Do an intial .get so immediate_by_name is primed:
+                    settings_manager.get(name); }
             },
             /** Set using the designated setter.
              *
@@ -2702,18 +2722,31 @@ var spideroak = function () {
              */
             set: function(name, value, pretty_val) {
                 assoc_pretty_val(name, value, pretty_val);
-                var method = set_getters[getsettter_by_name[name]];
+                var method = getsetters[getsettter_by_name[name]];
                 return method(name, value);
             },
-            /** Get a settings variable, using its getter.
+            /** Get a settings value, using its getter.
              *
              * @return {object} promise A deferred object promise for the result
              * @public
              * @param {string} name Settings variable name
              */
             get: function(name) {
-                var method = set_getters[getsettter_by_name[name]];
+                var method = getsetters[getsettter_by_name[name]];
                 return method(name);
+            },
+            /** Get the most recently obtained value for a setting.
+             *
+             * This will miss values that are asynchronously pending.  Use
+             * the promise object returned from a plain '.get' to ensure
+             * catching those.
+             *
+             * @return {string} value The most recently gotten value.
+             * @public
+             * @param {string} name Settings variable name
+             */
+            get_immediate: function(name) {
+                return immediate_by_name[name];
             },
             /** Get the pretty name for a settings value.
              *
