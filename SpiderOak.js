@@ -2614,7 +2614,16 @@ var spideroak = function () {
          *
          * @private
          */
-        var getsettter_by_name = {};
+        var getsetter_by_name = {};
+        /** Retrieve the getsetter method for given name.
+         *
+         * We do proper defaulting, according to the spec for the null entry.
+         *
+         * @return {function}
+         */
+        function get_getsetter(name) {
+            return getsetters[getsetter_by_name[name]
+                              || getsetter_by_name[null]]; }
 
         /** Registry of  methods per settings name.
          *
@@ -2625,6 +2634,15 @@ var spideroak = function () {
          * @private
          */
         var pretty_by_name_and_val = {};
+        /** Retrieve the pretty value for given name.
+         *
+         * We do proper defaulting, according to the spec for the null entry.
+         *
+         * @return {function}
+         */
+        function get_getsetter(name) {
+            return getsetters[getsetter_by_name[name]
+                              || getsetter_by_name[null]]; }
 
         /** Settings set and get methods.  Add new ones here.
          *
@@ -2645,13 +2663,14 @@ var spideroak = function () {
         var getsetters = {
             /** Store values using persistence_manager / local.
              *
-             * Our promise arrives already resolved.
+             * @return {object} Promise, already resolved.
              */
             literal: function (name, value) {
                 var deferred = new jQuery.Deferred();
                 if (typeof value === "undefined") {
                     deferred.done(function (got_val)
-                                  { immediate_by_name[name] = got_val; });
+                                  { immediate_by_name[name] = got_val;
+                                    return got_val; });
                     deferred.resolve(persistence_manager.get(name));
                 } else {
                     persistence_manager.set(name, value);
@@ -2664,13 +2683,15 @@ var spideroak = function () {
              * Our promise actually concludes asynchronously.
              *
              * @private
+             * @return {object} Promise to deliver keychain result
              */
             secure: function (name, value) {
                 var kc = get_keychain();
                 var deferred = new jQuery.Deferred();
                 if (typeof value === "undefined") {
                     deferred.done(function (got_val)
-                                  { immediate_by_name[name] = got_val; });
+                                  { immediate_by_name[name] = got_val;
+                                    return got_val; });
                     kc.getForKey(deferred.resolve, deferred.reject,
                                  name, generic.keychain_servicename);
                 } else {
@@ -2718,7 +2739,7 @@ var spideroak = function () {
              */
             define: function(name, getsetter_id, initial_val, pretty_val) {
                 // "default" is a reserved word, hence "initial_val".
-                getsettter_by_name[name] = getsetter_id;
+                getsetter_by_name[name] = getsetter_id;
                 assoc_pretty_val(name, initial_val, pretty_val);
                 if (typeof initial_val !== "undefined") {
                     settings_manager.set(name, initial_val);
@@ -2735,7 +2756,7 @@ var spideroak = function () {
              */
             set: function(name, value, pretty_val) {
                 assoc_pretty_val(name, value, pretty_val);
-                var method = getsetters[getsettter_by_name[name]];
+                var method = get_getsetter(name);
                 return method(name, value);
             },
             /** Get a settings value, using its getter.
@@ -2745,7 +2766,7 @@ var spideroak = function () {
              * @param {string} name Settings variable name
              */
             get: function(name) {
-                var method = getsetters[getsettter_by_name[name]];
+                var method = get_getsetter(name);
                 return method(name);
             },
             /** Get the most recently obtained value for a setting.

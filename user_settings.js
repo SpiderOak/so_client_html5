@@ -11,7 +11,8 @@
  * See the SpiderOak.js settings_manager for details.
  */
 user_settings =
-    [["folder-layout", "literal", "list", "List"],
+    [[null, "literal", "", ""],                 // Default, for ad-hoc settings.
+     ["folder-layout", "literal", "list", "List"],
      ["logout-on-exit", "literal", "off", "Off"],
      ["account", "secure", ""],
      ["PIN-mode", "literal", "off", "Off"],
