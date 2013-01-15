@@ -40,7 +40,7 @@
   <script src="js_aux/misc.js"></script>
   <script src="js_aux/functests.js"></script>
   <script>
-    if (window.device) {
+    if (navigator.userAgent.match(/(iPhone|iPod|iPad|Android|BlackBerry)/)) {
         // Register function to report when PhoneGap device is ready:
         document.addEventListener("deviceready", onDeviceReady, false); }
     else {
