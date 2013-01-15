@@ -57,8 +57,6 @@ var spideroak = function () {
 
     /* ==== Object-wide settings ==== */
 
-    var keychain = get_keychain();
-
     /** Constants not specific to a particular login session: */
     var generic = {
         // API v1.

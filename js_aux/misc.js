@@ -298,11 +298,32 @@ var keychain = null;
  */
 function get_keychain() {
     if (keychain) {
-        return keychain; }
-    try {
+        return keychain;
+    } else if (in_cordova()) {
         return keychain = cordova.require("cordova/plugin/keychain");
-    } catch (err) {
-        return keychain = undefined; }}
+    } else if (SO_DEBUGGING) {
+        var msg = "Using INSECURE keychain stub - localStorage";
+        alert(msg);
+        blather(msg);
+        return keychain = new keychain_stub();
+    } else {
+        throw new Error("No secure storage/keychain.");
+    }
+}
+
+function keychain_stub() {};
+keychain_stub.prototype.getForKey = function (done_callback, fail_callback,
+                                              name, servicename) {
+        done_callback(localStorage.getItem(name));
+        return true; }
+keychain_stub.prototype.setForKey = function (done_callback, fail_callback,
+                                              name, value, servicename) {
+    done_callback(localStorage.setItem(name, value));
+    return true; }
+keychain_stub.prototype.removeForKey = function (done_callback, fail_callback,
+                                                 name, servicename) {
+    done_callback(localStorage.removeItem(name));
+    return true; }
 
 // Polyfill for context .bind(context), for it's lack in Safari.
 // Taken almost verbatim from
