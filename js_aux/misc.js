@@ -284,8 +284,8 @@ function url_tail(url) {
  */
 function in_cordova() {
     return ((typeof window.device !== "undefined")
-            && (typeof device.cordova !== "undefined")
-            && device.cordova()); }
+            && (typeof window.device.cordova !== "undefined"));
+}
 
 /** Keychain object, for reuse via get_keychain.
  */
