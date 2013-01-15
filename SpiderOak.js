@@ -712,20 +712,31 @@ var spideroak = function () {
                                                   mode_opts.var_val,
                                                   mode_opts.var_val_pretty);
             if (result_promise.state() === "pending") {
-                // Since the promise is not already resolved, we need to
-                // show a busy cursor until it is, and then deactivate the
-                // busy cursor and update the settings if the promise is
-                // fulfilled, or else post a toast indicating what went
-                // wrong.
+                // Since the promise is not already resolved, we need to:
+                //
+                // - show a busy cursor until it is
+                // - then deactivate the busy cursor on conclusion
+                // - and update the settings if the promise is fulfilled,
+                // - or else post a toast indicating what went wrong.
+
                 $.mobile.loading('show');
                 result_promise.always(function () { $.mobile.loading('hide'); })
+
+                // On success, apply settings once again - the newly
+                // established value will be incorporated.
+                // TECH NOTE: We re-process all settings on the page,
+                // rather than just the one that we know changed, because
+                // some settings values are derived from others, and we
+                // can't, ab initio, identify which might be affected.
                 result_promise.done(
-                    // On success, apply settings once again - the newly
-                    // established value will be incorporated.
                     function () { apply_settings_values($mypage); }) ;
+
+                // On reject, post info as toast and console log. We do not
+                // include the value because it may be sensitive.
                 result_promise.fail(function (err)
-                                    { msg = ("Failed to set " + var_name +
-                                             " to " + var_val + ": " + err)
+                                    { msg = ("Failed to set " + var_name
+                                             + ": " + err)
+                                      console.log(msg);
                                       toastish(msg, 3);}); }
         }
         apply_settings_values($mypage);
