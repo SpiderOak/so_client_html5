@@ -3373,6 +3373,7 @@ var spideroak = function () {
         // Expose the managers for access while debugging:
         public_interface.nmgr = nmgr;
         public_interface.ctmgr = ctmgr;
+        public_interface.setmgr = setmgr;
         public_interface.pmgr = pmgr; }
 
     /* ==== Here we go: ==== */
