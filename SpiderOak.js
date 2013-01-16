@@ -95,7 +95,7 @@ var spideroak = function () {
         titled_choice_popup_id: 'titled-choice-popup',
         depth_path_popup_id: 'depth-path-popup',
         top_level_info_ids: ['about-dashboard', 'about-spideroak'],
-        keychain_servicename: 'keychain',
+        keychain_servicename: 'Keychain',
     };
 
     if (SO_DEBUGGING) {
