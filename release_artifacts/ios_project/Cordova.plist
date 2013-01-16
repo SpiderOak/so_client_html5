@@ -53,6 +53,8 @@
 	</array>
 	<key>Plugins</key>
 	<dict>
+		<key>Keychain</key>
+		<string>CDVKeychain</string>
 		<key>Device</key>
 		<string>CDVDevice</string>
 		<key>Logger</key>

@@ -181,8 +181,12 @@ make_pluginstaller () {
 situate_plugins () {
   # Situate all of the plugins in the indicated application package.
   # XXX For now we're very coarse about this - include all plugins in the
-  #     ios packages.  Eventually - soon - we're going to have to
-  #     discriminate, idenitifying which plugins are for which platforms.
+  #     ios packages.  Eventually we're going to have to discriminate,
+  #     idenitifying which plugins are for which platforms.
+  # XXX 2013-01-16 With the keychain plugin, the Cordova.plist entries are not
+  #     being properly included, so I've added them to the template plist. This
+  #     is is not sufficient - the plugin 'getForKey' isn't working.  This
+  #     needs to be properly solved.
   local platform="$1"
   local package="$2"
 
