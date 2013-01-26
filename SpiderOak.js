@@ -686,7 +686,7 @@ var spideroak = function () {
 
         /** Adjust page variable display slots with the current values.
          *
-         * We use settings_manager.get_immediate(), so we we can be used as
+         * We use settings_manager.get_immediate(), since we are used as
          * the success callback on promises for settings_manager.get()
          *
          * Handles the various kinds of slots so-setting-display=[*], currently:
@@ -697,14 +697,26 @@ var spideroak = function () {
          * @param {object} page$ The target jQm page
          */
         function apply_settings_values($page) {
-            var $contents_displays =
-                   $page.find('[so-setting-display="content"]'),
-                $checkbox_displays =
-                   $page.find('[so-setting-display="checkbox"]'),
-                $button_displays =
-                   $page.find('[so-setting-display="button"]');
+            var $contents = $page.find('[so-setting-display="content"]'),
+                $checkboxes = $page.find('[so-setting-display="checkbox"]'),
+                $buttons = $page.find('[so-setting-display="button"]');
+            $contents.map(
+                function (i) {
+                    var $item = $contents[i];
+                    $item.html(
+                      setmgr.get_immediate($item.getAttribute('so-setting-name')
+                                           || "")); });
+            $checkboxes.map(
+                function (i) {
+                    var $item = $checkboxes[i],
+                        name = $item.getAttribute('so-setting-name'),
+                        val = $item.getAttribute('so-setting-value');
+                    if (val === setmgr.get_immediate(name)) {
+                        // check the checkbox
+                        ;
+                    }
+                } );
         }
-
         var $mypage = this.my_page$();
         var result_promise;
         if (mode_opts && mode_opts.hasOwnProperty('var_name')) {
@@ -3277,7 +3289,7 @@ var spideroak = function () {
 
         // ... and go, using the traversal hook:
         $.mobile.changePage(combo_root.url); }
-    
+
 
     /* ==== Public interface ==== */
 

@@ -1,15 +1,10 @@
-[[PageOutline]]
-= Web Storage API JSON Data Structures =
-
 Representative or template examples of various web_storage_api, from the
 API v1, per https://spideroak.com/apis/partners/web_storage_api .
 
-(Proposed API v2: https://spideroak.com/pandora/wiki/NewJsonObjectApi .)
 
 == Root storage node ==
 
-{{{#!python
-  {"stats": {"firstname": "ken", "lastname": "manheimer",
+  {"stats": {"firstname": "ken", "lastname": "whoever",
              "devices": 2, "backupsize": "1.784 GB",
              "billing_url": "https://spideroak.com/user/validate?hmac=69...",
              "size": 3},
@@ -19,11 +14,9 @@ API v1, per https://spideroak.com/apis/partners/web_storage_api .
                {"encoded": "Server%20%2F%20Colorful/",
                 "name": " Server / Colorful",
                 "lastlogin": 1335464648, "lastcommit": 1335464699}]}
-}}}
 
 == Directory (Folder) resource ==
 
-{{{#!python
   {dirs: [["display name of folder", "subfolder/"]],
    files:
     [{"url": "relative url to download file",
@@ -39,11 +32,9 @@ API v1, per https://spideroak.com/apis/partners/web_storage_api .
       }
     ]
   }
-}}}
 
-== Share Room - !RoomShareRoom ==
+== Share Room ==
 
-{{{#!python
   {"stats": {
     "start_date": null,
     "room_name": "This is the name of the room",
@@ -57,4 +48,20 @@ API v1, per https://spideroak.com/apis/partners/web_storage_api .
             ["display name of folder", "path/to/folder/"]
            ]
   }
-}}}
+
+== Share Rooms ==
+
+This is the list of share rooms published by an account. Access to it is
+restricted to the account, while access to the share room elements depends
+on having the account's shareid and room_key.
+
+   {"share_id":"ashareid",
+    "share_id_b32": "MFZWQYLSMVUWI",
+    "share_rooms":[{"room_description": "This sentence no verb.",
+                    "room_key": "aroomkey",
+                    "room_name":"Random stuff for testing",
+                    "url": "/browse/share/ashareid/aroomkey"},
+                   {"room_description":"etc",
+                    "room_key":"roomkeytoo",
+                    "room_name":"Whatever",
+                    "url":"/browse/share/ashareid/roomkeytoo"}]}
