@@ -1,5 +1,4 @@
-Representative or template examples of various web_storage_api, from the
-API v1, per https://spideroak.com/apis/partners/web_storage_api .
+Examples of various [https://spideroak.com/faq/questions/37/how_do_i_use_the_spideroak_web_api/ web storage api v1] data structures.
 
 
 == Root storage node ==
@@ -49,7 +48,7 @@ API v1, per https://spideroak.com/apis/partners/web_storage_api .
            ]
   }
 
-== Share Rooms ==
+== List of Account's Share Rooms ==
 
 This is the list of share rooms published by an account. Access to it is
 restricted to the account, while access to the share room elements depends
@@ -65,3 +64,5 @@ on having the account's shareid and room_key.
                     "room_key":"roomkeytoo",
                     "room_name":"Whatever",
                     "url":"/browse/share/ashareid/roomkeytoo"}]}
+
+''Note that the share_id_b32 field is not included in the faq description, so its presence may not be reliable.''

@@ -108,6 +108,13 @@ var spideroak = function () {
             generic.alt_host_url = "https://" + hostname;
             generic.storage_path_prefix = "" + generic.storage_path_prefix;
             generic.shares_path_suffix = "" + generic.shares_path_suffix; }
+
+        // XXXXXXXXXXXXX
+/*
+        generic.base_host_url = "https://devvm";
+        generic.alt_host_replace = generic.base_host_url;
+        generic.alt_host_url = generic.alt_host_replace;
+*/
     }
 
     /** Login session settings. */
@@ -3426,3 +3433,7 @@ var spideroak = function () {
 
 // Report that the app is ready:
 so_init_manager.ready('app');
+
+//Local variables:
+//js-indent-level: 4
+//End:

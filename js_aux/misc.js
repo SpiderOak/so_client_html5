@@ -303,7 +303,7 @@ function get_keychain() {
         return keychain = cordova.require("cordova/plugin/keychain");
     } else if (SO_DEBUGGING) {
         var msg = "Using INSECURE keychain stub - localStorage";
-        alert(msg);
+        toastish(msg, 10000);
         blather(msg);
         return keychain = new keychain_stub();
     } else {
